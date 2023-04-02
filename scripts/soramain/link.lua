@@ -32,14 +32,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 -- 如果他优先级比我高 这一段生效
 for k, mod in pairs(ModManager.mods) do -- 遍历已开启的mod
     if mod and rawget(mod, "SHOWME_STRINGS") then -- 因为showme的modmain的全局变量里有 SHOWME_STRINGS 所以有这个变量的应该就是showme
-        if mod.postinitfns and mod.postinitfns.PrefabPostInit and
-            mod.postinitfns.PrefabPostInit.treasurechest then -- 是的 箱子的寻物已经加上去了
-            mod.postinitfns.PrefabPostInit.sora2ice =
-                mod.postinitfns.PrefabPostInit.treasurechest -- 给我整一个！
-            mod.postinitfns.PrefabPostInit.sora2fire =
-                mod.postinitfns.PrefabPostInit.treasurechest -- 给我也整一个！
-            mod.postinitfns.PrefabPostInit.sora2chest =
-                mod.postinitfns.PrefabPostInit.treasurechest -- 给我也整一个！
+        if mod.postinitfns and mod.postinitfns.PrefabPostInit and mod.postinitfns.PrefabPostInit.treasurechest then -- 是的 箱子的寻物已经加上去了
+            mod.postinitfns.PrefabPostInit.sora2ice = mod.postinitfns.PrefabPostInit.treasurechest -- 给我整一个！
+            mod.postinitfns.PrefabPostInit.sora2fire = mod.postinitfns.PrefabPostInit.treasurechest -- 给我也整一个！
+            mod.postinitfns.PrefabPostInit.sora2chest = mod.postinitfns.PrefabPostInit.treasurechest -- 给我也整一个！
         end
     end
 end
@@ -51,11 +47,9 @@ TUNING.MONITOR_CHESTS.sora2chest = true
 
 -- 兼容沙雕旧版GPS
 for k, mod in pairs(ModManager.mods) do -- 遍历已开启的mod
-    if mod and rawget(mod, "OldTargetIndicatorOnUpdate") and
-        mod.modinfo.priority == -1000 and mod.modinfo.icon ==
+    if mod and rawget(mod, "OldTargetIndicatorOnUpdate") and mod.modinfo.priority == -1000 and mod.modinfo.icon ==
         "GlobalPositionsIcon.tex" then -- 可能是GPS
-        if next(mod.postinitfns.PrefabPostInitAny) == nil and
-            mod.postinitfns.PrefabPostInit.wilson then -- 可能是老版本
+        if next(mod.postinitfns.PrefabPostInitAny) == nil and mod.postinitfns.PrefabPostInit.wilson then -- 可能是老版本
             local postinitfn = mod.postinitfns.PrefabPostInit.wilson[1] -- 提取postinit
             for k, v in pairs(mod.postinitfns.PrefabPostInit) do -- 消除原有的
                 if k and v and v[1] and v[1] == postinitfn then
@@ -78,13 +72,10 @@ AddComponentPostInit("knownfoods", function(self)
     local oldafterload = self.OnAfterLoad
     self.OnAfterLoad = function(self, config, ...)
         oldafterload(self, config, ...)
-        if cooking.recipes and cooking.recipes.cookpot and
-            cooking.recipes.portablecookpot then
+        if cooking.recipes and cooking.recipes.cookpot and cooking.recipes.portablecookpot then
             for k, v in pairs(self._knownfoods) do
-                if k and v and v.cookername and type(k) == "string" and
-                    type(v.cookername) == "string" then
-                    if v.cookername ~= "portablecookpot" and
-                        cooking.recipes.portablecookpot[k] then
+                if k and v and v.cookername and type(k) == "string" and type(v.cookername) == "string" then
+                    if v.cookername ~= "portablecookpot" and cooking.recipes.portablecookpot[k] then
                         v.cookername = "portablecookpot"
                     end
                     if v.cookername ~= "cookpot" and cooking.recipes.cookpot[k] then
@@ -97,15 +88,12 @@ AddComponentPostInit("knownfoods", function(self)
 end)
 
 if IsMythEnable() then
-    STRINGS.CHARACTERS.SORA.DESCRIBE.MYTH_FOOD_ZPD =
-        "呜呜,我才不要吃这个"
+    STRINGS.CHARACTERS.SORA.DESCRIBE.MYTH_FOOD_ZPD = "呜呜,我才不要吃这个"
     local function TryToUnlockSkill(inst, data)
         if data.food and data.food.prefab == "sora_banhua" then -- 吃花花学仙术
-            if not inst.components.builder:KnowsRecipe(
-                "myth_flyskill_sora" .. rec_back) then
+            if not inst.components.builder:KnowsRecipe("myth_flyskill_sora" .. rec_back) then
                 inst.components.talker:Say("恰花花,学仙术")
-                inst.components.builder:UnlockRecipe(
-                    "myth_flyskill_sora" .. rec_back)
+                inst.components.builder:UnlockRecipe("myth_flyskill_sora" .. rec_back)
             end
         end
     end
@@ -119,34 +107,34 @@ if IsMythEnable() then
         inst:DoTaskInTime(0, function(i)
             if i.replica and i.replica.builder then
                 local oldKnowsRecipe = i.replica.builder.KnowsRecipe
-                i.replica.builder.KnowsRecipe =
-                    function(self, name, ...)
-                        if type(name) == "table" then
-                            name = name.name
-                        end
-                        if name == ("myth_flyskill" .. rec_back) and
-                            self.inst:HasTag("sora") then
-                            return false
-                        end
-                        if name == "myth_flyskill" and
-                            self.inst:HasTag("soraflyer") then
-                            return false
-                        end
-                        return oldKnowsRecipe(self, name, ...)
+                i.replica.builder.KnowsRecipe = function(self, name, ...)
+                    if type(name) == "table" then
+                        name = name.name
                     end
+                    if name == ("myth_flyskill" .. rec_back) and self.inst:HasTag("sora") then
+                        return false
+                    end
+                    if name == "myth_flyskill" and self.inst:HasTag("soraflyer") then
+                        return false
+                    end
+                    return oldKnowsRecipe(self, name, ...)
+                end
             end
-            if i:HasTag("sora") then return end
+            if i:HasTag("sora") then
+                return
+            end
             i:ListenForEvent("unlockrecipe", function(p, data)
                 if data and data.recipe and data.recipe == "myth_flyskill" then
-                    p.components.builder:UnlockRecipe(
-                        "myth_flyskill" .. rec_back)
+                    p.components.builder:UnlockRecipe("myth_flyskill" .. rec_back)
                 end
             end)
         end)
 
     end)
     AddLaterFn(function()
-        local function helperfn() return SpawnPrefab("myth_flyskill_pg") end
+        local function helperfn()
+            return SpawnPrefab("myth_flyskill_pg")
+        end
         local prefabname = "myth_flyskill_sora"
         local prefab = GLOBAL.Prefab(prefabname, helperfn, PlayerAssets)
         RegisterPrefabs(prefab)
@@ -154,13 +142,9 @@ if IsMythEnable() then
         AddPrefabPostInit("sora", function(i)
             if TheWorld.ismastersim then
                 i.Myth_Learn_Skill = function(ii)
-                    if ii.components.builder and
-                        ii.components.builder:CanLearn(
-                            "myth_flyskill_sora" .. rec_back) and
-                        not ii.components.builder:KnowsRecipe(
-                            "myth_flyskill_sora" .. rec_back) then
-                        ii.components.builder:UnlockRecipe(
-                            "myth_flyskill_sora" .. rec_back)
+                    if ii.components.builder and ii.components.builder:CanLearn("myth_flyskill_sora" .. rec_back) and
+                        not ii.components.builder:KnowsRecipe("myth_flyskill_sora" .. rec_back) then
+                        ii.components.builder:UnlockRecipe("myth_flyskill_sora" .. rec_back)
 
                     end
                 end
@@ -169,8 +153,7 @@ if IsMythEnable() then
         end)
 
         if myth_flyskill_soraflyer then
-            myth_flyskill_soraflyer.atlas =
-                "images/inventoryimages/myth_flyskill.xml"
+            myth_flyskill_soraflyer.atlas = "images/inventoryimages/myth_flyskill.xml"
             myth_flyskill_soraflyer.image = "myth_flyskill.tex"
             myth_flyskill_soraflyer.tab = AllRecipes.myth_flyskill.tab
         end
@@ -197,10 +180,14 @@ if IsMythEnable() then
             fs:SetMyCloud(data)
         else
             local t = up.Get(fs.SetFlying, "FlyConfig")
-            if t then t:AddData(data) end
+            if t then
+                t:AddData(data)
+            end
         end
         local t = up.Get(ACTIONS.READ_FLY_BOOK.fn, "skills", "mythhouse")
-        if t then t.sora = {"myth_flyskill_sora" .. rec_back} end
+        if t then
+            t.sora = {"myth_flyskill_sora" .. rec_back}
+        end
     end)
 end
 -- 太真兼容
@@ -240,38 +227,32 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
         local fixdish_farewellcupcake = function(inst)
             if inst.components.edible and inst.components.edible.oneaten then
                 local a = inst.components.edible.oneaten
-                inst.components.edible.oneaten =
-                    function(i, eater, ...)
-                        if eater and eater:HasTag("sora") then
-                            local feeder =
-                                eater.sg and eater.sg.statemem and
-                                    eater.sg.statemem.feeder
+                inst.components.edible.oneaten = function(i, eater, ...)
+                    if eater and eater:HasTag("sora") then
+                        local feeder = eater.sg and eater.sg.statemem and eater.sg.statemem.feeder
 
-                            if feeder then
-                                return a(i, feeder, ...)
-                            else
-                                return
-                            end
+                        if feeder then
+                            return a(i, feeder, ...)
+                        else
+                            return
                         end
-                        return a(i, eater, ...)
                     end
+                    return a(i, eater, ...)
+                end
             end
         end
 
-        local modprefabinitfns = up.Get(SpawnPrefabFromSim, "modprefabinitfns",
-                                        "mainfunctions.lua")
+        local modprefabinitfns = up.Get(SpawnPrefabFromSim, "modprefabinitfns", "mainfunctions.lua")
         if modprefabinitfns then
             AddSimPostInit(function()
                 for k, v in pairs(GLOBAL.Prefabs) do
                     if k and
-                        (k:match("dish_farewellcupcake") or
-                            k:match("explodingfruitcake") or
+                        (k:match("dish_farewellcupcake") or k:match("explodingfruitcake") or
                             k:match("dish_friedfishwithpuree")) then
                         if not modprefabinitfns[k] then
                             modprefabinitfns[k] = {}
                         end
-                        table.insert(modprefabinitfns[k],
-                                     fixdish_farewellcupcake)
+                        table.insert(modprefabinitfns[k], fixdish_farewellcupcake)
                     end
                 end
             end)
@@ -279,32 +260,27 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
         end
     end
 end
-if IsModEnable("taizhen") or IsModEnable("太真") or IsModEnable("2066838067") or
-    IsModEnable("2199027653598516676") then
+if IsModEnable("taizhen") or IsModEnable("太真") or IsModEnable("2066838067") or IsModEnable("2199027653598516676") then
     if TheNet:GetIsServer() then
         local fixghost_holly_dai = function(inst)
             if inst.components.edible and inst.components.edible.oneaten then
                 local a = inst.components.edible.oneaten
-                inst.components.edible.oneaten =
-                    function(i, eater, ...)
-                        if eater and eater:HasTag("sora") then
-                            local feeder =
-                                eater.sg and eater.sg.statemem and
-                                    eater.sg.statemem.feeder
+                inst.components.edible.oneaten = function(i, eater, ...)
+                    if eater and eater:HasTag("sora") then
+                        local feeder = eater.sg and eater.sg.statemem and eater.sg.statemem.feeder
 
-                            if feeder then
-                                return a(i, feeder, ...)
-                            else
-                                return
-                            end
+                        if feeder then
+                            return a(i, feeder, ...)
+                        else
+                            return
                         end
-                        return a(i, eater, ...)
                     end
+                    return a(i, eater, ...)
+                end
             end
         end
 
-        local modprefabinitfns = up.Get(SpawnPrefabFromSim, "modprefabinitfns",
-                                        "mainfunctions.lua")
+        local modprefabinitfns = up.Get(SpawnPrefabFromSim, "modprefabinitfns", "mainfunctions.lua")
         if modprefabinitfns then
             AddSimPostInit(function()
                 for k, v in pairs(GLOBAL.Prefabs) do
@@ -325,14 +301,13 @@ if IsModEnable("Element Reaction") or IsModEnable("元素反应") then
     AddPrefabPostInit("sora", function(inst)
         inst:AddTag("cryo")
         if TheNet:GetIsServer() then
-            inst.components.combat.overrideattackkeyfn =
-                function() return "cryo" end
+            inst.components.combat.overrideattackkeyfn = function()
+                return "cryo"
+            end
             local old = inst.components.combat.DoAttack
             inst.components.combat.DoAttack =
-                function(self, targ, weapon, projectile, stimuli, instancemult,
-                         attackkey, ...)
-                    return old(self, targ, weapon, projectile,
-                               stimuli or "cryo", instancemult, attackkey, ...)
+                function(self, targ, weapon, projectile, stimuli, instancemult, attackkey, ...)
+                    return old(self, targ, weapon, projectile, stimuli or "cryo", instancemult, attackkey, ...)
                 end
         end
     end)
@@ -340,14 +315,11 @@ if IsModEnable("Element Reaction") or IsModEnable("元素反应") then
         AddComponentPostInit("bundler", function(self)
             local old = self.OnFinishBundling
             self.OnFinishBundling = function(self, ...)
-                if self.wrappedprefab == "sora3packer" and self.bundlinginst and
-                    self.bundlinginst.components.container then
+                if self.wrappedprefab == "sora3packer" and self.bundlinginst and self.bundlinginst.components.container then
                     local items = {}
                     local t = true
                     for i = 1, self.bundlinginst.components.container:GetNumSlots() do
-                        local item =
-                            self.bundlinginst.components.container:GetItemInSlot(
-                                i)
+                        local item = self.bundlinginst.components.container:GetItemInSlot(i)
                         if item ~= nil then
                             t = t and item:HasTag("artifacts")
                             table.insert(items, item)
@@ -366,3 +338,31 @@ if IsModEnable("Element Reaction") or IsModEnable("元素反应") then
     end
 end
 
+if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
+    -- 有人欺负我老婆
+    AddPrefabPostInit("sora", function(inst)
+        if TheWorld.ismastersim then
+            local oldGetAttacked = inst.components.combat.GetAttacked
+            inst.components.combat.GetAttacked = function(self, doer, dam, cause, ...)
+                if dam > 2000 and
+                    (not doer or doer:HasTag("elaina") or not doer:HasTag("epic") or not doer:HasTag("monster")) then
+                    -- 收到超过2000点 非boss 非怪物的伤害 伊蕾娜 你看着办吧 
+                    if doer then
+                        if doer:HasTag("elaina") then -- 肯定是你自己打偏了！
+                            return doer.components.combat:GetAttacked(doer, dam, cause, ...)
+                        end
+                    else
+                        local eln = FindClosestEntity(self.inst, 30, {"elaina"}) -- 魔女姐姐你离我这么近 会保护我的对吧
+                        return eln.components.combat:GetAttacked(doer, dam, cause, ...)
+                    end
+                    return -- 无事发生
+                end
+                if doer and doer:HasTag("elaina") then
+                    return -- 无事发生
+                end
+                return oldGetAttacked(self, doer, dam, cause, ...)
+            end
+        end
+    end)
+
+end
