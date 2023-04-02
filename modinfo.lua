@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "11.24.0" -- 版本
+version = "11.24.1" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -97,7 +97,7 @@ icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
 -- MOD标签
-server_filter_tags = {"character", "sora", "Sora"}
+server_filter_tags = {"character", "sora", "Sora","qiong","xiaoqiong","穹","小穹","春日野穹","Kasugano","KasuganoSora"}
 string = string or ""
 local pre_name
 local pre_lable
