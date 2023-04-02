@@ -130,7 +130,10 @@ end
 STRINGS.NAMES.SORA_FL = "风铃草"
 local function helperfn()
     local inst = CreateEntity()
+    inst:AddTransform()
+    inst:AddAnimState()
+    inst:AddPhysics()
     inst:DoTaskInTime(0,inst.Remove)
-
+    return inst
 end
 return Prefab("sora_fl", fn, assets),Prefab("sora_flh_helper",helperfn,assets),MakePlacer("sora_fl_place","sora_fl","sora_fl","idle_flower")
