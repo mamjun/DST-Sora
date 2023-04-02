@@ -56,7 +56,4 @@ return      --非官方部分 手动维护
         SAME_OLD_5 = "呕~",
 		TASTY = "吃起来很不错",
     },
-    DESCRIBE ={
-        
-        }
 }

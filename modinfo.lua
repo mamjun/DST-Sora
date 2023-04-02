@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "11.23" -- 版本
+version = "11.24.0" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -70,17 +70,23 @@ local plat = folder_name and
                  ((folder_name:match("19351") and 1) or
                      (folder_name:match("24235") and 2) or
                      (folder_name:match("45075") and 3) or
-                     (folder_name:match("^sorav") and -1)) or 0
+                     (folder_name:match("^sorav") and -1)or
+                     (folder_name:match("^sora%-dev") and -1)) or 0
 if plat == 1 then
     mod_dependencies = {{workshop = "workshop-2199027653598529357"}}
 elseif plat == 2 then
     mod_dependencies = {{workshop = "workshop-2384660166"}}
 elseif plat == 3 then
     name = name .. " Beta"
+elseif plat == -1 then
+    name = name .. " Dev"
+    version = version .. "-dev"
+    description = '当前版本：' .. version 
 elseif plat == 0 then
     -- 给爷爬
     mod_dependencies = {{workshop = "workshop-238466016611"}}
 end
+
 dont_starve_compatible = false
 reign_of_giants_compatible = false
 
