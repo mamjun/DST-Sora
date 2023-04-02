@@ -46,15 +46,16 @@ function(self,owner)
     
 	self.expstr:SetHAnchor(1)  
 	self.expstr:SetVAnchor(2)  
-	self.expstr:SetPosition(100,30,0)   
+	self.expstr:SetPosition(100,60,0)   
 	self.expstr:MoveToFront()
 	self.expstr.exp = owner.soraexp:value() 
+    self.expstr.expper = owner.soraexpper:value() 
 	self.expstr.expmax = owner.soraexpmax:value() 
 	self.expstr.level = owner.soralevel:value() 
     self.cd = SoraCD(60)
     self.expstr:SetOnClick(function() 
         if self.cd() and (self.down or 0 )< 2 then
-            TheNet:Say("我现在"..self.expstr.level.."级",false)
+            TheNet:Say("我现在"..self.expstr.level.."级 "..self.expstr.expper.."%经验",false)
         end
         self.down = nil
         self.wikichange = nil
@@ -73,17 +74,15 @@ function(self,owner)
         end
     end)
 	self:StartUpdating()
-	owner:ListenForEvent("soraexpdirty",function(owner,data)     self.expstr.exp = owner.soraexp:value() 
+	owner:ListenForEvent("soraexpdirty",function(owner,data)     
 	self.expstr.level = owner.soralevel:value() 
-	self.expstr.expmax = owner.soraexpmax:value() 
+    self.expstr.expper = owner.soraexpper:value() 
 	end )
 	end
 	)
 function SoraExp:OnUpdate(dt)
-	local str = "当前等级:LV"..self.expstr.level
-    if TUNING.FLDEBUGCOMMAND then   
-    --str = str.."\r\n".."当前经验："..self.expstr.exp.."/"..self.expstr.expmax
-    end
+	local str = "当前等级:LV"..self.expstr.level  
+    str = str.."\r\n".."当前经验："..self.expstr.expper .. "%"
 	self.expstr:SetText(str)
 end
 

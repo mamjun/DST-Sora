@@ -38,5 +38,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 	--print ("Sora->LoadConfig")
 	soraconfig = {}
 	for k,v in pairs (load) do
-		require ("config/"..v)
+		soraconfig [v] =  require ("config/"..v)
 	end
+	soraconfig.level = soraconfig.soralevelup
+	return soraconfig
