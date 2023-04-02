@@ -82,7 +82,7 @@ function(self,owner)
 	)
 function SoraExp:OnUpdate(dt)
 	local str = "当前等级:LV"..self.expstr.level  
-    str = str.."\r\n".."当前经验："..self.expstr.expper .. "%"
+    str = str.."\r\n".."大概经验："..self.expstr.expper .. "%"
 	self.expstr:SetText(str)
 end
 
