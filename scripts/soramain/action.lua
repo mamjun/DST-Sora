@@ -275,6 +275,30 @@ AddComponentAction("ISVALID", "sorabind",UnBind)
   --                              ACTIONS.SORABIND, "dolongaction"))
 --AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(
     --                            ACTIONS.SORABIND, "dolongaction"))
+
+
+-- 圣诞树领取礼物
+local SORAWQLEVELUP = GLOBAL.Action({priority = 999})
+SORAWQLEVELUP.id = "SORAWQLEVELUP"
+SORAWQLEVELUP.str = "精炼"
+SORAWQLEVELUP.fn = function(act)
+    if act.target ~= nil and act.target.components.sorawq ~= nil then
+        act.target.components.sorawq:LevelUp(act.doer,act.invobject)
+    end
+    return true
+end
+
+AddAction(SORAWQLEVELUP)
+AddComponentAction("USEITEM", "sorawq", function(inst, doer,target, actions, right)
+    if right and inst and inst:HasTag("sorawqlevelup") and target and target:HasTag("sorawqlevelup") then
+        table.insert(actions, ACTIONS.SORAWQLEVELUP)
+    end
+end)
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(
+                               ACTIONS.SORAWQLEVELUP, "dolongaction"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(
+                               ACTIONS.SORAWQLEVELUP, "dolongaction"))
     
     
 

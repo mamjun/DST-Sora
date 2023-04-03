@@ -27,67 +27,85 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local assets =
-{
-    Asset("ANIM", "anim/sora_wq.zip"),
-    Asset("ATLAS", "images/inventoryimages/sora_wq.xml"),
-    Asset("IMAGE", "images/inventoryimages/sora_wq.tex"),
-    Asset("ATLAS_BUILD", "images/inventoryimages/sora_wq.xml", 256)
-}
+]] local assets = {Asset("ANIM", "anim/sora_wq.zip"), Asset("ATLAS", "images/inventoryimages/sora_wq.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sora_wq.tex"),
+                   Asset("ATLAS", "images/inventoryimages/sorawqlevel.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sorawqlevel.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora_wq.xml", 256)}
 
 local function onattack(inst, attacker, target)
 
-
 end
-local function onequip(inst, owner) 
+local function onequip(inst, owner)
 
     owner.AnimState:OverrideSymbol("swap_object", "sora_wq", "swap_wq")
-    owner.AnimState:Show("ARM_carry") 
+    owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
-    
+
 end
 
-local function onunequip(inst, owner) 
-    owner.AnimState:Hide("ARM_carry") 
+local function onunequip(inst, owner)
+    owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 end
 local function fn()
-	local inst = CreateEntity()
-	local trans = inst.entity:AddTransform()
-	local anim = inst.entity:AddAnimState()
+    local inst = CreateEntity()
+    local trans = inst.entity:AddTransform()
+    local anim = inst.entity:AddAnimState()
     MakeInventoryPhysics(inst)
-	inst.entity:AddNetwork() 
-	inst:AddTag("aquatic")
-	inst:AddTag("waterproofer")
+    inst.entity:AddNetwork()
+    inst:AddTag("aquatic")
+    inst:AddTag("waterproofer")
     anim:SetBank("sora_wq")
     anim:SetBuild("sora_wq")
     anim:PlayAnimation("idle")
-	inst.entity:AddMiniMapEntity()
-	inst.MiniMapEntity:SetIcon("sora_wq.tex")
-	if not TheWorld.ismastersim then
+    inst.entity:AddMiniMapEntity()
+    inst.MiniMapEntity:SetIcon("sora_wq.tex")
+    inst.inv_image_bg = {
+        image = "1.tex"
+    }
+    inst.inv_image_bg.atlas = softresolvefilepath("images/inventoryimages/sorawqlevel.xml")
+    inst.invbg = net_int(inst.GUID, "invbg", "invbgdirty")
+    if not TheNet:IsDedicated() then
+
+        inst:ListenForEvent("invbgdirty", function(i)
+            inst.inv_image_bg.image = math.min(math.max(inst.invbg:value(), 1), 5) .. ".tex"
+            inst:PushEvent("imagechange")
+        end)
+        
+    end
+    if not TheWorld.ismastersim then
         return inst
     end
-	
-    inst:AddComponent("inspectable")
-    inst.components.inspectable:SetDescription([[]])
-    inst:AddComponent("inventoryitem")
-	inst.components.inventoryitem.atlasname = "images/inventoryimages/sora_wq.xml"
-	inst.components.inventoryitem.imagename = "sora_wq"
-	inst:AddComponent("waterproofer")
-    inst.components.waterproofer:SetEffectiveness(0)
-	inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip( onequip )
-    inst.components.equippable:SetOnUnequip( onunequip )
-	
-	inst.components.equippable.walkspeedmult = 1.1
+    inst:AddComponent("sorawq")
+    inst:ListenForEvent("sorawqlevelchange", function(i)
 
-	inst:AddComponent("weapon")
-	inst.components.weapon:SetDamage(68)
-	inst.components.weapon:SetRange(2)
-	inst.components.weapon:SetOnAttack(onattack)
-	
+        inst.components.inspectable:SetDescription("精炼等级:" .. inst.components.sorawq.level .. [[ 
+闪烁着凄烈紫光的太刀。
+名之为「回光」是因为一度破碎的过去。]])
+        inst.invbg:set(inst.components.sorawq.level)
+    end)
+
+    inst:AddComponent("inspectable")
+    inst.components.inspectable:SetDescription("")
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora_wq.xml"
+    inst.components.inventoryitem.imagename = "sora_wq"
+
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(0)
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(onequip)
+    inst.components.equippable:SetOnUnequip(onunequip)
+
+    inst.components.equippable.walkspeedmult = 1.25
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(68)
+    inst.components.weapon:SetRange(2)
+    inst.components.weapon:SetOnAttack(onattack)
+
     return inst
 end
-RegisterInventoryItemAtlas("images/inventoryimages/sora_wq.xml","sora_wq.tex")
-return	Prefab( "sora_wq", fn, assets)
+RegisterInventoryItemAtlas("images/inventoryimages/sora_wq.xml", "sora_wq.tex")
+return Prefab("sora_wq", fn, assets)

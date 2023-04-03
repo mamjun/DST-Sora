@@ -49,6 +49,19 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         GHOST = "小穹，你怎么了",
     }
     strings.SORASTRING = {NAMES={},DESCRIBE={},RECIPE_DESC={},ACTIONFAIL={}}
+    local SORASTRING = strings.SORASTRING
+    local NAMES = SORASTRING.NAMES
+    local DESCRIBE = SORASTRING.DESCRIBE
+    local RECIPE_DESC = SORASTRING.RECIPE_DESC
+    local ACTIONFAIL = SORASTRING.ACTIONFAIL
+    NAMES.SORA_WQ = "雾切之回光"
+    ACTIONFAIL.SORAWQLEVELUP  = {
+        ERRLEVEL = "武器不正确",
+        ERRWQ = "不能用这个精炼",
+        MAXLEVEL = "这个已经满精炼了",
+        TARGETMAXLEVEL ="目标已经满精炼了",
+    }
+
     copytotable(STRINGS,strings)
     local function toupper(str)
         if str and type(str) == "string" then return str:upper() end
@@ -86,11 +99,11 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     
     for k, v in pairs(STRINGS.SORASTRING.DESCRIBE) do
         STRINGS.CHARACTERS.GENERIC.DESCRIBE[k] = v
-        STRINGS.CHARACTERS.ONIKIRI.DESCRIBE[k] = v
+        STRINGS.CHARACTERS.SORA.DESCRIBE[k] = v
     end
     
     for k, v in pairs(STRINGS.SORASTRING.RECIPE_DESC) do STRINGS.RECIPE_DESC[k] = v end
     for k, v in pairs(STRINGS.SORASTRING.ACTIONFAIL) do
-        STRINGS.CHARACTERS.ONIKIRI.ACTIONFAIL[k] = v
+        STRINGS.CHARACTERS.SORA.ACTIONFAIL[k] = v
         STRINGS.CHARACTERS.GENERIC.ACTIONFAIL[k] = v
     end
