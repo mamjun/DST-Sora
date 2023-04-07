@@ -34,7 +34,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local com = Class(function(self, inst)
     self.inst = inst
     self.link = false
-    local items = {"soratele","sorapick","soramagic","sorahealing","soraclothes","sorahat","sorabowknot"}
+    local items = {"soratele","sorapick","soramagic","sorahealing","soraclothes","sorahat","sorabowknot","sora_wq"}
     self.item = items[math.random(1,#items)]
     inst:DoTaskInTime(0,function()
         self:Init()
@@ -86,7 +86,11 @@ function com:Link(doer)
         e = e + doer.components.age:GetAgeInDays()* 20
     end
     doer:GetExp(e,"sorabind",nil,true)
-    doer.components.inventory:GiveItem(SpawnPrefab(self.item))
+    local item = SpawnPrefab(self.item)
+    if item.components.sorawq then
+        item.components.sorawq.str = doer.userid or "unknow"
+    end
+    doer.components.inventory:GiveItem(item)
     self.inst:RemoveTag("soranotlink")
     self.link = true
 end

@@ -749,7 +749,22 @@ AddPlayerPostInit(function(inst)
     inst:DoTaskInTime(0, function() SoraUpdate:TryToUpdate() end)
 
 end)
-
+AddComponentPostInit("combat",function (self)
+    local oldGetAttacked = self.GetAttacked
+    self.GetAttacked = function(s,attacker, damage, weapon, stimuli,...)
+        local olddamagetobreak 
+        if weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
+            olddamagetobreak = s.inst.components.freezable.damagetobreak
+            s.inst.components.freezable.damagetobreak = damage * 100000
+        end
+        local x,y,z = oldGetAttacked(s,attacker, damage, weapon, stimuli,...)
+        if olddamagetobreak  and weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
+             s.inst.components.freezable.damagetobreak =olddamagetobreak
+        end
+        return x,y,z
+    end
+    
+end)
 -- local hook1
 -- hook1 = userdata.MakeHook("AnimState","SetBuild",function(x,y,z)
 -- local args = hook1.args

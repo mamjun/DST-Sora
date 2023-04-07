@@ -33,20 +33,79 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
                    Asset("IMAGE", "images/inventoryimages/sorawqlevel.tex"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sora_wq.xml", 256)}
 
-local function onattack(inst, attacker, target)
+local function OnLevelChange(inst,data)
+    -- body
+    local level = data and data.level or inst.components.sorawq and inst.components.sorawq.level or 1
+    inst.areaattack = 1 + 0.2*level 
+    inst.heal  = 1+0.2 * level
+    inst.ice = 1+0.2 * level
+    inst.damageup = 1.3 + 0.1 *level
+    if inst.owner then
+        local owner = inst.owner
+        owner.components.combat.externaldamagemultipliers:SetModifier("sora_wq",inst.damageup)
+        if owner.components.combat.external_critical_damage_multipliers then
+            owner.components.combat.external_critical_damage_multipliers:SetModifier(inst, 0.442, "sora_wq")
+            owner.components.combat.external_pyro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+            owner.components.combat.external_cryo_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+            owner.components.combat.external_hydro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+            owner.components.combat.external_electro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+            owner.components.combat.external_anemo_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+            owner.components.combat.external_geo_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+            owner.components.combat.external_dendro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+        end
+    end
 
+   
+end
+local function attackfn(target,player)
+    if not player.sorawqattack then return true end
+    if target.components.freezable ~= nil then
+        target.components.freezable:AddColdness(player.sorawqattack.ice)
+        target.components.freezable:SpawnShatterFX()
+    end
+    if  player.components.health then
+        player.components.health:DoDelta(player.sorawqattack.heal)
+    end
+    return true
+end
+local function onattack(inst, attacker, target)
+    attacker.sorawqattack = {heal = inst.heal,ice=inst.ice}
+    attackfn(target,attacker)
+    attacker.components.combat:DoAreaAttack(target,inst.areaattack,inst,attackfn,"cryo",{"player", "companion","wall","sora2lm"})
 end
 local function onequip(inst, owner)
-
+    inst.owner = owner
     owner.AnimState:OverrideSymbol("swap_object", "sora_wq", "swap_wq")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
-
+    owner.components.combat.externaldamagemultipliers:SetModifier("sora_wq",inst.damageup)
+    if owner.components.combat.external_critical_damage_multipliers then
+        owner.components.combat.external_critical_damage_multipliers:SetModifier(inst, 0.442, "sora_wq")
+        owner.components.combat.external_pyro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+        owner.components.combat.external_cryo_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+        owner.components.combat.external_hydro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+        owner.components.combat.external_electro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+        owner.components.combat.external_anemo_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+        owner.components.combat.external_geo_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+        owner.components.combat.external_dendro_multipliers:SetModifier(inst, 0.3+0.1*inst.components.sorawq.level, "sora_wq")
+    end
 end
 
 local function onunequip(inst, owner)
+    inst.owner = nil
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
+    owner.components.combat.externaldamagemultipliers:SetModifier("sora_wq")
+    if owner.components.combat.external_critical_damage_multipliers then
+        owner.components.combat.external_critical_damage_multipliers:RemoveModifier(inst)
+        owner.components.combat.external_pyro_multipliers:RemoveModifier(inst, "sora_wq")
+        owner.components.combat.external_cryo_multipliers:RemoveModifier(inst, "sora_wq")
+        owner.components.combat.external_hydro_multipliers:RemoveModifier(inst, "sora_wq")
+        owner.components.combat.external_electro_multipliers:RemoveModifier(inst, "sora_wq")
+        owner.components.combat.external_anemo_multipliers:RemoveModifier(inst, "sora_wq")
+        owner.components.combat.external_geo_multipliers:RemoveModifier(inst, "sora_wq")
+        owner.components.combat.external_dendro_multipliers:RemoveModifier(inst, "sora_wq")
+    end
 end
 local function fn()
     local inst = CreateEntity()
@@ -62,17 +121,48 @@ local function fn()
     inst.entity:AddMiniMapEntity()
     inst.MiniMapEntity:SetIcon("sora_wq.tex")
     inst.inv_image_bg = {
-        image = "1.tex"
+        image = "sorawqlevel_1.tex"
     }
     inst.inv_image_bg.atlas = softresolvefilepath("images/inventoryimages/sorawqlevel.xml")
     inst.invbg = net_int(inst.GUID, "invbg", "invbgdirty")
+
+    inst:AddTag("subtextweapon")
+    inst.subtext = "crit_dmg"
+    inst.subnumber = "44.2%"
+    --inst.description = "雾切御腰物\n·获得40%/50%/60%/70%/80%全元素伤害加成。\n获得40%/50%/60%/70%/80%伤害增加\n普攻附加冻元素\n普攻回复生命值\n普攻附加溅射伤害"
+    inst.description = {
+		"雾切御腰物\n·获得40%全元素伤害加成。\n获得40%伤害增加\n普攻附加冻元素\n普攻回复生命值\n普攻附加溅射伤害",
+		"雾切御腰物\n·获得50%全元素伤害加成。\n获得50%伤害增加\n普攻附加冻元素\n普攻回复生命值\n普攻附加溅射伤害",
+		"雾切御腰物\n·获得60%全元素伤害加成。\n获得60%伤害增加\n普攻附加冻元素\n普攻回复生命值\n普攻附加溅射伤害",
+		"雾切御腰物\n·获得70%全元素伤害加成。\n获得70%伤害增加\n普攻附加冻元素\n普攻回复生命值\n普攻附加溅射伤害",
+		"雾切御腰物\n·获得80%全元素伤害加成。\n获得80%伤害增加\n普攻附加冻元素\n普攻回复生命值\n普攻附加溅射伤害",
+	}
+    inst.weaponscreen_override = {
+        build = "sora_wq",
+        folder = "swap_wq",
+    }
+    inst.replica.refineable = {
+        _current_level = 1,
+        GetCurrentLevel = function(i) return i._current_level end,
+        GetIngredient = function(i) return "sora_wq" end,
+        GetImage = function(i) return "sora_wq" end,
+        GetAtlas = function(i) return GetInventoryItemAtlas("sora_wq.tex") end,
+        GetMaxLevel = function(i) return 5 end,
+        Refine  = function(i,level) if inst.components.sorawq then
+            inst.components.sorawq:Refine(level)
+        end 
+    end,
+    }
+ 
+    inst.components.refineable = inst.replica.refineable
     if not TheNet:IsDedicated() then
 
         inst:ListenForEvent("invbgdirty", function(i)
-            inst.inv_image_bg.image = math.min(math.max(inst.invbg:value(), 1), 5) .. ".tex"
+            inst.inv_image_bg.image = "sorawqlevel_"..math.clamp(inst.invbg:value(), 1, 5) .. ".tex"
             inst:PushEvent("imagechange")
+            inst.replica.refineable._current_level = math.clamp(inst.invbg:value(), 1, 5)
         end)
-        
+
     end
     if not TheWorld.ismastersim then
         return inst
@@ -104,7 +194,8 @@ local function fn()
     inst.components.weapon:SetDamage(68)
     inst.components.weapon:SetRange(2)
     inst.components.weapon:SetOnAttack(onattack)
-
+    OnLevelChange(inst,{level=1})
+    inst:ListenForEvent("sorawqlevelchange",OnLevelChange)
     return inst
 end
 RegisterInventoryItemAtlas("images/inventoryimages/sora_wq.xml", "sora_wq.tex")

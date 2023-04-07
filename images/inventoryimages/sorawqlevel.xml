@@ -1,7 +1,7 @@
 <Atlas><Texture filename="sorawqlevel.tex" /><Elements>
-<Element name="4.tex" u1="0.0" u2="0.25" v1="0.00" v2="0.25" />
-<Element name="3.tex" u1="0.0" u2="0.25" v1="0.25" v2="0.5" />
-<Element name="2.tex" u1="0.0" u2="0.25" v1="0.50" v2="0.75" />
-<Element name="1.tex" u1="0.0" u2="0.25" v1="0.75" v2="1.0" />
-<Element name="5.tex" u1="0.25" u2="0.50" v1="0.75" v2="1.0" />
+<Element name="sorawqlevel_4.tex" u1="0.0" u2="0.25" v1="0.00" v2="0.25" />
+<Element name="sorawqlevel_3.tex" u1="0.0" u2="0.25" v1="0.25" v2="0.5" />
+<Element name="sorawqlevel_2.tex" u1="0.0" u2="0.25" v1="0.50" v2="0.75" />
+<Element name="sorawqlevel_1.tex" u1="0.0" u2="0.25" v1="0.75" v2="1.0" />
+<Element name="sorawqlevel_5.tex" u1="0.25" u2="0.50" v1="0.75" v2="1.0" />
 </Elements></Atlas>

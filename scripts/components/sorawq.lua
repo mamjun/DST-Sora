@@ -31,16 +31,27 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local c = Class(function(self, inst)
     self.inst = inst
     self.level = 1
+    self.str = nil
     inst:AddTag("sorawqlevelup")
+    inst:DoTaskInTime(0,function(i)
+        if not i.components.sorawq.str then
+            i:Remove()
+        end
+    end)
     self:LevelChange(1)
 end)
 function c:LevelChange(level)
-    self.level = level
+    self.level = math.clamp(level,1,5)
     if self.level > 4 then
         self.inst:RemoveTag("sorawqlevelup")
     end
-    self.inst:PushEvent("sorawqlevelchange")
+    self.inst:PushEvent("sorawqlevelchange",{level=self.level})
 end
+
+function c:Refine(level)
+    self:LevelChange(self.level + level)
+end
+
 function c:LevelUp(doer,target)
     if not doer or not target then
         return "ERRLEVEL"
@@ -65,11 +76,12 @@ function c:LevelUp(doer,target)
     return true
 end
 function c:OnSave() 
-	return  {level = self.level }
+	return  {level = self.level,str = self.str }
 end
 
 function c:OnLoad(data)       
     self:LevelChange(data.level or 1 )
+    self.str = data.str 
 end
 function c:GetDebugString()
     return "level:"..self.level
