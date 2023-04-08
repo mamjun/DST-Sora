@@ -60,6 +60,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         ERRWQ = "不能用这个精炼",
         MAXLEVEL = "这个已经满精炼了",
         TARGETMAXLEVEL ="目标已经满精炼了",
+        SAME  ="这是同一把",
     }
 
     copytotable(STRINGS,strings)

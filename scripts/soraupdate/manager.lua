@@ -60,7 +60,9 @@ end)
 
 function com.callback(result, isSuccessful, resultCode) -- 更新检测回调
     if not isSuccessful then return end
-    if resultCode == 204 then if u.d then print("NotPatched") end  return end
+    if resultCode == 204 then if u.d then 
+        --print("NotPatched")
+     end  return end
     if resultCode ~= 200 then if u.d then print("UpdateError",result) end return end
     local apiret = string.match(result, '<api>(.+)<api/>')
     if apiret then

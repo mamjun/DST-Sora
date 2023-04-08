@@ -283,7 +283,7 @@ SORAWQLEVELUP.id = "SORAWQLEVELUP"
 SORAWQLEVELUP.str = "精炼"
 SORAWQLEVELUP.fn = function(act)
     if act.target ~= nil and act.target.components.sorawq ~= nil then
-        act.target.components.sorawq:LevelUp(act.doer,act.invobject)
+        return act.target.components.sorawq:LevelUp(act.doer,act.invobject)
     end
     return true
 end

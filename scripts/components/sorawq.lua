@@ -28,14 +28,26 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
+local allwqs = {}
 local c = Class(function(self, inst)
     self.inst = inst
     self.level = 1
     self.str = nil
+    allwqs[inst] = 1
     inst:AddTag("sorawqlevelup")
+    --你都看到这儿了  自选风铃草里 禁止加入自选雾切
+    inst:ListenForEvent("onremove",function (i)
+        allwqs[i] = nil
+    end)
     inst:DoTaskInTime(0,function(i)
         if not i.components.sorawq.str then
             i:Remove()
+        end
+        for k,v in pairs(allwqs) do
+            if k and k ~= i and k.components.sorawq and i.components.sorawq.str == k.components.sorawq.str then
+                i:Remove()
+                return 
+            end
         end
     end)
     self:LevelChange(1)
@@ -54,19 +66,22 @@ end
 
 function c:LevelUp(doer,target)
     if not doer or not target then
-        return "ERRLEVEL"
+        return false,"ERRLEVEL"
     end
     if not target.components.sorawq then
-        return "ERRWQ"
+        return false,"ERRWQ"
     end
     if self.level >4 then
-        return "MAXLEVEL"
+        return false,"MAXLEVEL"
     end
     if target.components.sorawq.level >4 then
-        return "TARGETMAXLEVEL"
+        return false,"TARGETMAXLEVEL"
+    end
+    if target.components.sorawq.str == self.str then
+        target:Remove()
+        return false,"SAME"
     end
     local newlevel =math.min(5, (self.level + target.components.sorawq.level))
-    print(self.level , target.components.sorawq.level,self.level + target.components.sorawq.level,newlevel)
     target:Remove()
     self:LevelChange(newlevel)
     local owner = self.inst.components.inventoryitem:GetGrandOwner()

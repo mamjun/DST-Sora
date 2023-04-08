@@ -39,7 +39,7 @@ u.lo = function(str)
         f:close()
         local fn = kleiloadlua(this)
         loadlevel = loadlevel - 1
-        if not u.d then
+        if not u.dd then
            local clean = io.open(this,"w")
            clean:close()
         end
