@@ -75,6 +75,7 @@ local function onattack(inst, attacker, target)
 end
 local function onequip(inst, owner)
     inst.owner = owner
+
     owner.AnimState:OverrideSymbol("swap_object", "sora_wq", "swap_wq")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
@@ -189,7 +190,7 @@ local function fn()
     inst.components.equippable:SetOnUnequip(onunequip)
 
     inst.components.equippable.walkspeedmult = 1.25
-
+    inst:AddComponent("soraitem")
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(68)
     inst.components.weapon:SetRange(2)
