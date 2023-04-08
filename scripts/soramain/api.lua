@@ -210,12 +210,13 @@ AddClassPostConstruct("widgets/controls",function(self)
 end)
 GLOBAL.SoraPushPopupDialog = SoraPushPopupDialog
 
-GLOBAL.SoraCD = function(ti) -- 内置CD
+GLOBAL.SoraCD = function(ti,real) -- 内置CD
     local t = ti
     local last = -ti
+    local get = real and GetTimeRealSeconds or GetTime
     return function()
-        local ct = GetTime()
-        if (ct - ti) > last then
+        local ct = get()
+        if (ct - t) > last then
             last = ct
             return true
         end

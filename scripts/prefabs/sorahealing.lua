@@ -51,8 +51,9 @@ local function upgrade(inst)
 	inst.zbslevel = math.min(math.floor(inst.zbsnum / inst.need),inst.maxlevel)
 	inst.hbslevel = math.min(math.floor(inst.hbsnum / inst.need),inst.maxlevel)
 	inst.lbslevel = math.min(math.floor(inst.lbsnum / inst.need),inst.maxlevel)
-	inst.cd = math.max(cd1 -inst.hbslevel*cd2,0)
+	inst.cd = math.max(cd1 -inst.hbslevel*cd2,0.01)
 	inst.components.weapon:SetDamage(math.max(att1+inst.zbslevel*att2,0))
+	inst.components.rechargeable:SetMaxCharge(inst.cd)
 	getname(inst)
 end
 
@@ -96,7 +97,8 @@ local function OnGetItemFromPlayer(inst, giver, item)
 			inst.zbslevel = math.min(math.floor(inst.zbsnum / inst.need),inst.maxlevel)
 			if inst.zbslevel < inst.maxlevel  then 
 				giver.components.talker:Say("紫宝石数量:"..inst.zbsnum.."/"..inst.need*inst.maxlevel .."\tLV:"..inst.zbslevel.."\n攻击力："..(math.max(att1+inst.zbslevel*att2,0)))
-				else
+		
+			else
 				giver.components.talker:Say("紫宝石已满\tLV:"..inst.maxlevel.."\n攻击力："..math.max(att1+inst.zbslevel*att2,0))
 			end
 		elseif (item.prefab == "yellowgem") 
@@ -105,7 +107,8 @@ local function OnGetItemFromPlayer(inst, giver, item)
 			inst.hbslevel = math.min(math.floor(inst.hbsnum / inst.need),inst.maxlevel)
 			if inst.hbslevel < inst.maxlevel then 
 				giver.components.talker:Say("黄宝石数量:"..inst.hbsnum.."/"..inst.need *inst.maxlevel.."\tLV:"..inst.hbslevel.."\n冷却时间："..(math.max(cd1 -inst.hbslevel*cd2,0)))
-				else
+				
+			else
 				giver.components.talker:Say("黄宝石已满\tLV:"..inst.maxlevel .."\n冷却时间："..math.max(cd1 -inst.hbslevel*cd2,0))
 			end
 		elseif (item.prefab == "greengem") 
@@ -118,8 +121,7 @@ local function OnGetItemFromPlayer(inst, giver, item)
 				giver.components.talker:Say("绿宝石已满\tLV:"..inst.maxlevel .."\n生命回复："..math.max(player1+inst.lbslevel*player2,0))
 			end	
 		end
-
-	upgrade(inst)
+		upgrade(inst)	
 end
 
 local function onpreload(inst, data)
@@ -184,13 +186,12 @@ local function soramagicfn(staff, target, pos)
 	if not caster or not caster:HasTag("Sora") then
 	return false
 	end
-	local t = GetTime()
-	if (t-staff.lastspell) < staff.cd then 
-		t= staff.cd-t+staff.lastspell
+	if not staff.components.rechargeable:IsCharged() then 
+		local t= staff.components.rechargeable:GetTimeToCharge()
 		caster.components.talker:Say("冷却中："..math.floor(t).."S")
 		return false
 	end
-	staff.lastspell = t 
+	staff.components.rechargeable:Discharge(staff.cd)
 	if not pos then
 	pos  = target:GetPosition()
 	end
@@ -236,37 +237,6 @@ local function onhaunt (inst,doer)
 		return true
 	end
 end
---[[
-local function ReticuleTargetFn()
-    return Vector3(ThePlayer.entity:LocalToWorldSpace(6.5, 0, 0))
-end
-
-local function ReticuleMouseTargetFn(inst, mousepos)
-    if mousepos ~= nil then
-        local x, y, z = inst.Transform:GetWorldPosition()
-        local dx = mousepos.x - x
-        local dz = mousepos.z - z
-        local l = dx * dx + dz * dz
-        if l <= 0 then
-            return inst.components.reticule.targetpos
-        end
-        l = 6.5 / math.sqrt(l)
-        return Vector3(x + dx * l, 0, z + dz * l)
-    end
-end
-
-local function ReticuleUpdatePositionFn(inst, pos, reticule, ease, smoothing, dt)
-    local x, y, z = inst.Transform:GetWorldPosition()
-    reticule.Transform:SetPosition(x, 0, z)
-    local rot = -math.atan2(pos.z - z, pos.x - x) / DEGREES
-    if ease and dt ~= nil then
-        local rot0 = reticule.Transform:GetRotation()
-        local drot = rot - rot0
-        rot = Lerp((drot > 180 and rot0 + 360) or (drot < -180 and rot0 - 360) or rot0, rot, dt * smoothing)
-    end
-    reticule.Transform:SetRotation(rot)
-end
-]]--
 
 local function fn()
 	local inst = CreateEntity()
@@ -279,6 +249,7 @@ local function fn()
     anim:SetBuild("sorahealing")
     anim:PlayAnimation("idle")
 	inst:AddTag("soratrader")
+	inst:AddTag("rechargeable")
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("sorahealing.tex")
 	--[[inst:AddComponent("aoetargeting")
@@ -330,15 +301,17 @@ local function fn()
     inst.components.spellcaster.canuseonpoint = true
 	--inst.components.spellcaster.CanCast = function() return true end
     inst.components.spellcaster:SetSpellFn(soramagicfn)
-	inst.lastspell = GetTime()-cd1
+	inst:AddComponent("rechargeable")
+	inst.components.rechargeable:SetMaxCharge(inst.cd)
 	inst.cd2 = GetTime()-300
 	--inst.magicfx.entity:SetParent(inst.entity)
 	inst:AddComponent("weapon")
 	inst.components.weapon:SetDamage(att1)
 	inst.components.weapon:SetRange(getsora("sorahealingrange"))
-   --inst.components.weapon:SetElectric()
-    --inst.components.weapon.OnAttack = onattack
 	inst.components.weapon:SetProjectile("sorahealing_projectile")
+
+	inst:AddComponent("rechargeable")
+	inst.components.rechargeable:SetMaxCharge(inst.cd)
 	inst:AddComponent("trader")
 	inst.cantrader = TraderCount
 	inst.components.trader:SetAcceptTest(AcceptTest)

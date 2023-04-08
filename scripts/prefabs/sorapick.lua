@@ -49,9 +49,10 @@ local function upgrade(inst)
 	inst.icelevel = math.min(math.floor(inst.icenum / inst.need/20),inst.maxlevel)
 	inst.zbslevel = math.min(math.floor(inst.zbsnum / inst.need),inst.maxlevel)
 	inst.cbslevel = math.min(math.floor(inst.cbsnum / inst.need),inst.maxlevel)
-	inst.cd = math.max(cd1 -inst.zbslevel*cd2,0)
+	inst.cd = math.max(cd1 -inst.zbslevel*cd2,0.01)
 	inst.miehuo = math.max(ice1+inst.icelevel*ice2,0)
 	inst.caiji = math.max(pick1+inst.cbslevel*pick2,0)
+	inst.components.rechargeable:SetMaxCharge(inst.cd)
 end
 
 local function OnRefuseItem(inst, giver, item)
@@ -208,9 +209,8 @@ local function soramagicfn(staff, target, pos)
 	if not caster or not caster:HasTag("Sora") then
 	return false
 	end
-	local t = GetTime()
-	if (t-staff.lastspell) < staff.cd then 
-		t= staff.cd-t+staff.lastspell
+	if not staff.components.rechargeable:IsCharged() then 
+		local t= staff.components.rechargeable:GetTimeToCharge()
 		caster.components.talker:Say("冷却中："..math.floor(t).."S")
 		return false
 	end
@@ -218,14 +218,14 @@ local function soramagicfn(staff, target, pos)
 	if not pos then
 	pos  = target:GetPosition()
 	end
-	
+	local hasdo = false
 	local x, y, z = pos:Get()
 	--灭火
 	local ents = TheSim:FindEntities(x, y, z,staff.miehuo,nil,nil, { "fire","smolder" })
 	for i, v in ipairs(ents) do
         if v.components.burnable ~= nil then
             v.components.burnable:Extinguish()
-			staff.lastspell = t 
+			hasdo = true
 			caster.components.sanity:DoDelta(-1)
         end
     end
@@ -233,7 +233,7 @@ local function soramagicfn(staff, target, pos)
     local rocks = TheSim:FindEntities(x, y, z,staff.caiji, { "ignorewalkableplatforms" })
     for i,v in ipairs(rocks) do 
         if v.prefab=="seastack" and   v.components.workable then
-            staff.lastspell = t
+			hasdo = true
             v.components.workable:WorkedBy(caster,15)
         end
     end
@@ -251,7 +251,7 @@ local function soramagicfn(staff, target, pos)
             else
                 caster.components.inventory:GiveItem(v, nil, pos)
             end
-			staff.lastspell = t 
+			hasdo = true
 			caster.components.sanity:DoDelta(-1)
         end
     end
@@ -261,27 +261,27 @@ local function soramagicfn(staff, target, pos)
         
         elseif v.components.pickable  then 
 			v.components.pickable:Pick(caster)
-			staff.lastspell = t 
+			hasdo = true
 			caster.components.sanity:DoDelta(-1)
 		elseif v.components.harvestable then
 			v.components.harvestable:Harvest(caster)
-			staff.lastspell = t 
+			hasdo = true 
 			caster.components.sanity:DoDelta(-1)
 		elseif v.components.dryer then
 			v.components.dryer:Harvest(caster)
-			staff.lastspell = t 
+			hasdo = true 
 			caster.components.sanity:DoDelta(-1)
 		elseif v.components.stewer then
 			v.components.stewer:Harvest(caster)
-			staff.lastspell = t 
+			hasdo = true
 			caster.components.sanity:DoDelta(-1)
 		elseif v.components.stewer_fur then
 			v.components.stewer_fur:Harvest(caster)
-			staff.lastspell = t 
+			hasdo = true
 			caster.components.sanity:DoDelta(-1)
         elseif v.components.crop then
 			v.components.crop:Harvest(caster)
-			staff.lastspell = t 
+			hasdo = true
 			caster.components.sanity:DoDelta(-1)
         end
 	end
@@ -305,11 +305,13 @@ local function soramagicfn(staff, target, pos)
                 local v_position = caster:GetPosition()
                 ae_cp:Launch(v_position, caster)
             end
-            staff.lastspell = GetTime()
+			hasdo = true
             caster.components.sanity:DoDelta(-10)
         end
     end
-                        
+    if hasdo then
+		staff.components.rechargeable:Discharge(staff.cd)
+	end
 	caster:DoTaskInTime(0.1, stackall,pos,staff.caiji)
 	return true
 end
@@ -365,6 +367,7 @@ local function fn()
 	inst:AddTag("soratrader")
     inst:AddTag("nopunch")
     inst:AddTag("allow_action_on_impassable")
+	inst:AddTag("rechargeable")
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("sorapick.tex")
 	if not TheWorld.ismastersim then
@@ -404,7 +407,6 @@ local function fn()
     inst.components.spellcaster.canuseonpoint_water = true
 	--inst.components.spellcaster.CanCast = function() return true end
     inst.components.spellcaster:SetSpellFn(soramagicfn)
-	inst.lastspell = GetTime()-cd1
 	--inst.magicfx.entity:SetParent(inst.entity)
 	inst:AddComponent("weapon")
 	inst.components.weapon:SetDamage(math.max(getsora("sorapickatt"),0))
@@ -412,6 +414,10 @@ local function fn()
    --inst.components.weapon:SetElectric()
     --inst.components.weapon.OnAttack = onattack
 	inst.components.weapon:SetProjectile("sorapick_projectile")
+
+	inst:AddComponent("rechargeable")
+	inst.components.rechargeable:SetMaxCharge(inst.cd)
+
 	inst:AddComponent("trader")
 	inst.cantrader = TraderCount
 	inst.components.trader:SetAcceptTest(AcceptTest)

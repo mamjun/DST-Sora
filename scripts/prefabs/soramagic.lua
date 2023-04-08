@@ -45,7 +45,7 @@ local range1 = getsora("soramagicrange1")
 local range2 = getsora("soramagicrange2")
 local skill1 = getsora("soramagicskill1")
 local skill2 = getsora("soramagicskill2")
-local cd = math.max(getsora("soramagicskillcd"),0)
+local cd = math.max(getsora("soramagicskillcd"),0.01)
 local function upgrade(inst)
 	inst.hbslevel = math.min(math.floor(inst.hbsnum / inst.need),inst.maxlevel*5)
 	inst.jsqlevel = math.min(math.floor(inst.jsqnum / inst.need),inst.maxlevel*5)
@@ -173,229 +173,24 @@ local function onunequip(inst, owner)
         inst.magicfx = nil
     end
 end
---[[
-local DESTSOUNDS =
-{
-    {   --magic
-        soundpath = "dontstarve/common/destroy_magic",
-        ing = { "nightmarefuel", "livinglog" },
-    },
-    {   --cloth
-        soundpath = "dontstarve/common/destroy_clothing",
-        ing = { "silk", "beefalowool" },
-    },
-    {   --tool
-        soundpath = "dontstarve/common/destroy_tool",
-        ing = { "twigs" },
-    },
-    {   --gem
-        soundpath = "dontstarve/common/gem_shatter",
-        ing = { "redgem", "bluegem", "greengem", "purplegem", "yellowgem", "orangegem" },
-    },
-    {   --wood
-        soundpath = "dontstarve/common/destroy_wood",
-        ing = { "log", "boards" },
-    },
-    {   --stone
-        soundpath = "dontstarve/common/destroy_stone",
-        ing = { "rocks", "cutstone" },
-    },
-    {   --straw
-        soundpath = "dontstarve/common/destroy_straw",
-        ing = { "cutgrass", "cutreeds" },
-    },
-}
-local DESTSOUNDSMAP = {}
-for i, v in ipairs(DESTSOUNDS) do
-    for i2, v2 in ipairs(v.ing) do
-        DESTSOUNDSMAP[v2] = v.soundpath
-    end
-end
-DESTSOUNDS = nil
-local function stackin (v,v1,k,k1)
-	if v and v1 then
-        local newtotal = v.components.stackable.stacksize + v1.components.stackable.stacksize
-        local oldsize = v.components.stackable.stacksize
-        local newsize = math.min(v.components.stackable.maxsize, newtotal)        
-        if v.components.stackable.maxsize >= newtotal then
-            v1.soradel = true
-        else
-            v1.components.stackable:SetStackSize(newtotal - v.components.stackable.maxsize)
-        end
-        v.components.stackable:SetStackSize(newsize)
-	end
-end
-
-local function stackall(pos)
-	local finds = TheSim:FindEntities(pos.x, pos.y, pos.z, 5)
-	for k,v in pairs (finds) do 
-		if v and not v.soradel and v.components.stackable and not v.components.stackable:IsFull() and not v.components.inventoryitem.owner then
-			for k1,v1 in pairs (finds) do 
-				if v1 and not v1.soradel and k ~= k1 and v ~= v1 and v.prefab == v1.prefab and not v1.components.inventoryitem.owner   then
-				stackin(v,v1,k,k1)
-				end
-			end
-		end
-	end 
-	for k,v in pairs (finds) do 
-		if v and v.soradel then
-			v:Remove()
-		end
-	end 
-end
-
-local function CheckSpawnedLoot(loot)
-    if loot.components.inventoryitem == nil or not loot.components.inventoryitem:IsHeld() then
-        local x, y, z = loot.Transform:GetWorldPosition()
-        if not loot:IsOnValidGround() or TheWorld.Map:IsPointNearHole(Vector3(x, 0, z)) then
-            SpawnPrefab("splash_ocean").Transform:SetPosition(x, y, z)
-            if loot:HasTag("irreplaceable") then
-                loot.Transform:SetPosition(FindSafeSpawnLocation(x, y, z))
-            else
-                loot:Remove()
-            end
-        end
-    end
-end
-
-local function SpawnLootPrefab(inst, lootprefab,lootnum)
-    if lootprefab == nil then
-        return
-    end
-while lootnum > 0 do
-	
-    local loot = SpawnPrefab(lootprefab)
-    if loot == nil then
-        return
-    end
-	if loot.components.stackable then 
-			if loot.components.stackable.maxsize >= lootnum then
-			loot.components.stackable:SetStackSize(lootnum)
-			lootnum = 0 
-			else 
-			loot.components.stackable:SetStackSize(loot.components.stackable.maxsize)
-			lootnum = lootnum - loot.components.stackable.maxsize
-			end
-	else
-	lootnum = lootnum -1
-	end
-    local x, y, z = inst.Transform:GetWorldPosition()
-
-    if loot.Physics ~= nil then
-        local angle = math.random() * 2 * PI
-        loot.Physics:SetVel(2 * math.cos(angle), 10, 2 * math.sin(angle))
-
-        if inst.Physics ~= nil then
-            local len = loot:GetPhysicsRadius(0) + inst:GetPhysicsRadius(0)
-            x = x + math.cos(angle) * len
-            z = z + math.sin(angle) * len
-        end
-
-        loot:DoTaskInTime(1, CheckSpawnedLoot)
-    end
-
-    loot.Transform:SetPosition(x, y, z)
-end
-
-end
-
-local function soramagicfnone(staff,target) 
-	local ret =0 
-	local recipe = AllRecipes[target.prefab]
-		if recipe == nil or target:HasTag("nosoramagic") then
-        --不可建造的物品不处理
-        return ret
-		end
-		
-		if target.components.inventoryitem and target.components.inventoryitem.owner ~= nil then
-		return ret
-		end
-		
-		--返还材料
-		local caster = staff.components.inventoryitem.owner
-		local stacksize = 1
-		if target.components.stackable then stacksize = target.components.stackable.stacksize end
-
-			for i, v in ipairs(recipe.ingredients) do
-				ret = 1
-				if caster ~= nil and DESTSOUNDSMAP[v.type] ~= nil then
-				caster.SoundEmitter:PlaySound(DESTSOUNDSMAP[v.type])
-				end
-				SpawnLootPrefab(target, v.type,stacksize * v.amount) 
-			end
-		
-		if target.components.inventory ~= nil then target.components.inventory:DropEverything() end
-		if target.components.container ~= nil then target.components.container:DropEverything() end
-		if target.components.spawner ~= nil and target.components.spawner:IsOccupied() then target.components.spawner:ReleaseChild() end
-		if target.components.occupiable ~= nil and target.components.occupiable:IsOccupied() then
-			local item = target.components.occupiable:Harvest()
-			if item ~= nil then
-				item.Transform:SetPosition(target.Transform:GetWorldPosition())
-				item.components.inventoryitem:OnDropped()
-			end
-		end
-
-		if target.components.trap ~= nil then target.components.trap:Harvest() end
-		if target.components.dryer ~= nil then target.components.dryer:DropItem() end
-		if target.components.harvestable ~= nil then target.components.harvestable:Harvest() end
-		if target.components.stewer ~= nil then target.components.stewer:Harvest() end
-		target:Remove()
-	return ret
-end
-
-local function soramagicfn(staff, target, pos)
-	local caster = staff.components.inventoryitem.owner
-	if caster.components.sanity.current < staff.sf then
-		caster.components.talker:Say("法力不足，当前需要："..staff.sf)
-	return
-	end
-	local count = 0
-    local ents = TheSim:FindEntities(pos.x,pos.y,pos.z, 2.7)
-    for k,v in pairs(ents) do
-		count = count + soramagicfnone(staff,v)
-    end
-	stackall(pos)
-	--施法声音和消耗
-	if count > 0 then
-		
-		if caster ~= nil then
-			caster.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
-			if caster.components.sanity ~= nil then
-				caster.components.sanity:DoDelta(-staff.sf)
-			end
-		end
-	end
-end
-
-local function onattack(inst, attacker, target)
-	if not target:IsValid() then
-		--target killed or removed in combat damage phase
-		return
-	end
-	--local x, y, z = target.Transform:GetWorldPosition()
-	--SpawnPrefab("soralighting").Transform:SetPosition(x, y - .5, z)
-end
-]]--
 
 local function soramagicfn(staff, target, pos)
 	local caster = staff.components.inventoryitem.owner
 	if not caster or not caster:HasTag("Sora") then
 	return false
 	end
-	local t = GetTime()
-	if (t-staff.lastspell) < cd then 
-		t= cd-t+staff.lastspell
-		caster.components.talker:Say("冷却中："..math.floor(t).."S")
+	if not staff.components.rechargeable:IsCharged() then 
+		local t = math.floor(staff.components.rechargeable:GetTimeToCharge() )
+		caster.components.talker:Say("冷却中"..t.."S")
 		return false
 	end
-	staff.lastspell = t 
 	if not pos then
 	pos  = target:GetPosition()
 	end
     local mul = caster.components.combat.externaldamagemultipliers:Get()
 	local att = caster.components.combat.damagemultiplier * (math.max(skill1+skill2*staff.hbslevel,0))*mul
 	SpawnPrefab("sorameteor"):AttackArea(caster, staff, pos,att)
-	
+	staff.components.rechargeable:Discharge(cd)
 end
 local function onattack(inst, attacker, target)
     if inst and attacker and target then
@@ -405,7 +200,7 @@ local function onattack(inst, attacker, target)
         local d = inst.components.weapon.damage * att
         for _,ent in ipairs(ents) do
             if ent and ent.entity:IsValid() and ent ~= target and ent.entity:IsVisible() and ent.components.health and not ent.components.health:IsDead() and ent.components.combat then
-            ent.components.combat:GetAttacked(attacker,d,inst)
+            ent.components.combat:GetAttacked(attacker,d,inst,"fire")
 			end
 		end
         if math.random() < 0.03 then
@@ -426,6 +221,7 @@ local function fn()
     anim:PlayAnimation("idle")
 	inst:AddTag("soratrader")
 	inst:AddTag("waterproofer")
+	inst:AddTag("rechargeable")
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("soramagic.tex")
 	
@@ -465,7 +261,8 @@ local function fn()
     inst.components.spellcaster.canuseonpoint = true
 	--inst.components.spellcaster.CanCast = function() return true end
     inst.components.spellcaster:SetSpellFn(soramagicfn)
-	inst.lastspell = GetTime()-cd
+	inst:AddComponent("rechargeable")
+	inst.components.rechargeable:SetMaxCharge(cd)
 	--inst.magicfx.entity:SetParent(inst.entity)
 	inst:AddComponent("weapon")
 	inst.components.weapon:SetDamage(att1)

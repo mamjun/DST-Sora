@@ -130,9 +130,9 @@ end
 STRINGS.NAMES.SORA_FL = "风铃草"
 local function helperfn()
     local inst = CreateEntity()
-    inst:AddTransform()
-    inst:AddAnimState()
-    inst:AddPhysics()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddPhysics()
     inst:DoTaskInTime(0,inst.Remove)
     return inst
 end

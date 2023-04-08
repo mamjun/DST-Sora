@@ -805,6 +805,7 @@ local master_postinit = function(inst)
             inst.components.eater.Eat = original_Eat
         end
     end
+    inst:AddComponent("soraglobalsave")
     inst:AddComponent("sorafl")
     inst.SoraSound = SoraSound
     inst.wlist = wlist

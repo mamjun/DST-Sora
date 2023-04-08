@@ -46,8 +46,9 @@ local cd2 = getsora("soratelecd2")
 local function upgrade(inst)
 	inst.zbslevel = math.min(math.floor(inst.zbsnum / inst.need),inst.maxlevel)
 	inst.sflevel = math.min(math.floor(inst.sfnum / inst.need/20),inst.maxlevel)
-	inst.cd = math.max(cd1 -inst.zbslevel*cd2,0 )
+	inst.cd = math.max(cd1 -inst.zbslevel*cd2,0.01 )
 	inst.sf = math.max(san1-inst.sflevel*san2,0)
+	inst.components.rechargeable:SetMaxCharge(inst.cd)
 end
 local function getname(inst)
 inst.components.named:SetName(inst.hammer and "穹の瞬(全开)"  or  "穹の瞬(标准)" )
@@ -108,6 +109,7 @@ local function OnGetItemFromPlayer(inst, giver, item)
 			inst.zbslevel = math.min(math.floor(inst.zbsnum / inst.need),inst.maxlevel)
 			if inst.zbslevel < inst.maxlevel then 
 				giver.components.talker:Say("紫宝石数量:"..inst.zbsnum.."/"..inst.need *inst.maxlevel.."\tLV:"..inst.zbslevel.."\n冷却时间："..(math.max(cd1 -inst.zbslevel*cd2,0 )))
+
 				else
 				giver.components.talker:Say("紫宝石已满\tLV:"..inst.maxlevel .."\n冷却时间："..(math.max(cd1 -inst.zbslevel*cd2,0 )))
 			end
@@ -117,11 +119,12 @@ local function OnGetItemFromPlayer(inst, giver, item)
 			inst.sflevel = math.min(math.floor(inst.sfnum / inst.need/20),inst.maxlevel)
 			if inst.sflevel <  inst.maxlevel then 
 				giver.components.talker:Say("噩梦燃料数量:"..inst.sfnum.."/"..inst.need*20*inst.maxlevel.."\tLV:"..inst.sflevel.."\n施法消耗："..(math.max(san1-inst.sflevel*san2,0)))
-				else
+				
+			else
 				giver.components.talker:Say("噩梦燃料已满\tLV:"..inst.maxlevel .."\n施法消耗："..(math.max(san1-inst.sflevel*san2,0)))
 			end	
 		end
-	upgrade(inst)
+		upgrade(inst)	
 end
 
 local function onpreload(inst, data)
@@ -174,13 +177,12 @@ local function SoraBlink(blink, pos, caster)
 	return false
 	end
 	local staff = blink.inst
-	local t = GetTime()
-	if (t-staff.lastspell) < staff.cd then 
-		t= staff.cd-t+staff.lastspell
+	if not staff.components.rechargeable:IsCharged() then 
+		local t= staff.components.rechargeable:GetTimeToCharge()
 		caster.components.talker:Say("冷却中："..math.floor(t).."S")
 		return true
 	end
-	staff.lastspell = t
+	staff.components.rechargeable:Discharge(staff.cd)
     if caster.components.sanity ~= nil then
         caster.components.sanity:DoDelta(-staff.sf)
     end
@@ -220,6 +222,7 @@ local function fn()
     anim:PlayAnimation("idle")
 	inst:AddTag("soratrader")
     inst:AddTag("nopunch")
+	inst:AddTag("rechargeable")
     inst:AddTag("allow_action_on_impassable")
 	inst:AddComponent("reticule")
     inst.components.reticule.targetfn = blinkstaff_reticuletargetfn
@@ -233,7 +236,7 @@ local function fn()
 	inst.sfnum=0
 	inst.zbslevel=0
 	inst.sflevel=0
-	inst.sf = math.max(san1,0)
+	inst.sf = math.max(san1,0.01)
 	inst.need = TUNING.SORAMODE/2
 	inst.maxlevel = 10 
 	inst.cd =math.max(cd1,0)
@@ -255,8 +258,6 @@ local function fn()
     inst.components.blinkstaff:SetFX("sand_puff_large_front", "sand_puff_large_back")
 	inst.blink = inst.components.blinkstaff.Blink
 	inst.components.blinkstaff.Blink = SoraBlink
-	inst.lastspell = GetTime()-60
-	--inst.magicfx.entity:SetParent(inst.entity)
 	inst:AddComponent("tool")
 	inst.components.tool:SetAction(ACTIONS.CHOP,10)
 	inst.components.tool:SetAction(ACTIONS.MINE,7.9)
@@ -277,9 +278,10 @@ local function fn()
 	inst:AddComponent("weapon")
 	inst.components.weapon:SetDamage(17)
 	inst.components.weapon:SetRange(12)
-   --inst.components.weapon:SetElectric()
-    --inst.components.weapon.OnAttack = onattack
 	inst.components.weapon:SetProjectile("soratele_projectile")
+	inst:AddComponent("rechargeable")
+	inst.components.rechargeable:SetMaxCharge(inst.cd)
+
 	inst:AddComponent("trader")
     inst:AddComponent("soraitem")
 	inst.cantrader = TraderCount
