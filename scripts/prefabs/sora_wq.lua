@@ -192,6 +192,7 @@ local function fn()
 
     inst.components.equippable.walkspeedmult = 1.25
     inst:AddComponent("soraitem")
+    inst.components.soraitem:SetBind(true)
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(68)
     inst.components.weapon:SetRange(2)

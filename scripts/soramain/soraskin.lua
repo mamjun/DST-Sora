@@ -439,7 +439,7 @@ local skinhandle = {
                 elseif (code == 6231) then
                     if data.type and data.type:find("baseworld") then
                         if inst.components.soraglobalsave:Get(data.name) then 
-                            mes(inst, "你这个档已经领取过这个礼包了")
+                            mes(inst, "你这个档已经领取过这个礼包了!")
                             return 
                         end
                         inst.components.soraglobalsave:Set(data.name,1)
@@ -481,11 +481,17 @@ local skinhandle = {
                                 if v.prefab == "sora_wq" then
                                     v.components.sorawq.str = inst.userid .."|"..cdk
                                 end
+                                if v.components.soraitem and v.components.soraitem.bind then
+                                    v.components.soraitem.user = inst.userid
+                                end
                             end
                     
                             if #items > 0 then
                                 local packer = SpawnPrefab("sora3packer")
                                 packer.components.unwrappable:WrapItems(items)
+                                if gifts.super and packer.super then
+                                    packer:super({})
+                                end
                                 packer.components.named:SetName("礼包:"..(data.name or "未知"))
                                 packer.components.inspectable:SetDescription("礼包:"..(data.name or "未知").."\r\n内含:"..(data.item or "未知"))
                                 for i,v in ipairs(items) do 

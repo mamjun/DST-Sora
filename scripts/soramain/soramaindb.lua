@@ -1,5 +1,5 @@
 --[[
-授权级别:参考级
+授权级别:开放级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
 Steam平台：MySora 模组ID：workshop-1638724235
 WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
@@ -28,47 +28,59 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
---[[专属物品捡不起来
-]]--
 
-local function dropitem(doer,inst)
-    if inst and inst.components.inventoryitem then
-        doer.components.inventory:DropItem(inst)
-    end
-end
-local function checkowner(inst,data)
-    local owner = data.owner 
-    if inst.components.soraitem.bind and (inst.components.soraitem.user == "" or inst.components.soraitem.user == nil) then
-        inst.components.soraitem.user = owner.userid
-    end
-    if owner and not owner:HasTag("sora") then 
-        owner:DoTaskInTime(0,dropitem,inst)
-        return 
-    end
+--[[shard间数据同步模块
+通过ShardRPC 进行数据通信
+主世界负责存取写入数据
+从世界负责查询
+]] --
+local key = "sora"  --防冲突
 
-    if inst.components.soraitem.bind and owner and inst.components.soraitem.user ~= owner.userid then
-        owner:DoTaskInTime(0,dropitem,inst)
-        return    
-    end
-end
-local com = Class(function(self,inst)
-    self.inst = inst
-    self.bind = false
-    self.user = ""
-    inst:ListenForEvent("equipped",checkowner)
-    inst:ListenForEvent("onpickup",checkowner)
+
+--SendRPCToShard(SHARD_RPC.RPCNAME, shards, ...)
+--shards is either:
+--nil == all connected shards
+--shardid == send to that shard
+--table == list of shards to send to
+--ZipAndEncodeStrin
+--DecodeAndUnzipString
+
+local namespace = key .. "maindb"
+AddShardModRPCHandler(key,"maindb",function()
+
 end)
-function com:SetBind(bind)
-    self.bind = bind
 
+local MainDB = Class(function (self,namespace)
+    
+end)
+--基础模块
+function  MainDB:Init(namespace) --初始化
+    self:Sync()
 end
-function com:OnSave()
-    return {bind = self.bind,user = self.user}
+function  MainDB:Send() --发送数据
+    
 end
-function com:OnLoad(data)
-    if data.bind ~= nil then
-        self.bind = data.bind or false
-        self.user = data.user or ""
-    end
+function  MainDB:Handle()   --处理收到的数据
+    
 end
-return com
+
+function  MainDB:Save()   --保存数据
+    
+end
+
+function  MainDB:Load()   --读取数据
+    
+end
+--逻辑模块
+function  MainDB:Get() --发送数据
+    
+end
+
+function  MainDB:Set() --发送数据
+    
+end
+
+
+function  MainDB:Sync() --强制同步
+    
+end
