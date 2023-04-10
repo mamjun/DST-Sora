@@ -45,6 +45,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     mi("logupload")
     --相关API 提供给mod使用
     mi("api")
+    --导入maindb
+    mi("soramaindb")
     --导入皮肤api
     mi("skins")
     mi("soraskin")

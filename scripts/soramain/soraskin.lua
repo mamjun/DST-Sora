@@ -477,9 +477,12 @@ local skinhandle = {
                                     table.insert(items,item)
                                 end
                             end
+                            local i = 1
                             for k,v in pairs(items) do
+                                i = i +1
                                 if v.prefab == "sora_wq" then
-                                    v.components.sorawq.str = inst.userid .."|"..cdk
+
+                                    v.components.sorawq.str = inst.userid .."|"..cdk .. "|"..i
                                 end
                                 if v.components.soraitem and v.components.soraitem.bind then
                                     v.components.soraitem.user = inst.userid

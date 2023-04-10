@@ -27,60 +27,527 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-
---[[shard间数据同步模块
+]] --[[shard间数据同步模块
 通过ShardRPC 进行数据通信
 主世界负责存取写入数据
 从世界负责查询
 ]] --
-local key = "sora"  --防冲突
+local key = "sora" -- 防冲突
+--[[  doc && demo 
+数据同步结构
+
+  self.data = {
+    root1 = {
+        key1= string or int or table ,
+        key2= string or int or table ,
+    },
+    root2 = {
+        key1= string or int or table ,
+        key2= string or int or table ,
+    },
+    key和eoot只允许为 string 或者 int 类型的 
+    value 可以为 string int 或者 table
+  }
+
+  每个根可以单独定义是否 在设置的时候同步(下称手动同步)  或者 定期完整同步一次(下称自动同步)
+  手动同步 一次只发送修改的key 和 对应的数据  修改完数据会立刻发送同步
+  自动同步 一次性发送整个根 对应的全部数据   每X秒同步一次 
+
+  自动同步的时候 会根据根的数量 延迟同步 避开流量高峰 例如 一个namespace下有5个根  设置的每600秒同步一次  
+  则600秒的时候 同步第一个根 601秒的时候 同步第二个根 以此类推
+
+  可用方法：
+  MainDB:InitRoot(root,noSyn)       创建一个 root 可用动态创建 但是建议在同步开始前创建好所有的root
+                                    允许通过 noSyn参数指定同步方式 
+                                        nil  正常同步
+                                        1   不进行自动同步
+                                        2   不进行手动同步
+                                        3   不进行自动同步和手动同步
+  MainDB:UnInitRoot(root)           一个root不在需要了 销毁  一般不需要调用
+  MainDB:Get(root,key,value)        读取本地的数据 如果本地不存在 则返回 value作为默认值 
+  MainDB:GetRoot(root)              获取整个根的数据 可以用于遍历 但是请勿修改！！！ 强行修改会导致数据不同步
+  MainDB:Set(root,key,value)        设置本地的数据 并根据是否需要同步来决定是否发给其他shard
+  MainDB:Sync(root)                 强制同步 指定root 或者 全部 root的数据 noSyn =3的不会同步
+  MainDB:AsynGet(root,key,value)    读取主世界的数据  只能在线程里使用
+  MainDB:AsynSet(root,key,value)    设置主世界的数据  只能在线程里使用 如果单独设置 不需要返回结果 也可以直接调用 
+
+  示例：
+    --modmain 环境
+    modimport "soramaindb"
+    local ShopInfo = CreateMainDB("ShopInfo")
+    ShopInfo:InitRoot("Shops")
+    ShopInfo:InitRoot("Items",1)        --这个根 不进行定时同步 只需要修改的时候同步 一般用于数据量大 但是不那么重要 允许出错  
+    ShopInfo:InitRoot("Buy",3)          --这个根 不进行同步 想获取数据 必须主世界执行 一般用于只允许主世界修改的内容 
+    if TheNet:GetIsMasterSimulation() and not TheShard:IsSecondary() then   --只绑定主世界的 只有主世界的需要保存
+        AddPrefabPostInit("forest",function (inst)    --绑定给一个实体 如果不需要保存数据可以不绑定
+            inst.components.MainDBShop = ShopInfo       --绑定到实体 这样就可以使用组件的OnSave 和 OnLoad了
+        end)
+        AddPrefabPostInit("cave",function (inst)    --防止有洞穴为主的 也绑定一下
+            inst.components.MainDBShop = ShopInfo       --绑定到实体 这样就可以使用组件的OnSave 和 OnLoad了
+        end)
+    end
+
+    --运行中 
+    ShopInfo:Get("Shops","a")   --获取 Shops/a的数据 
+    ShopInfo:Set("Shops","a",2) --设置 Shops/a的数据 为2 
+    for k,v in pairs(ShopInfo:GetRoot("Shops")) do  --遍历 shops
+        ...
+    end
+    --设置table数据 
+    local a = {a = 1,b=2 }
+    ShopInfo:Set("Shops","a",a)
+
+    a.a = 2 
+    ShopInfo:Set("Shops","a",a) --修改了表内值必须重新Set才能同步
+
+    local b = ShopInfo:Get("Shops","a")
+    print(b.a)  
+    ShopInfo:Set("Shops","a",a) --修改了表内值必须重新Set才能同步
+    print(b.a)      --错误用法 获取到的可能是上次的值 
+    print(ShopInfo:Get("Shops","a").a)  --必须使用Get 才能获取到最新值 
+
+    ShopInfo:Sync()     --强制同步所有根
+    ShopInfo:Sync("Shops")  --强制同步 Shops
 
 
---SendRPCToShard(SHARD_RPC.RPCNAME, shards, ...)
---shards is either:
---nil == all connected shards
---shardid == send to that shard
---table == list of shards to send to
---ZipAndEncodeStrin
---DecodeAndUnzipString
+    ShopInfo:Set("Buy","a",1)    --错误用法 不会通知主世界
+    print(ShopInfo:Get("Buy","a"))  --无法获取正确数据 因为主世界没有把数据同步到本地
 
-local namespace = key .. "maindb"
-AddShardModRPCHandler(key,"maindb",function()
+    TheWorld:StartThread(function ()
+        ShopInfo:AsynSet("Buy","a",1)    --可以设置数据 
+        print(ShopInfo:Get("Buy","a"))      --因为没有同步给本地 所以获取不到数据
+        print(ShopInfo:AsynGet("Buy","a"))  --可以获取到数据 
+    end)
 
+
+]]
+
+if not TheNet:GetIsServer() then
+    return
+end
+
+local dbnamespace = key .. "maindb"
+local dbhandles = {}
+local sid = TheShard:GetShardId() -- 自身ID
+local mid = SHARDID.MASTER -- 主世界ID
+local ismaster = TheShard:IsMaster()
+
+AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
+    if not ns then
+        return
+    end -- 无namespace 
+    if not (dbhandles[ns] and dbhandles[ns].Handle) then
+        return
+    end -- 无handle
+    print("MAIN DB RPC",id, ns, cmd, data, ...)
+    return dbhandles[ns]:Handle(id, cmd, data, ...)
 end)
 
-local MainDB = Class(function (self,namespace)
-    
+local function encode(data)
+    local r, str = pcall(json.encode, data)
+    if not r then
+        print("MAINDB:ERROE ENCODE", str, tostring(data))
+    end
+    return str
+end
+
+local function decode(str)
+    local r, data = pcall(json.decode, str)
+    if not r then
+        print("MAINDB:ERROE DECODE", data, tostring(str))
+    end
+    return data
+end
+local rpc = SHARD_MOD_RPC[dbnamespace]["maindb"]
+
+local MainDB = Class(function(self, inst)
+    self.Inited = false
+    -- 数据
+    self.data = {}
+    self.noSyn = {}
+    -- 事件
+    self.listenid = 1
+    self.events = {}
+    -- 异步
+    self.AsynId = 1
+    self.Asyns = {}
+    -- RPC！
+    self.RPCHandles = {}
+
+    self.Syn = { -- 记录同步顺序和同步状态
+        syntime = 600, -- 默认600秒同步一次
+        roottime = 1, -- 默认每1秒同步一个根
+
+        syning = 0,
+        rooting = 0,
+        this = nil
+    }
 end)
---基础模块
-function  MainDB:Init(namespace) --初始化
-    self:Sync()
+-- 基础模块
+function MainDB:Init(namespace, syntime, roottime) -- 初始化
+    if self.Inited then
+        return
+    end
+    dbhandles[namespace] = self
+    self.namespace = namespace
+    self.Inited = true
+    self.Syn.syntime = syntime or 600 -- 默认600秒同步一次  0 不同步
+    self.Syn.roottime = roottime or 1 -- 默认每1秒只同步一个 根 注意 根数量 * 根更新时间 要小于同步时间
 end
-function  MainDB:Send() --发送数据
-    
+function MainDB:UnInit(e) -- 卸载
+    self.inited = false
+    self.namespace = nil
+    dbhandles[self] = nil
 end
-function  MainDB:Handle()   --处理收到的数据
-    
+function MainDB:Send(id, cmd, data, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
+    SendModRPCToShard(rpc, id, self.namespace, cmd, data, ...)
+end
+function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
+    if cmd == "event" then -- 推送事件
+        return self:HandleEvent(id, data, data2)
+    elseif cmd == "Sync" then -- 对方要求我方发送所有数据 进行同步
+        if id  == sid then return end    --不处理自己的 
+        local keys, hashs, str = self:GetRootHash(data)
+        if keys == data2 and hashs == data3 then
+            return self:Send(id, "SyncReply", data, hashs) -- 数据一致 不需要同步
+        end
+        return self:Send(id, "SyncReply", data, hashs, str) -- 数据一致 不需要同步
+    elseif cmd == "SyncReply" then -- 对方要求我方发送所有数据 进行同步
+        if id  == sid then return end    --不处理自己的 
+        if not data3 then
+            return -- 数据一致 不需要更新
+        end
+        local hashs = data2
+        if hashs ~= hash(data3 or "") then
+            print("MAINDB:ERROE HASHCHECK FAILD", data)
+            return
+        end
+        local d = decode(data3)
+        if type(d) == "table" then
+            if data then
+                if self.data[data] then
+                    self.data[data] = d
+                end
+            else
+                for k, v in pairs(self.data) do
+                    if d[k] then
+                        self[k] = v
+                    end
+                end
+            end
+        end
+        return
+    elseif cmd == "Set" then -- 通知对方有数据修改
+        if id  == sid then return end    --不处理自己的 
+        if self.data[data] then
+            self.data[data][data2] = decode(data3)
+        end
+    elseif cmd == "Asyn" then -- 异步请求
+        local aid = data
+        local cmdd = data2
+        local req = decode(data3)
+        if cmdd == "Get" then
+            if req.root and req.key then
+                local d = {self:Get(req.root, req.key)}
+                return self:AsynReply(id, aid, cmdd, d)
+            end
+        elseif cmdd == "Set" then
+            if req.root and req.key and req.value then
+                local d = {self:Set(req.root, req.key, req.value)}
+                return self:AsynReply(id, aid, cmdd, d)
+            end
+        end
+       
+        local d = {self:RPCHandle(id, cmdd, req)}
+        return self:AsynReply(id, aid, cmd, d)
+    elseif cmd == "AsynReply" then -- 异步回复
+        local aid = data
+        local cmd = data2
+        local ret = decode(data3)
+        if self.Asyns[aid] then
+            self.Asyns[aid].ret = ret
+            self.Asyns[aid].status = 1
+        end
+        return
+    end
+
+end
+function MainDB:Asyn(id, cmd, req) -- 创建异步
+    local asyn = {
+        AsynId = "A" .. self.AsynId, -- 请求ID
+        cmd = cmd,
+        req = req, -- 请求数据
+        ret = {}, -- 返回数据
+        status = 0, --
+        timeout = 90 -- 默认最多等待3s
+    }
+    asyn.Wait = function(s)
+        while s.status < 1 and s.timeout > 0 do
+            s.timeout = s.timeout - 1
+            Sleep(FRAMES)
+        end
+        self.Asyns[s.AsynId] = nil
+        if s.timeout < 1 then
+            return false
+        end
+        return true, s.ret
+    end
+    self.Asyns[asyn.AsynId] = asyn
+    self.AsynId = self.AsynId + 1
+    self:Send(id, "Asyn", asyn.AsynId, cmd, encode(req))
+    return asyn
 end
 
-function  MainDB:Save()   --保存数据
-    
+function MainDB:AsynReply(id, aid, cmd, ret) -- 异步回复
+    self:Send(id, "AsynReply", aid, cmd, encode(ret))
+end
+function MainDB:GetRootHash(root) -- 获取hash值 用于对比同步
+    local keys = 0
+    local hashs = 0
+    local str = ""
+    if not root then
+        for k, v in pairs(self.data) do
+            for ik, iv in paris(v) do
+                keys = keys + 1
+            end
+        end
+        str = encode(self.data)
+        hashs = hash(str)
+    elseif self.data[root] then
+        for k, v in pairs(self.data[root]) do
+            keys = keys + 1
+        end
+        str = encode(self.data[root])
+        hashs = hash(str)
+    end
+    return keys, hashs, str
 end
 
-function  MainDB:Load()   --读取数据
-    
-end
---逻辑模块
-function  MainDB:Get() --发送数据
-    
+function MainDB:OnSave() -- 保存数据--组件保存 如果想写到文件 请重写这个方法
+    return self.data
 end
 
-function  MainDB:Set() --发送数据
-    
+function MainDB:OnLoad(data) -- 读取数据--组件读取
+    if data and next(data) then
+        for k, v in pairs(self.data) do
+            self.data[k] = data[k] or {}
+        end
+    end
 end
 
-
-function  MainDB:Sync() --强制同步
-    
+-- 数据同步模块
+function MainDB:InitRoot(root, noSyn) -- 创建根 参数是是否自动同步 
+    -- noSyn  1 不进行 定时同步  2 不进行手动同步 3 定时手动同步都不进行
+    self.data[root] = {}
+    self.noSyn[root] = noSyn
 end
+
+function MainDB:UnInitRoot(root) -- 销毁根 不再进行相关操作  一般不需要
+    self.data[root] = nil
+end
+
+function MainDB:Get(root, key, value) -- 获取数据 value是默认值 获取的是缓存的数据 
+    return self.data[root] and self.data[root][key] or value
+end
+
+function MainDB:GetRoot(root) -- 获取整个根的数据 可以用于遍历 但是请勿修改！！！
+    return self.data[root]
+end
+function MainDB:Set(root, key, value) -- 设置数据 并通知其他世界更新 
+    if self.data[root] then
+        self.data[root][key] = value
+        if self.noSyn[root] and self.noSyn[root] > 1 then -- 不进行手动同步
+            return true
+        end
+        self:Send(nil, "Set", root, key, encode(value)) -- 通知所有人修改
+        return true
+    end
+    return false, "No Root"
+end
+
+function MainDB:Sync(root) -- 强制同步 允许只同步一个 根 或者 同步所有的根  非必要不建议整根同步
+    local keys, hashs = self:GetRootHash(root)
+    self:Send(mid, "Sync", root, keys, hashs) -- 同步数据 同步完不要立刻获取 有延迟！
+end
+
+function MainDB:AsynGet(root, key, value) -- 异步获取 获取主世界存储的值 只能在协程里使用
+    local s = self:Asyn(mid, "Get", {
+        root = root,
+        key = key
+    })
+    local r, data = s:Wait()
+    if r then
+        return  data[1]
+    else
+        return value
+    end
+end
+
+function MainDB:AsynSet(root, key, value) -- 异步设置 直接设置主世界的值 只能在协程里使用
+    local s = self:Asyn(mid, "Set", {
+        root = root,
+        key = key,
+        value = value
+    })
+    local r, data = s:Wait()
+    if r then
+        return data[1], data[2]
+    else
+        return false
+    end
+end
+
+-- 事件相关 
+function MainDB:HandleEvent(id, event, data) -- 处理事件并分发给event
+    if event and self.events[event] then
+        for k, v in pairs(self.events[event]) do
+            v.fn(id, data, event)
+        end
+    end
+end
+
+function MainDB:PushEvent(event, data, toid) -- 推送事件  不会保存
+    self:Send(toid, "event", event, encode(data))
+end
+
+function MainDB:ListenForEvent(event, fn) -- 监听事件   不会保存
+    local listener = {
+        lisid = "l" .. self.listenid,
+        event = event,
+        fn = fn,
+        inst = self
+    }
+    if not self.events[event] then
+        self.events[event] = {}
+    end
+    self.events[event][listener.lisid] = listener
+    self.listenid = self.listenid + 1
+    return listener
+end
+
+function MainDB:RemoveEvent(listener) -- 监听事件   不会保存
+    if listener and listener.lisid and self.events[listener.event] and self.events[listener.event][listener.lisid] then
+        self.events[listener.event][listener.lisid] = nil
+    end
+end
+
+-- 远程函数调用
+
+function MainDB:RPC(id, cmd, data) -- 远程函数调用
+    id = id or mid -- 为空发给主世界  禁止广播
+    local s = self:Asyn(id, cmd, encode(data))
+    local r,data = s:Wait()
+    if r then
+        return unpack(data)
+    else
+        return false,"Time Out"
+    end
+end
+
+function MainDB:RPCHandle(id, cmd, data) -- 远程函数处理
+    if cmd and self.RPCHandles[cmd] then
+        return true,self.RPCHandles[cmd](id, decode(data))
+    end
+    return false,"NO Handle"
+end
+
+function MainDB:AddRPCHandle(cmd, fn) -- 远程函数处理
+    if cmd then
+        self.RPCHandles[cmd] = fn
+    end
+end
+
+function MainDB:RemoveRPCHandle(cmd) -- 远程函数处理
+    if cmd then
+        self.RPCHandles[cmd] = nil
+    end
+end
+
+local MaindbUpdataTask -- 自动同步用的周期任务
+local MainConnect = false
+
+local function MaindbUpdataFn()
+    local MConnect = Shard_IsWorldAvailable()
+    if not MainConnect and MConnect then
+        -- 连接上主世界了 同步一次
+        for k, db in pairs(dbhandles) do
+            for ik, iv in pairs(v.data) do
+                if not db.noSyn[ik] or db.noSyn[ik] == 2 then
+                    db:Sync(ik)
+                end
+            end
+        end
+        return
+    end
+    MainConnect = MConnect
+
+    for k, db in pairs(dbhandles) do
+        if db.Syn.syning < 1 then
+            db.Syn.syning = db.Syn.syning + 1
+        end
+        db.Syn.syning = db.Syn.syning - 1
+        db.Syn.rooting = db.Syn.rooting - 1
+        if db.Syn.syning < 1 then
+            db.Syn.this = next(db.data)
+        end
+        if db.Syn.this and db.Syn.rooting < 1 then
+            while db.Syn.syning < db.Syn.syntime do
+                local this = db.Syn.this
+                if not db.noSyn[this] or db.noSyn[this] == 2 then
+                    db:Sync(this)
+                    db.Syn.syning = db.Syn.syntime
+                end
+                db.Syn.this = next(db.data,this)
+            end
+        end
+    end
+end
+if not ismaster then -- 主世界不需要去同步
+    AddSimPostInit(function(inst)
+        MaindbUpdataTask = TheWorld:DoPeriodicTask(1, MaindbUpdataFn)
+    end)
+end
+
+function CreateMainDB(namespace, syntime, roottime)
+    local db = MainDB(namespace)
+    db:Init(namespace, syntime, roottime)
+    return db
+end
+
+--下面是测试代码 
+
+GLOBAL.DB = CreateMainDB("test",300,1)
+AddPrefabPostInit("forest",function(inst)
+    inst.components.TestDB = DB
+end)
+
+DB:InitRoot("ShopInfo")
+DB:InitRoot("ShopInfo2")
+DB:InitRoot("ShopInfo3")
+DB:InitRoot("Shops",1)
+DB:InitRoot("Info",2)
+DB:InitRoot("ITEMS",3)
+
+DB:AddRPCHandle("test",function (...) print("RPC Do",...) return "Rpc REQ" end)
+DB:ListenForEvent("test",function (...) print("Event Do",...) end)
+DB:AddRPCHandle("remote",function (id,data) if data then 
+    local fn = loadstring(data)
+    if type(fn) == "function" then 
+        local r,ret = pcall(fn) 
+        return ret
+    end
+end end)
+
+--[[
+测试指令
+DB:Set("ShopInfo","a",2)  DB:Set("Shops","a",1)  DB:Set("Info","a",1)  DB:Set("ITEMS","a",1)
+print(DB:Get("ShopInfo","a") ,DB:Get("Shops","a") ,DB:Get("Info","a"),DB:Get("ITEMS","a"))
+
+DB:PushEvent("test",{a=1})
+TheWorld:StartThread(function () print("AsynGet",DB:AsynGet("ITEMS","a")) end)
+
+TheWorld:StartThread(function () print("AsynSet",DB:AsynSet("ITEMS","a",3)) end)
+
+TheWorld:StartThread(function () print("RPC",DB:RPC(1,"test",{a={b={c=1}}})) end)
+TheWorld:StartThread(function () print("RPC",DB:RPC(1,"remote","print (111) return 111")) end)
+]]--
