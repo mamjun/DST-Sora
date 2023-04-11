@@ -34,7 +34,15 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] --
 local key = "sora" -- 防冲突
 --[[  doc && demo 
-数据同步结构
+快速导航        
+数据同步模块
+事件模块
+RPC模块
+测试代码 
+
+!!!注意 所有的data部分 都可以为 table 但是都只允许 出现 int string table,  不允许 class function entity userdata 等!!!
+
+--数据同步模块
 
   self.data = {
     root1 = {
@@ -48,6 +56,7 @@ local key = "sora" -- 防冲突
     key和eoot只允许为 string 或者 int 类型的 
     value 可以为 string int 或者 table
   }
+
 
   每个根可以单独定义是否 在设置的时候同步(下称手动同步)  或者 定期完整同步一次(下称自动同步)
   手动同步 一次只发送修改的key 和 对应的数据  修改完数据会立刻发送同步
@@ -120,16 +129,174 @@ local key = "sora" -- 防冲突
     end)
 
 
+
+
+
+--事件模块 
+
+  self.events = {
+    event1 = {
+        listener1 = {
+            lisid = string,
+            event = string,
+            fn = fn,
+            inst = self
+        },
+        listener2 = {
+            lisid = string,
+            event = string,
+            fn = fn,
+            inst = self
+        },
+    },
+    event2 = {
+        listener1 = {
+            lisid = string,
+            event = string,
+            fn = fn,
+            inst = self
+        },
+        listener2 = {
+            lisid = string,
+            event = string,
+            fn = fn,
+            inst = self
+        },
+    },
+  }
+
+  类似于饥荒本身的事件机制 但是也有区别 
+        1,ListenForEvent 会返回一个 listener 移除是使用这个移除 
+        2,ListenForEvent 不绑定实体 不会根据实体移除而自动移除 
+        3 ListenForEvent的 fn的参数也不一致 
+
+
+  可用方法：
+  MainDB:PushEvent(event, data, toid)       推送一个事件 event 名称 data内容可以为table
+                                            toid 为空是 发给所有世界 包含自己
+                                            {"1","2","3"} 发给指定的世界 
+                                            "1" 发给指定的世界 
+  MainDB:ListenForEvent(event, fn)          监听一个事件  返回一个 listener对象 
+                                            fn 参数  (id,data,event)      
+                                                id 事件来源WORLDID
+                                                data 事件data
+                                                event 事件名称  不常用 但是可以支持 一个函数处理多个event 
+
+  MainDB:RemoveEvent(listener)              移除一个监听 需要ListenForEvent返回的 listener 对象 
+
+
+  示例：
+    --modmain 环境
+    modimport "soramaindb"
+    local ShopInfo = CreateMainDB("ShopInfo")
+    loccal listener = DB:ListenForEvent("test",function (...) print("Event Do",...) end)
+
+    --运行中 
+    ShopInfo:PushEvent("test","a")   --推送给所有世界
+    ShopInfo:PushEvent("test","a",{"1","3","5"})   --推送给世界 1 3 5
+    ShopInfo:PushEvent("test","a","6")   --推送给 世界6
+
+    DB:RemoveEvent(listener) --移除监听  一般不需要调用 
+
+
+--RPC模块 
+  self.RPCHandles = {
+        cmd1 = fn1,
+        cmd2 = fn2,
+  }
+
+  类似于饥荒本身的事件机制 但是也有区别 
+        1,ListenForEvent 会返回一个 listener 移除是使用这个移除 
+        2,ListenForEvent 不绑定实体 不会根据实体移除而自动移除 
+        3 ListenForEvent的 fn的参数也不一致 
+
+
+  可用方法：
+  MainDB:RPC(id,event, data)        推送一个RPC  
+                                    id 只能是字符串 
+                                    event名称 data内容可以为table
+                                    只能在协程里使用 
+                                    会返回  true, RpcHandle返回的 值
+                                    或者  fakse,识别原因
+                                            
+
+  MainDB:AddRPCHandle(cmd,fn)          监听一个RPC 
+                                            fn 参数  (id,data,cmd)      
+                                                id 事件来源WORLDID
+                                                data 事件data
+                                                cmd RPC名称  不常用 但是可以支持 一个函数处理多个event 
+
+  MainDB:RemoveRPCHandle(cmd)              移除一个RPC监听 参数是 cmd 
+
+
+  示例：
+    --modmain 环境
+    modimport "soramaindb"
+    local ShopInfo = CreateMainDB("ShopInfo")
+    DB:ListenForEvent("test",function (...) print("Event Do",...) end)
+    DB:AddRPCHandle("remote",function (id,data) if data then 
+    local fn = loadstring(data)
+        if type(fn) == "function" then 
+        local r,ret = pcall(fn) 
+        return ret
+        end
+    end end)
+
+    --运行中 
+    TheWorld:StartThread(function () print("RPC",DB:RPC(1,"test",{a={b={c=1}}})) end)
+    TheWorld:StartThread(function () print("RPC",DB:RPC(1,"remote","print (111) return 111")) end)
+
 ]]
+
+--[[
+    --下面是测试代码 
+
+GLOBAL.DB = CreateMainDB("test",300,1)
+AddPrefabPostInit("forest",function(inst)
+    inst.components.TestDB = DB
+end)
+
+DB:InitRoot("ShopInfo")
+DB:InitRoot("ShopInfo2")
+DB:InitRoot("ShopInfo3")
+DB:InitRoot("Shops",1)
+DB:InitRoot("Info",2)
+DB:InitRoot("ITEMS",3)
+
+DB:AddRPCHandle("test",function (...) print("RPC Do",...) return "Rpc REQ" end)
+DB:ListenForEvent("test",function (...) print("Event Do",...) end)
+DB:AddRPCHandle("remote",function (id,data) if data then 
+    local fn = loadstring(data)
+    if type(fn) == "function" then 
+        local r,ret = pcall(fn) 
+        return ret
+    end
+end end)
+
+]]
+--[[
+测试指令
+DB:Set("ShopInfo","a",2)  DB:Set("Shops","a",1)  DB:Set("Info","a",1)  DB:Set("ITEMS","a",1)
+print(DB:Get("ShopInfo","a") ,DB:Get("Shops","a") ,DB:Get("Info","a"),DB:Get("ITEMS","a"))
+
+DB:PushEvent("test",{a=1})
+TheWorld:StartThread(function () print("AsynGet",DB:AsynGet("ITEMS","a")) end)
+
+TheWorld:StartThread(function () print("AsynSet",DB:AsynSet("ITEMS","a",3)) end)
+
+TheWorld:StartThread(function () print("RPC",DB:RPC(1,"test",{a={b={c=1}}})) end)
+TheWorld:StartThread(function () print("RPC",DB:RPC(1,"remote","print (111) return 111")) end)
+]]
+
+
 
 if not TheNet:GetIsServer() then
     return
 end
-
 local dbnamespace = key .. "maindb"
 local dbhandles = {}
 local sid = TheShard:GetShardId() -- 自身ID
-local mid = SHARDID.MASTER -- 主世界ID
+local mid = sid == "0" and "0" or SHARDID.MASTER -- 主世界ID
 local ismaster = TheShard:IsMaster()
 
 AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
@@ -200,20 +367,25 @@ function MainDB:UnInit(e) -- 卸载
     dbhandles[self] = nil
 end
 function MainDB:Send(id, cmd, data, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
-    SendModRPCToShard(rpc, id, self.namespace, cmd, data, ...)
+    if tostring(id) == tostring(sid) then 
+        print("MAIN DB LOCAL RPC",cmd, data, ...)
+        self:Handle(id, cmd, data, ...)
+    else
+        SendModRPCToShard(rpc, id, self.namespace, cmd, data, ...)
+    end
 end
 function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
     if cmd == "event" then -- 推送事件
         return self:HandleEvent(id, data, data2)
     elseif cmd == "Sync" then -- 对方要求我方发送所有数据 进行同步
-        if id  == sid then return end    --不处理自己的 
+        if tostring(id) == tostring(sid) then return end    --不处理自己的 
         local keys, hashs, str = self:GetRootHash(data)
         if keys == data2 and hashs == data3 then
             return self:Send(id, "SyncReply", data, hashs) -- 数据一致 不需要同步
         end
         return self:Send(id, "SyncReply", data, hashs, str) -- 数据一致 不需要同步
     elseif cmd == "SyncReply" then -- 对方要求我方发送所有数据 进行同步
-        if id  == sid then return end    --不处理自己的 
+        if tostring(id) == tostring(sid) then return end    --不处理自己的 
         if not data3 then
             return -- 数据一致 不需要更新
         end
@@ -238,10 +410,11 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
         end
         return
     elseif cmd == "Set" then -- 通知对方有数据修改
-        if id  == sid then return end    --不处理自己的 
+        if tostring(id) == tostring(sid) then return end    --不处理自己的 
         if self.data[data] then
             self.data[data][data2] = decode(data3)
         end
+        return
     elseif cmd == "Asyn" then -- 异步请求
         local aid = data
         local cmdd = data2
@@ -288,7 +461,7 @@ function MainDB:Asyn(id, cmd, req) -- 创建异步
         end
         self.Asyns[s.AsynId] = nil
         if s.timeout < 1 then
-            return false
+            return false,"TimeOut"
         end
         return true, s.ret
     end
@@ -434,7 +607,7 @@ end
 -- 远程函数调用
 
 function MainDB:RPC(id, cmd, data) -- 远程函数调用
-    id = id or mid -- 为空发给主世界  禁止广播
+    id = type(id) == "string" and id  or mid -- 为空发给主世界  禁止广播
     local s = self:Asyn(id, cmd, encode(data))
     local r,data = s:Wait()
     if r then
@@ -446,7 +619,7 @@ end
 
 function MainDB:RPCHandle(id, cmd, data) -- 远程函数处理
     if cmd and self.RPCHandles[cmd] then
-        return true,self.RPCHandles[cmd](id, decode(data))
+        return true,self.RPCHandles[cmd](id, decode(data),cmd)
     end
     return false,"NO Handle"
 end
@@ -514,7 +687,7 @@ function CreateMainDB(namespace, syntime, roottime)
     return db
 end
 
---下面是测试代码 
+
 
 GLOBAL.DB = CreateMainDB("test",300,1)
 AddPrefabPostInit("forest",function(inst)
@@ -538,6 +711,7 @@ DB:AddRPCHandle("remote",function (id,data) if data then
     end
 end end)
 
+
 --[[
 测试指令
 DB:Set("ShopInfo","a",2)  DB:Set("Shops","a",1)  DB:Set("Info","a",1)  DB:Set("ITEMS","a",1)
@@ -550,4 +724,4 @@ TheWorld:StartThread(function () print("AsynSet",DB:AsynSet("ITEMS","a",3)) end)
 
 TheWorld:StartThread(function () print("RPC",DB:RPC(1,"test",{a={b={c=1}}})) end)
 TheWorld:StartThread(function () print("RPC",DB:RPC(1,"remote","print (111) return 111")) end)
-]]--
+]]
