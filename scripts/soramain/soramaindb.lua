@@ -480,7 +480,7 @@ function MainDB:GetRootHash(root) -- 获取hash值 用于对比同步
     local str = ""
     if not root then
         for k, v in pairs(self.data) do
-            for ik, iv in paris(v) do
+            for ik, iv in pairs(v) do
                 keys = keys + 1
             end
         end
