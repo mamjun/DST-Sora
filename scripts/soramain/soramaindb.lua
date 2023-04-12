@@ -297,8 +297,8 @@ local dbnamespace = key .. "maindb"
 local dbhandles = {}
 local sid = TheShard:GetShardId() -- 自身ID
 local mid = sid == "0" and "0" or SHARDID.MASTER -- 主世界ID
-local ismaster = TheShard:IsMaster()
-
+local ismaster = TheShard:IsMaster() or mid == "0"
+print("AddShardModRPCHandler",AddShardModRPCHandler,env,AddShardModRPCHandler,GLOBAL.AddShardModRPCHandler)
 AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
     if not ns then
         return
@@ -656,19 +656,23 @@ local function MaindbUpdataFn()
 
     for k, db in pairs(dbhandles) do
         if db.Syn.syning < 1 then
-            db.Syn.syning = db.Syn.syning + 1
+            db.Syn.syning = db.Syn.syntime + 1
         end
         db.Syn.syning = db.Syn.syning - 1
         db.Syn.rooting = db.Syn.rooting - 1
         if db.Syn.syning < 1 then
             db.Syn.this = next(db.data)
         end
+        print(db.Syn.this , db.Syn.rooting,db.Syn.roottime,db.Syn.syning,db.Syn.syntime)
         if db.Syn.this and db.Syn.rooting < 1 then
-            while db.Syn.syning < db.Syn.syntime do
+            while db.Syn.rooting < db.Syn.roottime do
                 local this = db.Syn.this
-                if not db.noSyn[this] or db.noSyn[this] == 2 then
+                if not this then
+                    db.Syn.rooting = db.Syn.roottime
+                    break
+                elseif not db.noSyn[this] or db.noSyn[this] == 2 then
                     db:Sync(this)
-                    db.Syn.syning = db.Syn.syntime
+                    db.Syn.rooting = db.Syn.roottime
                 end
                 db.Syn.this = next(db.data,this)
             end
@@ -689,27 +693,27 @@ end
 
 
 
-GLOBAL.DB = CreateMainDB("test",300,1)
-AddPrefabPostInit("forest",function(inst)
-    inst.components.TestDB = DB
-end)
+-- GLOBAL.DB = CreateMainDB("test",300,1)
+-- AddPrefabPostInit("forest",function(inst)
+--     inst.components.TestDB = DB
+-- end)
 
-DB:InitRoot("ShopInfo")
-DB:InitRoot("ShopInfo2")
-DB:InitRoot("ShopInfo3")
-DB:InitRoot("Shops",1)
-DB:InitRoot("Info",2)
-DB:InitRoot("ITEMS",3)
+-- DB:InitRoot("ShopInfo")
+-- DB:InitRoot("ShopInfo2")
+-- DB:InitRoot("ShopInfo3")
+-- DB:InitRoot("Shops",1)
+-- DB:InitRoot("Info",2)
+-- DB:InitRoot("ITEMS",3)
 
-DB:AddRPCHandle("test",function (...) print("RPC Do",...) return "Rpc REQ" end)
-DB:ListenForEvent("test",function (...) print("Event Do",...) end)
-DB:AddRPCHandle("remote",function (id,data) if data then 
-    local fn = loadstring(data)
-    if type(fn) == "function" then 
-        local r,ret = pcall(fn) 
-        return ret
-    end
-end end)
+-- DB:AddRPCHandle("test",function (...) print("RPC Do",...) return "Rpc REQ" end)
+-- DB:ListenForEvent("test",function (...) print("Event Do",...) end)
+-- DB:AddRPCHandle("remote",function (id,data) if data then 
+--     local fn = loadstring(data)
+--     if type(fn) == "function" then 
+--         local r,ret = pcall(fn) 
+--         return ret
+--     end
+-- end end)
 
 
 --[[
