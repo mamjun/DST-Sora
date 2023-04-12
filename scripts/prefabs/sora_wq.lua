@@ -75,10 +75,11 @@ local function onattack(inst, attacker, target)
 end
 local function onequip(inst, owner)
     inst.owner = owner
-
+    
     owner.AnimState:OverrideSymbol("swap_object", "sora_wq", "swap_wq")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
+    if not owner:HasTag("sora") then return end
     owner.components.combat.externaldamagemultipliers:SetModifier("sora_wq",inst.damageup)
     if owner.components.combat.external_critical_damage_multipliers then
         owner.components.combat.external_critical_damage_multipliers:SetModifier(inst, 0.442, "sora_wq")

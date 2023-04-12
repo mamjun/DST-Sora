@@ -32,7 +32,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 主世界负责存取写入数据
 从世界负责查询
 ]] --
-local key = "sora" -- 防冲突
+local key = env.MODKEY or env.modkey or env.modname or "" -- 防冲突       可以在外面定义
+local rpcprint = env.DEBUGPRINT or env.DebugPrint or print  --可以在外面定义在实现根据条件屏蔽RPC的print 太多太刷屏了！
+
 --[[  doc && demo 
 快速导航        
 数据同步模块
@@ -294,19 +296,20 @@ if not TheNet:GetIsServer() then
     return
 end
 local dbnamespace = key .. "maindb"
+dbnamespace = dbnamespace:lower()
 local dbhandles = {}
 local sid = TheShard:GetShardId() -- 自身ID
 local mid = sid == "0" and "0" or SHARDID.MASTER -- 主世界ID
 local ismaster = TheShard:IsMaster() or mid == "0"
-print("AddShardModRPCHandler",AddShardModRPCHandler,env,AddShardModRPCHandler,GLOBAL.AddShardModRPCHandler)
-AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
+--print("AddShardModRPCHandler",AddShardModRPCHandler,env,AddShardModRPCHandler,GLOBAL.AddShardModRPCHandler)
+env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
     if not ns then
         return
     end -- 无namespace 
     if not (dbhandles[ns] and dbhandles[ns].Handle) then
         return
     end -- 无handle
-    print("MAIN DB RPC",id, ns, cmd, data, ...)
+    rpcprint("MAIN DB RPC",id, ns, cmd, data, ...)
     return dbhandles[ns]:Handle(id, cmd, data, ...)
 end)
 
@@ -368,7 +371,7 @@ function MainDB:UnInit(e) -- 卸载
 end
 function MainDB:Send(id, cmd, data, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
     if tostring(id) == tostring(sid) then 
-        print("MAIN DB LOCAL RPC",cmd, data, ...)
+        rpcprint("MAIN DB LOCAL RPC",cmd, data, ...)
         self:Handle(id, cmd, data, ...)
     else
         SendModRPCToShard(rpc, id, self.namespace, cmd, data, ...)
@@ -663,7 +666,6 @@ local function MaindbUpdataFn()
         if db.Syn.syning < 1 then
             db.Syn.this = next(db.data)
         end
-        print(db.Syn.this , db.Syn.rooting,db.Syn.roottime,db.Syn.syning,db.Syn.syntime)
         if db.Syn.this and db.Syn.rooting < 1 then
             while db.Syn.rooting < db.Syn.roottime do
                 local this = db.Syn.this
