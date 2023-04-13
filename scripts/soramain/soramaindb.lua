@@ -344,6 +344,9 @@ local MainDB = Class(function(self, inst)
     -- RPC！
     self.RPCHandles = {}
 
+
+    self.Bigs = {}  --大数据传输
+
     self.Syn = { -- 记录同步顺序和同步状态
         syntime = 600, -- 默认600秒同步一次
         roottime = 1, -- 默认每1秒同步一个根
@@ -369,32 +372,65 @@ function MainDB:UnInit(e) -- 卸载
     self.namespace = nil
     dbhandles[self] = nil
 end
-function MainDB:Send(id, cmd, data, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
+local maxsenddata = 60000
+function MainDB:Send(id, cmd, data,data2,data3, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
+    if type(data3) == "string" and #data3 > maxsenddata then
+        local all = math.ceil(#data3 / maxsenddata)
+        local hashs = hash(data3)
+        local bigdataid =sid.."|".. tostring(os.time()) .."|" .. tostring(hashs)
+        
+        for i=1,all do 
+            if i==1 then        --只有第一部分带全部的参数 和 data3的第一个分段
+                local data3tosend  = data3:sub(1,maxsenddata)
+                self:Send(id,"BigData",encode({bid = bigdataid,all =all,i=i,hashs=hashs}),encode({cmd=cmd,data=data,data2=data2}),data3tosend,...)
+            else
+                local data3tosend  = data3:sub(maxsenddata*i-maxsenddata+1,maxsenddata*i)
+                self:Send(id,"BigData",encode({bid = bigdataid,all =all,i=i,hashs=hashs}),nil,data3tosend,nil)
+            end
+        end
+        return 
+    end
     if tostring(id) == tostring(sid) then 
-        rpcprint("MAIN DB LOCAL RPC",cmd, data, ...)
-        self:Handle(id, cmd, data, ...)
+        rpcprint("MAIN DB LOCAL RPC",cmd, data, data2,data3,...)
+        self:Handle(id, cmd, data, data2,data3,...)
     else
-        SendModRPCToShard(rpc, id, self.namespace, cmd, data, ...)
+        SendModRPCToShard(rpc, id, self.namespace, cmd, data, data2,data3,...)
     end
 end
 function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
     if cmd == "event" then -- 推送事件
-        return self:HandleEvent(id, data, data2)
+        return self:HandleEvent(id, data, data3)
     elseif cmd == "Sync" then -- 对方要求我方发送所有数据 进行同步
         if tostring(id) == tostring(sid) then return end    --不处理自己的 
-        local keys, hashs, str = self:GetRootHash(data)
-        if keys == data2 and hashs == data3 then
-            return self:Send(id, "SyncReply", data, hashs) -- 数据一致 不需要同步
+        local keys, hashs = self:GetRootHash(data,false)    --第一次只计算key key数量不一致直接同步 节省性能
+        if keys == data2 then
+            keys, hashs = self:GetRootHash(data,true)
+            if hashs == data3 then
+                return self:Send(id, "SyncReply", data, hashs) -- 数据一致 不需要同步
+            end
         end
-        return self:Send(id, "SyncReply", data, hashs, str) -- 数据一致 不需要同步
+        local str = ""
+        if data then
+            str = encode(self.data[data])
+        else
+            local tosend = {}
+            for k,v in pairs(self.data) do
+                if k and (not self.noSyn[k] or self.noSyn[k]==2 ) then
+                    tosend = self.data[k]
+                end
+            end
+            str = encode(tosend)
+        end
+        return self:Send(id, "SyncReply", data, hash(str), str) -- 数据一致 不需要同步
     elseif cmd == "SyncReply" then -- 对方要求我方发送所有数据 进行同步
         if tostring(id) == tostring(sid) then return end    --不处理自己的 
         if not data3 then
+            
             return -- 数据一致 不需要更新
         end
         local hashs = data2
         if hashs ~= hash(data3 or "") then
-            print("MAINDB:ERROE HASHCHECK FAILD", data)
+            print("MAINDB:ERROE HASH CHECK FAILD", data)
             return
         end
         local d = decode(data3)
@@ -445,6 +481,54 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
             self.Asyns[aid].status = 1
         end
         return
+    elseif cmd == "BigData" then -- 异步回复
+        data =decode(data)
+        if not (type(data) == "table") then return end
+        local bid = data.bid
+        if not self.Bigs[bid] then
+            self.Bigs[bid] = {
+                all = data.all ,
+                data3s = {},
+                cmd = nil,
+                hashs = nil,
+                data = nil,
+                data2 = nil,
+                endtime = os.time()+5,
+                others = nil,
+            }
+        end
+        if data.i ==1 then
+            self.Bigs[bid].cmd = data2 and  decode(data2).cmd
+            self.Bigs[bid].data = data2 and  decode(data2).data 
+            self.Bigs[bid].data2 = data2 and  decode(data2).data2 
+            self.Bigs[bid].others  = {...} 
+            self.Bigs[bid].hashs = data.hashs
+        end
+        self.Bigs[bid].data3s[data.i] = data3
+        if #self.Bigs[bid].data3s == self.Bigs[bid].all then        --收齐了 组包！
+            local bigdata3 = table.concat(self.Bigs[bid].data3s)
+            local bigdata = self.Bigs[bid]
+            self.Bigs[bid] = nil
+            if hash(bigdata3) == bigdata.hashs then
+                --print("MAIN DB BIG DATA CHECK OK",id,bigdata.cmd,bigdata.data,bigdata.data2,#bigdata3) 
+                self:Handle(id,bigdata.cmd,bigdata.data,bigdata.data2,bigdata3,bigdata.others and  unpack(bigdata.others))
+            else
+               print("MAIN DB BIG DATA CHECK FAILED",bid) 
+            end
+        end
+         --清理过期的 
+        local time = os.time()
+        local todel = {}
+        for k,v in pairs(self.Bigs) do
+            if v and v.endtime < time then  --五秒还没数据清了算了
+                todel [k] = 1
+            end
+        end
+        for k,v in pairs(todel) do     
+            self.Bigs[k] = nil
+            print("MAIN DB BIG DATA TIME OUT",k)
+        end
+        return
     end
 
 end
@@ -477,7 +561,20 @@ end
 function MainDB:AsynReply(id, aid, cmd, ret) -- 异步回复
     self:Send(id, "AsynReply", aid, cmd, encode(ret))
 end
-function MainDB:GetRootHash(root) -- 获取hash值 用于对比同步
+
+function MainDB:GetTableHash(t) --性能低就低吧
+    local kv = {}
+    for k,v in pairs(t) do
+        if type(v) == "table" then
+            table.insert(kv,k..self:GetTableHash(v))
+        else
+            table.insert(kv,k..tostring(v))
+        end
+    end
+    table.sort(kv,function (a,b) return hash(a)<hash(b)end)
+    return hash(table.concat(kv))
+end
+function MainDB:GetRootHash(root,needhash) -- 获取hash值 用于对比同步
     local keys = 0
     local hashs = 0
     local str = ""
@@ -487,16 +584,18 @@ function MainDB:GetRootHash(root) -- 获取hash值 用于对比同步
                 keys = keys + 1
             end
         end
-        str = encode(self.data)
-        hashs = hash(str)
+        if needhash then 
+            hashs = self:GetTableHash(self.data)
+        end
     elseif self.data[root] then
         for k, v in pairs(self.data[root]) do
             keys = keys + 1
         end
-        str = encode(self.data[root])
-        hashs = hash(str)
+        if needhash then 
+            hashs = self:GetTableHash(self.data[root])
+        end
     end
-    return keys, hashs, str
+    return keys, hashs
 end
 
 function MainDB:OnSave() -- 保存数据--组件保存 如果想写到文件 请重写这个方法
@@ -542,7 +641,7 @@ function MainDB:Set(root, key, value) -- 设置数据 并通知其他世界更�
 end
 
 function MainDB:Sync(root) -- 强制同步 允许只同步一个 根 或者 同步所有的根  非必要不建议整根同步
-    local keys, hashs = self:GetRootHash(root)
+    local keys, hashs = self:GetRootHash(root,true)
     self:Send(mid, "Sync", root, keys, hashs) -- 同步数据 同步完不要立刻获取 有延迟！
 end
 
@@ -583,7 +682,7 @@ function MainDB:HandleEvent(id, event, data) -- 处理事件并分发给event
 end
 
 function MainDB:PushEvent(event, data, toid) -- 推送事件  不会保存
-    self:Send(toid, "event", event, encode(data))
+    self:Send(toid, "event", event,nil, encode(data))
 end
 
 function MainDB:ListenForEvent(event, fn) -- 监听事件   不会保存
@@ -643,20 +742,22 @@ local MaindbUpdataTask -- 自动同步用的周期任务
 local MainConnect = false
 
 local function MaindbUpdataFn()
-    local MConnect = Shard_IsWorldAvailable()
+
+    local MConnect = Shard_IsWorldAvailable(mid)
     if not MainConnect and MConnect then
         -- 连接上主世界了 同步一次
         for k, db in pairs(dbhandles) do
-            for ik, iv in pairs(v.data) do
+            for ik, iv in pairs(db.data) do
                 if not db.noSyn[ik] or db.noSyn[ik] == 2 then
                     db:Sync(ik)
                 end
             end
         end
+        MainConnect = MConnect
         return
     end
     MainConnect = MConnect
-
+    
     for k, db in pairs(dbhandles) do
         if db.Syn.syning < 1 then
             db.Syn.syning = db.Syn.syntime + 1
