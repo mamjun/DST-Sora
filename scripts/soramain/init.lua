@@ -56,36 +56,7 @@ mi("logupload")
 mi("api")
 -- 导入maindb
 mi("soramaindb")
-if CreateMainDB then
-    GLOBAL.DB = CreateMainDB("test", 300, 1)
-    AddPrefabPostInit("forest", function(inst)
-        inst.components.TestDB = DB
-    end)
-
-    DB:InitRoot("ShopInfo")
-    DB:InitRoot("ShopInfo2")
-    DB:InitRoot("ShopInfo3")
-    DB:InitRoot("Shops", 1)
-    DB:InitRoot("Info", 2)
-    DB:InitRoot("ITEMS", 3)
-
-    DB:AddRPCHandle("test", function(...)
-        print("RPC Do", ...)
-        return "Rpc REQ"
-    end)
-    DB:ListenForEvent("test", function(...)
-        print("Event Do", ...)
-    end)
-    DB:AddRPCHandle("remote", function(id, data)
-        if data then
-            local fn = loadstring(data)
-            if type(fn) == "function" then
-                local r, ret = pcall(fn)
-                return ret
-            end
-        end
-    end)
-end
+mi("soramaindbinit")
 -- 导入皮肤api
 mi("skins")
 mi("soraskin")
