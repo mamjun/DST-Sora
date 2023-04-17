@@ -36,8 +36,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 	strings.CHARACTER_DESCRIPTIONS.sora = "悠远的天空\n在苍穹的尽头"
 	strings.CHARACTER_QUOTES.sora = "悠远的天空\n在苍穹的尽头"
     -- 角色台词
-	strings.CHARACTERS.SORA = require "soramain/speech"
-    local extend = require "soramain/speech_extend"
+    mi("speech")
+    mi("speech_extend")
+	strings.CHARACTERS.SORA = SORA_SPEECH
+    local extend = SORA_SPEECH_EXTEND
 	copytotable(strings.CHARACTERS.SORA,extend)
     -- 人物语言反馈
     strings.CHARACTERS.GENERIC.DESCRIBE.SORA = 

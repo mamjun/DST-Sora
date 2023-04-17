@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] local MakePlayerCharacter = require "prefabs/player_common"
-local soraconfig = require "config/config"
+local soraconfig = require "soraconfig/config"
 local fix = require "utils/soraplayerextend"
 require "debugtools"
 local assets = {Asset("SOUND", "sound/sora.fsb"), -- Asset( "ANIM", "anim/sora.zip" ),

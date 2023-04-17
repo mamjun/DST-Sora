@@ -27,33 +27,73 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-return      --非官方部分 手动维护
-{
-	DESCRIBE =
-	{
-		SEELE =         --和希儿的对话
-		{
-			GENERIC = "你需要来点HCl吗，%s？",
-		},
-    },
-    ANNOUNCE_EAT =
-	{
-		GENERIC = "没有悠做的好吃!",
-		PAINFUL = "不要，我不想吃这个.",
-		SPOILED = "悠，给我做新的！",
-		STALE = "悠，给我做新的！",
-		INVALID = "不要，我不想吃这个",
-        YUCKY = "我才不要吃这个呢！",
-        
-		COOKED = "不是很好吃.",
-		DRIED = "有点干,能给我来杯水吗.",
-        PREPARED = "虽然没有悠做的好吃,但是勉强能吃了!",
-		SAME_OLD_1 = "我想换个口味.",
-		SAME_OLD_2 = "我已经吃腻了.",
-		SAME_OLD_3 = "我快要吃吐了!.",
-		SAME_OLD_4 = "真的，我要吐了",
-        SAME_OLD_5 = "呕~",
-		TASTY = "吃起来很不错",
-    },
-}
+]] -- 初始化
+-- 配置读取
+MODKEY = "sora"
+SORADEBUG = modname:find("dev") and true or false
+DebugPrint = function(...)
+    if SORADEBUG  then
+        print(...)
+    end
+end
+
+GLOBAL.TUNING.SORAMODE = GetModConfigData("mode")
+mode = GLOBAL.TUNING.SORAMODE
+GLOBAL.TUNING.SORAADD = GetModConfigData("add")
+GLOBAL.TUNING.SORAWIKI = GetModConfigData("wiki", true)
+GLOBAL.TUNING.SORAPACK = GetModConfigData("pack")
+GLOBAL.TUNING.SORAADD2 = GetModConfigData("add2")
+GLOBAL.TUNING.SORACHESTRANGE = GetModConfigData("chest") or 60
+GLOBAL.TUNING.SORAMODNAME = modname
+GLOBAL.TUNING.SORAVERSION = modinfo.version
+-- 加载模块
+function mi(str)
+    modimport("soramain/" .. str)
+end
+-- 日志上传
+mi("logupload")
+-- 相关API 提供给mod使用
+mi("api")
+-- 导入maindb
+mi("soramaindb")
+mi("soramaindbinit")
+-- 导入皮肤api
+mi("skins")
+mi("soraskin")
+-- 资源加载
+mi("assets")
+-- 修改过的动画包
+mi("editedanim")
+-- 制作配方
+mi("recipes")
+-- 食物
+mi("food")
+-- 容器
+mi("containers")
+-- 字符
+mi("strings")
+-- UI
+if GetModConfigData("disableui_multab") then
+    function MakeRecipeTabMul()
+    end
+else
+    mi("ui_multab") -- 多层制作栏
+end
+mi("ui")
+-- 动作
+mi("action")
+-- 钩子相关 修改部分原有机制
+mi("hook")
+-- 兼容、联动
+mi("link")
+-- 平衡
+mi("ban")
+-- 修复klei的bug
+mi("kleibugfix")
+-- 自动更新
+modimport("scripts/soraupdate/main")
+-- 注册全局API
+GLOBAL.SoraAPI = env
+GLOBAL.SORAAPI = env
+-- 添加角色
+AddModCharacter("sora", "FEMALE")

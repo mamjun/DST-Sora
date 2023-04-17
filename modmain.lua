@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 GLOBAL.setmetatable(env, {__index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end}) 
-modimport("scripts/soramain/init")
+modimport("soramain/init")
     --prefab文件列表
     PrefabFiles = {
         "sora",

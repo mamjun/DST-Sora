@@ -442,7 +442,13 @@ local skinhandle = {
                             mes(inst, "你这个档已经领取过这个礼包了!")
                             return 
                         end
+                        local giftid = inst.userid .. "|" .. data.name
+                        if GLOBALDB:Get("giftsave",giftid) then 
+                            mes(inst, "你这个档已经领取过这个礼包了!!!")
+                            return 
+                        end
                         inst.components.soraglobalsave:Set(data.name,1)
+                        GLOBALDB:Set("giftsave",giftid,1)
                     end
                     if data.prefab then
                         local r,gifts = pcall(json.decode,data.prefab)

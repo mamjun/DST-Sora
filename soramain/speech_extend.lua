@@ -28,17 +28,33 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
-	local load = {
-		"sorabase",		--基础属性
-		"soracaneat",	--可以吃的东西
-		"soralevelup",	--等级和经验对应关系
-		"debug",		--debug辅助
-	}
-	mode = TUNING.SORAMODE
-	--print ("Sora->LoadConfig")
-	soraconfig = {}
-	for k,v in pairs (load) do
-		soraconfig [v] =  require ("config/"..v)
-	end
-	soraconfig.level = soraconfig.soralevelup
-	return soraconfig
+      --非官方部分 手动维护
+SORA_SPEECH_EXTEND = {
+	DESCRIBE =
+	{
+		SEELE =         --和希儿的对话
+		{
+			GENERIC = "你需要来点HCl吗，%s？",
+		},
+    },
+    ANNOUNCE_EAT =
+	{
+		GENERIC = "没有悠做的好吃!",
+		PAINFUL = "不要，我不想吃这个.",
+		SPOILED = "悠，给我做新的！",
+		STALE = "悠，给我做新的！",
+		INVALID = "不要，我不想吃这个",
+        YUCKY = "我才不要吃这个呢！",
+        
+		COOKED = "不是很好吃.",
+		DRIED = "有点干,能给我来杯水吗.",
+        PREPARED = "虽然没有悠做的好吃,但是勉强能吃了!",
+		SAME_OLD_1 = "我想换个口味.",
+		SAME_OLD_2 = "我已经吃腻了.",
+		SAME_OLD_3 = "我快要吃吐了!.",
+		SAME_OLD_4 = "真的，我要吐了",
+        SAME_OLD_5 = "呕~",
+		TASTY = "吃起来很不错",
+    },
+}
+return SORA_SPEECH_EXTEND

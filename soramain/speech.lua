@@ -28,8 +28,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
-return
-{
+
+SORA_SPEECH = {
 	ACTIONFAIL =
 	{
         APPRAISE = 
@@ -3379,3 +3379,5 @@ return
 		WINTERSFEASTFUEL = "很熟悉的味道，以前应该和悠一起吃过。",		--吃冬季盛宴食物
     },
 }
+
+return SORA_SPEECH
