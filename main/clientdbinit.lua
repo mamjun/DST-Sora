@@ -19,6 +19,7 @@ temp.serverfn = function(ns, db, userid)
         end
     end)
     db.inst = TheWorld
+    db:BindMainDB("data",MailDB,"Players")
 end
 
 temp.clientfn = function(ns, db, userid)

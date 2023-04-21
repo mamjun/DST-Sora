@@ -450,7 +450,7 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
             else
                 for k, v in pairs(self.data) do
                     if d[k] then
-                        self[k] = v
+                        self[k] = d[k]
                         self:Notice("MainDBRootSync",{namespace=self.namespace,root=k,value=v})
                     end
                 end

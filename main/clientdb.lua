@@ -29,6 +29,16 @@ end
 
 local function serverandclientrpchandle(id, ns, cmd, data, ...)
     -- rpcprint("Client DB RPC!", id, ns, cmd, data, ...)
+    if not ns and id  and cmd == "link" then
+        for k, temp in pairs(alltemps) do
+            if not GetClientDB(temp.namespace, id, true) then -- 找不到就创建
+                CreateClientDB(temp, id, true)
+                rpcprint("rpc 初始化",temp.namespace, id)
+            end
+            
+        end
+        return
+    end
     local dbhandles = id and serverdbhandles or clientdbhandles
     if not (dbhandles[ns] and dbhandles[ns].Handle) then
         return
@@ -63,8 +73,6 @@ local function decode(str)
 end
 local srpc = MOD_RPC[dbnamespace]["ClientDB"]
 local crpc = CLIENT_MOD_RPC[dbnamespace]["ClientDB"]
-GLOBAL.srpc = srpc
-GLOBAL.crpc = crpc
 
 local ClientDB = Class(function(self)
     self.namespace = nil
@@ -235,7 +243,7 @@ function ClientDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数
         end
         local hashs = data2
         if hashs ~= hash(data3 or "") then
-            print("MAINDB:ERROE HASH CHECK FAILD", data)
+            print("ClientDB:ERROE HASH CHECK FAILD", data)
             return
         end
         local d = decode(data3)
@@ -252,7 +260,7 @@ function ClientDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数
             else
                 for k, v in pairs(self.data) do
                     if d[k] then
-                        self[k] = v
+                        self.data[k] = d[k]
                         self:Notice("ClientBRootSync", {
                             namespace = self.namespace,
                             root = k,
@@ -474,7 +482,7 @@ function ClientDB:BindMainDB(selfroot, maindb, root)
         return maindb:GetRoot(root)
     end
     local changefn = function(i, data)
-        print("changefn", data.root, data.key)
+        --print("changefn", data.root, data.key)
         if data.root == root then
             if data.key then
                 self:Send(nil, "Set", selfroot, data.key, encode(data.value))
@@ -680,8 +688,8 @@ AddPrefabPostInit("world",function(inst)
         for k, temp in pairs(alltemps) do
             if not GetClientDB(temp.namespace, userid, true) then -- 找不到就创建
                 CreateClientDB(temp, userid, true)
-            end
-            --print("初始化",temp.namespace, userid)
+                rpcprint("event 初始化",temp.namespace, userid)
+            end  
         end
     end)
     inst:ListenForEvent("ms_clientdisconnected",function (i,d)
@@ -699,18 +707,12 @@ AddPrefabPostInit("world",function(inst)
             if serverdbhandles[k] then
                 serverdbhandles[k]:UnInit()
             end
-           --print("卸载",k)
+           rpcprint("卸载",k)
         end
     end)
 end)
 
 
-if not ismaster then -- 主世界不需要去同步
-    AddSimPostInit(function(inst)
-        ClientDBUpdataFn(nil, true)
-        ClientDBUpdataTask = TheWorld:DoPeriodicTask(1, ClientDBUpdataFn)
-    end)
-end
 
 AddPlayerPostInit(function(inst) -- 绑定玩家
     inst:DoTaskInTime(0, function()
@@ -774,8 +776,12 @@ AddSimPostInit(function()   --创建客户端的
                 CreateClientDB(temp, TheNet:GetUserID(), false)
             end
         end
+        SendModRPCToServer(srpc, nil,"link")
+        ClientDBUpdataFn(nil, true)
+        ClientDBUpdataTask = TheWorld:DoPeriodicTask(1, ClientDBUpdataFn)
     end
 end)
+
 function GetClientDB(tempornamespace, userid, IsServer)
     local namespace = (type(tempornamespace) == "table" and tempornamespace.namespace) or
                           (type(tempornamespace) == "string" and tempornamespace) or tempornamespace
