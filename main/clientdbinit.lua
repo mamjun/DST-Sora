@@ -3,17 +3,17 @@ if not CreateClientDB then
 end
 env.SoraClientDB = {}
 
-local temp = CreateClientDBTemple("chou", 30, 1)
-temp:InitRoot("data")   --up池 纠缠之源 这些小数据
-temp:InitRoot("record",3)   --大数据
+local temp = CreateClientDBTemple("chou", 300, 1)
+temp:InitRoot("data") -- up池 纠缠之源 这些小数据
+temp:InitRoot("record", 3) -- 大数据
 
-temp.serverfn = function(ns,db,userid)
-    
-    db:ListenForEvent("chouka", function(id,data,event)
-        
+temp.serverfn = function(ns, db, userid)
+
+    db:ListenForEvent("", function(id, data, event)
+
     end)
-    db:AddRPCHandle("chouka", function(id,data,cmd)
-        if db.player and db.player:HasTag("sora") and type(data) == "table" and (data.code == 1 or data.code == 10)  then
+    db:AddRPCHandle("chouka", function(id, data, cmd)
+        if db.player and db.player:HasTag("sora") and type(data) == "table" and (data.code == 1 or data.code == 10) then
             local p = db.player
             return p.components.sorachouka and p.components.sorachouka:ChouKa(data.code)
         end
@@ -21,8 +21,8 @@ temp.serverfn = function(ns,db,userid)
     db.inst = TheWorld
 end
 
-temp.clientfn = function(ns,db,userid)
-    CKDB = db       --用于客户端取数据
+temp.clientfn = function(ns, db, userid)
+    CKDB = db -- 用于客户端取数据
     SoraClientDB.SoraClientDB = CKDB
 end
 
