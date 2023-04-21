@@ -12,6 +12,8 @@ SoraDB.GLOBALDB = GLOBALDB
 AddPrefabPostInit("world", function(inst)
     inst.components.SoraMailDB = SoraDB.MailDB
     inst.components.SoraGLOBALDB = SoraDB.GLOBALDB
+    SoraDB.MailDB.inst = inst
+    SoraDB.GLOBALDB.inst = inst
 end)
 MailDB:InitRoot("Players")      --存放玩家 以及玩家拥有哪些邮件
 MailDB:InitRoot("Mails",3)      --存放邮件详细内容 

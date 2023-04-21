@@ -57,6 +57,9 @@ mi("api")
 -- 导入maindb
 mi("soramaindb")
 mi("soramaindbinit")
+-- 导入clientdb
+mi("soraclientdb")
+mi("soraclientdbinit")
 -- 导入皮肤api
 mi("skins")
 mi("soraskin")

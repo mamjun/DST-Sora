@@ -332,6 +332,7 @@ local rpc = SHARD_MOD_RPC[dbnamespace]["maindb"]
 
 local MainDB = Class(function(self, inst)
     self.Inited = false
+    self.inst =  inst or nil
     -- 数据
     self.data = {}
     self.noSyn = {}
@@ -368,9 +369,9 @@ function MainDB:Init(namespace, syntime, roottime) -- 初始化
     self.Syn.roottime = roottime or 1 -- 默认每1秒只同步一个 根 注意 根数量 * 根更新时间 要小于同步时间
 end
 function MainDB:UnInit(e) -- 卸载
-    self.inited = false
+    self.Inited = false
+    dbhandles[self.namespace] = nil
     self.namespace = nil
-    dbhandles[self] = nil
 end
 local maxsenddata = 60000
 function MainDB:Send(id, cmd, data,data2,data3, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
@@ -397,9 +398,15 @@ function MainDB:Send(id, cmd, data,data2,data3, ...) -- 发送数据   数据长
         SendModRPCToShard(rpc, id, self.namespace, cmd, data, data2,data3,...)
     end
 end
+function MainDB:Notice(event,data)
+    if self.inst  and self.inst:IsValid() then
+        self.inst:PushEvent(event,data)
+    end
+end
+
 function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
     if cmd == "event" then -- 推送事件
-        return self:HandleEvent(id, data, data3)
+        return self:HandleEvent(id, data, decode(data3))
     elseif cmd == "Sync" then -- 对方要求我方发送所有数据 进行同步
         if tostring(id) == tostring(sid) then return end    --不处理自己的 
         local keys, hashs = self:GetRootHash(data,false)    --第一次只计算key key数量不一致直接同步 节省性能
@@ -416,7 +423,7 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
             local tosend = {}
             for k,v in pairs(self.data) do
                 if k and (not self.noSyn[k] or self.noSyn[k]==2 ) then
-                    tosend = self.data[k]
+                    tosend[k] = self.data[k]
                 end
             end
             str = encode(tosend)
@@ -438,11 +445,13 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
             if data then
                 if self.data[data] then
                     self.data[data] = d
+                    self:Notice("MainDBRootSync",{namespace=self.namespace,root=data,value=d})
                 end
             else
                 for k, v in pairs(self.data) do
                     if d[k] then
                         self[k] = v
+                        self:Notice("MainDBRootSync",{namespace=self.namespace,root=k,value=v})
                     end
                 end
             end
@@ -452,7 +461,9 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
         if tostring(id) == tostring(sid) then return end    --不处理自己的 
         if self.data[data] then
             self.data[data][data2] = decode(data3)
+            self:Notice("MainDBSet",{namespace=self.namespace,root=data,key=data2,value=self.data[data][data2]})
         end
+
         return
     elseif cmd == "Asyn" then -- 异步请求
         local aid = data
@@ -635,6 +646,7 @@ function MainDB:Set(root, key, value) -- 设置数据 并通知其他世界更�
             return true
         end
         self:Send(nil, "Set", root, key, encode(value)) -- 通知所有人修改
+        self:Notice("MainDBSet",{namespace=self.namespace,root=root,key=key,value=value})
         return true
     end
     return false, "No Root"

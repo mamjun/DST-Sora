@@ -512,3 +512,38 @@ function EntityScript:SoraAddComponentWithNoPostInit(name,...)
 end
 
 LISTCONFIG = {}
+local RandomInstA  = 32310901
+local RandomInstB  = 1729
+RandomInst =  Class(function (inst)     --随机生成一个 0-9999的随机数
+    self.seed = 0   --初始种子
+    self.last = 0    --上一次的值
+    self.hasget = 0     --已经取了多少次 配合种子 用于验证
+end)
+function RandomInst:SetSeed(num)
+    self.seed = num
+    self.last = num
+    self.hasget = 0
+end
+
+function  RandomInst:Get(num)
+    num = num or 1
+    local r = 0
+    for i=1,num do
+        r = (RandomInstA * self.last + RandomInstB ) % 10000
+        self.last = r
+        self.hasget = self.hasget + 1 
+    end
+    return r 
+end
+
+function  RandomInst:OnSave()
+    return {seed = self.seed,last = self.last,hasget = self.hasget}
+end
+
+function  RandomInst:OnLoad(data)
+    if data then
+        self.seed = data.seed or 0
+        self.last = data.last or 0
+        self.hasget = data.hasget or 0
+    end
+end
