@@ -30,6 +30,7 @@ end
 local function serverandclientrpchandle(id, ns, cmd, data, ...)
     -- rpcprint("Client DB RPC!", id, ns, cmd, data, ...)
     if not ns and id  and cmd == "link" then
+        --rpcprint("rpc 尝试初始化",id)
         for k, temp in pairs(alltemps) do
             if not GetClientDB(temp.namespace, id, true) then -- 找不到就创建
                 CreateClientDB(temp, id, true)
@@ -139,9 +140,9 @@ function ClientDB:UnInit(e) -- 卸载 基本不调用
         end
     end
     if self.IsServer then
-        serverdbhandles[self] = nil
+        serverdbhandles[self.namespace] = nil
     else
-        clientdbhandles[self] = nil
+        clientdbhandles[self.namespace] = nil
     end
     if self.player then
         if self.player[key] then
@@ -682,6 +683,7 @@ end
 
 AddPrefabPostInit("world",function(inst)
     inst:ListenForEvent("ms_clientauthenticationcomplete",function (i,d)
+        --rpcprint("我来了",d and d.userid)
         if not i.ismastersim then rpcprint("ClintDB ERROR event") return end
         local userid = d and d.userid or nil
         if not userid then return end
@@ -693,6 +695,7 @@ AddPrefabPostInit("world",function(inst)
         end
     end)
     inst:ListenForEvent("ms_clientdisconnected",function (i,d)
+        --rpcprint("我走了",d and d.userid)
         if not i.ismastersim then rpcprint("ClintDB ERROR event") return end
         local userid = d and d.userid or nil
         if not userid then return end

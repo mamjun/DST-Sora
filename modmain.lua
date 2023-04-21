@@ -45,6 +45,7 @@ modimport("main/init")
         "sora3sword",
         "sora2ice",
         "sora2fire",
+        "sora2plant",
         "soramagic",
         "sorapick",
         "sorahealing",
