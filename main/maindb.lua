@@ -330,9 +330,9 @@ local function decode(str)
 end
 local rpc = SHARD_MOD_RPC[dbnamespace]["maindb"]
 
-local MainDB = Class(function(self, inst)
+local MainDB = Class(function(self)
     self.Inited = false
-    self.inst =  inst or nil
+    self.inst =  nil
     -- 数据
     self.data = {}
     self.noSyn = {}
@@ -801,7 +801,7 @@ if not ismaster then -- 主世界不需要去同步
 end
 
 function CreateMainDB(namespace, syntime, roottime)
-    local db = MainDB(namespace)
+    local db = MainDB()
     db:Init(namespace, syntime, roottime)
     return db
 end

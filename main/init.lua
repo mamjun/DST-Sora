@@ -48,21 +48,21 @@ GLOBAL.TUNING.SORAMODNAME = modname
 GLOBAL.TUNING.SORAVERSION = modinfo.version
 -- 加载模块
 function mi(str)
-    modimport("soramain/" .. str)
+    modimport("main/" .. str)
 end
 -- 日志上传
 mi("logupload")
 -- 相关API 提供给mod使用
 mi("api")
 -- 导入maindb
-mi("soramaindb")
-mi("soramaindbinit")
+mi("maindb")
+mi("maindbinit")
 -- 导入clientdb
-mi("soraclientdb")
-mi("soraclientdbinit")
+mi("clientdb")
+mi("clientdbinit")
 -- 导入皮肤api
 mi("skins")
-mi("soraskin")
+mi("skin")
 -- 资源加载
 mi("assets")
 -- 修改过的动画包

@@ -3,13 +3,13 @@ if not CreateClientDB then
 end
 env.SoraClientDB = {}
 
-local temp = CreateClientDBTemple("chou", 300, 1)
+local temp = CreateClientDBTemple("chou", 30, 1)
 temp:InitRoot("data")   --up池 纠缠之源 这些小数据
 temp:InitRoot("record",3)   --大数据
 
 temp.serverfn = function(ns,db,userid)
     
-    db:ListenForEvent("", function(id,data,event)
+    db:ListenForEvent("chouka", function(id,data,event)
         
     end)
     db:AddRPCHandle("chouka", function(id,data,cmd)

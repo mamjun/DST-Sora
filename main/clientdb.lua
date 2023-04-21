@@ -681,7 +681,7 @@ AddPrefabPostInit("world",function(inst)
             if not GetClientDB(temp.namespace, userid, true) then -- 找不到就创建
                 CreateClientDB(temp, userid, true)
             end
-            print("初始化",temp.namespace, userid)
+            --print("初始化",temp.namespace, userid)
         end
     end)
     inst:ListenForEvent("ms_clientdisconnected",function (i,d)
@@ -699,7 +699,7 @@ AddPrefabPostInit("world",function(inst)
             if serverdbhandles[k] then
                 serverdbhandles[k]:UnInit()
             end
-            print("卸载",k)
+           --print("卸载",k)
         end
     end)
 end)
@@ -750,7 +750,7 @@ function CreateClientDBTemple(namespace, syntime, roottime, roots, comomfn, serv
     return temp
 end
 function CreateClientDB(temp, userid, IsServer)
-    local db = ClientDB(temp.namespace)
+    local db = ClientDB()
     db:Init(temp.namespace, userid, temp.syntime, temp.roottime, IsServer)
     for k, v in pairs(temp.roots) do
         db:InitRoot(v[1], v[2])
