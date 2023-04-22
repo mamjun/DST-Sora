@@ -41,37 +41,84 @@ local prefabs = {
 
 
 local function onequip(inst, owner) 
-	if owner ~= nil and not owner:HasTag("sora") then 
-	owner:DoTaskInTime(0, function()
-            if owner.components.inventory  then owner.components.inventory :GiveItem(inst) end
-            if  owner.components.talker then owner.components.talker:Say("这是Sora的法杖") end
-        end)
-	return
-	end
     owner.AnimState:OverrideSymbol("swap_object", "sora2plant", "swap_weapon")
     owner.AnimState:Show("ARM_carry") 
     owner.AnimState:Hide("ARM_normal")
-	if inst.magicfx ~= nil then
-        inst.magicfx:Remove()
-        inst.magicfx = nil
-    end
-	inst.magicfx = SpawnPrefab("cane_victorian_fx")
-	if inst.magicfx then 
-	inst.magicfx.entity:AddFollower()
-	inst.magicfx.entity:SetParent(owner.entity)
-    inst.magicfx.Follower:FollowSymbol(owner.GUID, "swap_object", 0, -60, 0)
-	end
 end
 
 local function onunequip(inst, owner) 
     owner.AnimState:Hide("ARM_carry") 
     owner.AnimState:Show("ARM_normal")
-	if inst.magicfx ~= nil then
-        inst.magicfx:Remove()
-        inst.magicfx = nil
-    end
+end
+local function StartAOETargeting(inst)
+	local playercontroller = ThePlayer.components.playercontroller
+	if playercontroller ~= nil then
+		playercontroller:StartAOETargetingUsing(inst)
+	end
+end
+local function ReticuleTargetAllowWaterFn()
+	local player = ThePlayer
+	local ground = TheWorld.Map
+	local pos = Vector3()
+	--Cast range is 8, leave room for error
+	--4 is the aoe range
+	for r = 7, 0, -.25 do
+		pos.x, pos.y, pos.z = player.entity:LocalToWorldSpace(r, 0, 0)
+		if ground:IsPassableAtPoint(pos.x, 0, pos.z, true) and not ground:IsGroundTargetBlocked(pos) then
+			return pos
+		end
+	end
+	return pos
 end
 
+local ICON_SCALE = .6
+local ICON_RADIUS = 60
+local SPELLBOOK_RADIUS = 100
+local SPELLBOOK_FOCUS_RADIUS = SPELLBOOK_RADIUS + 2
+local SPELLS =
+{
+	{
+		label = "3x3",	--铲出3x3的坑
+		onselect = function(inst) end,
+		atlas = "images/spell_icons.xml",
+		normal = "shadow_protector.tex",
+	},
+	{
+		label = "4x4",	--铲出4x4的坑
+		onselect = function(inst) end,
+		atlas = "images/spell_icons.xml",
+		normal = "shadow_trap.tex",
+	},
+	{
+		label = "9x9",	--铲出9x9的坑 仅限穹妹
+		onselect = function(inst) end,
+		atlas = "images/spell_icons.xml",
+		normal = "shadow_pillars.tex",
+	},
+	{
+		label = "收",	--批量收取大作物的产出 仅限穹妹 且可以铲树根 
+		onselect = function(inst) end,
+		atlas = "images/spell_icons.xml",
+		normal = "shadow_pillars.tex",
+	},
+	{
+		label = "育",	--作物的压力值-2 仅限穹妹 15级以后 每个作物只能1次 
+		onselect = function(inst) end,
+		atlas = "images/spell_icons.xml",
+		normal = "shadow_pillars.tex",
+	},
+	{
+		label = "肥",	--对普通作物进行施肥     穹妹10级以后 可以对农田进行施肥  15级以后 可以把普通作物转换为野生状态 参考空白
+		onselect = function(inst) end,
+		atlas = "images/spell_icons.xml",
+		normal = "shadow_pillars.tex",
+	}
+}
+for k, v in pairs(SPELLS) do
+	v.widget_scale = ICON_SCALE
+	v.hit_radius = ICON_RADIUS
+	v.execute = StartAOETargeting
+end
 
 local function fn()
 	local inst = CreateEntity()
@@ -88,12 +135,32 @@ local function fn()
 	inst:AddTag("rechargeable")
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("sora2plant.tex")
+
+	inst:AddComponent("spellbook")
+	inst.components.spellbook:SetRadius(100)
+	inst.components.spellbook:SetFocusRadius(102)
+	inst.components.spellbook:SetItems(SPELLS)
+	inst.components.spellbook.opensound = "dontstarve/common/together/book_maxwell/use"
+	inst.components.spellbook.closesound = "dontstarve/common/together/book_maxwell/close"
+	--inst.components.spellbook.executesound = "dontstarve/common/together/book_maxwell/close"
+
+	inst:AddComponent("aoetargeting")
+	inst.components.aoetargeting:SetAllowWater(false)
+	inst.components.aoetargeting.reticule.targetfn = nil
+	inst.components.aoetargeting.reticule.validcolour = { 1, .75, 0, 1 }
+	inst.components.aoetargeting.reticule.invalidcolour = { .5, 0, 0, 1 }
+	inst.components.aoetargeting.reticule.ease = true
+	inst.components.aoetargeting.reticule.mouseenabled = true
+	inst.components.aoetargeting.reticule.twinstickmode = 1
+	inst.components.aoetargeting.reticule.twinstickrange = 8
+
 	if not TheWorld.ismastersim then
         return inst
     end
 
     inst:AddComponent("inspectable")
-    inst.components.inspectable:SetDescription([[]])
+    inst.components.inspectable:SetDescription([[桃源深处有
+	大规模手工业生产基地]])
     inst:AddComponent("inventoryitem")
 	inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2plant.xml"
 	inst.components.inventoryitem.imagename = "sora2plant"
@@ -116,11 +183,8 @@ local function fn()
 	inst.components.weapon:SetProjectile("sorapick_projectile")
 
 	inst:AddComponent("rechargeable")
-	inst.components.rechargeable:SetMaxCharge(10)
+	inst.components.rechargeable:SetMaxCharge(5)
 
-	inst.OnSave = onsave
-	inst.OnPreLoad = onpreload
-    
     return inst
 end
 return	Prefab( "sora2plant", fn, assets, prefabs)
