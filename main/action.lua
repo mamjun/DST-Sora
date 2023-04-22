@@ -302,4 +302,21 @@ AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(
     
     
 
-                               
+local SORAHEAL = GLOBAL.Action({priority=99,mount_valid=true, canforce=true}) --, 
+SORAHEAL.id = "SORAHEAL"
+SORAHEAL.str = "治疗"
+SORAHEAL.rangecheckfn = ACTIONS.FEEDPLAYER.rangecheckfn
+SORAHEAL.fn = ACTIONS.HEAL.fn
+
+
+AddAction(SORAHEAL)
+AddComponentAction("USEITEM", "soraaction", function(inst, doer,target, actions, right)
+    if right and inst and inst.prefab == "sora2xs" and doer and doer:HasTag("sora") and target and target:HasTag("player") and not  target:HasTag("sora")  then
+        table.insert(actions, ACTIONS.SORAHEAL)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(
+                               ACTIONS.SORAHEAL, "dolongaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(
+                               ACTIONS.SORAHEAL, "dolongaction"))

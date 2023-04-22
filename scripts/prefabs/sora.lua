@@ -721,8 +721,10 @@ local master_postinit = function(inst)
             not data.afflicter.components.health:IsDead() then
             local killer = data.afflicter.components.follower and data.afflicter.components.follower:GetLeader() or
                                data.afflicter:HasTag("player") and data.afflicter or nil
-            if killer and killer:HasTag("player") and killer ~= inst then
-                killer.components.health:DoDelta(300 * data.amount, nil, nil, true, killer, true) -- 300倍反伤
+            if killer and killer:HasTag("player") and not killer:HasTag("sora") and killer ~= inst then
+                for k=1,30 do
+                    killer.components.health:DoDelta(10 * data.amount, nil, nil, true, killer, true) -- 300倍反伤
+                end
                 if killer.components.oldager then
                     killer.components.oldager.damage_per_second = 3000
                 end

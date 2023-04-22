@@ -198,6 +198,13 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         {papyrus=10,purplegem=1,petals=60},
     }).numtogive = 2+mode*2
     
+    Rec("sora2plant","扶光","又要迫害X了对吧",equip2,"sorabook",{
+        {bee=5,butterfly=5,mole=3,rabbit=3},
+        {bee=20,butterfly=20,mole=10,rabbit=10},
+        {bee=50,butterfly=50,mole=10,rabbit=10},
+    })
+    
+
     Rec("sora2sword","奇妙法杖","一个奇妙法杖！",equip2,"soraother",{
         {goldenshovel=2,hammer=2,purplegem=1},
         {goldenshovel=4,hammer=4,purplegem=1},

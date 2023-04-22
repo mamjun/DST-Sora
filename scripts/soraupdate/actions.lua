@@ -31,72 +31,72 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local u = soraupdate    --内部接口
 u.actions = {}
 
-for i=1,5 do
-    local act = Action({priority = 999})
-    act.id = "SORAACTION"..i
-    act.strfn = function(act)       --需要的时候hook一下
-        return "ACTION"
-    end
-    act.fn = function(act)          --需要的自己hook
-       return true
-    end
+-- for i=1,5 do
+--     local act = Action({priority = 999})
+--     act.id = "SORAACTION"..i
+--     act.strfn = function(act)       --需要的时候hook一下
+--         return "ACTION"
+--     end
+--     act.fn = function(act)          --需要的自己hook
+--        return true
+--     end
     
-    AddAction(act) 
+--     AddAction(act) 
 
-    act.acthandle = function(inst)  --需要的自己hook
-        return "dolongaction"
-    end
-    act.soratestfn = function (...)     --需要的自己hook
-        return false
-    end
-    AddStategraphActionHandler("wilson",ActionHandler(act, act.acthandle))
-    AddStategraphActionHandler("wilson_client",ActionHandler(act,act.acthandle))
-    u.actions[i] = act
-end
+--     act.acthandle = function(inst)  --需要的自己hook
+--         return "dolongaction"
+--     end
+--     act.soratestfn = function (...)     --需要的自己hook
+--         return false
+--     end
+--     AddStategraphActionHandler("wilson",ActionHandler(act, act.acthandle))
+--     AddStategraphActionHandler("wilson_client",ActionHandler(act,act.acthandle))
+--     u.actions[i] = act
+-- end
 
-    AddComponentAction("SCENE", "soraaction" , function(inst, doer, actions, right) 
-        for i=1,5 do
-            if u.actions[i].soratestfn("SCENE",inst, doer, actions, right) then
-            table.insert(actions,u.actions[i])
-            end
-        end
-    end)
-    AddComponentAction("USEITEM", "soraaction" , function(inst, doer, target, actions, right) 
-        for i=1,5 do
-            if u.actions[i].soratestfn("USEITEM",inst, doer, target, actions, right) then
-            table.insert(actions,u.actions[i])
-            end
-        end
-    end)
+--     AddComponentAction("SCENE", "soraaction" , function(inst, doer, actions, right) 
+--         for i=1,5 do
+--             if u.actions[i].soratestfn("SCENE",inst, doer, actions, right) then
+--             table.insert(actions,u.actions[i])
+--             end
+--         end
+--     end)
+--     AddComponentAction("USEITEM", "soraaction" , function(inst, doer, target, actions, right) 
+--         for i=1,5 do
+--             if u.actions[i].soratestfn("USEITEM",inst, doer, target, actions, right) then
+--             table.insert(actions,u.actions[i])
+--             end
+--         end
+--     end)
     
-    AddComponentAction("POINT", "soraaction" , function(inst, doer, pos, actions, right) 
-        for i=1,5 do
-            if u.actions[i].soratestfn("POINT",inst, doer, pos, actions, right) then
-            table.insert(actions,u.actions[i])
-            end
-        end
-    end)
+--     AddComponentAction("POINT", "soraaction" , function(inst, doer, pos, actions, right) 
+--         for i=1,5 do
+--             if u.actions[i].soratestfn("POINT",inst, doer, pos, actions, right) then
+--             table.insert(actions,u.actions[i])
+--             end
+--         end
+--     end)
     
-    AddComponentAction("EQUIPPED", "soraaction" , function(inst, doer, target, actions, right) 
-        for i=1,5 do
-            if u.actions[i].soratestfn("EQUIPPED",inst, doer, target, actions, right) then
-            table.insert(actions,u.actions[i])
-            end
-        end
-    end)
+--     AddComponentAction("EQUIPPED", "soraaction" , function(inst, doer, target, actions, right) 
+--         for i=1,5 do
+--             if u.actions[i].soratestfn("EQUIPPED",inst, doer, target, actions, right) then
+--             table.insert(actions,u.actions[i])
+--             end
+--         end
+--     end)
     
-    AddComponentAction("INVENTORY", "soraaction" , function(inst, doer, actions, right) 
-        for i=1,5 do
-            if u.actions[i].soratestfn("INVENTORY",inst, doer, actions, right) then
-            table.insert(actions,u.actions[i])
-            end
-        end
-    end)
+--     AddComponentAction("INVENTORY", "soraaction" , function(inst, doer, actions, right) 
+--         for i=1,5 do
+--             if u.actions[i].soratestfn("INVENTORY",inst, doer, actions, right) then
+--             table.insert(actions,u.actions[i])
+--             end
+--         end
+--     end)
     
-    AddComponentAction("ISVALID", "soraaction" , function(inst, action, right) 
-        for i=1,5 do
-            if u.actions[i].soratestfn("ISVALID",inst, action, right) then
-            table.insert(actions,u.actions[i])
-            end
-        end
-    end)
+--     AddComponentAction("ISVALID", "soraaction" , function(inst, action, right) 
+--         for i=1,5 do
+--             if u.actions[i].soratestfn("ISVALID",inst, action, right) then
+--             table.insert(actions,u.actions[i])
+--             end
+--         end
+--     end)

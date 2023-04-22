@@ -719,6 +719,7 @@ end)
 
 AddPlayerPostInit(function(inst) -- 绑定玩家
     inst:DoTaskInTime(0, function()
+        if not inst.userid  then return end --可能是假人
         if not inst[key] then
             inst[key] = {}
         end
@@ -732,8 +733,10 @@ AddPlayerPostInit(function(inst) -- 绑定玩家
             end
             if not ismaster then
                 local db = GetClientDB(v.namespace, inst.userid, false)
-                inst[key][v.namespace] = db
-                db.player = inst
+                if db then
+                    inst[key][v.namespace] = db
+                    db.player = inst
+                end
             end
         end
     end)
