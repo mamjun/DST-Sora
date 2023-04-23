@@ -171,7 +171,7 @@ function soragift:GiveGift(doer)
                 giftconfig.givefn(self.inst,doer,packer,giftconfig)
             end
             
-            self.inst.SoundEmitter:PlaySound("dontstarve/creatures/together/deer/bell")
+            --self.inst.SoundEmitter:PlaySound("dontstarve/creatures/together/deer/bell")
             self.inst.SoundEmitter:PlaySound("dontstarve/creatures/together/deer/chain")
         end
     end

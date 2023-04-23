@@ -199,7 +199,9 @@ function ClientDB:Send(id, cmd, data, data2, data3, ...) -- 发送数据   数�
     if self.IsServer then
         SendModRPCToClient(crpc, self.userid, nil, self.namespace, cmd, data, data2, data3, ...)
     else
+        print("begen",srpc, self.namespace, cmd, data, data2, data3, ...)
         SendModRPCToServer(srpc, self.namespace, cmd, data, data2, data3, ...)
+        print("end",srpc, self.namespace, cmd, data, data2, data3, ...)
     end
 end
 function ClientDB:Notice(event, data)

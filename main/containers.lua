@@ -27,50 +27,46 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
---容器
+]] -- 容器
 local containers = require "containers"
 local templates = require "widgets/redux/templates"
 
-local params=containers.params or up.Get(containers.widgetsetup,"params","^scripts/containers.lua")
-local needhelp 
+local params = containers.params or up.Get(containers.widgetsetup, "params", "^scripts/containers.lua")
+local needhelp
 if not params then
-	params = {}
-	needhelp = true
+    params = {}
+    needhelp = true
 end
-params.sorapack_container =
-{
-    widget =
-    {
-        slotpos =
-        {
-        },
+params.sorapack_container = {
+    widget = {
+        slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "ui_chest_3x3",
         pos = GLOBAL.Vector3(200, 0, 0),
         side_align_tip = 120,
-        buttoninfo =
-        {
+        buttoninfo = {
             text = STRINGS.ACTIONS.WRAPBUNDLE,
-            position = GLOBAL.Vector3(0, -150, 0),
+            position = GLOBAL.Vector3(0, -150, 0)
         }
     },
-    type = "cooker",
+    type = "cooker"
 }
 for y = 2, 0, -1 do
     for x = 0, 2 do
-        table.insert(params.sorapack_container.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 2 + 80, 80 * y - 80 * 2 + 80, 0))
+        table.insert(params.sorapack_container.widget.slotpos,
+            GLOBAL.Vector3(80 * x - 80 * 2 + 80, 80 * y - 80 * 2 + 80, 0))
     end
 end
 function params.sorapack_container.itemtestfn(container, item, slot)
     return true
 end
 
-function params.sorapack_container.widget.buttoninfo.fn(inst,doer)
+function params.sorapack_container.widget.buttoninfo.fn(inst, doer)
     if inst.components.container ~= nil then
         GLOBAL.BufferedAction(doer, inst, GLOBAL.ACTIONS.WRAPBUNDLE):Do()
     elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
-        GLOBAL.SendRPCToServer(GLOBAL.RPC.DoWidgetButtonAction, GLOBAL.ACTIONS.WRAPBUNDLE.code, inst,GLOBAL. ACTIONS.WRAPBUNDLE.mod_name)
+        GLOBAL.SendRPCToServer(GLOBAL.RPC.DoWidgetButtonAction, GLOBAL.ACTIONS.WRAPBUNDLE.code, inst,
+            GLOBAL.ACTIONS.WRAPBUNDLE.mod_name)
     end
 end
 
@@ -78,32 +74,27 @@ function params.sorapack_container.widget.buttoninfo.validfn(inst)
     return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
 end
 
-params.sora2tree =
-{
-    widget =
-    {
-        slotpos =
-        {
-        },
+params.sora2tree = {
+    widget = {
+        slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "sorachest",
         pos = GLOBAL.Vector3(0, 100, 0),
         side_align_tip = 120,
-		buttoninfo =
-        {
+        buttoninfo = {
             text = "献祭",
-            position = GLOBAL.Vector3(80, -290, 0),
+            position = GLOBAL.Vector3(80, -290, 0)
         }
-       
+
     },
-    type = "chest",
+    type = "chest"
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do
-        table.insert(params.sora2tree.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3-15, 0))
+        table.insert(params.sora2tree.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
---treeconfig = require "config/sora2tree"
+-- treeconfig = require "config/sora2tree"
 function params.sora2tree.itemtestfn(container, item, slot)
     -- if item and treeconfig.sale[item.prefab] then
     -- return true
@@ -111,18 +102,17 @@ function params.sora2tree.itemtestfn(container, item, slot)
     return true
     -- end
 end
-AddModRPCHandler("sora","sora2treeclose",function(player,inst)
- if inst and type(inst)=="table" and inst.GUID and inst.components.container ~= nil then
+AddModRPCHandler("sora", "sora2treeclose", function(player, inst)
+    if inst and type(inst) == "table" and inst.GUID and inst.components.container ~= nil then
         inst.components.container.onclosefn(inst)
-end
+    end
 end)
-
 
 function params.sora2tree.widget.buttoninfo.fn(inst)
     if inst.components.container ~= nil then
         inst.components.container.onclosefn(inst)
     elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
-		SendModRPCToServer(MOD_RPC["sora"]["sora2treeclose"],inst)
+        SendModRPCToServer(MOD_RPC["sora"]["sora2treeclose"], inst)
     end
 end
 
@@ -130,117 +120,115 @@ function params.sora2tree.widget.buttoninfo.validfn(inst)
     return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
 end
 
-
-params.sorafire = 	{
-    widget =
-    {
-        slotpos =
-        {
-        },
+params.sorafire = {
+    widget = {
+        slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "sorachest",
         pos = GLOBAL.Vector3(0, 300, 0),
-        side_align_tip = 120,
-       
+        side_align_tip = 120
+
     },
-    type = "chest",
+    type = "chest"
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do
-        table.insert(params.sorafire.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3-15, 0))
+        table.insert(params.sorafire.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
 
-
-params.sora2chest = 	{
-    widget =
-    {
-        slotpos =
-        {
-        },
+params.sora2chest = {
+    widget = {
+        slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "sorachest",
         pos = GLOBAL.Vector3(0, 300, 0),
-        side_align_tip = 120,
-       
+        side_align_tip = 120
+
     },
-    type = "chest",
+    type = "chest"
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do
-        table.insert(params.sora2chest.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3-15, 0))
+        table.insert(params.sora2chest.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
-    local sora2chestpopup = require "widgets/sora2chestpopup"
+local sora2chestpopup = require "widgets/sora2chestpopup"
 function params.sora2chest.widget:OnOpenFn(inst)
-     self.text = self:AddChild(sora2chestpopup())
+    self.text = self:AddChild(sora2chestpopup())
 end
 
-
-params.sorabase = 	{
-    widget =
-    {
-        slotpos =
-        {
-        },
+params.sorabase = {
+    widget = {
+        slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "sorachest",
         pos = GLOBAL.Vector3(0, 100, 0),
-        side_align_tip = 120,
-       
+        side_align_tip = 120
+
     },
-    type = "chest",
+    type = "chest"
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do
-        table.insert(params.sorabase.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3-15, 0))
+        table.insert(params.sorabase.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
-    local soratreepopup = require "widgets/soratreepopup"
+local soratreepopup = require "widgets/soratreepopup"
 function params.sorabase.widget:OnOpenFn(inst)
-     self.text = self:AddChild(soratreepopup())
+    self.text = self:AddChild(soratreepopup())
 end
 
-params.sora_light =
-{
-    widget =
-    {
-        slotpos =
-        {
-            Vector3(0, 64 + 32 + 8 + 4, 0), 
-            Vector3(0, 32 + 4, 0),
-            Vector3(0, -(32 + 4), 0), 
-            Vector3(0, -(64 + 32 + 8 + 4), 0),
-        },
+params.sora_light = {
+    widget = {
+        slotpos = {Vector3(0, 64 + 32 + 8 + 4, 0), Vector3(0, 32 + 4, 0), Vector3(0, -(32 + 4), 0),
+                   Vector3(0, -(64 + 32 + 8 + 4), 0)},
         animbank = "ui_lamp_1x4",
         animbuild = "ui_lamp_1x4",
         pos = Vector3(200, 0, 0),
-        side_align_tip = 100,
+        side_align_tip = 100
     },
     acceptsstacks = false,
-    type = "cooker",
+    type = "cooker"
 }
 
 function params.sora_light.itemtestfn(container, item, slot)
     return item:HasTag("sora_light_batteries")
 end
 
-if needhelp then
-print("????")
-local old_widgetsetup = containers.widgetsetup
-
-function containers.widgetsetup(container, prefab, data)
-	local t = data or params[prefab or container.inst.prefab]
-	if t ~= nil then
-			for k, v in pairs(t) do
-				container[k] = v
-			end
-		container:SetNumSlots(container.widget.slotpos ~= nil and #container.widget.slotpos or 0)
-	else
-		return old_widgetsetup(container, prefab,data)
-	end
+params.sora_huapen = {
+    widget = {
+        slotpos = {Vector3(0, 15, 0)},
+        animbank = "ui_alterguardianhat_1x1",
+        animbuild = "ui_alterguardianhat_1x1",
+        pos = Vector3(100, 0, 0),
+        side_align_tip = 100
+    },
+    acceptsstacks = true,
+    type = "chest"
+}
+function params.sora_huapen.itemtestfn(container, item, slot)
+    return item and item.prefab ~= "sora_flh" and
+               (item:HasTag("sorafood") or item.prefab == "butterfly" or item.prefab == "moonrocknugget" or item.prefab ==
+                   "moonglass" or item.prefab == "petals" or item.prefab == "opalpreciousgem")
 end
-	
+
+if needhelp then
+    print("????")
+    local old_widgetsetup = containers.widgetsetup
+
+    function containers.widgetsetup(container, prefab, data)
+        local t = data or params[prefab or container.inst.prefab]
+        if t ~= nil then
+            for k, v in pairs(t) do
+                container[k] = v
+            end
+            container:SetNumSlots(container.widget.slotpos ~= nil and #container.widget.slotpos or 0)
+        else
+            return old_widgetsetup(container, prefab, data)
+        end
+    end
+
 end
 for k, v in pairs(params) do
     containers.MAXITEMSLOTS = math.max(containers.MAXITEMSLOTS, v.widget.slotpos ~= nil and #v.widget.slotpos or 0)
