@@ -213,6 +213,27 @@ function params.sora_huapen.itemtestfn(container, item, slot)
                    "moonglass" or item.prefab == "petals" or item.prefab == "opalpreciousgem")
 end
 
+params.sora_lightflier_cat = {
+    widget = {
+        slotpos = { Vector3(-37.5,50 , 0),
+        Vector3(37.5, 50 , 0),
+        Vector3(-37.5, -20 , 0),
+        Vector3(37.5, -20 , 0),
+        Vector3(-37.5, -90 , 0),
+        Vector3(37.5, -90 , 0),
+    
+    },
+        animbank = "ui_bundle_2x2",
+        animbuild = "ui_bundle_2x2",
+        pos = Vector3(200, 0, 0),
+        side_align_tip = 120,
+        
+    },
+    acceptsstacks = true,
+    type = "chest"
+}
+
+
 if needhelp then
     print("????")
     local old_widgetsetup = containers.widgetsetup

@@ -303,22 +303,22 @@ Rec("sora2pack", "穹の打包纸", "打包什么好呢！", item, "soraother", 
     petals = 60
 }}).numtogive = 2 + mode * 2
 
-Rec("sora2plant", "扶光", "又要迫害X了对吧", equip2, "sorabook", {{
-    bee = 5,
-    butterfly = 5,
-    mole = 3,
-    rabbit = 3
-}, {
-    bee = 20,
-    butterfly = 20,
-    mole = 10,
-    rabbit = 10
-}, {
-    bee = 50,
-    butterfly = 50,
-    mole = 10,
-    rabbit = 10
-}})
+-- Rec("sora2plant", "扶光", "又要迫害X了对吧", equip2, "sorabook", {{
+--     bee = 5,
+--     butterfly = 5,
+--     mole = 3,
+--     rabbit = 3
+-- }, {
+--     bee = 20,
+--     butterfly = 20,
+--     mole = 10,
+--     rabbit = 10
+-- }, {
+--     bee = 50,
+--     butterfly = 50,
+--     mole = 10,
+--     rabbit = 10
+-- }})
 
 Rec("sora2sword", "奇妙法杖", "一个奇妙法杖！", equip2, "soraother", {{
     goldenshovel = 2,
@@ -631,13 +631,20 @@ Rec("chum", nil, nil, DST, "sora", {
     spoiled_food = 10
 })
 
-AddInvImg("sora_butterfly", "inventoryimages/sora2fire", "sora2fire")
+AddInvImg2("sora_butterfly", GetInventoryItemAtlas("butterfly.tex"), "butterfly.tex")
 Rec("sora_butterfly", "拟造-蝴蝶", "这也是蝴蝶吗?", DST, "sora", {
     butterfly = 1,
     [san]=10
-})
-AddInvImg("sora_lighter", "inventoryimages/sora2fire", "sora2fire")
-Rec("sora_lighter", "拟造-萤火", "这是什么呀?", DST, "sora", {
+}).placer = "no"
+
+AddInvImg2("sora_moonbutterfly", GetInventoryItemAtlas("moonbutterfly.tex"), "moonbutterfly.tex")
+Rec("sora_moonbutterfly", "拟造-月蛾", "这也是月蛾吗?", DST, "sora", {
+    butterfly = 1,
+    [san]=10
+}).placer = "no"
+
+AddInvImg2("sora_lightflier", GetInventoryItemAtlas("lightflier.tex"), "lightflier.tex")
+Rec("sora_lightflier", "拟造-萤火", "这是什么呀?", DST, "sora", {
     moonrocknugget = 3,
     fireflies = 3,
     [san]=30

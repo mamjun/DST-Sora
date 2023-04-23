@@ -64,7 +64,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         TARGETMAXLEVEL ="目标已经满精炼了",
         SAME  ="这是同一把",
     }
-
+    NAMES.SORA_LIGHTFLIER_CAT = "拟造-萤火"
+    STRINGS.CHARACTERS.GENERIC.DESCRIBE.SORA_LIGHTFLIER_CAT = "这是什么呀"
     copytotable(STRINGS,strings)
     local function toupper(str)
         if str and type(str) == "string" then return str:upper() end

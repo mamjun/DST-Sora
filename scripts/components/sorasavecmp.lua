@@ -27,16 +27,40 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] GLOBAL.setmetatable(env, {
-    __index = function(t, k)
-        return GLOBAL.rawget(GLOBAL, k)
+]] local c = Class(function(self, inst, type)
+    self.inst = inst
+    self.onSave = {}
+    self.onLoad = {}
+    self.data = {}
+end)
+function c:AddSave(key, fn)
+    self.onSave[key] = fn
+end
+function c:AddLoad(key, fn)
+    self.onLoad[key] = fn
+end
+function c:SetSave(key, data)
+    self.data[key] = data
+end
+function c:GetSave(key)
+    return self.data[key] 
+end
+function c:OnSave()
+    for k, v in pairs(self.onSave) do
+        self.data[k] = v(self.inst, self.data[k],k)
     end
-})
-modimport("main/init")
--- prefab文件列表
-PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "sorahat", "sora2hat", "sora2bag",
-               "sora2sword", "sora3sword", "sora2ice", "sora2fire", "sora2plant", "soramagic", "sorapick",
-               "sorahealing", "soratele", "sorabowknot", "sorabooks", "sorahealingstar", "soraprojectile", "sorameteor",
-               "sora2buffer", "sora2prop", "sora2amulet", "sora2base", "sora2chest", "sora2tree", "sorafoods",
-               "sorahair", "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
-               "sora_nizao"}
+    return self.data
+end
+
+function c:OnLoad(data)
+    if not data then
+        return
+    end
+    for k, v in pairs(self.onLoad) do
+        if data[k] then
+            self.data[k] = v(self.inst, data[k],k)
+        end
+    end
+end
+
+return c

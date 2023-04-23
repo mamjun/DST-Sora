@@ -1,6 +1,7 @@
 if not CreateClientDB then
     return
 end
+
 env.SoraClientDB = {}
 
 local temp = CreateClientDBTemple("chou", 300, 1)

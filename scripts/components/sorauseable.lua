@@ -60,7 +60,7 @@ end
 function sorauseable:StartUsingItem(doer)
 	self.inuse = true
 	if self.onusefn then
-		self.onusefn(self.inst,doer)
+		self.inuse = self.onusefn(self.inst,doer) ~= false
 	end
 
 	if self.stopuseevents then

@@ -765,6 +765,16 @@ AddComponentPostInit("combat",function (self)
     end
     
 end)
+
+AddComponentPostInit("locomotor",function (self)
+    local oldGoToEntity = self.GoToEntity
+    self.GoToEntity = function(s,target,...)
+        if target and target.components.sorafollewer then
+            target.components.sorafollewer.stoptime = 3
+        end
+        return oldGoToEntity(s,target,...)
+    end
+end)
 -- local hook1
 -- hook1 = userdata.MakeHook("AnimState","SetBuild",function(x,y,z)
 -- local args = hook1.args
