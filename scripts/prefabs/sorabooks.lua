@@ -282,6 +282,12 @@ local changelist = {
     reeds = "monkeytail",
 }
 SORAAPI.LISTCONFIG.CHANGELIST = changelist
+local function fixCostController(self)
+    self.donemoisture = true
+	self.donenutrient = true
+	self.donetendable = true
+end
+
 local function trychange(inst)
 	if not inst or inst:IsInLimbo() then
         return
@@ -326,6 +332,7 @@ local function trychange(inst)
         inst.components.perennialcrop2.pollinated_max = -1
         inst.components.perennialcrop2.infested_max = 100
         inst.components.perennialcrop2.getsickchance = 0
+        inst.components.perennialcrop2.CostController = fixCostController
         fix = inst
     end
     

@@ -120,7 +120,7 @@ local function DayUpdate()
         chest[k] = CheckChest(k,true)
     end
     for k,v in pairs(Ents) do
-        if v:IsValid() and v.components.inventoryitem and
+        if type(v) == "table" and v.IsValid  and v:IsValid() and v.components.inventoryitem and
                 not v:IsInLimbo() and
                 not v.components.inventoryitem.owner then
                 
@@ -144,7 +144,7 @@ if TUNING.SORACHESTRANGE > 2000 then
         local p = toprefab(prefab)
         local container = inst.components.container
         for k, v in pairs(Ents) do
-            if catch(v) and toprefab(v.prefab) == p then
+            if type(v) == "table" and v.IsValid and catch(v) and toprefab(v.prefab) == p then
                 if not (container:GiveItem(v, nil, nil, true)) then 
                     if not v:HasTag("bird") then
                         return 
@@ -321,7 +321,7 @@ local function HeLiMiZhi(inst,m,doer)
     local pos = Vector3(x,y,z)
     for n=1,25 do 
         local item = inst.components.container:GetItemInSlot(n)
-        if item and not item.prefab:match("gem") and item.components.deployable then
+        if item and not item.prefab:match("gem") and item.components.deployable and not item.prefab:match("^turf_") and not item.components.deployable.mode == DEPLOYMODE.TURF  then
              if num >= m then return  end
              item = inst.components.container:RemoveItem(item, true)
              if item.components.stackable then

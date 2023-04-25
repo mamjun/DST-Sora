@@ -577,6 +577,9 @@ local function onnewstate(inst, data)
         inst:RemoveEventCallback("newstate", onnewstate)
     end
 end
+local function  ontilling(inst,data)
+    GetExp(inst, 10, "till", 100)
+end
 local function onemote(inst, data)
     GetExp(inst, 5, "emote", 20)
     local soundname = data.soundoverride or
@@ -693,7 +696,7 @@ local master_postinit = function(inst)
     inst:ListenForEvent("killed", onkill)
     inst:ListenForEvent("emote", onemote)
     inst:ListenForEvent("onhitother", onattack)
-
+    inst:ListenForEvent("tilling", ontilling)
     inst:ListenForEvent("working", onfinishedwork)
     inst:ListenForEvent("cookitem", oncook)
     inst:ListenForEvent("repair", onrepair)

@@ -55,10 +55,19 @@ local function getextendinfo()
     end
     return str
 end
+local matchname = {
+    modprefabinitfns = 1,
+
+}
+local mt = getmetatable(_G)
+local mtd = {}
+if mt and mt.__declared then
+    mtd = mt.__declared
+end
 local function formatvar(name,value,level,visit)  
     --格式化变量用于显示
     level = level or 1 
-    visit = visit or {}
+    visit = visit or {[mtd]=1}
     local f = string.rep("\t",level+2)
     local t = type(value)
     if t == "table" then
@@ -115,7 +124,11 @@ local function getextendtrace(start)
                 index = index +1
                 local k,name = debug.getupvalue(info.func,index)
                 if k then
-                    table.insert(get,"\t\tUpvalue "..formatvar(k,name))
+                    if matchname[name] then
+                        table.insert(get,"\t\tUpvalue "..name .." Don't Trace")
+                    else
+                        table.insert(get,"\t\tUpvalue "..formatvar(k,name))
+                    end
                 else
                     break
                 end
@@ -254,6 +267,8 @@ local function InitLogUpload()
         --给饥荒加一份 方便其他modder排查
         local last = 1
         local num = 0
+        TheSim:LuaPrint("----ErrorTraceStart By LogUpLoad---")
+        TheSim:LuaPrint(ExtendTrace:sub(last,last+num-2))
         for i=1,#ExtendTrace,1 do
             num = num +1 
             if num >3000 and ExtendTrace:byte(num+last-1) == 10 then
@@ -264,6 +279,7 @@ local function InitLogUpload()
             
         end
         TheSim:LuaPrint(ExtendTrace:sub(last,-1))
+        TheSim:LuaPrint("----ErrorTraceEnd By LogUpLoad---")
         return alllog
     end
 

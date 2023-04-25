@@ -137,6 +137,7 @@ local function uninit(inst)
             v:Remove()
         end
         ErodeAway(inst.cat, 2)
+        inst.components.rechargeable:Discharge(0)
     end
     inst.cat = nil
 end
@@ -146,18 +147,15 @@ end
 local function onuse(inst, doer)
     if inst.cat and inst.cat:IsValid() then
         uninit(inst)
-        inst.components.rechargeable:Discharge(0)
         if doer and doer.components.talker then
             doer.components.talker:Say("回去休息吧")
         end
-        inst.components.rechargeable:Discharge(0)
         return false
     elseif doer then
         if doer.sora_lightflier_cat and doer.sora_lightflier_cat:IsValid() then
             if doer and doer.components.talker then
-                doer.components.talker:Say("回去休息吧")
+                doer.components.talker:Say("你已经有一只了")
             end
-            inst.components.rechargeable:Discharge(0)
             return false
         end
         inst.components.rechargeable:Discharge(99999999)
@@ -167,6 +165,7 @@ local function onuse(inst, doer)
         if save and save.data then
             cat:SetPersistData(save.data, save.refs)
         end
+        cat.components.container.canbeopened = true
         cat.components.sorafollewer:Init(doer)
         doer.sora_lightflier_cat = cat
         inst.cat = cat
@@ -187,6 +186,7 @@ function makelightflier()
         inst.entity:AddNetwork()
         inst:AddTag("NOBLOCK")
         inst:AddTag("rechargeable")
+        inst:AddTag("soracantpack")
         inst.Transform:SetTwoFaced()
         inst.AnimState:SetBuild("lightflier")
         inst.AnimState:SetBank("lightflier")
@@ -232,7 +232,7 @@ function makelightflier()
         end)
 
         inst:ListenForEvent("ondropped", OnDropped)
-
+        inst:ListenForEvent("onremove", uninit)
         return inst
     end
     return Prefab("sora_lightflier", lightflierfn)
@@ -248,6 +248,8 @@ function makelightflier_cat()
         inst.entity:AddNetwork()
         MakeGhostPhysics(inst, 1, .1)
         inst:AddTag("NOBLOCK")
+        inst:AddTag("soracantpack")
+        inst:AddTag("companion")
         inst.entity:SetCanSleep(false)
         inst.Transform:SetTwoFaced()
         inst.AnimState:SetBuild("lightflier")
@@ -269,7 +271,17 @@ function makelightflier_cat()
         inst:AddComponent("container")
         inst.components.container.openlimit = 1
         inst.components.container:WidgetSetup("sora_lightflier_cat")
-        
+        inst.components.container.canbeopened = false
+        inst:AddComponent("preserver")
+        inst.components.preserver:SetPerishRateMultiplier(-5000)
+        inst:DoTaskInTime(0,function ()
+            if not inst.components.container.canbeopened then
+                local items = inst.components.container:RemoveAllItems()
+                for k,v in paris(items) do
+                    v:Remove()
+                end
+            end
+        end)
         -- inst:AddComponent("locomotor")
         -- inst.components.locomotor.walkspeed = TUNING.LIGHTFLIER.WALK_SPEED * 3
         -- inst.components.locomotor.runspeed = TUNING.LIGHTFLIER.WALK_SPEED * 5

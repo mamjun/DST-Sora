@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "11.27.1" -- 版本
+version = "11.28.4" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -78,6 +78,7 @@ elseif plat == 2 then
     mod_dependencies = {{workshop = "workshop-2384660166"}}
 elseif plat == 3 then
     name = name .. " Beta"
+    mod_dependencies = {{workshop = "workshop-2384660166"}}
 elseif plat == -1 then
     name = name .. " Dev"
     version = version .. "-dev"

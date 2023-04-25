@@ -52,6 +52,7 @@ soraconfig.canteatname = {
     monstertartare=1,           --怪物鞑靼 
     monsterlasagna=1,           --怪物千层饼
     poop=1,
+    old_eights = 1,
 }
 soraconfig.cannoteatfn = function(inst,food)
     if food then

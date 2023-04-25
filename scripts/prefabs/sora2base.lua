@@ -574,7 +574,7 @@ local function onuse(inst,doer)
 	if not doer:HasTag("player") then  inst.components.sorauseable:StopUsingItem() return true  end 
 	if IsNearDanger(doer) then doer.components.talker:Say("太危险了") 
 		 inst.components.sorauseable:StopUsingItem() 
-		return true
+		return false
 	end
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local dests = TheSim:FindEntities(x, y, z, 3000, {"sora2base_tele"})
@@ -590,11 +590,11 @@ local function onuse(inst,doer)
 	if not closed then 
 		doer.components.talker:Say("我需要一个秘法祭坛(传送魔杖)")
 		inst.components.sorauseable:StopUsingItem()
-		return true
+		return false
 	end
 	StartTele(inst,doer,closed)
 	inst.components.sorauseable:StopUsingItem()
-	return true
+	return false
 end
 
 local function stonefn()

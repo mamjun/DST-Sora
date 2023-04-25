@@ -27,8 +27,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
--- 穹妹重生保留经验相关
+]] -- 穹妹重生保留经验相关
 local function Onsoradespawn(userid, soraexp)
     TheWorld.components.soraexpsave:SetExp(userid, soraexp)
 end
@@ -49,21 +48,17 @@ end
 AddPrefabPostInit("world", function(inst)
     if inst.ismastersim then
         inst:AddComponent("soraworldevent")
-        inst.components.soraworldevent.debug =
-            (inst.components.soraworldevent.namespace ~= "1935" and
-                inst.components.soraworldevent.namespace ~= "2423" and
-                inst.components.soraworldevent.namespace ~= "4507")
+        inst.components.soraworldevent.debug = (inst.components.soraworldevent.namespace ~= "1935" and
+                                                   inst.components.soraworldevent.namespace ~= "2423" and
+                                                   inst.components.soraworldevent.namespace ~= "4507")
         inst:AddComponent("soraexpsave")
         inst.components.soraworldevent:SetNameSpace("sora")
         inst.components.soraworldevent:SetTimer(5)
         inst:ListenForEvent("ms_playerdespawn", Onplayerdespawnanddelete)
-        inst:ListenForEvent("ms_playerdespawnandmigrate",
-                            Onplayerdespawnanddelete)
-        inst:ListenForEvent("ms_playerdespawnanddelete",
-                            Onplayerdespawnanddelete)
+        inst:ListenForEvent("ms_playerdespawnandmigrate", Onplayerdespawnanddelete)
+        inst:ListenForEvent("ms_playerdespawnanddelete", Onplayerdespawnanddelete)
         if inst.ismastershard then
-            inst.components.soraworldevent:ListenForEvent("soradespawn",
-                                                          function(inst, data)
+            inst.components.soraworldevent:ListenForEvent("soradespawn", function(inst, data)
                 Onsoradespawn(data.userid, data.soraexp)
             end)
         end
@@ -74,14 +69,15 @@ end)
 AddComponentPostInit("trader", function(Trader)
     local oldAcceptGift = Trader.AcceptGift
     function Trader:AcceptGift(giver, item, count)
-        if self.inst:HasTag("soratrader") and item.components.stackable and
-            count == nil then
+        if self.inst:HasTag("soratrader") and item.components.stackable and count == nil then
             if self.inst.cantrader then
                 count = self.inst:cantrader(giver, item)
             else
                 count = item.components.stackable.stacksize
             end
-            if count < 1 then count = 1 end
+            if count < 1 then
+                count = 1
+            end
         end
         return oldAcceptGift(self, giver, item, count)
     end
@@ -92,7 +88,9 @@ AddComponentPostInit("cooker", function(cooker, inst)
     local SoraOldCookItem = cooker.CookItem
     cooker.CookItem = function(self, item, chef)
         if self:CanCook(item, chef) and chef then
-            chef:PushEvent("cookitem", {cookitem = item})
+            chef:PushEvent("cookitem", {
+                cookitem = item
+            })
             return SoraOldCookItem(self, item, chef)
         end
     end
@@ -107,20 +105,17 @@ AddComponentPostInit("harvestable", function(hav, inst)
                 picker.GetExp(picker, 3 * self.produce, "harvestable")
             end
             if not getsora("sbcj") then
-                if picker and picker:HasTag("sora") and picker.soralevel:value() >
-                    14 then
+                if picker and picker:HasTag("sora") and picker.soralevel:value() > 14 then
                     local num = self.produce
                     if self.product ~= nil then
                         for i = 1, num, 1 do
                             local loot = GLOBAL.SpawnPrefab(self.product)
                             if loot ~= nil then
                                 if loot.components.inventoryitem ~= nil then
-                                    loot.components.inventoryitem:InheritMoisture(
-                                        GLOBAL.TheWorld.state.wetness,
+                                    loot.components.inventoryitem:InheritMoisture(GLOBAL.TheWorld.state.wetness,
                                         GLOBAL.TheWorld.state.iswet)
                                 end
-                                if picker ~= nil and picker.components.inventory ~=
-                                    nil then
+                                if picker ~= nil and picker.components.inventory ~= nil then
                                     picker.components.inventory:GiveItem(loot)
                                 else
                                     GLOBAL.LaunchAt(loot, self.inst, nil, 1, 1)
@@ -139,8 +134,9 @@ end)
 AddComponentPostInit("dryer", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker)
-        if not self:IsDone() or picker == nil or picker.components.inventory ==
-            nil then return false end
+        if not self:IsDone() or picker == nil or picker.components.inventory == nil then
+            return false
+        end
         if picker:HasTag("sora") and picker.GetExp then
             picker.GetExp(picker, 10, "dryer")
         end
@@ -148,8 +144,7 @@ AddComponentPostInit("dryer", function(hav, inst)
             if picker:HasTag("sora") and picker.soralevel:value() > 14 then
                 local loot = GLOBAL.SpawnPrefab(self.product)
                 if loot ~= nil then
-                    picker.components.inventory:GiveItem(loot, nil,
-                                                         self.inst:GetPosition())
+                    picker.components.inventory:GiveItem(loot, nil, self.inst:GetPosition())
                 end
             end
         end
@@ -161,10 +156,11 @@ end)
 AddComponentPostInit("crop", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker, ...)
-        if not picker then return SoraOldHarvest(self, picker, ...) end
+        if not picker then
+            return SoraOldHarvest(self, picker, ...)
+        end
         if self.cropdata then -- Legion 多年生的加一年 
-            if picker:HasTag("sora") and picker.GetExp and
-                not self.inst:HasTag("withered") then
+            if picker:HasTag("sora") and picker.GetExp and not self.inst:HasTag("withered") then
                 picker.GetExp(picker, 10, "crop")
                 if self.product_prefab ~= nil then
                     picker.GetExp(picker, 20, self.product_prefab, nil, true)
@@ -176,8 +172,7 @@ AddComponentPostInit("crop", function(hav, inst)
             return SoraOldHarvest(self, picker)
         end
         if self.matured or self.inst:HasTag("withered") then
-            if picker:HasTag("sora") and picker.GetExp and
-                not self.inst:HasTag("withered") then
+            if picker:HasTag("sora") and picker.GetExp and not self.inst:HasTag("withered") then
                 picker.GetExp(picker, 10, "crop")
                 if self.product_prefab ~= nil then
                     picker.GetExp(picker, 20, self.product_prefab, nil, true)
@@ -187,26 +182,20 @@ AddComponentPostInit("crop", function(hav, inst)
                 if picker:HasTag("sora") and picker.soralevel:value() > 14 then
                     local product = nil
                     if self.grower ~= nil and
-                        (self.grower.components.burnable ~= nil and
-                            self.grower.components.burnable:IsBurning()) or
-                        (self.inst.components.burnable ~= nil and
-                            self.inst.components.burnable:IsBurning()) then
+                        (self.grower.components.burnable ~= nil and self.grower.components.burnable:IsBurning()) or
+                        (self.inst.components.burnable ~= nil and self.inst.components.burnable:IsBurning()) then
                         local temp = GLOBAL.SpawnPrefab(self.product_prefab)
-                        product = GLOBAL.SpawnPrefab(
-                                      temp.components.cookable ~= nil and
-                                          temp.components.cookable.product or
-                                          "seeds_cooked")
+                        product = GLOBAL.SpawnPrefab(temp.components.cookable ~= nil and
+                                                         temp.components.cookable.product or "seeds_cooked")
                         temp:Remove()
                     else
                         product = GLOBAL.SpawnPrefab(self.product_prefab)
                     end
                     if product ~= nil then
                         if picker ~= nil then
-                            picker.components.inventory:GiveItem(product, nil,
-                                                                 self.inst:GetPosition())
+                            picker.components.inventory:GiveItem(product, nil, self.inst:GetPosition())
                         else
-                            product.Transform:SetPosition(
-                                self.inst.Transform:GetWorldPosition())
+                            product.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
                         end
                     end
                 end
@@ -221,7 +210,9 @@ local cooking = require("cooking")
 AddComponentPostInit("stewer", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker, ...)
-        if not picker then return SoraOldHarvest(self, picker, ...) end
+        if not picker then
+            return SoraOldHarvest(self, picker, ...)
+        end
         local rec = cooking.GetRecipe(self.inst.prefab, self.product)
         local sta = rec and rec.stacksize or 1
         if picker:HasTag("sora") and picker.GetExp then
@@ -231,8 +222,7 @@ AddComponentPostInit("stewer", function(hav, inst)
             end
         end
         if not getsora("sbsg") then
-            if self.done and picker:HasTag("sora") and picker.soralevel:value() >
-                24 then
+            if self.done and picker:HasTag("sora") and picker.soralevel:value() > 24 then
                 if self.product ~= nil then
                     local loot = GLOBAL.SpawnPrefab(self.product)
                     if loot ~= nil then
@@ -240,8 +230,7 @@ AddComponentPostInit("stewer", function(hav, inst)
                             loot.components.stackable:SetStackSize(sta)
                         end
                         if picker ~= nil and picker.components.inventory ~= nil then
-                            picker.components.inventory:GiveItem(loot, nil,
-                                                                 self.inst:GetPosition())
+                            picker.components.inventory:GiveItem(loot, nil, self.inst:GetPosition())
                         else
                             GLOBAL.LaunchAt(loot, self.inst, nil, 1, 1)
                         end
@@ -257,7 +246,9 @@ end)
 AddComponentPostInit("stewer_fur", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker, ...)
-        if not picker then return SoraOldHarvest(self, picker, ...) end
+        if not picker then
+            return SoraOldHarvest(self, picker, ...)
+        end
         local sta = 1
         if picker:HasTag("sora") and picker.GetExp then
             picker.GetExp(picker, 10 * sta, "stewer")
@@ -266,8 +257,7 @@ AddComponentPostInit("stewer_fur", function(hav, inst)
             end
         end
         if not getsora("sbcj") then
-            if self.done and picker:HasTag("sora") and picker.soralevel:value() >
-                14 then
+            if self.done and picker:HasTag("sora") and picker.soralevel:value() > 14 then
                 if self.product ~= nil then
                     local loot = GLOBAL.SpawnPrefab(self.product)
                     if loot ~= nil then
@@ -275,8 +265,7 @@ AddComponentPostInit("stewer_fur", function(hav, inst)
                             loot.components.stackable:SetStackSize(sta)
                         end
                         if picker ~= nil and picker.components.inventory ~= nil then
-                            picker.components.inventory:GiveItem(loot, nil,
-                                                                 self.inst:GetPosition())
+                            picker.components.inventory:GiveItem(loot, nil, self.inst:GetPosition())
                         else
                             GLOBAL.LaunchAt(loot, self.inst, nil, 1, 1)
                         end
@@ -289,24 +278,22 @@ AddComponentPostInit("stewer_fur", function(hav, inst)
 end)
 
 -- 允许交易
-local canlevelup = {
-    "petals", -- 花瓣
-    "dragon_scales", -- 龙鳞
-    "goose_feather", -- 羽绒
-    "deerclops_eyeball", -- 眼球
-    "bearger_fur", -- 厚重皮毛
-    "shroom_skin", -- 蘑蛤皮
-    "log", -- 木头
-    "marble", -- 大理石
-    "butterflywings", -- 蝴蝶翅膀
-    "butter", -- 黄油
-    "fireflies", -- 萤火虫
-    "lightbulb", -- 荧光果
-    "wormlight_lesser", -- 微光浆果
-    "wormlight", -- 发光浆果
-    "nightmarefuel", -- 发光浆果
-    "houndstooth", "manrabbit_tail", "stinger"
-}
+local canlevelup = {"petals", -- 花瓣
+"dragon_scales", -- 龙鳞
+"goose_feather", -- 羽绒
+"deerclops_eyeball", -- 眼球
+"bearger_fur", -- 厚重皮毛
+"shroom_skin", -- 蘑蛤皮
+"log", -- 木头
+"marble", -- 大理石
+"butterflywings", -- 蝴蝶翅膀
+"butter", -- 黄油
+"fireflies", -- 萤火虫
+"lightbulb", -- 荧光果
+"wormlight_lesser", -- 微光浆果
+"wormlight", -- 发光浆果
+"nightmarefuel", -- 发光浆果
+"houndstooth", "manrabbit_tail", "stinger"}
 for k, v in pairs(canlevelup) do
     AddPrefabPostInit(v, function(inst)
         if GLOBAL.TheWorld.ismastersim and not inst.components.tradable then
@@ -322,19 +309,20 @@ AddPlayerPostInit(function(inst)
 end)
 
 AddLaterFn(function()
-    local old = up.Get(EntityScript.CollectActions, 'COMPONENT_ACTIONS',
-                       "componentactions.lua")
+    local old = up.Get(EntityScript.CollectActions, 'COMPONENT_ACTIONS', "componentactions.lua")
     if old and old.SCENE and old.INVENTORY then
         local oldSCENEfn = old.SCENE.bundlemaker
         old.SCENE.bundlemaker = function(inst, doer, ...)
-            if inst and inst:HasTag("sorabowknot") and
-                not (doer and doer:HasTag("sora")) then return end
+            if inst and inst:HasTag("sorabowknot") and not (doer and doer:HasTag("sora")) then
+                return
+            end
             return oldSCENEfn(inst, doer, ...)
         end
         local oldINVENTORYfn = old.INVENTORY.bundlemaker
         old.INVENTORY.bundlemaker = function(inst, doer, ...)
-            if inst and inst:HasTag("sorabowknot") and
-                not (doer and doer:HasTag("sora")) then return end
+            if inst and inst:HasTag("sorabowknot") and not (doer and doer:HasTag("sora")) then
+                return
+            end
             return oldINVENTORYfn(inst, doer, ...)
         end
     end
@@ -343,24 +331,24 @@ end)
 local oldbunldefn = ACTIONS.BUNDLE.fn
 ACTIONS.BUNDLE.fn = function(act, ...)
     local target = act.invobject or act.target
-    if target ~= nil and target:HasTag("sorabowknot") and act.doer and
-        not act.doer:HasTag("sora") then return true end
+    if target ~= nil and target:HasTag("sorabowknot") and act.doer and not act.doer:HasTag("sora") then
+        return true
+    end
     return oldbunldefn(act, ...)
 end
 AddReplicableComponent("sorapacker")
 
 -- 能力标签
-GLOBAL.SoraTags = {
-    "fastbuilder", -- 修理工快速制作
-    "fastpicker", -- 蜘蛛快采
-    "fastpick", -- 成就快采
-    "woodcutter2", -- 新的快砍 不再能白嫖路西和树精
-    "quagmire_fasthands", -- 修理工快手
-    "masterchef", -- 大厨
-    "professionalchef", -- 调味
-    "expertchef", -- 做饭动作快点
-    "swampwhisperer", -- 未知标签 但是不会吓跑颤栗花
-    "soraflyer" -- 白云飞行术
+GLOBAL.SoraTags = {"fastbuilder", -- 修理工快速制作
+"fastpicker", -- 蜘蛛快采
+"fastpick", -- 成就快采
+"woodcutter2", -- 新的快砍 不再能白嫖路西和树精
+"quagmire_fasthands", -- 修理工快手
+"masterchef", -- 大厨
+"professionalchef", -- 调味
+"expertchef", -- 做饭动作快点
+"swampwhisperer", -- 未知标签 但是不会吓跑颤栗花
+"soraflyer" -- 白云飞行术
 }
 
 RegTag("fastbuilder") -- 修理工快速制作
@@ -380,8 +368,7 @@ RegTag("sorabook")
 RegTag("soranotlink") -- 风铃契约
 
 AddLaterFn(function()
-    if AllRecipes.portablecookpot_item and
-        AllRecipes.portablecookpot_item.builder_tag and
+    if AllRecipes.portablecookpot_item and AllRecipes.portablecookpot_item.builder_tag and
         AllRecipes.portablecookpot_item.builder_tag ~= "masterchef" then
         table.insert(SoraTags, AllRecipes.portablecookpot_item.builder_tag)
     end
@@ -401,30 +388,30 @@ end)
 -- local RETARGET_MUST_TAGS = {"_combat", "_health"}
 -- local RETARGET_CANT_TAGS = {"prey", "sora", "senior_tentaclemedal"}
 -- local function newretargetfn(inst)
-    -- return FindEntity(inst, TUNING.TENTACLE_ATTACK_DIST, function(guy)
-        -- return guy.prefab ~= inst.prefab and guy.entity:IsVisible() and
-                   -- not guy.components.health:IsDead() and
-                   -- (guy.components.combat.target == inst or
-                       -- guy:HasTag("character") or guy:HasTag("monster") or
-                       -- guy:HasTag("animal"))
-    -- end, RETARGET_MUST_TAGS, RETARGET_CANT_TAGS)
+-- return FindEntity(inst, TUNING.TENTACLE_ATTACK_DIST, function(guy)
+-- return guy.prefab ~= inst.prefab and guy.entity:IsVisible() and
+-- not guy.components.health:IsDead() and
+-- (guy.components.combat.target == inst or
+-- guy:HasTag("character") or guy:HasTag("monster") or
+-- guy:HasTag("animal"))
+-- end, RETARGET_MUST_TAGS, RETARGET_CANT_TAGS)
 -- end
 
 -- AddPrefabPostInit("tentacle", function(inst)
-    -- if not TheWorld.ismastersim then return end
-    -- inst:DoTaskInTime(0, function(i)
-        -- local retargetfn = inst.components.combat.targetfn
-        -- if retargetfn then
-            -- inst.components.combat.targetfn =
-                -- function(inst, ...)
-                    -- local target = retargetfn(inst, ...)
-                    -- if target and target:HasTag("sora") then -- 重新找个目标给你
-                        -- target = newretargetfn(inst, ...)
-                    -- end
-                    -- return target
-                -- end
-        -- end
-    -- end)
+-- if not TheWorld.ismastersim then return end
+-- inst:DoTaskInTime(0, function(i)
+-- local retargetfn = inst.components.combat.targetfn
+-- if retargetfn then
+-- inst.components.combat.targetfn =
+-- function(inst, ...)
+-- local target = retargetfn(inst, ...)
+-- if target and target:HasTag("sora") then -- 重新找个目标给你
+-- target = newretargetfn(inst, ...)
+-- end
+-- return target
+-- end
+-- end
+-- end)
 -- end)
 
 AddStategraphPostInit("wilson", function(self)
@@ -455,9 +442,7 @@ AddStategraphPostInit("wilson_client", function(self)
     end
 end)
 
-local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol",
-                                             function(inst, symbol, build,
-                                                      newsymbol)
+local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol", function(inst, symbol, build, newsymbol)
     if not inst.SoraLastSymbols[symbol] then
         inst.SoraLastSymbols[symbol] = {}
     end
@@ -469,10 +454,10 @@ local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol",
         return false
     end
 end)
-local ClearOverrideSymbolHook = userdata.MakeHook("AnimState",
-                                                  "ClearOverrideSymbol",
-                                                  function(inst, symbol)
-    if inst.SoraLastSymbols[symbol] then inst.SoraLastSymbols[symbol] = nil end
+local ClearOverrideSymbolHook = userdata.MakeHook("AnimState", "ClearOverrideSymbol", function(inst, symbol)
+    if inst.SoraLastSymbols[symbol] then
+        inst.SoraLastSymbols[symbol] = nil
+    end
     if inst.SoraLockSymbols[symbol] and next(inst.SoraLockSymbols[symbol]) then
         return true
     else
@@ -480,7 +465,9 @@ local ClearOverrideSymbolHook = userdata.MakeHook("AnimState",
     end
 end)
 local function SoraLockSymbol(inst, symbol, key, build, newsymbol)
-    if not inst.SoraLockSymbols then return false end
+    if not inst.SoraLockSymbols then
+        return false
+    end
     if not inst.SoraLockSymbols[symbol] then
         inst.SoraLockSymbols[symbol] = {}
     end
@@ -489,13 +476,20 @@ local function SoraLockSymbol(inst, symbol, key, build, newsymbol)
             table.remove(inst.SoraLockSymbols[symbol], k)
         end
     end
-    table.insert(inst.SoraLockSymbols[symbol],
-                 {key = key, build = build, symbol = newsymbol})
+    table.insert(inst.SoraLockSymbols[symbol], {
+        key = key,
+        build = build,
+        symbol = newsymbol
+    })
     userdata.Call(inst, OverrideSymbolHook, symbol, build, newsymbol)
 end
 local function SoraUnlockSymbol(inst, symbol, key)
-    if not inst.SoraLockSymbols then return false end
-    if not inst.SoraLockSymbols[symbol] then return false end
+    if not inst.SoraLockSymbols then
+        return false
+    end
+    if not inst.SoraLockSymbols[symbol] then
+        return false
+    end
     for k, v in pairs(inst.SoraLockSymbols[symbol]) do
         if v and v.key == key then
             table.remove(inst.SoraLockSymbols[symbol], k)
@@ -507,8 +501,7 @@ local function SoraUnlockSymbol(inst, symbol, key)
         local nn = #tb
         for n = nn, 1, -1 do
             if tb[n].build and tb[n].symbol then
-                userdata.Call(inst, OverrideSymbolHook, symbol, tb[n].build,
-                              tb[n].symbol)
+                userdata.Call(inst, OverrideSymbolHook, symbol, tb[n].build, tb[n].symbol)
                 return
             end
         end
@@ -519,7 +512,9 @@ local function SoraUnlockSymbol(inst, symbol, key)
 end
 
 AddPlayerPostInit(function(inst)
-    if not TheWorld.ismastersim then return end
+    if not TheWorld.ismastersim then
+        return
+    end
     userdata.Hook(inst, OverrideSymbolHook)
     userdata.Hook(inst, ClearOverrideSymbolHook)
     inst.SoraLockSymbols = {}
@@ -527,29 +522,28 @@ AddPlayerPostInit(function(inst)
     inst.SoraLockSymbol = SoraLockSymbol
     inst.SoraUnlockSymbol = SoraUnlockSymbol
     inst:ListenForEvent("trade", function(inst, data)
-        if not inst:HasTag("sora") and data and data.giver and
-            data.giver:HasTag("sora") and data.item and data.item.prefab ==
-            "sora2armor" and data.item.skinname == "sora2armorskin" then
+        if not inst:HasTag("sora") and data and data.giver and data.giver:HasTag("sora") and data.item and
+            data.item.prefab == "sora2armor" and data.item.skinname == "sora2armorskin" then
             data.giver.components.talker:Say("给大佬递女装")
             inst.components.inventory:Equip(data.item)
-            local hands = inst.components.inventory:GetEquippedItem(
-                              EQUIPSLOTS.HANDS)
+            local hands = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
 
             if not (hands and hands.skinname == "sora3swordskin") then
-                local i = inst.components.inventory:FindItem(
-                              function(it)
-                        return it.skinname == "sora3swordskin"
-                    end)
-                if i then inst.components.inventory:Equip(i) end
+                local i = inst.components.inventory:FindItem(function(it)
+                    return it.skinname == "sora3swordskin"
+                end)
+                if i then
+                    inst.components.inventory:Equip(i)
+                end
             end
-            local head = inst.components.inventory:GetEquippedItem(
-                             EQUIPSLOTS.HEAD)
+            local head = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
             if not (head and head.skinname == "sora2hatskin") then
-                local i = inst.components.inventory:FindItem(
-                              function(it)
-                        return it.skinname == "sora2hatskin"
-                    end)
-                if i then inst.components.inventory:Equip(i) end
+                local i = inst.components.inventory:FindItem(function(it)
+                    return it.skinname == "sora2hatskin"
+                end)
+                if i then
+                    inst.components.inventory:Equip(i)
+                end
 
             end
         end
@@ -567,13 +561,13 @@ AddComponentPostInit("wateryprotection", function(self)
     end)
 end)
 
-AddComponentPostInit("farmtiller", function(self)
-    bhook(self, "Till", function(s, pt, doer, ...)
-        if doer and doer.GetExp and doer:HasTag("sora") then
-            doer:GetExp(10, "till", 50)
-        end
-    end)
-end)
+-- AddComponentPostInit("farmtiller", function(self)
+--     bhook(self, "Till", function(s, pt, doer, ...)
+--         if doer and doer.GetExp and doer:HasTag("sora") then
+--             doer:GetExp(10, "till", 50)
+--         end
+--     end)
+-- end)
 
 AddComponentPostInit("farmplanttendable", function(self)
     bhook(self, "TendTo", function(s, doer, ...)
@@ -703,8 +697,7 @@ GLOBAL.require = oldrequire
 oldCanEntitySeeTarget = CanEntitySeeTarget
 GLOBAL.CanEntitySeeTarget = function(inst, target, ...)
     if inst and target and target:HasTag("sorabind") then
-        if not (inst:HasTag("sora") and inst.userid and
-            target:HasTag(inst.userid) or inst.Network:IsServerAdmin()) then
+        if not (inst:HasTag("sora") and inst.userid and target:HasTag(inst.userid) or inst.Network:IsServerAdmin()) then
             return false
         end
     end
@@ -716,8 +709,7 @@ local function RefreshContainer(inst)
             if j and j.components.container then
                 for k, jv in pairs(j.components.container.slots) do
                     if jv and jv.components.perishable then
-                        jv.components.perishable.perishremainingtime =
-                            jv.components.perishable.perishtime
+                        jv.components.perishable.perishremainingtime = jv.components.perishable.perishtime
                     end
                 end
             end
@@ -725,7 +717,9 @@ local function RefreshContainer(inst)
     end
 end
 local function ContainerPreseverFix(inst)
-    if TheWorld.ismastersim then inst:DoPeriodicTask(10, RefreshContainer) end
+    if TheWorld.ismastersim then
+        inst:DoPeriodicTask(10, RefreshContainer)
+    end
 end
 AddPrefabPostInit("sora2bag", ContainerPreseverFix)
 AddPrefabPostInit("sorabag", ContainerPreseverFix)
@@ -746,34 +740,51 @@ AddSimPostInit(function()
     end
 end)
 AddPlayerPostInit(function(inst)
-    inst:DoTaskInTime(0, function() SoraUpdate:TryToUpdate() end)
+    inst:DoTaskInTime(0, function()
+        SoraUpdate:TryToUpdate()
+    end)
 
 end)
-AddComponentPostInit("combat",function (self)
+AddComponentPostInit("combat", function(self)
     local oldGetAttacked = self.GetAttacked
-    self.GetAttacked = function(s,attacker, damage, weapon, stimuli,...)
-        local olddamagetobreak 
+    self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
+        local olddamagetobreak
         if weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
             olddamagetobreak = s.inst.components.freezable.damagetobreak
             s.inst.components.freezable.damagetobreak = damage * 100000
         end
-        local x,y,z = oldGetAttacked(s,attacker, damage, weapon, stimuli,...)
-        if olddamagetobreak  and weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
-             s.inst.components.freezable.damagetobreak =olddamagetobreak
+        local x, y, z = oldGetAttacked(s, attacker, damage, weapon, stimuli, ...)
+        if olddamagetobreak and weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
+            s.inst.components.freezable.damagetobreak = olddamagetobreak
         end
-        return x,y,z
+        return x, y, z
     end
-    
+
 end)
 
-AddComponentPostInit("locomotor",function (self)
+AddComponentPostInit("locomotor", function(self)
     local oldGoToEntity = self.GoToEntity
-    self.GoToEntity = function(s,target,...)
+    self.GoToEntity = function(s, target, ...)
         if target and target.components.sorafollewer then
             target.components.sorafollewer.stoptime = 3
         end
-        return oldGoToEntity(s,target,...)
+        return oldGoToEntity(s, target, ...)
     end
+end)
+local function tryDestroyReticule(inst, data)
+    if data.eslot == EQUIPSLOTS.HANDS then
+        local self = inst.components.playercontroller
+        if self.reticule ~= nil then
+            if self.reticule.inst.components.spellbook ~= nil and self.reticule.inst.prefab == "sora2plant" then
+                self.reticule:DestroyReticule()
+                return
+            end
+        end
+    end
+end
+
+AddPlayerPostInit(function(inst)
+    inst:ListenForEvent("unequip", tryDestroyReticule)
 end)
 -- local hook1
 -- hook1 = userdata.MakeHook("AnimState","SetBuild",function(x,y,z)
