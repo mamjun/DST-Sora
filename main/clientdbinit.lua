@@ -25,7 +25,7 @@ end
 
 temp.clientfn = function(ns, db, userid)
     CKDB = db -- 用于客户端取数据
-    SoraClientDB.SoraClientDB = CKDB
+    SoraClientDB.SoraClientCKDB = CKDB
 end
 
 --[[

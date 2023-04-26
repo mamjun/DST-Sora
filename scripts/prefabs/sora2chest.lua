@@ -321,7 +321,7 @@ local function HeLiMiZhi(inst,m,doer)
     local pos = Vector3(x,y,z)
     for n=1,25 do 
         local item = inst.components.container:GetItemInSlot(n)
-        if item and not item.prefab:match("gem") and item.components.deployable and not item.prefab:match("^turf_") and not item.components.deployable.mode == DEPLOYMODE.TURF  then
+        if item and not item.prefab:match("gem") and item.components.deployable and not item.prefab:match("^turf_") and not (item.components.deployable.mode == DEPLOYMODE.TURF)  then
              if num >= m then return  end
              item = inst.components.container:RemoveItem(item, true)
              if item.components.stackable then
