@@ -97,6 +97,7 @@ local function onunequip(inst, owner)
     inst.owner = nil
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
+    if not owner:HasTag("sora") then return end
     owner.components.combat.externaldamagemultipliers:SetModifier("sora_wq")
     if owner.components.combat.external_critical_damage_multipliers then
         owner.components.combat.external_critical_damage_multipliers:RemoveModifier(inst)
