@@ -33,7 +33,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 从世界负责查询
 ]] --
 local key = env.MODKEY or env.modkey or env.modname or "" -- 防冲突       可以在外面定义
-local rpcprint = env.DEBUGPRINT or env.DebugPrint or print  --可以在外面定义在实现根据条件屏蔽RPC的print 太多太刷屏了！
+local rpcprint = env.DEBUGPRINT or env.DebugPrint or print -- 可以在外面定义在实现根据条件屏蔽RPC的print 太多太刷屏了！
 
 --[[  doc && demo 
 快速导航        
@@ -290,18 +290,21 @@ TheWorld:StartThread(function () print("RPC",DB:RPC(1,"test",{a={b={c=1}}})) end
 TheWorld:StartThread(function () print("RPC",DB:RPC(1,"remote","print (111) return 111")) end)
 ]]
 
-
-
-if not TheNet:GetIsServer() then
-    return
-end
 local dbnamespace = key .. "maindb"
 dbnamespace = dbnamespace:lower()
+
+if not TheNet:GetIsServer() then
+    env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
+    end)
+
+    return
+end
+
 local dbhandles = {}
 local sid = TheShard:GetShardId() -- 自身ID
 local mid = sid == "0" and "0" or SHARDID.MASTER -- 主世界ID
 local ismaster = TheShard:IsMaster() or mid == "0"
---print("AddShardModRPCHandler",AddShardModRPCHandler,env,AddShardModRPCHandler,GLOBAL.AddShardModRPCHandler)
+-- print("AddShardModRPCHandler",AddShardModRPCHandler,env,AddShardModRPCHandler,GLOBAL.AddShardModRPCHandler)
 env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
     if not ns then
         return
@@ -309,7 +312,7 @@ env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...
     if not (dbhandles[ns] and dbhandles[ns].Handle) then
         return
     end -- 无handle
-    rpcprint("MAIN DB RPC",id, ns, cmd, data, ...)
+    rpcprint("MAIN DB RPC", id, ns, cmd, data, ...)
     return dbhandles[ns]:Handle(id, cmd, data, ...)
 end)
 
@@ -332,7 +335,7 @@ local rpc = SHARD_MOD_RPC[dbnamespace]["maindb"]
 
 local MainDB = Class(function(self)
     self.Inited = false
-    self.inst =  nil
+    self.inst = nil
     -- 数据
     self.data = {}
     self.noSyn = {}
@@ -345,8 +348,7 @@ local MainDB = Class(function(self)
     -- RPC！
     self.RPCHandles = {}
 
-
-    self.Bigs = {}  --大数据传输
+    self.Bigs = {} -- 大数据传输
 
     self.Syn = { -- 记录同步顺序和同步状态
         syntime = 600, -- 默认600秒同步一次
@@ -374,33 +376,47 @@ function MainDB:UnInit(e) -- 卸载
     self.namespace = nil
 end
 local maxsenddata = 60000
-function MainDB:Send(id, cmd, data,data2,data3, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
+function MainDB:Send(id, cmd, data, data2, data3, ...) -- 发送数据   数据长度不做检查 单参数最大长度 65535！
     if type(data3) == "string" and #data3 > maxsenddata then
         local all = math.ceil(#data3 / maxsenddata)
         local hashs = hash(data3)
-        local bigdataid =sid.."|".. tostring(os.time()) .."|" .. tostring(hashs)
-        
-        for i=1,all do 
-            if i==1 then        --只有第一部分带全部的参数 和 data3的第一个分段
-                local data3tosend  = data3:sub(1,maxsenddata)
-                self:Send(id,"BigData",encode({bid = bigdataid,all =all,i=i,hashs=hashs}),encode({cmd=cmd,data=data,data2=data2}),data3tosend,...)
+        local bigdataid = sid .. "|" .. tostring(os.time()) .. "|" .. tostring(hashs)
+
+        for i = 1, all do
+            if i == 1 then -- 只有第一部分带全部的参数 和 data3的第一个分段
+                local data3tosend = data3:sub(1, maxsenddata)
+                self:Send(id, "BigData", encode({
+                    bid = bigdataid,
+                    all = all,
+                    i = i,
+                    hashs = hashs
+                }), encode({
+                    cmd = cmd,
+                    data = data,
+                    data2 = data2
+                }), data3tosend, ...)
             else
-                local data3tosend  = data3:sub(maxsenddata*i-maxsenddata+1,maxsenddata*i)
-                self:Send(id,"BigData",encode({bid = bigdataid,all =all,i=i,hashs=hashs}),nil,data3tosend,nil)
+                local data3tosend = data3:sub(maxsenddata * i - maxsenddata + 1, maxsenddata * i)
+                self:Send(id, "BigData", encode({
+                    bid = bigdataid,
+                    all = all,
+                    i = i,
+                    hashs = hashs
+                }), nil, data3tosend, nil)
             end
         end
-        return 
+        return
     end
-    if tostring(id) == tostring(sid) then 
-        rpcprint("MAIN DB LOCAL RPC",cmd, data, data2,data3,...)
-        self:Handle(id, cmd, data, data2,data3,...)
+    if tostring(id) == tostring(sid) then
+        rpcprint("MAIN DB LOCAL RPC", cmd, data, data2, data3, ...)
+        self:Handle(id, cmd, data, data2, data3, ...)
     else
-        SendModRPCToShard(rpc, id, self.namespace, cmd, data, data2,data3,...)
+        SendModRPCToShard(rpc, id, self.namespace, cmd, data, data2, data3, ...)
     end
 end
-function MainDB:Notice(event,data)
-    if self.inst  and self.inst:IsValid() then
-        self.inst:PushEvent(event,data)
+function MainDB:Notice(event, data)
+    if self.inst and self.inst:IsValid() then
+        self.inst:PushEvent(event, data)
     end
 end
 
@@ -408,10 +424,12 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
     if cmd == "event" then -- 推送事件
         return self:HandleEvent(id, data, decode(data3))
     elseif cmd == "Sync" then -- 对方要求我方发送所有数据 进行同步
-        if tostring(id) == tostring(sid) then return end    --不处理自己的 
-        local keys, hashs = self:GetRootHash(data,false)    --第一次只计算key key数量不一致直接同步 节省性能
+        if tostring(id) == tostring(sid) then
+            return
+        end -- 不处理自己的 
+        local keys, hashs = self:GetRootHash(data, false) -- 第一次只计算key key数量不一致直接同步 节省性能
         if keys == data2 then
-            keys, hashs = self:GetRootHash(data,true)
+            keys, hashs = self:GetRootHash(data, true)
             if hashs == data3 then
                 return self:Send(id, "SyncReply", data, hashs) -- 数据一致 不需要同步
             end
@@ -421,8 +439,8 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
             str = encode(self.data[data])
         else
             local tosend = {}
-            for k,v in pairs(self.data) do
-                if k and (not self.noSyn[k] or self.noSyn[k]==2 ) then
+            for k, v in pairs(self.data) do
+                if k and (not self.noSyn[k] or self.noSyn[k] == 2) then
                     tosend[k] = self.data[k]
                 end
             end
@@ -430,9 +448,11 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
         end
         return self:Send(id, "SyncReply", data, hash(str), str) -- 数据一致 不需要同步
     elseif cmd == "SyncReply" then -- 对方要求我方发送所有数据 进行同步
-        if tostring(id) == tostring(sid) then return end    --不处理自己的 
+        if tostring(id) == tostring(sid) then
+            return
+        end -- 不处理自己的 
         if not data3 then
-            
+
             return -- 数据一致 不需要更新
         end
         local hashs = data2
@@ -445,23 +465,38 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
             if data then
                 if self.data[data] then
                     self.data[data] = d
-                    self:Notice("MainDBRootSync",{namespace=self.namespace,root=data,value=d})
+                    self:Notice("MainDBRootSync", {
+                        namespace = self.namespace,
+                        root = data,
+                        value = d
+                    })
                 end
             else
                 for k, v in pairs(self.data) do
                     if d[k] then
                         self[k] = d[k]
-                        self:Notice("MainDBRootSync",{namespace=self.namespace,root=k,value=v})
+                        self:Notice("MainDBRootSync", {
+                            namespace = self.namespace,
+                            root = k,
+                            value = v
+                        })
                     end
                 end
             end
         end
         return
     elseif cmd == "Set" then -- 通知对方有数据修改
-        if tostring(id) == tostring(sid) then return end    --不处理自己的 
+        if tostring(id) == tostring(sid) then
+            return
+        end -- 不处理自己的 
         if self.data[data] then
             self.data[data][data2] = decode(data3)
-            self:Notice("MainDBSet",{namespace=self.namespace,root=data,key=data2,value=self.data[data][data2]})
+            self:Notice("MainDBSet", {
+                namespace = self.namespace,
+                root = data,
+                key = data2,
+                value = self.data[data][data2]
+            })
         end
 
         return
@@ -480,7 +515,7 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
                 return self:AsynReply(id, aid, cmdd, d)
             end
         end
-       
+
         local d = {self:RPCHandle(id, cmdd, req)}
         return self:AsynReply(id, aid, cmd, d)
     elseif cmd == "AsynReply" then -- 异步回复
@@ -493,51 +528,54 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
         end
         return
     elseif cmd == "BigData" then -- 异步回复
-        data =decode(data)
-        if not (type(data) == "table") then return end
+        data = decode(data)
+        if not (type(data) == "table") then
+            return
+        end
         local bid = data.bid
         if not self.Bigs[bid] then
             self.Bigs[bid] = {
-                all = data.all ,
+                all = data.all,
                 data3s = {},
                 cmd = nil,
                 hashs = nil,
                 data = nil,
                 data2 = nil,
-                endtime = os.time()+5,
-                others = nil,
+                endtime = os.time() + 5,
+                others = nil
             }
         end
-        if data.i ==1 then
-            self.Bigs[bid].cmd = data2 and  decode(data2).cmd
-            self.Bigs[bid].data = data2 and  decode(data2).data 
-            self.Bigs[bid].data2 = data2 and  decode(data2).data2 
-            self.Bigs[bid].others  = {...} 
+        if data.i == 1 then
+            self.Bigs[bid].cmd = data2 and decode(data2).cmd
+            self.Bigs[bid].data = data2 and decode(data2).data
+            self.Bigs[bid].data2 = data2 and decode(data2).data2
+            self.Bigs[bid].others = {...}
             self.Bigs[bid].hashs = data.hashs
         end
         self.Bigs[bid].data3s[data.i] = data3
-        if #self.Bigs[bid].data3s == self.Bigs[bid].all then        --收齐了 组包！
+        if #self.Bigs[bid].data3s == self.Bigs[bid].all then -- 收齐了 组包！
             local bigdata3 = table.concat(self.Bigs[bid].data3s)
             local bigdata = self.Bigs[bid]
             self.Bigs[bid] = nil
             if hash(bigdata3) == bigdata.hashs then
-                --print("MAIN DB BIG DATA CHECK OK",id,bigdata.cmd,bigdata.data,bigdata.data2,#bigdata3) 
-                self:Handle(id,bigdata.cmd,bigdata.data,bigdata.data2,bigdata3,bigdata.others and  unpack(bigdata.others))
+                -- print("MAIN DB BIG DATA CHECK OK",id,bigdata.cmd,bigdata.data,bigdata.data2,#bigdata3) 
+                self:Handle(id, bigdata.cmd, bigdata.data, bigdata.data2, bigdata3,
+                    bigdata.others and unpack(bigdata.others))
             else
-               print("MAIN DB BIG DATA CHECK FAILED",bid) 
+                print("MAIN DB BIG DATA CHECK FAILED", bid)
             end
         end
-         --清理过期的 
+        -- 清理过期的 
         local time = os.time()
         local todel = {}
-        for k,v in pairs(self.Bigs) do
-            if v and v.endtime < time then  --五秒还没数据清了算了
-                todel [k] = 1
+        for k, v in pairs(self.Bigs) do
+            if v and v.endtime < time then -- 五秒还没数据清了算了
+                todel[k] = 1
             end
         end
-        for k,v in pairs(todel) do     
+        for k, v in pairs(todel) do
             self.Bigs[k] = nil
-            print("MAIN DB BIG DATA TIME OUT",k)
+            print("MAIN DB BIG DATA TIME OUT", k)
         end
         return
     end
@@ -559,7 +597,7 @@ function MainDB:Asyn(id, cmd, req) -- 创建异步
         end
         self.Asyns[s.AsynId] = nil
         if s.timeout < 1 then
-            return false,"TimeOut"
+            return false, "TimeOut"
         end
         return true, s.ret
     end
@@ -573,19 +611,21 @@ function MainDB:AsynReply(id, aid, cmd, ret) -- 异步回复
     self:Send(id, "AsynReply", aid, cmd, encode(ret))
 end
 
-function MainDB:GetTableHash(t) --性能低就低吧
+function MainDB:GetTableHash(t) -- 性能低就低吧
     local kv = {}
-    for k,v in pairs(t) do
+    for k, v in pairs(t) do
         if type(v) == "table" then
-            table.insert(kv,k..self:GetTableHash(v))
+            table.insert(kv, k .. self:GetTableHash(v))
         else
-            table.insert(kv,k..tostring(v))
+            table.insert(kv, k .. tostring(v))
         end
     end
-    table.sort(kv,function (a,b) return hash(a)<hash(b)end)
+    table.sort(kv, function(a, b)
+        return hash(a) < hash(b)
+    end)
     return hash(table.concat(kv))
 end
-function MainDB:GetRootHash(root,needhash) -- 获取hash值 用于对比同步
+function MainDB:GetRootHash(root, needhash) -- 获取hash值 用于对比同步
     local keys = 0
     local hashs = 0
     local str = ""
@@ -595,14 +635,14 @@ function MainDB:GetRootHash(root,needhash) -- 获取hash值 用于对比同步
                 keys = keys + 1
             end
         end
-        if needhash then 
+        if needhash then
             hashs = self:GetTableHash(self.data)
         end
     elseif self.data[root] then
         for k, v in pairs(self.data[root]) do
             keys = keys + 1
         end
-        if needhash then 
+        if needhash then
             hashs = self:GetTableHash(self.data[root])
         end
     end
@@ -646,14 +686,19 @@ function MainDB:Set(root, key, value) -- 设置数据 并通知其他世界更�
             return true
         end
         self:Send(nil, "Set", root, key, encode(value)) -- 通知所有人修改
-        self:Notice("MainDBSet",{namespace=self.namespace,root=root,key=key,value=value})
+        self:Notice("MainDBSet", {
+            namespace = self.namespace,
+            root = root,
+            key = key,
+            value = value
+        })
         return true
     end
     return false, "No Root"
 end
 
 function MainDB:Sync(root) -- 强制同步 允许只同步一个 根 或者 同步所有的根  非必要不建议整根同步
-    local keys, hashs = self:GetRootHash(root,true)
+    local keys, hashs = self:GetRootHash(root, true)
     self:Send(mid, "Sync", root, keys, hashs) -- 同步数据 同步完不要立刻获取 有延迟！
 end
 
@@ -664,7 +709,7 @@ function MainDB:AsynGet(root, key, value) -- 异步获取 获取主世界存储�
     })
     local r, data = s:Wait()
     if r then
-        return  data[1]
+        return data[1]
     else
         return value
     end
@@ -694,7 +739,7 @@ function MainDB:HandleEvent(id, event, data) -- 处理事件并分发给event
 end
 
 function MainDB:PushEvent(event, data, toid) -- 推送事件  不会保存
-    self:Send(toid, "event", event,nil, encode(data))
+    self:Send(toid, "event", event, nil, encode(data))
 end
 
 function MainDB:ListenForEvent(event, fn) -- 监听事件   不会保存
@@ -721,21 +766,21 @@ end
 -- 远程函数调用
 
 function MainDB:RPC(id, cmd, data) -- 远程函数调用
-    id = type(id) == "string" and id  or mid -- 为空发给主世界  禁止广播
+    id = type(id) == "string" and id or mid -- 为空发给主世界  禁止广播
     local s = self:Asyn(id, cmd, encode(data))
-    local r,data = s:Wait()
+    local r, data = s:Wait()
     if r then
         return unpack(data)
     else
-        return false,"Time Out"
+        return false, "Time Out"
     end
 end
 
 function MainDB:RPCHandle(id, cmd, data) -- 远程函数处理
     if cmd and self.RPCHandles[cmd] then
-        return true,self.RPCHandles[cmd](id, decode(data),cmd)
+        return true, self.RPCHandles[cmd](id, decode(data), cmd)
     end
-    return false,"NO Handle"
+    return false, "NO Handle"
 end
 
 function MainDB:AddRPCHandle(cmd, fn) -- 远程函数处理
@@ -769,7 +814,7 @@ local function MaindbUpdataFn()
         return
     end
     MainConnect = MConnect
-    
+
     for k, db in pairs(dbhandles) do
         if db.Syn.syning < 1 then
             db.Syn.syning = db.Syn.syntime + 1
@@ -789,7 +834,7 @@ local function MaindbUpdataFn()
                     db:Sync(this)
                     db.Syn.rooting = db.Syn.roottime
                 end
-                db.Syn.this = next(db.data,this)
+                db.Syn.this = next(db.data, this)
             end
         end
     end
@@ -805,8 +850,6 @@ function CreateMainDB(namespace, syntime, roottime)
     db:Init(namespace, syntime, roottime)
     return db
 end
-
-
 
 -- GLOBAL.DB = CreateMainDB("test",300,1)
 -- AddPrefabPostInit("forest",function(inst)
@@ -829,7 +872,6 @@ end
 --         return ret
 --     end
 -- end end)
-
 
 --[[
 测试指令

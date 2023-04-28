@@ -532,7 +532,14 @@ local function fn()
     inst.components.aoetargeting:SetDeployRadius(0)
     inst.components.aoetargeting:SetShouldRepeatCastFn(nil)
     inst.components.aoetargeting.reticule.mousetargetfn = GetTileCenter
-
+    local oldIsEnabled = inst.components.aoetargeting.IsEnabled
+    inst.components.aoetargeting.IsEnabled = function(self,...)
+        local can = true
+        if ThePlayer and  ThePlayer.replica.inventory:GetActiveItem() then
+            return false
+        end
+        return can and oldIsEnabled(self,...)
+    end
     Setreticule(inst)
 
     if not TheWorld.ismastersim then
