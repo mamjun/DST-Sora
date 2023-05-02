@@ -54,11 +54,18 @@ function RecTab(name, des, img, sxml, stex)
     smart(name, "sora")
     return name:upper()
 end
-
-function Rec(prefab, name, des, tab, tag, ings) -- 添加配方
+local prefabhas = {}
+function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     name = name or ""
-    des = des or ""
     local build = prefab:lower() .. rec_back
+    if prefabhas[prefab] then
+        prefabhas[prefab] = prefabhas[prefab] + 1
+        build = build .."_" .. tostring(prefabhas[prefab])
+    else
+        prefabhas[prefab] = 1
+    end
+    des = des or ""
+
     local BUILD = build:upper()
     local PREFAB = prefab:upper()
     local recings = {}
@@ -155,6 +162,18 @@ Rec("sorarepairer", "穹の缝纫包", "缝缝补补又三年", item, "sora", {{
     silk = 10,
     goldnugget = 3
 }}).numtogive = 4
+
+Rec("sorarepairer", "穹の缝纫包", "缝缝补补又三年", item, "sora", {{
+    spider = 1,
+    goldnugget = 1
+}, {
+    spider = 2,
+    goldnugget = 2
+}, {
+    spider = 3,
+    goldnugget = 3
+}}).numtogive = 4
+
 
 Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
     goose_feather = 5,
@@ -305,19 +324,19 @@ Rec("sora2pack", "穹の打包纸", "打包什么好呢！", item, "soraother", 
 
 Rec("sora2plant", "扶光", "又要迫害X了对吧", equip2, "sorabook", {{
     bee = 5,
-    butterfly = 5,
+    petals = 20,
+    mole = 2,
+    mandrake = 1
+}, {
+    bee = 10,
+    petals = 80,
     mole = 3,
-    rabbit = 3
+    mandrake = 1
 }, {
-    bee = 20,
-    butterfly = 20,
-    mole = 10,
-    rabbit = 10
-}, {
-    bee = 50,
-    butterfly = 50,
-    mole = 10,
-    rabbit = 10
+    bee = 40,
+    petals = 200,
+    mole = 5,
+    mandrake = 2
 }})
 
 Rec("sora2sword", "奇妙法杖", "一个奇妙法杖！", equip2, "soraother", {{
@@ -631,31 +650,48 @@ Rec("chum", nil, nil, DST, "sora", {
     spoiled_food = 10
 })
 
+Rec("yotc_seedpacket", nil, nil, DST, "sora", {
+    goldnugget = 2
+})
+Rec("yotc_seedpacket_rare", nil, nil, DST, "sora", {
+    goldnugget = 5
+})
 AddInvImg2("sora_butterfly", GetInventoryItemAtlas("butterfly.tex"), "butterfly.tex")
 Rec("sora_butterfly", "拟造-蝴蝶", "这也是蝴蝶吗?", DST, "sora", {
     butterfly = 1,
-    [san]=10
+    [san] = 10
 }).placer = "no"
 
 AddInvImg2("sora_moonbutterfly", GetInventoryItemAtlas("moonbutterfly.tex"), "moonbutterfly.tex")
 Rec("sora_moonbutterfly", "拟造-月蛾", "这也是月蛾吗?", DST, "sora", {
     butterfly = 1,
-    [san]=10
+    [san] = 10
 }).placer = "no"
 
 AddInvImg2("sora_lightflier", GetInventoryItemAtlas("lightflier.tex"), "lightflier.tex")
 Rec("sora_lightflier", "拟造-萤火", "这是什么呀?", DST, "sora", {
     moonrocknugget = 3,
     fireflies = 3,
-    [san]=30
+    [san] = 30
 })
+if IsModEnable("Legion") or IsModEnable("棱镜") then
+
+    Rec("petals", nil, "花花花花", maker, "sora", {
+        petals_lily = 40
+    }).numtogive = 40
+    Rec("petals", nil, "花花花花", maker, "sora", {
+        petals_orchid = 40
+    }).numtogive = 40
+    Rec("petals", nil, "花花花花", maker, "sora", {
+        petals_rose = 40
+    }).numtogive = 40
+end
+
 -- Rec("sora_butter", "拟造-黄油", "一份黄油蟹蟹!", DST, "sora", {
 --     moonrocknugget = 3,
 --     fireflies = 3,
 --     [san]=30
 -- })
-
-
 
 TUNING.SORAUNLOCKRECIPES = {}
 function UnlonkRecipes(name, ings, des)

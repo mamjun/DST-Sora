@@ -547,3 +547,18 @@ function  RandomInst:OnLoad(data)
         self.hasget = data.hasget or 0
     end
 end
+
+function  Pfn(fn,ret)       --MakePcallFn
+    local newfn = function(...)
+        local r,re = pcall(fn,...)
+        if not r then 
+            local info = debug.getinfo(fn)
+            print(info.source,info.name,info.currentline,info.linedefined,info.lastlinedefined)
+            print("fn err",re)
+            return ret
+        end
+        return re 
+    end
+    return newfn
+end
+MakePcallFn = Pfn

@@ -295,8 +295,27 @@ local changelist = {
     cutted_orchidbush = "dug_lilybush",
     cutted_lilybush = "dug_rosebush",
     monkeytail = "reeds",
-    reeds = "monkeytail"
+    reeds = "monkeytail",
 }
+local crops = {
+    asparagus = 1,
+    garlic = 1,
+    pumpkin = 1,
+    corn = 1,
+    onion = 1,
+    potato = 1,
+    dragonfruit = 1,
+    pomegranate = 1,
+    eggplant = 1,
+    tomato = 1,
+    watermelon = 1,
+    pepper = 1,
+    durian = 1,
+    carrot = 1,
+}
+for k,v in pairs(crops) do
+    changelist[k.."_seeds"] = "seeds"
+end
 SORAAPI.LISTCONFIG.CHANGELIST = changelist
 local function fixCostController(self)
     self.donemoisture = true
@@ -338,8 +357,8 @@ local function trychange(inst)
         inst.components.pickable.transplanted = false
         if inst.components.pickable:IsBarren() then
             inst.components.pickable:MakeEmpty()
-            inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         end
+        inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         fix = inst
     end
     if inst.components.perennialcrop2 and
@@ -349,6 +368,7 @@ local function trychange(inst)
         inst.components.perennialcrop2.infested_max = 100
         inst.components.perennialcrop2.getsickchance = 0
         inst.components.perennialcrop2.CostController = fixCostController
+        inst.components.perennialcrop2:CostController()
         fix = inst
     end
 
@@ -373,6 +393,10 @@ local function trychange(inst)
         cmp.cost_nutrient = 0 -- 需肥类型(这里只需要一个量即可，不需要关注肥料类型)
         cmp.can_getsick = false -- 是否能产生病虫害（原创）
         cmp.killjoystolerance = 3 -- 扫兴容忍度：一般都为0
+        fix = inst
+    end
+    if inst.components.genetrans then
+        inst.components.genetrans:LongUpdate(480)
         fix = inst
     end
     if fix then
@@ -408,6 +432,9 @@ local function TryToRemoveTentacle(doer, inst)
     doer.tentacles[doer.tentaclesindex]:Remove()
     doer.tentacles[doer.tentaclesindex] = inst
     doer.tentaclesindex = (doer.tentaclesindex % 20) + 1
+end
+local function SpawnPrefabChooser(inst)
+    return inst.cage == 1 and math.random(1,10) < 5 and  "seeds" or nil
 end
 local Magic_defs = {{
     name = "sora_magics",
@@ -445,6 +472,9 @@ local Magic_defs = {{
             maker.components.sanity:DoDelta(san)
         else
             local num = math.random(30, 50)
+            local cage = FindEntity(maker,20,function ( e)
+                return e and e.prefab == "birdcage"
+            end,"cage")
             maker:StartThread(function()
                 for k = 1, num do
                     local pos = birdspawner:GetSpawnPoint(pt)
@@ -452,6 +482,12 @@ local Magic_defs = {{
                         local bird = birdspawner:SpawnBird(pos, true)
                         if bird ~= nil then
                             bird:AddTag("magicalbird")
+                            if bird.components.periodicspawner then
+                                bird.cage = cage and 1 or 0
+                                bird.components.periodicspawner:SetPrefab(SpawnPrefabChooser)
+                                bird.components.periodicspawner:SetDensityInRange(nil, nil)
+                                bird.components.periodicspawner:SetMinimumSpacing(nil)
+                            end
                         end
                     end
                     local m = k % 5

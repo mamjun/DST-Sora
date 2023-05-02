@@ -41,12 +41,14 @@ local function onequip(inst, owner)
     owner.AnimState:OverrideSymbol("swap_object", "sora2plant", "swap_weapon")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
+    if not owner:HasTag("sora") then
+        inst.isbig:set(false)
+    end
 end
 
 local function onunequip(inst, owner)
     inst.owner = nil
     inst:RemoveTag("sora2plantequiped")
-    inst.isbig:set(false)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
     Setreticule(inst)
@@ -89,7 +91,7 @@ end
 
 local function cd(inst, time)
     if inst and inst.components.rechargeable then
-        inst.components.rechargeable:Discharge(time or 10)
+        inst.components.rechargeable:Discharge(time or 5)
     end
 end
 
@@ -189,11 +191,13 @@ end
 local function DoBig(fn, inst, doer, pos, ...)
     -- 1格还是9格
     CacheNames(doer)
+    local rr = {}
     if inst.isbig:value() and doer:HasTag("sora") then
         for x = -4, 4, 4 do
             for y = -4, 4, 4 do
                 local newpos = Point(pos.x + x, 0, pos.z + y)
-                fn(inst, doer, newpos, ...)
+                local r = fn(inst, doer, newpos, ...)
+                table.insert(rr, r)
             end
         end
     else
@@ -201,8 +205,10 @@ local function DoBig(fn, inst, doer, pos, ...)
         if not r then
             Say(doer, str)
         end
+        table.insert(rr, r)
     end
     names_tmp = {}
+    return rr
 end
 
 local function On3x3Fn(inst, doer, pos)
@@ -226,13 +232,141 @@ local function On10Fn(inst, doer, pos)
     end
     DoBig(FarmFn, inst, doer, pos, "M10")
 end
+local crops = {
+    asparagus = 1,
+    garlic = 1,
+    pumpkin = 1,
+    corn = 1,
+    onion = 1,
+    potato = 1,
+    dragonfruit = 1,
+    pomegranate = 1,
+    eggplant = 1,
+    tomato = 1,
+    watermelon = 1,
+    pepper = 1,
+    durian = 1,
+    carrot = 1,
+    pineananas = 1,
+    gourd = 1,
+    immortal_fruit = 1
+}
+local seedcrops = {}
+local bigcrops = {}
+for k, v in pairs(crops) do
+    bigcrops[k .. "_oversized"] = 1
+    seedcrops[k .. "_seeds"] = 1
+end
+crops = bigcrops
+
+local function PickFn(inst, doer, pos)
+    -- 刨树根
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"stump", "DIG_workable"})
+    for k, v in pairs(ents) do
+        if isNear(v, pos) and v.components.workable then
+            v.components.workable:WorkedBy(doer, 10)
+        end
+    end
+    -- 大作物 
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled"},
+        {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
+    local prefabs = {}
+    local items = {}
+    for k, v in pairs(ents) do
+        if isNear(v, pos) then
+            if crops[v.prefab] then
+                if not prefabs[v.prefab] then
+                    if v.components.lootdropper then
+                        local t = {}
+                        prefabs[v.prefab] = t
+                        t.items = {}
+                        t.num = 0
+                        local is = v.components.lootdropper:GenerateLoot()
+                        for k, v in pairs(is) do
+                            t.items[v] = (t.items[v] or 0) + 1
+                        end
+                    end
+                end
+                prefabs[v.prefab].num = prefabs[v.prefab].num + 1
+                v:Remove()
+            elseif v.prefab == "medal_gift_fruit_oversized" then
+
+            end
+        end
+    end
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"seeds"})
+    for k, v in pairs(ents) do
+        if isNear(v, pos) and seedcrops[v.prefab] then
+            items["seeds"] = (items["seeds"] or 0) + (v.components.stackable and v.components.stackable.stacksize or 1)
+            v:Remove()
+        end
+    end
+
+    for k, v in pairs(prefabs) do
+        for ik, iv in pairs(v.items) do
+            items[ik] = (items[ik] or 0) + iv * v.num
+        end
+    end
+    return items
+end
+local function makepacker(inst, doer, items)
+    local ents = {}
+    for k, v in pairs(items) do
+        print("items", k, v)
+        local num = v
+        while num > 0 do
+            local it = SpawnPrefab(k)
+            local inum = 1
+            if it then
+                if it.components.stackable then
+                    inum = math.min(it.components.stackable.maxsize, num)
+                    it.components.stackable:SetStackSize(inum)
+                end
+                table.insert(ents, it)
+            end
+            num = num - inum
+        end
+    end
+    if not next(ents) then
+        return
+    end
+    local packer = SpawnPrefab("sora3packer")
+    packer.components.unwrappable:WrapItems(ents)
+    for k, v in pairs(ents) do
+        v:Remove()
+    end
+    return packer
+end
 local function OnPickFn(inst, doer, pos)
     if incd(inst, doer) then
         return
     end
-    -- 采摘大作物
-    Say(doer, "还没做呢")
+
+    local rr = DoBig(PickFn, inst, doer, pos)
+    local items = {}
+    local seeditems = {}
+    for k, v in pairs(rr) do
+        for ik, iv in pairs(v) do
+            local t = ik:match("seeds$") and seeditems or items
+            t[ik] = (t[ik] or 0) + iv
+        end
+    end
+
+    local pro = makepacker(inst, doer, items)
+    if pro then
+        pro.components.named:SetName("打包的作物")
+        pro.components.inspectable:SetDescription("这是打包的作物")
+        doer.components.inventory:GiveItem(pro, nil, inst:GetPosition())
+    end
+    local pro = makepacker(inst, doer, seeditems)
+    if pro then
+        pro.components.named:SetName("打包的种子")
+        pro.components.inspectable:SetDescription("这是打包的种子")
+        doer.components.inventory:GiveItem(pro, nil, inst:GetPosition())
+    end
+
 end
+OnPickFn = SoraAPI.Pfn(OnPickFn, true)
 
 local function OnSeedFn(inst, doer, pos)
     -- 种种子
@@ -243,8 +377,8 @@ local function OnSeedFn(inst, doer, pos)
 end
 local function fixCostController(self)
     self.donemoisture = true
-	self.donenutrient = true
-	self.donetendable = true
+    self.donenutrient = true
+    self.donetendable = true
 end
 local function FeiFn(inst, doer, pos)
     -- body
@@ -261,8 +395,8 @@ local function FeiFn(inst, doer, pos)
                         v.components.pickable.transplanted = false
                         if v.components.pickable:IsBarren() then
                             v.components.pickable:MakeEmpty()
-                            v.components.pickable.cycles_left = v.components.pickable.max_cycles
                         end
+                        v.components.pickable.cycles_left = v.components.pickable.max_cycles
                         fix = v
                     end
                     if v.components.perennialcrop2 and
@@ -272,6 +406,7 @@ local function FeiFn(inst, doer, pos)
                         v.components.perennialcrop2.infested_max = 100
                         v.components.perennialcrop2.getsickchance = 0
                         v.components.perennialcrop2.CostController = fixCostController
+                        v.components.perennialcrop2:CostController()
                         fix = v
                     end
 
@@ -303,8 +438,10 @@ local function FeiFn(inst, doer, pos)
                         fx:Bind(fix, 3)
                     end
                 else
-                    if v.components.pickable and v.components.pickable:IsBarren() then
-                        v.components.pickable:MakeEmpty()
+                    if v.components.pickable then
+                        if v.components.pickable:IsBarren() then
+                            v.components.pickable:MakeEmpty()
+                        end
                         v.components.pickable.cycles_left = v.components.pickable.max_cycles
                     end
                 end
@@ -333,10 +470,10 @@ local function PlantFn(inst, doer, pos)
             if v.components.farmplanttendable then
                 v.components.farmplanttendable:TendTo(doer)
             end
-            local reducemax = math.min(v.components.farmplantstress.stress_points, 2)
+            local reducemax = math.min(v.components.farmplantstress.stress_points, 3)
             if reducemax > 0 then
                 local hasreduce = v.components.farmplantstress.sorareduce or 0
-                local reduce = math.min(2 - hasreduce, reducemax)
+                local reduce = math.min(3 - hasreduce, reducemax)
                 if reduce > 0 then
                     v.components.farmplantstress.sorareduce = hasreduce + reduce
                     v.components.farmplantstress.stress_points = v.components.farmplantstress.stress_points - reduce
@@ -533,12 +670,12 @@ local function fn()
     inst.components.aoetargeting:SetShouldRepeatCastFn(nil)
     inst.components.aoetargeting.reticule.mousetargetfn = GetTileCenter
     local oldIsEnabled = inst.components.aoetargeting.IsEnabled
-    inst.components.aoetargeting.IsEnabled = function(self,...)
+    inst.components.aoetargeting.IsEnabled = function(self, ...)
         local can = true
-        if ThePlayer and  ThePlayer.replica.inventory:GetActiveItem() then
+        if ThePlayer and ThePlayer.replica.inventory:GetActiveItem() then
             return false
         end
-        return can and oldIsEnabled(self,...)
+        return can and oldIsEnabled(self, ...)
     end
     Setreticule(inst)
 

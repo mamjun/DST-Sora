@@ -157,7 +157,7 @@ local function fn()
     inst.components.container.onclosefn = onclose
     inst:WatchWorldState("cycles", function(i)
         if not i:IsAsleep() then
-            local butterflies = math.random(0, 1)
+            local butterflies = math.random(1, 2)
             if butterflies > 0 then
                 local a = SpawnAt("butterfly", i)
                 if a then
