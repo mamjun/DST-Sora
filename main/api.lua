@@ -27,8 +27,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
--- Upvaluehelper
+]] -- Upvaluehelper
 up = require("utils/soraupvaluehelper")
 GLOBAL.SoraUp = up
 userdata = require("utils/sorauserdatahook")
@@ -45,7 +44,9 @@ end
 -- MOD是否开启
 function IsModEnable(name)
     for k, v in pairs(enablemods) do
-        if v and (k:match(name) or v:match(name)) then return true end
+        if v and (k:match(name) or v:match(name)) then
+            return true
+        end
     end
     return false
 end
@@ -53,7 +54,9 @@ GLOBAL.SoraIsModEnable = IsModEnable
 GLOBAL.SoraEnableMods = enablemods
 local mythenable = nil
 function IsMythEnable()
-    if mythenable ~= nil then return mythenable end
+    if mythenable ~= nil then
+        return mythenable
+    end
     if IsModEnable("Myth Words") then
         mythenable = true
         return true
@@ -76,102 +79,139 @@ end
 local imagecache = {}
 local repl = {}
 local notimagecache = {}
-function SoraGetImage(na)       --mod加载加载过程中请勿调用 不准确
+function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
     local name = repl[na] or na
     local t = name
     if t:sub(-4):lower() ~= ".tex" then
-        t = t..".tex"
+        t = t .. ".tex"
     end
     if notimagecache[name] then
-        return nil,nil
+        return nil, nil
     end
     if imagecache[name] then
-        return imagecache[name].atlas,imagecache[name].image
+        return imagecache[name].atlas, imagecache[name].image
     end
     if TheSim:AtlasContains("images/inventoryimages.xml", t) then
-        imagecache[name] ={ atlas = "images/inventoryimages.xml",image=t}
-        return "images/inventoryimages.xml",t
+        imagecache[name] = {
+            atlas = "images/inventoryimages.xml",
+            image = t
+        }
+        return "images/inventoryimages.xml", t
     elseif TheSim:AtlasContains("images/inventoryimages1.xml", t) then
-        imagecache[name] = { atlas = "images/inventoryimages1.xml",image=t}
-        return "images/inventoryimages1.xml",t
-    elseif TheSim:AtlasContains("images/inventoryimages.xml", 'quagmire_'..t) then
-        imagecache[name] ={ atlas = "images/inventoryimages.xml",image='quagmire_'..t}
-        return "images/inventoryimages.xml",'quagmire_'..t
-    elseif TheSim:AtlasContains("images/inventoryimages1.xml", 'quagmire_'..t) then
-        imagecache[name] = { atlas = "images/inventoryimages1.xml",image='quagmire_'..t}
-        return "images/inventoryimages1.xml",'quagmire_'..t
+        imagecache[name] = {
+            atlas = "images/inventoryimages1.xml",
+            image = t
+        }
+        return "images/inventoryimages1.xml", t
+    elseif TheSim:AtlasContains("images/inventoryimages.xml", 'quagmire_' .. t) then
+        imagecache[name] = {
+            atlas = "images/inventoryimages.xml",
+            image = 'quagmire_' .. t
+        }
+        return "images/inventoryimages.xml", 'quagmire_' .. t
+    elseif TheSim:AtlasContains("images/inventoryimages1.xml", 'quagmire_' .. t) then
+        imagecache[name] = {
+            atlas = "images/inventoryimages1.xml",
+            image = 'quagmire_' .. t
+        }
+        return "images/inventoryimages1.xml", 'quagmire_' .. t
     elseif TheSim:AtlasContains("images/inventoryimages2.xml", t) then
-        imagecache[name] ={ atlas =  "images/inventoryimages2.xml",image=t}
-        return "images/inventoryimages2.xml",t
+        imagecache[name] = {
+            atlas = "images/inventoryimages2.xml",
+            image = t
+        }
+        return "images/inventoryimages2.xml", t
     else
         if GLOBAL.Prefabs[name] then
             local assets = GLOBAL.Prefabs[name].assets or {}
-            for ak,av in pairs(assets) do
-                if type(av) == "table" and av.type and av.file and av.type == "ATLAS"  then
+            for ak, av in pairs(assets) do
+                if type(av) == "table" and av.type and av.file and av.type == "ATLAS" then
                     if TheSim:AtlasContains(av.file, t) then
-                        imagecache[name] = { atlas = av.file,image=t}
-                        return av.file,t
+                        imagecache[name] = {
+                            atlas = av.file,
+                            image = t
+                        }
+                        return av.file, t
                     end
                 end
             end
         end
-        
-        local trueatlas = softresolvefilepath("images/inventoryimages/"..name..".xml")
+
+        local trueatlas = softresolvefilepath("images/inventoryimages/" .. name .. ".xml")
         if trueatlas and TheSim:AtlasContains(trueatlas, t) then
-            imagecache[name] = { atlas = "images/inventoryimages/"..name..".xml",image=t}
-            return "images/inventoryimages/"..name..".xml",t
+            imagecache[name] = {
+                atlas = "images/inventoryimages/" .. name .. ".xml",
+                image = t
+            }
+            return "images/inventoryimages/" .. name .. ".xml", t
         end
-        trueatlas = GetInventoryItemAtlas(t,true)
+        trueatlas = GetInventoryItemAtlas(t, true)
         if trueatlas and TheSim:AtlasContains(trueatlas, t) then
-            imagecache[name] ={ atlas =  trueatlas,image=t}
-            return trueatlas,t
+            imagecache[name] = {
+                atlas = trueatlas,
+                image = t
+            }
+            return trueatlas, t
         end
-        trueatlas = softresolvefilepath("images/"..name..".xml")
+        trueatlas = softresolvefilepath("images/" .. name .. ".xml")
         if trueatlas and TheSim:AtlasContains(trueatlas, t) then
-            imagecache[name] ={ atlas =  "images/"..name..".xml",image=t}
-            return "images/"..name..".xml",t
+            imagecache[name] = {
+                atlas = "images/" .. name .. ".xml",
+                image = t
+            }
+            return "images/" .. name .. ".xml", t
         end
         trueatlas = softresolvefilepath("images/monkey_king_item.xml")
         if trueatlas and TheSim:AtlasContains(trueatlas, t) then
-            imagecache[name] = { atlas = "images/monkey_king_item.xml",image=t}
-            return "images/monkey_king_item.xml",t
+            imagecache[name] = {
+                atlas = "images/monkey_king_item.xml",
+                image = t
+            }
+            return "images/monkey_king_item.xml", t
         end
         if PREFABDEFINITIONS[name] then
-            for idx,asset in ipairs(PREFABDEFINITIONS[name].assets) do
-              if asset.type == "ATLAS" then
-                trueatlas = asset.file
-              end
+            for idx, asset in ipairs(PREFABDEFINITIONS[name].assets) do
+                if asset.type == "ATLAS" then
+                    trueatlas = asset.file
+                end
             end
-        end 
+        end
         if trueatlas and TheSim:AtlasContains(softresolvefilepath(trueatlas), t) then
-            imagecache[name] = { atlas = trueatlas,image=t}
-            return trueatlas,t
-        end 
-        
-        if trueatlas and TheSim:AtlasContains(softresolvefilepath(trueatlas), 'quagmire_'..t) then
-            imagecache[name] = { atlas = trueatlas,image='quagmire_'..t}
-            return trueatlas,'quagmire_'..t
-        end 
-        
-        for k,v in pairs(GLOBAL.Prefabs) do
+            imagecache[name] = {
+                atlas = trueatlas,
+                image = t
+            }
+            return trueatlas, t
+        end
+
+        if trueatlas and TheSim:AtlasContains(softresolvefilepath(trueatlas), 'quagmire_' .. t) then
+            imagecache[name] = {
+                atlas = trueatlas,
+                image = 'quagmire_' .. t
+            }
+            return trueatlas, 'quagmire_' .. t
+        end
+
+        for k, v in pairs(GLOBAL.Prefabs) do
             if k and k:match("MOD_") then
                 local assets = v.assets or {}
-                for ak,av in pairs(assets) do
-                    if type(av) == "table" and av.type and av.file and av.type == "ATLAS"  then
+                for ak, av in pairs(assets) do
+                    if type(av) == "table" and av.type and av.file and av.type == "ATLAS" then
                         if TheSim:AtlasContains(av.file, t) then
-                            imagecache[name] = { atlas = av.file,image=t}
-                            return av.file,t
+                            imagecache[name] = {
+                                atlas = av.file,
+                                image = t
+                            }
+                            return av.file, t
                         end
                     end
                 end
             end
         end
         notimagecache[name] = name
-    return nil,nil
+        return nil, nil
     end
 end
-
-
 
 GLOBAL.SoraGetImage = SoraGetImage
 -- 弹出消息
@@ -179,38 +219,42 @@ local messages = {}
 local PopupDialogScreen = require "screens/redux/popupdialog"
 function SoraPushPopupDialog(title, message, button, fn)
     if not (ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls) then
-        table.insert(messages,{title, message, button, fn})
+        table.insert(messages, {title, message, button, fn})
     end
     local buttonstr = button or STRINGS.UI.POPUPDIALOG.OK
     local scr
-    local function doclose() TheFrontEnd:PopScreen(scr) end
-    scr = PopupDialogScreen(title, message, {
-        {
-            text = buttonstr,
-            cb = function()
-                doclose()
-                if fn then fn() end
+    local function doclose()
+        TheFrontEnd:PopScreen(scr)
+    end
+    scr = PopupDialogScreen(title, message, {{
+        text = buttonstr,
+        cb = function()
+            doclose()
+            if fn then
+                fn()
             end
-        }
-    })
+        end
+    }})
     TheFrontEnd:PushScreen(scr)
     local screen = TheFrontEnd:GetActiveScreen()
-    if screen then screen:Enable() end
+    if screen then
+        screen:Enable()
+    end
     return scr
 end
-AddClassPostConstruct("widgets/controls",function(self)
-    self.inst:DoTaskInTime(3,function()
-    if next(messages) then
-        for k,v in pairs(messages) do
-            SoraPushPopupDialog(unpack(v))
+AddClassPostConstruct("widgets/controls", function(self)
+    self.inst:DoTaskInTime(3, function()
+        if next(messages) then
+            for k, v in pairs(messages) do
+                SoraPushPopupDialog(unpack(v))
+            end
+            messages = {}
         end
-        messages = {}
-    end
     end)
 end)
 GLOBAL.SoraPushPopupDialog = SoraPushPopupDialog
 
-GLOBAL.SoraCD = function(ti,real) -- 内置CD
+GLOBAL.SoraCD = function(ti, real) -- 内置CD
     local t = ti
     local last = -ti
     local get = real and GetTimeRealSeconds or GetTime
@@ -231,10 +275,16 @@ function GLOBAL.SoraGetRandom(tb) -- 抽奖池
         v=3
     }]]
     local srctb = {}
-    for k, v in pairs(tb) do for i = 1, v do table.insert(srctb, k) end end
+    for k, v in pairs(tb) do
+        for i = 1, v do
+            table.insert(srctb, k)
+        end
+    end
     local pool = deepcopy(srctb)
     return function()
-        if #pool < 1 then pool = deepcopy(srctb) end
+        if #pool < 1 then
+            pool = deepcopy(srctb)
+        end
         return table.remove(pool, math.random(#pool))
     end
 end
@@ -249,7 +299,9 @@ function bhook(tb, name, fn)
             return oldfn(...)
         end
     else
-        tb[name] = function(...) return fn(...) end
+        tb[name] = function(...)
+            return fn(...)
+        end
     end
     return oldfn, fn
 end
@@ -264,7 +316,9 @@ function ehook(tb, name, fn)
             return fn(...)
         end
     else
-        tb[name] = function(...) return fn(...) end
+        tb[name] = function(...)
+            return fn(...)
+        end
     end
     return oldfn, fn
 end
@@ -274,9 +328,13 @@ function rhook(tb, name, fn)
     assert(type(tb) == "table", "TryToRHook " .. type(tb))
     local oldfn = tb[name]
     if oldfn then
-        tb[name] = function(...) return fn({oldfn(...)}, {...}) end
+        tb[name] = function(...)
+            return fn({oldfn(...)}, {...})
+        end
     else
-        tb[name] = function(...) return fn({}, {...}) end
+        tb[name] = function(...)
+            return fn({}, {...})
+        end
     end
     return oldfn, fn
 end
@@ -350,7 +408,8 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     -- 第四个参数为扩展属性 是一个table 或者 nil 描述了实体的对齐的问题
     s.onikirimovable = {}
     local m = s.onikirimovable
-    m.nullfn = function() end
+    m.nullfn = function()
+    end
     m.name = name or "default"
     m.self = s
     m.downtime = 0
@@ -365,8 +424,8 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     TheSim:GetPersistentString(m.name, function(load_success, str)
         if load_success then
             local fn = loadstring(str)
-            if type(fn) == "function" then 
-                m.pos = fn() 
+            if type(fn) == "function" then
+                m.pos = fn()
                 if not (type(m.pos) == "table" and m.pos.Get) then
                     m.pos = pos
                 end
@@ -395,9 +454,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     s.OnRawKey = function(self, key, down, ...)
         if s.focus and key == KEY_SPACE and not down and not m.cd() then
             s:SetPosition(m.dpos:Get())
-            TheSim:SetPersistentString(m.name, string.format(
-                                           "return Vector3(%d,%d,%d)",
-                                           m.dpos:Get()), false)
+            TheSim:SetPersistentString(m.name, string.format("return Vector3(%d,%d,%d)", m.dpos:Get()), false)
         end
         return m.OnRawKey(self, key, down, ...)
     end
@@ -409,9 +466,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
             if TUNING.FLDEBUGCOMMAND then
                 print(s, name, newpos:Get())
             end
-            TheSim:SetPersistentString(m.name, string.format(
-                                           "return Vector3(%f,%f,%f)",
-                                           newpos:Get()), false)
+            TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
         end
         if m.lastx and m.lasty and s.o_pos then
             s.o_pos = Vector3(m.lastx, m.lasty, 0)
@@ -420,12 +475,18 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
 
     m.OnUpdate = s.OnUpdate or m.nullfn
     s.OnUpdate = function(self, dt)
-        if m.down then if m.whiledown then m.whiledown(self) end end
+        if m.down then
+            if m.whiledown then
+                m.whiledown(self)
+            end
+        end
         return m.OnUpdate(self, dt)
     end
     m.whiledown = function(self)
         m.downtime = m.downtime + 0.033
-        if m.downtime > m.whiletime then m.FollowMouse(self) end
+        if m.downtime > m.whiletime then
+            m.FollowMouse(self)
+        end
     end
     m.UpdatePosition = function(self, x, y)
         local sx, sy = s.parent.GetScale(s.parent):Get()
@@ -452,10 +513,9 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     end
     m.FollowMouse = function(self)
         if m.followhandler == nil then
-            m.followhandler = TheInput:AddMoveHandler(
-                                  function(x, y)
-                    m.UpdatePosition(self, x, y)
-                end)
+            m.followhandler = TheInput:AddMoveHandler(function(x, y)
+                m.UpdatePosition(self, x, y)
+            end)
             local spos = TheInput:GetScreenPosition()
             m.UpdatePosition(self, spos.x, spos.y)
             -- self:SetPosition()
@@ -477,47 +537,53 @@ GLOBAL.getsora = function(name)
     if not GLOBAL.TUNING.SORACONFIG[name] then
         GLOBAL.TUNING.SORACONFIG[name] = GetModConfigData(name)
     end
-    if type(GLOBAL.TUNING.SORACONFIG[name]) == "boolean"then
+    if type(GLOBAL.TUNING.SORACONFIG[name]) == "boolean" then
         return GLOBAL.TUNING.SORACONFIG[name]
     else
-    return tonumber(GLOBAL.TUNING.SORACONFIG[name]) or 0
+        return tonumber(GLOBAL.TUNING.SORACONFIG[name]) or 0
     end
 end
 
 -- later function 
 local laterfn = {}
 function AddLaterFn(fn)
-    if fn and type(fn) == "function" then table.insert(laterfn, fn) end
+    if fn and type(fn) == "function" then
+        table.insert(laterfn, fn)
+    end
 end
 
 local oldTranslateStringTable = TranslateStringTable -- modmain运行完之后就是 TranslateStringTable 在这儿下钩子 哈哈
 GLOBAL.TranslateStringTable = function(...)
-    for k, v in pairs(laterfn) do if v and type(v) == "function" then v() end end
+    for k, v in pairs(laterfn) do
+        if v and type(v) == "function" then
+            v()
+        end
+    end
     return oldTranslateStringTable(...)
 end
 
 mi("moretags")
 TUNING.SoraRegTag = RegTag
 
-function EntityScript:SoraAddComponentWithNoPostInit(name,...)
+function EntityScript:SoraAddComponentWithNoPostInit(name, ...)
     local old = ModManager.GetPostInitFns
-    ModManager.GetPostInitFns = function(s,t,n,...)
+    ModManager.GetPostInitFns = function(s, t, n, ...)
         if n == name and t == "ComponentPostInit" then
             return {}
         end
-        return old(s,t,name,...)
+        return old(s, t, name, ...)
     end
-    self:AddComponent(name,...)
+    self:AddComponent(name, ...)
     ModManager.GetPostInitFns = old
 end
 
 LISTCONFIG = {}
-local RandomInstA  = 32310901
-local RandomInstB  = 1729
-RandomInst =  Class(function (inst)     --随机生成一个 0-9999的随机数
-    self.seed = 0   --初始种子
-    self.last = 0    --上一次的值
-    self.hasget = 0     --已经取了多少次 配合种子 用于验证
+local RandomInstA = 32310901
+local RandomInstB = 1729
+RandomInst = Class(function(inst) -- 随机生成一个 0-9999的随机数
+    self.seed = 0 -- 初始种子
+    self.last = 0 -- 上一次的值
+    self.hasget = 0 -- 已经取了多少次 配合种子 用于验证
 end)
 function RandomInst:SetSeed(num)
     self.seed = num
@@ -525,22 +591,26 @@ function RandomInst:SetSeed(num)
     self.hasget = 0
 end
 
-function  RandomInst:Get(num)
+function RandomInst:Get(num)
     num = num or 1
     local r = 0
-    for i=1,num do
-        r = (RandomInstA * self.last + RandomInstB ) % 10000
+    for i = 1, num do
+        r = (RandomInstA * self.last + RandomInstB) % 10000
         self.last = r
-        self.hasget = self.hasget + 1 
+        self.hasget = self.hasget + 1
     end
-    return r 
+    return r
 end
 
-function  RandomInst:OnSave()
-    return {seed = self.seed,last = self.last,hasget = self.hasget}
+function RandomInst:OnSave()
+    return {
+        seed = self.seed,
+        last = self.last,
+        hasget = self.hasget
+    }
 end
 
-function  RandomInst:OnLoad(data)
+function RandomInst:OnLoad(data)
     if data then
         self.seed = data.seed or 0
         self.last = data.last or 0
@@ -548,17 +618,24 @@ function  RandomInst:OnLoad(data)
     end
 end
 
-function  Pfn(fn,ret)       --MakePcallFn
+function Pfn(fn, ret) -- MakePcallFn
     local newfn = function(...)
-        local r,re = pcall(fn,...)
-        if not r then 
+        local r, re = pcall(fn, ...)
+        if not r then
             local info = debug.getinfo(fn)
-            print(info.source,info.name,info.currentline,info.linedefined,info.lastlinedefined)
-            print("fn err",re)
+            print(info.source, info.name, info.currentline, info.linedefined, info.lastlinedefined)
+            print("fn err", re)
             return ret
         end
-        return re 
+        return re
     end
     return newfn
 end
 MakePcallFn = Pfn
+
+function TryLoadUI(str, ...) -- MakePcallFn
+    local ui = require("widget/" .. str)
+    local uiinst = ui(...)
+    ThePlayer.HUD.controls.containerroot:AddChild(ui)
+    return uiinst
+end

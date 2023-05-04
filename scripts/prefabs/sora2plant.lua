@@ -294,7 +294,7 @@ local function PickFn(inst, doer, pos)
             end
         end
     end
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"seeds"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"_inventoryitem"}, {"INLIMBO"})
     for k, v in pairs(ents) do
         if isNear(v, pos) and seedcrops[v.prefab] then
             items["seeds"] = (items["seeds"] or 0) + (v.components.stackable and v.components.stackable.stacksize or 1)
@@ -358,21 +358,18 @@ local function OnPickFn(inst, doer, pos)
         pro.components.inspectable:SetDescription("这是打包的作物")
         doer.components.inventory:GiveItem(pro, nil, inst:GetPosition())
     end
-    local pro = makepacker(inst, doer, seeditems)
-    if pro then
-        pro.components.named:SetName("打包的种子")
-        pro.components.inspectable:SetDescription("这是打包的种子")
-        doer.components.inventory:GiveItem(pro, nil, inst:GetPosition())
+    for k,v in pairs(seeditems) do 
+        inst.components.soraseedcontainer:AddSeed(k,v)
     end
-
 end
-OnPickFn = SoraAPI.Pfn(OnPickFn, true)
+--OnPickFn = SoraAPI.Pfn(OnPickFn, true)
 
 local function OnSeedFn(inst, doer, pos)
     -- 种种子
     if incd(inst, doer) then
         return
     end
+    
     Say(doer, "还没做呢")
 end
 local function fixCostController(self)
@@ -678,7 +675,7 @@ local function fn()
         return can and oldIsEnabled(self, ...)
     end
     Setreticule(inst)
-
+    inst:AddComponent("soraseedcontainer")
     if not TheWorld.ismastersim then
         inst.components.spellbook:SelectSpell(7)
         return inst
@@ -706,6 +703,12 @@ local function fn()
     -- inst.components.spellcaster.canuseonpoint_water = true
     -- inst.components.spellcaster:SetSpellFn(soramagicfn)
     inst:AddComponent("aoespell")
+    if not inst.components.aoespell.SetSpellFn then
+        inst.components.aoespell.SetSpellFn = function(self,fn,...)
+            self.aoe_cast = fn
+            self.spellfn = fn
+        end
+    end
     inst.components.aoespell:SetSpellFn(OnDefaultFn)
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(10)
@@ -765,6 +768,8 @@ local function fxfn(Sim)
     inst.components.scaler.OnSave = nil
     inst:AddComponent("inspectable")
     inst:AddComponent("sorasavecmp")
+    
+
     inst.components.sorasavecmp:AddLoad("name", function(i, data)
         if data and data.name and type(data.name) == "string" then
             inst:DoTaskInTime(0, function()

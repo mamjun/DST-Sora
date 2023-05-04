@@ -682,16 +682,16 @@ end
 function MainDB:Set(root, key, value) -- 设置数据 并通知其他世界更新 
     if self.data[root] then
         self.data[root][key] = value
-        if self.noSyn[root] and self.noSyn[root] > 1 then -- 不进行手动同步
-            return true
-        end
-        self:Send(nil, "Set", root, key, encode(value)) -- 通知所有人修改
         self:Notice("MainDBSet", {
             namespace = self.namespace,
             root = root,
             key = key,
             value = value
         })
+        if self.noSyn[root] and self.noSyn[root] > 1 then -- 不进行手动同步
+            return true
+        end
+        self:Send(nil, "Set", root, key, encode(value)) -- 通知所有人修改
         return true
     end
     return false, "No Root"

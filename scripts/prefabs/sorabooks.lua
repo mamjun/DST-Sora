@@ -434,7 +434,7 @@ local function TryToRemoveTentacle(doer, inst)
     doer.tentaclesindex = (doer.tentaclesindex % 20) + 1
 end
 local function SpawnPrefabChooser(inst)
-    return inst.cage == 1 and math.random(1,10) < 5 and  "seeds" or nil
+    return inst.cage == 1 and  "seeds" or nil
 end
 local Magic_defs = {{
     name = "sora_magics",
@@ -474,7 +474,7 @@ local Magic_defs = {{
             local num = math.random(30, 50)
             local cage = FindEntity(maker,20,function ( e)
                 return e and e.prefab == "birdcage"
-            end,"cage")
+            end,{"cage"})
             maker:StartThread(function()
                 for k = 1, num do
                     local pos = birdspawner:GetSpawnPoint(pt)

@@ -28,6 +28,27 @@ temp.clientfn = function(ns, db, userid)
     SoraClientDB.SoraClientCKDB = CKDB
 end
 
+
+local temp = CreateClientDBTemple("seed", 300, 1)
+temp:InitRoot("seeds") -- up池 纠缠之源 这些小数据
+
+temp.serverfn = function(ns, db, userid)
+
+    db:ListenForEvent("GetSeed", function(id, data, event)
+
+    end)
+
+    db.inst = TheWorld
+    db:BindMainDB("seeds",SeedDB,"seeds")
+    SeedCSDB  =db
+    SoraClientDB.SeedCSDB = SeedCSDB
+end
+
+temp.clientfn = function(ns, db, userid)
+    SeedCDB = db -- 用于客户端取数据
+    SoraClientDB.SeedCDB = SeedCDB
+end
+
 --[[
 
 CDB = SoraAPI.CDB SDB = SoraAPI.SDB MDB = SoraAPI.MailDB
