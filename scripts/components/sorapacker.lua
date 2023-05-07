@@ -48,9 +48,12 @@ end)
 function sorapacker:HasPackage() return self.item ~= nil end
 
 function sorapacker:SetCanPackFn(fn) self.canpackfn = fn end
-
+local cantpack = {}
 function sorapacker:DefaultCanPackTest(target) -- 目标待改
     if target and target:HasTag("soracantpack") then return false end
+    if target and target:HasTag("cantpack") then return false end
+    if cantpack[target.prefab] then return false end
+    if target.prefab:match("_bell$") then return false end
     if TUNING.SORAADD then
         return target and
                    not (target:HasTag("teleportato") -- or target:HasTag("irreplaceable")

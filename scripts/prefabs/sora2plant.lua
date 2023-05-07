@@ -138,8 +138,8 @@ local function Say(doer, str)
     end
 end
 local tillpos = {
-    M3x3 = {{-1.333, -1.333}, {0, -1.333}, {1.333, -1.333}, {-1.333, 0}, {0, 0}, {1.333, 0}, {-1.333, 1.333},
-            {0, 1.333}, {1.333, 1.333}},
+    M3x3 = {{-1.25, -1.25}, {0, -1.25}, {1.25, -1.25}, {-1.25, 0}, {0, 0}, {1.25, 0}, {-1.25, 1.25},
+            {0, 1.25}, {1.25, 1.25}},
     M4x4 = {{-1.5, -1.5}, {-0.5, -1.5}, {0.5, -1.5}, {1.5, -1.5}, {-1.5, -0.5}, {-0.5, -0.5}, {0.5, -0.5}, {1.5, -0.5},
             {-1.5, 0.5}, {-0.5, 0.5}, {0.5, 0.5}, {1.5, 0.5}, {-1.5, 1.5}, {-0.5, 1.5}, {0.5, 1.5}, {1.5, 1.5}},
     M10A = {{-1.5, -1.6}, {0.5, -1.6}, {-0.5, -0.8}, {1.5, -0.8}, {-1.5, 0}, {0.5, 0}, {-0.5, 0.8}, {1.5, 0.8},
@@ -522,6 +522,8 @@ local function SeedFn(inst, doer, pos)
         --print(fastdump(oldseeds))
 
     end
+    local oldCollapseSoilAtPoint = Map.CollapseSoilAtPoint
+    Map.CollapseSoilAtPoint = function() end
     for k, v in pairs(seeds) do
         local one = SpawnPrefab(v[3])
         if one then
@@ -531,6 +533,7 @@ local function SeedFn(inst, doer, pos)
             one.components.deployable:Deploy(seedpos, doer or inst)
         end
     end
+    Map.CollapseSoilAtPoint = oldCollapseSoilAtPoint 
     return true
 
     -- body

@@ -50,6 +50,7 @@ local seedinfo = Class(Button, function(self, seeddata)
         if seeddata.data and seeddata.data.atlas then
             self.image = self.btn:AddChild(Image(seeddata.data.atlas, seeddata.data.image))
             self.image:SetClickable(false)
+            self.image:ScaleToSize(64,64)
             self.image:SetScale(0.8, 0.8)
             self.image2 = self.btn:AddChild(Image("images/ui/soraseeds.xml", "soraseeds.tex"))
             self.image2:SetClickable(false)
@@ -152,6 +153,32 @@ local ui = Class(Widget, function(self, owner)
     -- self.seedroot:AddChild(info)
     -- info:SetPosition(250,-70,0)  
 end)
+
+function ui:OnGainFocus()
+    SoraAPI.SetModHUDFocus("sora_seedui",true) 
+end
+function ui:OnLoseFocus()
+    SoraAPI.SetModHUDFocus("sora_seedui",false) 
+end
+function ui:OnHide()
+    SoraAPI.SetModHUDFocus("sora_seedui",false) 
+end
+function ui:StopFollowMouse()
+    ui._base.StopFollowMouse(self)
+    SoraAPI.SetModHUDFocus("sora_seedui",false) 
+end
+
+function ui:OnControl(control, down)
+    if control == CONTROL_CANCEL then
+        self.inst:DoTaskInTime(0, function()
+            self:Kill()
+        end)
+        return true
+    else
+        return Widget.OnControl(self, control, down)
+    end
+end
+
 function ui:Refresh()
     -- if not self.cd() then return end
     local data = self.cmp:GetAllSeeds()
