@@ -30,7 +30,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] local assets = {Asset("ANIM", "anim/sora2plant.zip"), Asset("ATLAS", "images/inventoryimages/sora2plant.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sora2plant.xml", 256),
                    Asset("IMAGE", "images/inventoryimages/sora2plant.tex"),
-                   Asset("ATLAS", "images/ui/sora2plantspell.xml"), Asset("IMAGE", "images/ui/sora2plantspell.tex")}
+                   Asset("ATLAS", "images/ui/sora2plantspell.xml"), Asset("IMAGE", "images/ui/sora2plantspell.tex"),
+                   Asset("ATLAS", "images/ui/soraseeds.xml"), Asset("IMAGE", "images/ui/soraseeds.tex")}
 
 local prefabs = {}
 
@@ -190,14 +191,15 @@ local function FarmFn(inst, doer, pos, poss)
 end
 local function DoBig(fn, inst, doer, pos, ...)
     -- 1格还是9格
-    CacheNames(doer)
+
     local rr = {}
     if inst.isbig:value() and doer:HasTag("sora") then
         for x = -4, 4, 4 do
             for y = -4, 4, 4 do
                 local newpos = Point(pos.x + x, 0, pos.z + y)
-                local r = fn(inst, doer, newpos, ...)
+                local r, msg = fn(inst, doer, newpos, ...)
                 table.insert(rr, r)
+                table.insert(rr, msg)
             end
         end
     else
@@ -206,6 +208,7 @@ local function DoBig(fn, inst, doer, pos, ...)
             Say(doer, str)
         end
         table.insert(rr, r)
+        table.insert(rr, str)
     end
     names_tmp = {}
     return rr
@@ -216,6 +219,7 @@ local function On3x3Fn(inst, doer, pos)
     if incd(inst, doer) then
         return
     end
+    CacheNames(doer)
     DoBig(FarmFn, inst, doer, pos, tillpos.M3x3)
 end
 local function On4x4Fn(inst, doer, pos)
@@ -223,6 +227,7 @@ local function On4x4Fn(inst, doer, pos)
     if incd(inst, doer) then
         return
     end
+    CacheNames(doer)
     DoBig(FarmFn, inst, doer, pos, tillpos.M4x4)
 end
 local function On10Fn(inst, doer, pos)
@@ -230,6 +235,7 @@ local function On10Fn(inst, doer, pos)
     if incd(inst, doer) then
         return
     end
+    CacheNames(doer)
     DoBig(FarmFn, inst, doer, pos, "M10")
 end
 local crops = {
@@ -358,19 +364,240 @@ local function OnPickFn(inst, doer, pos)
         pro.components.inspectable:SetDescription("这是打包的作物")
         doer.components.inventory:GiveItem(pro, nil, inst:GetPosition())
     end
-    for k,v in pairs(seeditems) do 
-        inst.components.soraseedcontainer:AddSeed(k,v)
+    for k, v in pairs(seeditems) do
+        inst.components.soraseedcontainer:AddSeed(k, v)
     end
 end
---OnPickFn = SoraAPI.Pfn(OnPickFn, true)
+local allseeds = nil
+-- OnPickFn = SoraAPI.Pfn(OnPickFn, true)
+local function planttoseed(prefab)
+    if not allseeds then
+        return
+    end
+    if not prefab then
+        return
+    end
+    if prefab:match("^weed_") then
+        return allseeds['medal_weed_seeds'] and 'medal_weed_seeds' or "seeds"
+    end
+    if not prefab:match("^farm_plant_") then
+        return
+    end
+    prefab = prefab:sub(12, -1)
+    if prefab == "randomseed" then
+        return "seeds"
+    end
+    local name = prefab .. "_seeds"
+    if allseeds[name] then
+        return name
+    end
+    name = prefab .. "_seed"
+    if allseeds[name] then
+        return name
+    end
+    return
+end
+local function issame(a, b)
+    local r = a - b
+    return r < 0.01 and r > -0.01
+end
+local function compareseeds(src, dest)
+    if #src ~= #dest then
+        return false
+    end
+    local len = #src
+    local found = 0
+    local founds = {}
+    for k, v in pairs(src) do
+        for ik, iv in pairs(dest) do
+            if issame(v[1], iv[1]) and issame(v[2], iv[2]) and not founds[ik] then
+                founds[ik] = 1
+                found = found + 1
+            end
+        end
+    end
+    return found == len
+end
+local tempseedold = {}
+local seedneed = {}
+local needonce = {}
+local function loadseed(inst)
+    tempseedold = {}
+    seedneed = {}
+    needonce = {}
+
+    for k, v in pairs(inst.seeds) do
+        needonce[v[3]] = (needonce[v[3]] or 0) + 1
+    end
+
+    local allseedsinfo = inst.components.soraseedcontainer:GetAllSeeds()
+    for k, v in pairs(allseedsinfo) do
+        if v.name and needonce[v.name] then
+            tempseedold[v.name] = v.num
+        end
+    end
+    -- body
+end
+local function needseed(inst)
+    local req = true
+    for k, v in pairs(needonce) do
+        if ((seedneed[k] or 0) + v) > tempseedold[k] then
+            req = false
+        end
+    end
+    if req then
+        for k, v in pairs(needonce) do
+            seedneed[k] = (seedneed[k] or 0) + v
+        end
+        return true
+    else
+        return false
+    end
+    -- body
+end
+local function saveseed(inst)
+    for k, v in pairs(seedneed) do
+        inst.components.soraseedcontainer:AddSeed(k, -v)
+    end
+    tempseedold = {}
+    seedneed = {}
+    needonce = {}
+end
+local function CanDeployAnyWhere()
+    return true
+end
+
+local function SeedFn(inst, doer, pos)
+    if not TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) then
+        return false, "只能在农田里使用"
+    end
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"soil"})
+    local newents = {}
+    for k, v in pairs(ents) do
+        if isNear(v, pos) then
+            table.insert(newents, v)
+        end
+    end
+    if #newents ~= #inst.seeds then
+        return false, "农田数量与模板不匹配"
+    end
+    if not needseed(inst) then
+        return false, "种子数量不足"
+    end
+    for k, v in pairs(newents) do -- 数量对了就OK 坑不坑的无所谓
+        v:Remove()
+    end
+    local xs = 1
+    if #newents == 10 then
+        local tilex, tiley = TheWorld.Map:GetTileCoordsAtPoint(pos.x, pos.y, pos.z)
+        if (inst.seedsy ~= (tiley % 2)) then
+            xs = -1
+        end
+    end
+    local seeds = inst.seeds
+    if #seeds == 10 and xs == -1 then -- 翻转植物
+        local oldseeds = deepcopy(inst.seeds)
+        table.sort(oldseeds, function(a, b)
+            if a[1] == b[1] then
+                return a[2] < b[2]
+            else
+                return a[1] < b[1]
+            end
+        end)
+        local count = 0
+        for k,v in pairs(needonce) do
+            count = count + 1
+        end
+        local map = count == 2 and {9,9,10,6,7,4,4,5,1,2} or {6,7,8,9,10,1,2,3,4,5}
+        seeds = {}
+        for k,v in ipairs(oldseeds) do
+            if map[k] and oldseeds[map[k]] and oldseeds[map[k]][3] then 
+                table.insert(seeds,{v[1]*-1,v[2],oldseeds[map[k]][3]})
+            end
+        end
+        if #seeds ~= 10 then
+            return false,"种子错误"
+        end
+        --print(fastdump(seeds))
+        --print(fastdump(oldseeds))
+
+    end
+    for k, v in pairs(seeds) do
+        local one = SpawnPrefab(v[3])
+        if one then
+            local seedpos = Point(pos.x + v[1], 0, pos.z + v[2])
+            one.components.deployable.CanDeploy = CanDeployAnyWhere
+            one.components.deployable.spacing = DEPLOYSPACING.NONE
+            one.components.deployable:Deploy(seedpos, doer or inst)
+        end
+    end
+    return true
+
+    -- body
+end
 
 local function OnSeedFn(inst, doer, pos)
     -- 种种子
     if incd(inst, doer) then
         return
     end
-    
-    Say(doer, "还没做呢")
+    if not inst.seeds then
+        if not TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) then
+            return Say(doer, "请先选择一块农田作为模板")
+        end
+        local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"farm_plant"})
+        local seeds = {}
+        local x1, y1, z1 = pos:Get()
+        for k, v in pairs(ents) do
+            if isNear(v, pos) then
+                local x, y, z = v:GetPosition():Get()
+                -- allseeds = {}
+                local name = planttoseed(v.prefab)
+                if not name then
+                    if STRINGS.NAMES[v.prefab:upper()] then
+                        Say(doer, "暂不支持[" .. STRINGS.NAMES[v.prefab:upper()] .. "],请铲除后再试")
+                    else
+                        Say(doer, "存在无法识别的作物请铲除后再试")
+                    end
+                    return
+                end
+                table.insert(seeds, {x - x1, z - z1, name})
+            end
+        end
+        if #seeds == 9 then
+            if compareseeds(tillpos.M3x3, seeds) then
+                inst.seeds = seeds
+                return Say(doer, "种子模板设定成功,当前为3x3模式")
+            else
+                return Say(doer, "当前植物位置不匹配,请使用扶光附带的刨坑进行刨坑")
+            end
+        elseif #seeds == 10 then
+            if compareseeds(tillpos.M10A, seeds) or compareseeds(tillpos.M10B, seeds) then
+                inst.seeds = seeds
+                local tilex, tiley = TheWorld.Map:GetTileCoordsAtPoint(pos.x, pos.y, pos.z)
+                inst.seedsy = (tiley % 2)
+                return Say(doer,
+                    "种子模板设定成功,当前为10格模式\n注意10格模式种的位置可能和预期不一致")
+            else
+                return Say(doer, "当前植物位置不匹配,请使用扶光附带的刨坑进行刨坑")
+            end
+        elseif #seeds == 16 then
+            if compareseeds(tillpos.M4x4, seeds) then
+                inst.seeds = seeds
+                return Say(doer, "种子模板设定成功,当前为4x4模式")
+            else
+                return Say(doer, "当前植物位置不匹配,请使用扶光附带的刨坑进行刨坑")
+            end
+        else
+            return Say(doer, "请使用扶光附带的刨坑进行刨坑 并且种满植物")
+        end
+
+        Say(doer, "请先选择实验田作为模板")
+        return
+    end
+    loadseed(inst)
+    DoBig(SeedFn, inst, doer, pos)
+    saveseed(inst)
 end
 local function fixCostController(self)
     self.donemoisture = true
@@ -493,7 +720,8 @@ local function OnDefaultFn(inst, doer, pos)
     if inst and doer and doer:HasTag("sora") then
         str = "当前范围:" .. (inst.isbig:value() and "大" or "小") .. "\n"
     end
-    Say(doer, str .. "请选择功能")
+    inst.seeds = nil
+    Say(doer, str .. "种子模板已清空\n请选择功能")
     return true
 end
 
@@ -508,6 +736,7 @@ local function OnRangeFn(inst, doer, pos)
     elseif inst.owner then
         inst.isbig:set(false)
     end
+    inst.seeds = nil
     OnDefaultFn(inst, doer, pos)
 end
 
@@ -515,7 +744,7 @@ local ICON_SCALE = .5
 local ICON_RADIUS = 55
 local SPELLBOOK_RADIUS = 120
 local SPELLBOOK_FOCUS_RADIUS = SPELLBOOK_RADIUS + 2
-
+local ui = require("widgets/soraseed")
 local SPELLS = {{
     label = "收", -- 批量收取大作物的产出 仅限穹妹 且可以铲树根 
     onselect = function(inst)
@@ -599,6 +828,12 @@ local SPELLS = {{
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("种植种子")
         Setreticule(inst)
+        if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls and ThePlayer.HUD.controls.containerroot and
+            not ThePlayer.HUD.controls.containerroot.soraseedui then
+            ThePlayer.HUD.controls.containerroot.soraseedui =
+                ThePlayer.HUD.controls.containerroot:AddChild(ui(ThePlayer))
+        end
+
         if TheWorld.ismastersim then
             inst.components.aoespell:SetSpellFn(OnSeedFn)
         end
@@ -676,6 +911,9 @@ local function fn()
     end
     Setreticule(inst)
     inst:AddComponent("soraseedcontainer")
+    if not allseeds then
+        allseeds = inst.components.soraseedcontainer:GetAllName()
+    end
     if not TheWorld.ismastersim then
         inst.components.spellbook:SelectSpell(7)
         return inst
@@ -704,7 +942,7 @@ local function fn()
     -- inst.components.spellcaster:SetSpellFn(soramagicfn)
     inst:AddComponent("aoespell")
     if not inst.components.aoespell.SetSpellFn then
-        inst.components.aoespell.SetSpellFn = function(self,fn,...)
+        inst.components.aoespell.SetSpellFn = function(self, fn, ...)
             self.aoe_cast = fn
             self.spellfn = fn
         end
@@ -768,7 +1006,6 @@ local function fxfn(Sim)
     inst.components.scaler.OnSave = nil
     inst:AddComponent("inspectable")
     inst:AddComponent("sorasavecmp")
-    
 
     inst.components.sorasavecmp:AddLoad("name", function(i, data)
         if data and data.name and type(data.name) == "string" then

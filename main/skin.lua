@@ -290,7 +290,7 @@ local function Login(userid, netid, nick)
                 gametimes = data.time
             end
         else
-            print("LoginFailed", msg, fastdump(data) )
+            print("LoginFailed", msg, type(data) == "table" and  fastdump(data) or data)
             return false
         end
     end)

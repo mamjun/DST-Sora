@@ -277,7 +277,7 @@ function makelightflier_cat()
         inst:DoTaskInTime(0,function ()
             if not inst.components.container.canbeopened then
                 local items = inst.components.container:RemoveAllItems()
-                for k,v in paris(items) do
+                for k,v in pairs(items) do
                     v:Remove()
                 end
             end

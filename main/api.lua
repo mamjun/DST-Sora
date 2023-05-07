@@ -103,6 +103,18 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
             image = t
         }
         return "images/inventoryimages1.xml", t
+    elseif TheSim:AtlasContains("images/inventoryimages2.xml", t) then
+        imagecache[name] = {
+            atlas = "images/inventoryimages2.xml",
+            image = t
+        }
+        return "images/inventoryimages2.xml", t
+    elseif TheSim:AtlasContains("images/inventoryimages3.xml", t) then
+        imagecache[name] = {
+            atlas = "images/inventoryimages3.xml",
+            image = t
+        }
+        return "images/inventoryimages3.xml", t
     elseif TheSim:AtlasContains("images/inventoryimages.xml", 'quagmire_' .. t) then
         imagecache[name] = {
             atlas = "images/inventoryimages.xml",
@@ -115,12 +127,18 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
             image = 'quagmire_' .. t
         }
         return "images/inventoryimages1.xml", 'quagmire_' .. t
-    elseif TheSim:AtlasContains("images/inventoryimages2.xml", t) then
+    elseif TheSim:AtlasContains("images/inventoryimages2.xml", 'quagmire_' .. t) then
         imagecache[name] = {
             atlas = "images/inventoryimages2.xml",
-            image = t
+            image = 'quagmire_' .. t
         }
-        return "images/inventoryimages2.xml", t
+        return "images/inventoryimages2.xml", 'quagmire_' .. t
+    elseif TheSim:AtlasContains("images/inventoryimages3.xml", 'quagmire_' .. t) then
+        imagecache[name] = {
+            atlas = "images/inventoryimages3.xml",
+            image = 'quagmire_' .. t
+        }
+        return "images/inventoryimages3.xml", 'quagmire_' .. t
     else
         if GLOBAL.Prefabs[name] then
             local assets = GLOBAL.Prefabs[name].assets or {}
@@ -632,10 +650,18 @@ function Pfn(fn, ret) -- MakePcallFn
     return newfn
 end
 MakePcallFn = Pfn
-
+local lastui = nil
+global("TheUI")
 function TryLoadUI(str, ...) -- MakePcallFn
-    local ui = require("widget/" .. str)
+    if lastui then
+        lastui:Kill()
+        lastui = nil
+    end
+    package.loaded["widgets/" .. str]= nil
+    local ui = require("widgets/" .. str)
     local uiinst = ui(...)
-    ThePlayer.HUD.controls.containerroot:AddChild(ui)
+    GLOBAL.TheUI = uiinst
+    lastui = uiinst
+    ThePlayer.HUD.controls.containerroot:AddChild(uiinst)
     return uiinst
 end

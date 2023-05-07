@@ -27,74 +27,201 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local seedinfo = {
-}
-local function AddSeed(name,data)
-    table.insert(seedinfo,{name=name,data=data})
-end
-AddSeed("carrot_seeds")  --胡萝卜种子	
-AddSeed("corn_seeds")  --玉米种子	
-AddSeed("eggplant_seeds")  --茄子种子	
-AddSeed("pumpkin_seeds")  --南瓜种子	
-AddSeed()
-
-AddSeed("potato_seeds")  --土豆种子	
-AddSeed("tomato_seeds")  --番茄种子	
-AddSeed("asparagus_seeds")  --芦笋种子	
-AddSeed("gourd_seeds")  --葫芦种子	
-AddSeed()
-
-
-AddSeed("dragonfruit_seeds")  --火龙果种子	
-AddSeed("watermelon_seeds")  --西瓜种子	
-AddSeed("durian_seeds")  --榴莲种子	
-AddSeed("pomegranate_seeds")  --石榴种子	
-AddSeed()
-
-
-AddSeed("garlic_seeds")  --蒜种子	
-AddSeed("pepper_seeds")  --辣椒种子	
-AddSeed("onion_seeds")  --洋葱种子	
-AddSeed()
-AddSeed("pineananas_seeds")  --松萝种子	
-
-AddSeed("mandrake_seeds")  --曼德拉种子	
-AddSeed("medal_weed_seeds")  --杂草种子	
-AddSeed("medal_gift_fruit_seed")  --包果种子	
-AddSeed("immortal_fruit_seed")  --不朽种子	
-AddSeed("seeds")  --种子	
-
-local DB = nil
-local c = Class(function(self, inst)
-    self.inst = inst
-    if not DB then
-        inst:DoTaskInTime(0,function ()
-            DB = SoraAPI.SeedCSDB or SoraAPI.SeedCDB
-        end)
+]] local seedinfo = {}
+local allseeds = {}
+local function AddSeed(name, data)
+    if not Prefabs[name] then
+        name = nil
+        data = nil
     end
-end)
-function  c:AddSeed(name,num)
-    local old = DB:Get("seeds",name,0)
-    old = old + num
-    DB:Set("seeds",name,old)
-    return old
-end
-function  c:GetAllSeeds()
-    for k,v in paris(seedinfo) do
-        v.num = DB:Get("seeds",v.name,0) 
+    if not name then
+        table.insert(seedinfo, {})
+        return
     end
-    return seedinfo 
-end
-function  c:GetDebugString()
-    local strs = {}
-    table.insert(strs,"SeedSave:")
-    for k,v in pairs(seedinfo) do
-        if v.name then
-         local str = (STRINGS.NAMES["KNOWN_"..v.name:upper()] or STRINGS.NAMES[v.name:upper()] or "未知") .."|"..tostring(v.name) .. ":".. DB:Get("seeds",v.name,0) 
-         table.insert(strs,str)
+    allseeds[name] = 1
+    local data = data or {}
+    if not data.atlas then
+        if not data.image then
+            if name:find("_seeds") then
+                data.image = name:sub(1, -7) .. ".tex"
+            elseif name:find("_seed") then
+                data.image = name:sub(1, -6) .. ".tex"
+            elseif name == "seeds" then
+                data.image = "seeds.tex"
+            else
+                data.image = "seeds.tex"
+            end
+        end
+        data.atlas = SoraGetImage(data.image)
+        if data.image:sub(-4):lower() ~= ".tex" then
+            data.image = data.image .. ".tex"
         end
     end
-    return table.concat(strs,"\n")
+    table.insert(seedinfo, {
+        name = name,
+        data = data
+    })
+end
+AddSeed("carrot_seeds") -- 胡萝卜种子	
+AddSeed("corn_seeds") -- 玉米种子	
+AddSeed("eggplant_seeds") -- 茄子种子	
+AddSeed("pumpkin_seeds") -- 南瓜种子	
+AddSeed()
+
+AddSeed("potato_seeds") -- 土豆种子	
+AddSeed("tomato_seeds", {
+    image = "quagmire_tomato.tex"
+}) -- 番茄种子	
+AddSeed("asparagus_seeds") -- 芦笋种子	
+AddSeed("gourd_seeds") -- 葫芦种子	
+AddSeed()
+
+AddSeed("dragonfruit_seeds") -- 火龙果种子	
+AddSeed("watermelon_seeds") -- 西瓜种子	
+AddSeed("durian_seeds") -- 榴莲种子	
+AddSeed("pomegranate_seeds") -- 石榴种子	
+AddSeed()
+
+AddSeed("garlic_seeds") -- 蒜种子	
+AddSeed("pepper_seeds") -- 辣椒种子	
+AddSeed("onion_seeds", {
+    image = "quagmire_onion.tex"
+}) -- 洋葱种子	
+AddSeed()
+AddSeed("pineananas_seeds") -- 松萝种子	
+
+AddSeed("mandrake_seeds") -- 曼德拉种子	
+AddSeed("medal_weed_seeds", {
+    image = "medal_weed_seeds"
+}) -- 杂草种子	
+AddSeed("medal_gift_fruit_seed", {
+    image = "medal_gift_fruit"
+}) -- 包果种子	
+AddSeed("immortal_fruit_seed", {
+    image = "immortal_fruit"
+}) -- 不朽种子	
+AddSeed("seeds") -- 种子	
+
+local c = Class(function(self, inst)
+    self.inst = inst
+end)
+function c:GetDB()
+    if TheWorld.ismastersim then
+        local db = nil
+        if self.inst and self.inst.owner and self.inst.owner.userid then
+            db = SoraAPI.GetClientDB("seeds", self.inst.owner.userid, true)
+        end
+        return db or SoraAPI.SeedDB
+    else
+        return SoraAPI.SeedCDB
+    end
+end
+
+function c:AddSeed(name, num)
+    local db = self:GetDB()
+    local old = db:Get("seeds", name, 0)
+    old = math.max(old + num,0)
+    db:Set("seeds", name, old)
+    return old
+end
+function c:GetAllName()
+    return allseeds
+end
+
+function c:GetAllSeeds()
+    local db = self:GetDB()
+    for k, v in pairs(seedinfo) do
+        v.num = db:Get("seeds", v.name, 0)
+    end
+    return seedinfo
+end
+function c:CollectAllSeeds()
+    if TheWorld.ismastersim then
+        self:HandleCollectAllSeeds(ThePlayer)
+    else
+        local db = self:GetDB()
+        db:PushEvent("CollectAllSeeds")
+    end
+end
+function c:GetSeeds(name)
+    if TheWorld.ismastersim then
+        self:HandleGetSeeds(ThePlayer, name)
+    else
+        local db = self:GetDB()
+        db:PushEvent("GetSeeds", {
+            name = name
+        })
+    end
+end
+function c:HandleGetSeeds(player, name)
+    local db = self:GetDB()
+    if player and player.components.health and not player.components.health:IsDead() and type(name) == "string" then
+        local num = db:Get("seeds", name, 0)
+
+        if num > 0 then
+            local inst = SpawnPrefab(name)
+            local getnum = 1
+            if inst.components.stackable then
+                getnum = math.min(inst.components.stackable.maxsize, num)
+                inst.components.stackable:SetStackSize(getnum)
+            end
+            db:Set("seeds", name, num - getnum)
+            player.components.inventory:GiveItem(inst, nil, player:GetPosition())
+        end
+    end
+    print("call GetSeeds", name)
+
+end
+local function TestSeeds(inst)
+    return inst and inst.prefab and allseeds[inst.prefab]
+    -- body
+end
+function c:HandleCollectAllSeeds(player)
+    print("call HandleCollectAllSeeds")
+    local db = self:GetDB()
+    if player and player.components.health and not player.components.health:IsDead() then
+        local all = {}
+        local ents = player.components.inventory:FindItems(TestSeeds)
+        for k, v in pairs(ents or {}) do
+            if v and v:IsValid() then
+                all[v.prefab] = (all[v.prefab] or 0) +
+                                    (v.components.stackable and v.components.stackable.stacksize or 1)
+                                    player.components.inventory:RemoveItem(v,true,true)
+                                    v:Remove()
+            end
+        end
+        local containers = player.components.inventory.opencontainers
+        for container_inst in pairs(containers) do
+            local container = container_inst.components.container
+            local ents = container:FindItems(TestSeeds)
+            for k, v in pairs(ents or {}) do
+                if v and v:IsValid() then
+                    all[v.prefab] = (all[v.prefab] or 0) +
+                                        (v.components.stackable and v.components.stackable.stacksize or 1)
+                    container:RemoveItem(v,true,true)
+                                        v:Remove()
+                end
+            end
+        end
+
+        for k,v in pairs(all) do
+            self:AddSeed(k,v)
+        end
+    end
+end
+
+function c:GetDebugString()
+    local db = self:GetDB()
+    local strs = {}
+    table.insert(strs, "SeedSave:")
+    for k, v in pairs(seedinfo) do
+        if v.name then
+            local str =
+                (STRINGS.NAMES["KNOWN_" .. v.name:upper()] or STRINGS.NAMES[v.name:upper()] or "未知") .. "|" ..
+                    tostring(v.name) .. ":" .. db:Get("seeds", v.name, 0)
+            table.insert(strs, str)
+        end
+    end
+    return table.concat(strs, "\n")
 end
 return c

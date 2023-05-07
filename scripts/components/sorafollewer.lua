@@ -7,10 +7,15 @@ local c = Class(function (self,inst)
     self.stoptime = 0
 
     inst:DoPeriodicTask(1,function ()
-        if self.player and self.inst  and self.inst:GetDistanceSqToInst(self.player) > 100 then
+        if not (self.player and self.inst and self.player:IsValid() and self.inst:IsValid()) then
+            self.inst:Remove() 
+            return 
+        end
+        if self.player and self.inst and self.player:IsValid() and self.inst:IsValid() and self.inst:GetDistanceSqToInst(self.player) > 100 then
             --print("让我回来！")
             self.inst.Physics:Teleport(self.player.Transform:GetWorldPosition())
         end
+        
     end)
 end)
 

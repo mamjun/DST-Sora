@@ -30,22 +30,36 @@ end
 
 
 local temp = CreateClientDBTemple("seed", 300, 1)
-temp:InitRoot("seeds") -- up池 纠缠之源 这些小数据
+temp:InitRoot("seeds")
 
 temp.serverfn = function(ns, db, userid)
 
-    db:ListenForEvent("GetSeed", function(id, data, event)
-
+    db:ListenForEvent("GetSeeds", function(id, data, event)
+        local player = UserToPlayer(id)
+        if player and data and data.name then
+            local staff = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+            if staff and staff.components.soraseedcontainer then
+                staff.components.soraseedcontainer:HandleGetSeeds(player,data.name)
+            end
+        end
+    end)
+    db:ListenForEvent("CollectAllSeeds", function(id, data, event)
+        local player = UserToPlayer(id)
+        if player then
+            local staff = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+            if staff and staff.components.soraseedcontainer then
+                staff.components.soraseedcontainer:HandleCollectAllSeeds(player)
+            end
+        end
     end)
 
     db.inst = TheWorld
     db:BindMainDB("seeds",SeedDB,"seeds")
-    SeedCSDB  =db
-    SoraClientDB.SeedCSDB = SeedCSDB
 end
 
 temp.clientfn = function(ns, db, userid)
     SeedCDB = db -- 用于客户端取数据
+    db.inst = TheWorld
     SoraClientDB.SeedCDB = SeedCDB
 end
 
