@@ -45,16 +45,17 @@ local passlock = Class(Widget, function(self)
     self.num = 0
     self.bg = self:AddChild(Image("images/hud.xml", "inv_slot.tex"))
     self.bg:SetScale(0.5, 0.8)
-    self.text = self:AddChild(Text(CODEFONT, 60, "1", UICOLOURS.BLACK))
+    self.text = self:AddChild(Text(CODEFONT, 60, "0", UICOLOURS.BLACK))
+    self.cd = SoraCD(0.1)
 end)
 
 function passlock:OnControl(control, down)
-    if control == CONTROL_SCROLLFWD then
-        self.num = (self.num + 1) % 10
+    if control == CONTROL_SCROLLFWD and self.cd() then
+        self.num = (self.num - 1) % 10
         self.text:SetString(tostring(self.num))
         return true
-    elseif control == CONTROL_SCROLLBACK then
-        self.num = (self.num - 1) % 10
+    elseif control == CONTROL_SCROLLBACK  and self.cd() then
+        self.num = (self.num + 1) % 10
         self.text:SetString(tostring(self.num))
         return true
     else
@@ -62,13 +63,13 @@ function passlock:OnControl(control, down)
     end
 end
 
-local ui = Class(Widget, function(self, owner)
+local ui = Class(Widget, function(self, owner,container)
     Widget._ctor(self, "sora_lock_ui")
     self.owner = owner
     -- self.is_screen = true
     self.seedinfos = {}
     self.staff = nil
-
+    self.container = container or nil
     -- self.bg = self:AddChild(Image("images/bg_redux_wardrobe_bg.xml", "wardrobe_bg.tex"))
     self.bg = self:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_menu_bg.tex"))
     self.bg:SetScale(0.6, 0.4)
@@ -126,6 +127,7 @@ local ui = Class(Widget, function(self, owner)
     self.btn1:SetOnClick(function ()
         local pass = self:GetPass()
         self:SavePass(pass)
+        self:LoadPass()
     end)
 
     self.btn2 = self:AddChild(ImageButton())

@@ -138,8 +138,8 @@ local function Say(doer, str)
     end
 end
 local tillpos = {
-    M3x3 = {{-1.25, -1.25}, {0, -1.25}, {1.25, -1.25}, {-1.25, 0}, {0, 0}, {1.25, 0}, {-1.25, 1.25},
-            {0, 1.25}, {1.25, 1.25}},
+    M3x3 = {{-1.25, -1.25}, {0, -1.25}, {1.25, -1.25}, {-1.25, 0}, {0, 0}, {1.25, 0}, {-1.25, 1.25}, {0, 1.25},
+            {1.25, 1.25}},
     M4x4 = {{-1.5, -1.5}, {-0.5, -1.5}, {0.5, -1.5}, {1.5, -1.5}, {-1.5, -0.5}, {-0.5, -0.5}, {0.5, -0.5}, {1.5, -0.5},
             {-1.5, 0.5}, {-0.5, 0.5}, {0.5, 0.5}, {1.5, 0.5}, {-1.5, 1.5}, {-0.5, 1.5}, {0.5, 1.5}, {1.5, 1.5}},
     M10A = {{-1.5, -1.6}, {0.5, -1.6}, {-0.5, -0.8}, {1.5, -0.8}, {-1.5, 0}, {0.5, 0}, {-0.5, 0.8}, {1.5, 0.8},
@@ -318,7 +318,7 @@ end
 local function makepacker(inst, doer, items)
     local ents = {}
     for k, v in pairs(items) do
-        print("items", k, v)
+        -- print("items", k, v)
         local num = v
         while num > 0 do
             local it = SpawnPrefab(k)
@@ -505,25 +505,26 @@ local function SeedFn(inst, doer, pos)
             end
         end)
         local count = 0
-        for k,v in pairs(needonce) do
+        for k, v in pairs(needonce) do
             count = count + 1
         end
-        local map = count == 2 and {9,9,10,6,7,4,4,5,1,2} or {6,7,8,9,10,1,2,3,4,5}
+        local map = count == 2 and {9, 9, 10, 6, 7, 4, 4, 5, 1, 2} or {6, 7, 8, 9, 10, 1, 2, 3, 4, 5}
         seeds = {}
-        for k,v in ipairs(oldseeds) do
-            if map[k] and oldseeds[map[k]] and oldseeds[map[k]][3] then 
-                table.insert(seeds,{v[1]*-1,v[2],oldseeds[map[k]][3]})
+        for k, v in ipairs(oldseeds) do
+            if map[k] and oldseeds[map[k]] and oldseeds[map[k]][3] then
+                table.insert(seeds, {v[1] * -1, v[2], oldseeds[map[k]][3]})
             end
         end
         if #seeds ~= 10 then
-            return false,"种子错误"
+            return false, "种子错误"
         end
-        --print(fastdump(seeds))
-        --print(fastdump(oldseeds))
+        -- print(fastdump(seeds))
+        -- print(fastdump(oldseeds))
 
     end
     local oldCollapseSoilAtPoint = Map.CollapseSoilAtPoint
-    Map.CollapseSoilAtPoint = function() end
+    Map.CollapseSoilAtPoint = function()
+    end
     for k, v in pairs(seeds) do
         local one = SpawnPrefab(v[3])
         if one then
@@ -533,7 +534,7 @@ local function SeedFn(inst, doer, pos)
             one.components.deployable:Deploy(seedpos, doer or inst)
         end
     end
-    Map.CollapseSoilAtPoint = oldCollapseSoilAtPoint 
+    Map.CollapseSoilAtPoint = oldCollapseSoilAtPoint
     return true
 
     -- body
@@ -572,7 +573,7 @@ local function OnSeedFn(inst, doer, pos)
                 inst.seeds = seeds
                 return Say(doer, "种子模板设定成功,当前为3x3模式")
             else
-                return Say(doer, "当前植物位置不匹配,请使用扶光附带的刨坑进行刨坑")
+                return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
             end
         elseif #seeds == 10 then
             if compareseeds(tillpos.M10A, seeds) or compareseeds(tillpos.M10B, seeds) then
@@ -582,20 +583,20 @@ local function OnSeedFn(inst, doer, pos)
                 return Say(doer,
                     "种子模板设定成功,当前为10格模式\n注意10格模式种的位置可能和预期不一致")
             else
-                return Say(doer, "当前植物位置不匹配,请使用扶光附带的刨坑进行刨坑")
+                return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
             end
         elseif #seeds == 16 then
             if compareseeds(tillpos.M4x4, seeds) then
                 inst.seeds = seeds
                 return Say(doer, "种子模板设定成功,当前为4x4模式")
             else
-                return Say(doer, "当前植物位置不匹配,请使用扶光附带的刨坑进行刨坑")
+                return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
             end
         else
-            return Say(doer, "请使用扶光附带的刨坑进行刨坑 并且种满植物")
+            return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
         end
 
-        Say(doer, "请先选择实验田作为模板")
+        Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
         return
     end
     loadseed(inst)
@@ -818,9 +819,7 @@ local SPELLS = {{
     label = "范", -- 扩大操作范围
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("改变范围")
-
         if TheWorld.ismastersim then
-
             inst.components.aoespell:SetSpellFn(OnRangeFn)
         end
     end,
@@ -829,14 +828,13 @@ local SPELLS = {{
 }, {
     label = "种", -- 铲出3x3的坑
     onselect = function(inst)
-        inst.components.spellbook:SetSpellName("种植种子")
+        inst.components.spellbook:SetSpellName("先选择模板\n后种植种子")
         Setreticule(inst)
         if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls and ThePlayer.HUD.controls.containerroot and
             not ThePlayer.HUD.controls.containerroot.soraseedui then
             ThePlayer.HUD.controls.containerroot.soraseedui =
                 ThePlayer.HUD.controls.containerroot:AddChild(ui(ThePlayer))
         end
-
         if TheWorld.ismastersim then
             inst.components.aoespell:SetSpellFn(OnSeedFn)
         end
@@ -846,6 +844,16 @@ local SPELLS = {{
 }}
 
 for k, v in pairs(SPELLS) do
+    local oldonselect = v.onselect
+    v.onselect = function(inst, ...)
+        print("onselect", k, TheWorld.ismastersim, inst)
+        if not TheWorld.ismastersim then
+            SoraAPI.SoraRPC:PushEvent("SelectBook", {
+                id = k
+            }, nil, inst)
+        end
+        return oldonselect(inst, ...)
+    end
     v.widget_scale = ICON_SCALE
     v.hit_radius = ICON_RADIUS
     v.execute = StartAOETargeting
@@ -870,6 +878,7 @@ local function fn()
     anim:SetBuild("sora2plant")
     anim:PlayAnimation("anim")
     inst:AddTag("nopunch")
+    inst:AddTag("soraspellbook")
     inst:AddTag("sorarecharge")
     inst:AddTag("allow_action_on_impassable")
     inst:AddTag("rechargeable")
@@ -943,7 +952,10 @@ local function fn()
     -- inst.components.spellcaster.canuseonpoint = true
     -- inst.components.spellcaster.canuseonpoint_water = true
     -- inst.components.spellcaster:SetSpellFn(soramagicfn)
-    inst:AddComponent("aoespell")
+    inst:AddComponent("soraaoespell")
+    inst.components.aoespell = inst.components.soraaoespell
+    inst:RegisterComponentActions("aoespell")
+
     if not inst.components.aoespell.SetSpellFn then
         inst.components.aoespell.SetSpellFn = function(self, fn, ...)
             self.aoe_cast = fn

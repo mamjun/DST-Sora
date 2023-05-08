@@ -199,9 +199,7 @@ function ClientDB:Send(id, cmd, data, data2, data3, ...) -- 发送数据   数�
     if self.IsServer then
         SendModRPCToClient(crpc, self.userid, nil, self.namespace, cmd, data, data2, data3, ...)
     else
-        --print("begen",srpc, self.namespace, cmd, data, data2, data3, ...)
         SendModRPCToServer(srpc, self.namespace, cmd, data, data2, data3, ...)
-        --print("end",srpc, self.namespace, cmd, data, data2, data3, ...)
     end
 end
 function ClientDB:Notice(event, data)
@@ -210,9 +208,9 @@ function ClientDB:Notice(event, data)
     end
 end
 
-function ClientDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
+function ClientDB:Handle(id, cmd, data, data2, data3,...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
     if cmd == "event" then -- 推送事件
-        return self:HandleEvent(id, data, decode(data3))
+        return self:HandleEvent(id, data, decode(data3),...)
     elseif cmd == "Sync" then -- 对方要求我方发送所有数据 进行同步
         if not self.IsServer then
             return
@@ -293,7 +291,7 @@ function ClientDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数
         local aid = data
         local cmdd = data2
         local req = decode(data3)
-        local d = {self:RPCHandle(id, cmdd, req)}
+        local d = {self:RPCHandle(id, cmdd, req,...)}
         return self:AsynReply(id, aid, cmd, d)
     elseif cmd == "AsynReply" then -- 异步回复
         local aid = data
@@ -319,7 +317,7 @@ function ClientDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数
                 data = nil,
                 data2 = nil,
                 endtime = os.time() + 5,
-                others = nil
+                others = nil,
             }
         end
         if data.i == 1 then
@@ -357,14 +355,14 @@ function ClientDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数
     end
 
 end
-function ClientDB:Asyn(id, cmd, req) -- 创建异步
+function ClientDB:Asyn(id, cmd, req,...) -- 创建异步
     local asyn = {
         AsynId = "A" .. self.AsynId, -- 请求ID
         cmd = cmd,
         req = req, -- 请求数据
         ret = {}, -- 返回数据
         status = 0, --
-        timeout = 90 -- 默认最多等待3s
+        timeout = 90, -- 默认最多等待90s
     }
     asyn.Wait = function(s)
         while s.status < 1 and s.timeout > 0 do
@@ -379,7 +377,7 @@ function ClientDB:Asyn(id, cmd, req) -- 创建异步
     end
     self.Asyns[asyn.AsynId] = asyn
     self.AsynId = self.AsynId + 1
-    self:Send(id, "Asyn", asyn.AsynId, cmd, encode(req))
+    self:Send(id, "Asyn", asyn.AsynId, cmd, encode(req),...)
     return asyn
 end
 
@@ -577,16 +575,16 @@ function ClientDB:AsynSet(root, key, value) -- 异步设置 直接设置主世�
 end
 
 -- 事件相关 
-function ClientDB:HandleEvent(id, event, data) -- 处理事件并分发给event
+function ClientDB:HandleEvent(id, event, data,...) -- 处理事件并分发给event
     if event and self.events[event] then
         for k, v in pairs(self.events[event]) do
-            v.fn(id, data, event)
+            v.fn(id, data, event,...)
         end
     end
 end
 
-function ClientDB:PushEvent(event, data, toid) -- 推送事件  不会保存
-    self:Send(toid, "event", event, nil, encode(data))
+function ClientDB:PushEvent(event, data, toid,...) -- 推送事件  不会保存
+    self:Send(toid, "event", event, nil, encode(data),...)
 end
 
 function ClientDB:ListenForEvent(event, fn) -- 监听事件   不会保存
@@ -612,9 +610,9 @@ end
 
 -- 远程函数调用
 
-function ClientDB:RPC(id, cmd, data) -- 远程函数调用
+function ClientDB:RPC(id, cmd, data,...) -- 远程函数调用
     id = type(id) == "string" and id or mid -- 为空发给主世界  禁止广播
-    local s = self:Asyn(id, cmd, encode(data))
+    local s = self:Asyn(id, cmd, encode(data),...)
     local r, data = s:Wait()
     if r then
         return unpack(data)
@@ -623,9 +621,9 @@ function ClientDB:RPC(id, cmd, data) -- 远程函数调用
     end
 end
 
-function ClientDB:RPCHandle(id, cmd, data) -- 远程函数处理
+function ClientDB:RPCHandle(id, cmd, data,...) -- 远程函数处理
     if cmd and self.RPCHandles[cmd] then
-        return true, self.RPCHandles[cmd](id, decode(data), cmd)
+        return true, self.RPCHandles[cmd](id, decode(data), cmd,...)
     end
     return false, "NO Handle"
 end

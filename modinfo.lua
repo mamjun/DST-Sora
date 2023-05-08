@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "11.29.5" -- 版本
+version = "11.29.6" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""

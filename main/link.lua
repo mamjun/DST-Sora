@@ -365,3 +365,14 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
         end
     end)
 end
+
+
+AddLaterFn(function()       --怎么想都是花花的错
+    local oldfn = ACTIONS.CASTAOE.stroverridefn
+    ACTIONS.CASTAOE.stroverridefn = function(act,...)
+        if act.invobject and act.invobject:HasTag("soraspellbook") and act.invobject.components.spellbook  then
+            return act.invobject.components.spellbook:GetSpellName()
+        end
+        return  oldfn(act,...)
+    end
+end)

@@ -52,7 +52,6 @@ temp.serverfn = function(ns, db, userid)
             end
         end
     end)
-
     db.inst = TheWorld
     db:BindMainDB("seeds",SeedDB,"seeds")
 end
@@ -62,6 +61,28 @@ temp.clientfn = function(ns, db, userid)
     db.inst = TheWorld
     SoraClientDB.SeedCDB = SeedCDB
 end
+
+
+local temp = CreateClientDBTemple("RPC", 300, 1)
+temp.serverfn = function(ns, db, userid)
+
+    db:ListenForEvent("SelectBook", function(id, data, event,ent)
+        local player = UserToPlayer(id)
+        if player and data and data.id and type(ent) == "table" and ent:IsValid() and ent.components.spellbook then
+            ent.components.spellbook:SelectSpell(data.id)
+        end
+    end)
+ 
+    db.inst = TheWorld
+
+end
+
+temp.clientfn = function(ns, db, userid)
+    SoraRPC = db -- 用于客户端取数据
+    db.inst = TheWorld
+    SoraClientDB.SoraRPC = SoraRPC
+end
+
 
 --[[
 
