@@ -63,6 +63,12 @@ function IsMythEnable()
     elseif IsModEnable("%[DST%] 神话书说") then
         mythenable = true
         return true
+    elseif IsModEnable("%[DST%]神话书说") then
+        mythenable = true
+        return true
+    elseif IsModEnable("%[DST%]%s+神话书说") then
+        mythenable = true
+        return true
     elseif IsModEnable("workshop%-1991746508") then
         mythenable = true
         return true
