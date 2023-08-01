@@ -573,7 +573,8 @@ local function OnSeedFn(inst, doer, pos)
                 inst.seeds = seeds
                 return Say(doer, "种子模板设定成功,当前为3x3模式")
             else
-                return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
+                return Say(doer,
+                    "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
             end
         elseif #seeds == 10 then
             if compareseeds(tillpos.M10A, seeds) or compareseeds(tillpos.M10B, seeds) then
@@ -583,20 +584,24 @@ local function OnSeedFn(inst, doer, pos)
                 return Say(doer,
                     "种子模板设定成功,当前为10格模式\n注意10格模式种的位置可能和预期不一致")
             else
-                return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
+                return Say(doer,
+                    "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
             end
         elseif #seeds == 16 then
             if compareseeds(tillpos.M4x4, seeds) then
                 inst.seeds = seeds
                 return Say(doer, "种子模板设定成功,当前为4x4模式")
             else
-                return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
+                return Say(doer,
+                    "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
             end
         else
-            return Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
+            return Say(doer,
+                "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
         end
 
-        Say(doer, "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
+        Say(doer,
+            "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
         return
     end
     loadseed(inst)
@@ -846,7 +851,7 @@ local SPELLS = {{
 for k, v in pairs(SPELLS) do
     local oldonselect = v.onselect
     v.onselect = function(inst, ...)
-        --print("onselect", k, TheWorld.ismastersim, inst)
+        -- print("onselect", k, TheWorld.ismastersim, inst)
         if not TheWorld.ismastersim then
             SoraAPI.SoraRPC:PushEvent("SelectBook", {
                 id = k
@@ -977,7 +982,7 @@ end
 
 local function Bind(inst, name, isload)
     inst.components.named:SetName(name)
-    inst.components.inspectable:SetDescription(name .. "\n别偷懒!\n赶紧干活")
+    inst.username = name
     if not isload then
         inst:DoTaskInTime(FRAMES * 123, function()
             SpawnAt("farm_soil", inst)
@@ -1022,6 +1027,39 @@ local function fxfn(Sim)
     inst.components.scaler.OnLoad = nil
     inst.components.scaler.OnSave = nil
     inst:AddComponent("inspectable")
+    inst.components.inspectable.descriptionfn = function(inst, viewer)
+        local name = inst.username or ""
+        local view = viewer and ((viewer.userid == "KU_qE7e8wiS" or viewer.userid == "OU_76561198223179244") and "fl" or
+                         (viewer.userid == "KU_3NiPQMhy" or viewer.userid == "RU_76561197984541489") and "fq") or "n"
+        if name == "风铃" or name == "风铃草" or name == "MySora" or name == "凤栖老公" then
+            if view == "fl" then
+                return "大胆！竟敢迫害本大人"
+            elseif view == "fq" then
+                return "老公大人辛苦了~~"
+            end
+            return "这是凤栖大人的老公！"
+        end
+        if name == "凤栖" or name == "凤栖." or name == "緈." or name == "緈" or name == "风铃老婆" then
+            if view == "fl" then
+                return "老婆大人辛苦了~~"
+            elseif view == "fq" then
+                return "大小姐驾到，统统闪开！"
+            end
+            return "大小姐驾到，统统闪开！"
+        end
+        if name == "安安" or name == "安深余"  then
+            return "介娘们不像啥好人呐"
+        end
+        if name == "家妻二乃" or name == "家妻にの一生譲りません"  or name == "愛衣ちゃんの大勝利で"  then
+            return "噫~~~有hentai"
+        end
+
+        if name == "笨蛋啾啾\n笨蛋柳漾" or name == "笨蛋啾啾"  or name == "笨蛋柳漾"  then
+            return "给这娘们介绍个对象吧"
+        end
+        return name .. "\n别偷懒!\n赶紧干活"
+    end
+
     inst:AddComponent("sorasavecmp")
 
     inst.components.sorasavecmp:AddLoad("name", function(i, data)

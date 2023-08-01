@@ -174,6 +174,7 @@ end
 
 function CheckChest(inst,dontpick)
     if not inst:IsValid() then return end
+    SoraAPI.CheckChestValid(inst)
     local container = inst.components.container
     local first
     local drop_first 
@@ -394,11 +395,13 @@ function UpdateChest(inst,doer)
 end
 
 local function onopen(inst)
+    SoraAPI.CheckChestValid(inst)
     inst.AnimState:PlayAnimation("open")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
 
 local function onclose(inst,doer)
+    SoraAPI.CheckChestValid(inst)
     inst:DoTaskInTime(0, CheckChest)
     if doer and doer:HasTag("player") then
         inst:DoTaskInTime( 0.1 , function ()

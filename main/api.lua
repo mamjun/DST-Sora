@@ -671,3 +671,16 @@ function TryLoadUI(str, ...) -- MakePcallFn
     ThePlayer.HUD.controls.containerroot:AddChild(uiinst)
     return uiinst
 end
+
+
+function  CheckChestValid(inst)
+    if inst and inst:IsValid() and inst.components.container then
+        local container = inst.components.container
+        for i = 1, container:GetNumSlots() do
+            local item = container:GetItemInSlot(i)
+            if not (item and item:IsValid()) then
+                container.slots[i] = nil
+            end
+        end
+    end
+end

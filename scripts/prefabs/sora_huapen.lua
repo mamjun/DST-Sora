@@ -60,8 +60,13 @@ local function SetSkin(inst, x, y)
 end
 
 local function Onisfullmoon(inst, var)
+    SoraAPI.CheckChestValid(inst)
     if var and inst and inst.components.container then
         local item = inst.components.container:GetItemInSlot(1)
+        if not (item and item:IsValid()) then
+            inst.components.container.slots[1]=nil
+            return 
+        end
         local stacksize = item and item.components.stackable and item.components.stackable.stacksize or 1
         if item and (item.prefab == "butterfly" or item.prefab == "petals") then
             local prefab = item.prefab == "butterfly" and "moonrocknugget" or "moonglass"
@@ -98,7 +103,7 @@ function butterpickup(inst)
 end
 
 function buttersleep(inst)
-    if inst.sora_huapen and inst.sora_huapen:IsValid() then
+    if inst:IsValid() and inst.sora_huapen and inst.sora_huapen:IsValid() then
         local item = inst.sora_huapen.components.container:GetItemInSlot(1)
         if not item or
             (item.prefab == "butterfly" and item.components.stackable and not item.components.stackable:IsFull()) then
