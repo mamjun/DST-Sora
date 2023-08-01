@@ -27,7 +27,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] local Widget = require "widgets/widget"
+]] 
+local Widget = require "widgets/widget"
 local Image = require "widgets/image"
 local ImageButton = require "widgets/imagebutton"
 local TextButton = require "widgets/textbutton"
@@ -40,6 +41,7 @@ local Spinner = require "widgets/spinner"
 local ItemSlot = require "widgets/itemslot"
 local ItemTile = require "widgets/itemtile"
 local TEMPLATES = require "widgets/redux/templates"
+local RPC = SoraAPI.SoraRPC
 local passlock = Class(Widget, function(self)
     Widget._ctor(self, "sora_lock_lock")
     self.num = 0
@@ -47,6 +49,7 @@ local passlock = Class(Widget, function(self)
     self.bg:SetScale(0.5, 0.8)
     self.text = self:AddChild(Text(CODEFONT, 60, "0", UICOLOURS.BLACK))
     self.cd = SoraCD(0.1)
+    self.cdrpc = SoraCD(0.5)
 end)
 
 function passlock:OnControl(control, down)
@@ -89,11 +92,19 @@ local ui = Class(Widget, function(self, owner,container)
     self.btn4:SetText("修改密码")
     self.btn4:SetPosition(-75, -45, 0)
     self.btn4:ForceImageSize(125, 50)
-
+    self.btn4:SetOnClick(function ()
+        local pass = self:GetPass()
+        self:SavePass(pass)
+        self:LoadPass()
+        RPC:PushEvent("SoraLock",{cmd="UnLockByPass",pass=pass},nil,self.container)
+    end)
     self.btn5 = self.text3:AddChild(ImageButton())
     self.btn5:SetText("解除密码")
     self.btn5:SetPosition(55, -45, 0)
     self.btn5:ForceImageSize(125, 50)
+    self.btn5:SetOnClick(function ()
+        RPC:PushEvent("SoraLock",{cmd="UndoPass"},nil,self.container)
+    end)
 
     self.closebtn = self:AddChild(TextButton())
     self.closebtn:SetFont(CHATFONT)
@@ -128,18 +139,23 @@ local ui = Class(Widget, function(self, owner,container)
         local pass = self:GetPass()
         self:SavePass(pass)
         self:LoadPass()
+        RPC:PushEvent("SoraLock",{cmd="UnLockByPass",pass=pass},nil,self.container)
     end)
 
     self.btn2 = self:AddChild(ImageButton())
     self.btn2:SetText("指纹解锁")
     self.btn2:SetPosition(-70, -55, 0)
     self.btn2:ForceImageSize(125, 50)
-
+    self.btn2:SetOnClick(function()
+        RPC:PushEvent("SoraLock",{cmd="UnLockByUser"},nil,self.container)   
+    end)
     self.btn3 = self:AddChild(ImageButton())
     self.btn3:SetText("暴力开锁")
     self.btn3:SetPosition(55, -55, 0)
     self.btn3:ForceImageSize(125, 50)
-
+    self.btn3:SetOnClick(function()
+        RPC:PushEvent("SoraLock",{cmd="UnLockByClick"},nil,self.container)      
+    end)
     self.passes = {}
     self.pass = {}
     self.locks = {}
@@ -176,6 +192,16 @@ local ui = Class(Widget, function(self, owner,container)
     self:LoadPass()
 end)
 local maxpass = 8
+function ui:NewRPC(rpcname, data,cb)
+    self.inst:StartThread(function ()
+        local t,res = RPC:RPC(nil,rpcname,data,self.container)
+        if t then 
+            cb(res)
+        else
+            print(rpcname,t,res,type(data) == "table" and fastdump(data) or data)
+        end
+    end)
+end
 
 function ui:OnGainFocus()
     SoraAPI.SetModHUDFocus("sora_lock_lock", true)

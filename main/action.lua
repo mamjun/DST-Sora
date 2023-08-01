@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 --
 -----打包
-local SORAPACK = GLOBAL.Action({priority = 99})
+local SORAPACK = GLOBAL.Action({priority = 99,distance=3})
 SORAPACK.id = "SORAPACK"
 SORAPACK.str = "打包"
 local exp = {5000, 2000, 1000}
@@ -39,6 +39,15 @@ SORAPACK.fn = function(act)
     local target = act.target
     local invobject = act.invobject
     local doer = act.doer
+    if not invobject  then
+        invobject = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.NECK or EQUIPSLOTS.HEAD)
+        if not (invobject and invobject:HasTag("sorabowknot") ) then
+            return true
+        end
+    end
+    if not invobject  then
+        return true
+    end
     if not TUNING.SORAPACK then
         if doer then
             doer.components.talker:Say("现在不能打包")
@@ -102,6 +111,15 @@ AddComponentAction("USEITEM", "sorapacker",
         table.insert(actions, ACTIONS.SORAPACK)
     end
 end)
+-- --辅助打包
+AddComponentAction("SCENE", "inspectable",
+                   function(inst, doer, actions,right)
+    if right and doer and doer:HasTag("player") and doer.replica.inventory:EquipHasTag("sorabowknot") and doer.components.playercontroller and doer.components.playercontroller:IsControlPressed(CONTROL_FORCE_INSPECT) then
+        table.insert(actions, ACTIONS.SORAPACK)
+    end
+end)
+
+
 
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(
                                ACTIONS.SORAPACK, "doshortaction"))
@@ -180,6 +198,9 @@ AddComponentAction("INVENTORY", "sorauseable",
         table.insert(actions, ACTIONS.SORAUSE)
     end
 end)
+
+
+
 
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(
                                ACTIONS.SORAUSE, "doshortaction"))

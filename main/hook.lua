@@ -774,7 +774,7 @@ end)
 local function tryDestroyReticule(inst, data)
     if data.eslot == EQUIPSLOTS.HANDS then
         local self = inst.components.playercontroller
-        if self.reticule ~= nil then
+        if self and self.reticule ~= nil then
             if self.reticule.inst.components.spellbook ~= nil and self.reticule.inst.prefab == "sora2plant" then
                 self.reticule:DestroyReticule()
                 return

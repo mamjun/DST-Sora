@@ -28,55 +28,47 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
-local RegPatch = {
+--[[专属交互
+]] --
 
-}
+local com = Class(function(self, inst)
 
--- {key=key,patch=function,unpatch=function,data={}}
-local c = Class(function (self, inst,type)
-    self.inst = inst
-    self.patch = {}
 end)
-function c:RegPatch(key,data)
-    if not RegPatch[key] then
-        if data and data.patch and type(data.patch) == "function" and type(data.data) == "table" then
-            data.key= key
-            RegPatch[key] = data
+
+function com:Init(inst)
+
+end
+
+function com:FindSpawnPoint()
+    for i=1,10000 do
+        local x = math.random(-600,600)
+        local y = math.random(-600,600)
+        local yes = true 
+        local ents = TheSim:FindEntities(x,0,y,2,nil,{"FX","NOCLICK","NOBLOCK"})
+        yes = yes and #ents < 1
+        for ix = -2,2,1 do
+            for iy = -2,2,1 do
+                yes = yes and TheWorld.Map:CanPlantAtPoint(x+ix*4,0,y+iy*4)
+                yes = yes and TheWorld.Map:IsPassableAtPoint(x+ix*4,0,y+iy*4,false,true)
+            end
+        end
+        
+        if yes then
+              local ix = math.random()
+              local iy = math.random()
+              x = x + ix
+              y = y + iy
+                print(i,x,y,ix,math.random())
+            return Vector3(x,0,y)
         end
     end
-end
-function c:ApplyPatch(key,data,isload)
-    if RegPatch[key] and not self.patch[key] then
-        local newdata = isload and data or deepcopy(RegPatch[key].data)
-        self.patch[key] = newdata
-        RegPatch[key].patch(self,newdata,isload,RegPatch[key].data,data)
-    end
-end
-function c:UnApplyPatch(key)
-    if self.patch[key] and RegPatch[key] and  RegPatch[key].unpatch then
-        RegPatch[key].unpatch(self,self.patch[key])
-    end
-    self.patch[key] = nil
-end
-function c:GetPatch(key)
-    return self.patch[key]
+    return Vector3(math.random()*20,0,math.random()*20)
 end
 
-function c:OnSave() 
-    local data = {}
-    if next(self.patch) then
-        data.patch = self.patch
-        data.add_component_if_missing = 1 
-    end
-	return  data
+
+function com:OnSave() return end
+
+function com:OnLoad(data) 
 end
 
-function c:OnLoad(data)       
-    if data and data.patch then
-        for k,v in pairs(data.patch) do
-            self:ApplyPatch(k,v,true)
-        end
-    end
-end
-
-return c
+return com

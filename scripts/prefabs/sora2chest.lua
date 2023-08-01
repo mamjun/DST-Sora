@@ -316,7 +316,7 @@ local function HeLiMiZhi(inst,m,doer)
     
     local x,y,z = inst.Transform:GetWorldPosition()
     x, y, z = TheWorld.Map:GetTileCenterPoint(x+4, 0, z)
-    local ents = TheSim:FindEntities(x,y,z,2,nil,{"FX","NOBLOCK","NOCLICK"})
+    local ents = TheSim:FindEntities(x,y,z,2,nil,{"FX","NOBLOCK","NOCLICK","player","INLIMBO"})
     local num = #ents
     local pos = Vector3(x,y,z)
     for n=1,25 do 
@@ -401,7 +401,9 @@ end
 local function onclose(inst,doer)
     inst:DoTaskInTime(0, CheckChest)
     if doer and doer:HasTag("player") then
-        UpdateChest(inst,doer)
+        inst:DoTaskInTime( 0.1 , function ()
+            UpdateChest(inst,doer)
+        end )
     end
     inst.AnimState:PlayAnimation("close")
     inst.AnimState:PlayAnimation("closed")

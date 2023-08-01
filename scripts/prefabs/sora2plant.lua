@@ -846,7 +846,7 @@ local SPELLS = {{
 for k, v in pairs(SPELLS) do
     local oldonselect = v.onselect
     v.onselect = function(inst, ...)
-        print("onselect", k, TheWorld.ismastersim, inst)
+        --print("onselect", k, TheWorld.ismastersim, inst)
         if not TheWorld.ismastersim then
             SoraAPI.SoraRPC:PushEvent("SelectBook", {
                 id = k
@@ -979,10 +979,10 @@ local function Bind(inst, name, isload)
     inst.components.named:SetName(name)
     inst.components.inspectable:SetDescription(name .. "\n别偷懒!\n赶紧干活")
     if not isload then
-        inst:DoTaskInTime(FRAMES * 62, function()
+        inst:DoTaskInTime(FRAMES * 123, function()
             SpawnAt("farm_soil", inst)
         end)
-        inst:DoTaskInTime(FRAMES * 87, inst.Remove)
+        inst:DoTaskInTime(FRAMES * 135, inst.Remove)
         inst.components.scaler:SetScale(0.3)
     else
         inst.persists = true
@@ -1009,6 +1009,8 @@ local function fxfn(Sim)
     inst.AnimState:SetBuild("mole_build")
     inst.AnimState:PlayAnimation("enter")
     inst.AnimState:PushAnimation("exit")
+    inst.AnimState:PushAnimation("exit")
+    inst.AnimState:SetRayTestOnBB(true)
     -- inst:AddTag("FX")
     inst:AddTag("NOBLOCK")
     inst.entity:SetPristine()

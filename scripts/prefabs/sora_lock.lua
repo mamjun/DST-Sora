@@ -27,56 +27,31 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local RegPatch = {
+]] local assets = {}
 
-}
+local prefabs = {}
 
--- {key=key,patch=function,unpatch=function,data={}}
-local c = Class(function (self, inst,type)
-    self.inst = inst
-    self.patch = {}
-end)
-function c:RegPatch(key,data)
-    if not RegPatch[key] then
-        if data and data.patch and type(data.patch) == "function" and type(data.data) == "table" then
-            data.key= key
-            RegPatch[key] = data
-        end
+local function fn()
+    local inst = CreateEntity()
+    local trans = inst.entity:AddTransform()
+    local anim = inst.entity:AddAnimState()
+    MakeInventoryPhysics(inst)
+    inst.entity:AddNetwork()
+    anim:SetBank("sora2plant")
+    anim:SetBuild("sora2plant")
+    anim:PlayAnimation("anim")
+
+    if not TheWorld.ismastersim then
+        return inst
     end
-end
-function c:ApplyPatch(key,data,isload)
-    if RegPatch[key] and not self.patch[key] then
-        local newdata = isload and data or deepcopy(RegPatch[key].data)
-        self.patch[key] = newdata
-        RegPatch[key].patch(self,newdata,isload,RegPatch[key].data,data)
-    end
-end
-function c:UnApplyPatch(key)
-    if self.patch[key] and RegPatch[key] and  RegPatch[key].unpatch then
-        RegPatch[key].unpatch(self,self.patch[key])
-    end
-    self.patch[key] = nil
-end
-function c:GetPatch(key)
-    return self.patch[key]
+    inst:AddComponent("inspectable")
+    inst.components.inspectable:SetDescription([[桃子姐姐又在找借口\n咕咕我们了]])
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2plant.xml"
+    inst.components.inventoryitem.imagename = "sora2plant"
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(0)
+    return inst
 end
 
-function c:OnSave() 
-    local data = {}
-    if next(self.patch) then
-        data.patch = self.patch
-        data.add_component_if_missing = 1 
-    end
-	return  data
-end
-
-function c:OnLoad(data)       
-    if data and data.patch then
-        for k,v in pairs(data.patch) do
-            self:ApplyPatch(k,v,true)
-        end
-    end
-end
-
-return c
+return Prefab("sora_lock", fn, assets, prefabs)

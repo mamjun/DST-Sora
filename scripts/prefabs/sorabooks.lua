@@ -45,7 +45,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             nomagic = true
         end
         inst.components.pickable:FinishGrowing()
-        inst.components.pickable.nomagic = true
+        inst.components.pickable.nomagic = nomagic
     end
 
     if inst.components.crop ~= nil then

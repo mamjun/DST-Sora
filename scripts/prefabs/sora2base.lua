@@ -128,6 +128,7 @@ local function calcdest(inst,dest)
 end
 local stafftask  = {
 	firestaff = function(inst)
+        if inst:IsAsleep() then return end
 		local pos = inst:GetPosition()
         local ent = TheSim:FindEntities(pos.x, pos.y, pos.z,15,nil,nil,{"sora2basefire","daylight","HASHEATER"})
         local closest = 225

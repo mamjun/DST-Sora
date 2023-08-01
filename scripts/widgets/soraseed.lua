@@ -171,6 +171,10 @@ end
 function ui:OnControl(control, down)
     if control == CONTROL_CANCEL then
         self.inst:DoTaskInTime(0, function()
+            if self.parent and self.parent.soraseedui then
+                self.parent.soraseedui = nil
+            end
+        
             self:Kill()
         end)
         return true

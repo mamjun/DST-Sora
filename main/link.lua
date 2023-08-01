@@ -353,7 +353,7 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
                         end
                     else
                         local eln = FindClosestEntity(self.inst, 30, {"elaina"}) -- 魔女姐姐你离我这么近 会保护我的对吧
-                        return eln.components.combat:GetAttacked(doer, dam, cause, ...)
+                        return eln and eln.components.combat and  eln.components.combat:GetAttacked(doer, dam, cause, ...)
                     end
                     return -- 无事发生
                 end
