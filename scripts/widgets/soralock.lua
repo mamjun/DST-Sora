@@ -267,7 +267,7 @@ function ui:LoadPass()
                     pass:SetOnClick(function ()
                         for i=1,6 do
                             self.locks[i].text:SetString(v:sub(i,i))
-                            self.locks[i].num = tonumber(self.locks[i].text)
+                            self.locks[i].num = tonumber(v:sub(i,i))
                         end
                     end)
                     table.insert(self.passes, pass)

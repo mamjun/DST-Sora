@@ -129,61 +129,50 @@ local black = {
     sora_mysora = 1,
     sora_mysora_r = 1
 }
-MakeCharacterSkin("sora", "sora_llan", {
+local function MakeSkin(name, data, notemp)
+    local d = {}
+    d.quotes = "敢动我就杀了你哦"
+    d.rarity = "敢动我就杀了你哦"
+    d.raritycorlor = {255 / 255, 215 / 255, 0 / 255, 1}
+    d.rarityorder = 100
+    d.release_group = -1006
+    d.skin_tags = {"BASE", "sora", "CHARACTER"}
+    d.skins = {
+        normal_skin = name,
+        ghost_skin = "ghost_sora_build"
+    }
+    d.checkfn = SoraSkinCheckFn
+    d.checkclientfn = SoraSkinCheckClientFn
+    d.share_bigportrait_name = "sora"
+    d.FrameSymbol = "Distinguished"
+    for k, v in pairs(data) do
+        d[k] = v
+    end
+    MakeCharacterSkin("sora", name, d)
+    if not notemp then
+        local d2 = shallowcopy(d)
+        d2.rarity = "限时体验"
+        d2.rarityorder = 80
+        d2.raritycorlor = {0.957, 0.769, 0.188, 1}
+        d2.FrameSymbol = "heirloom"
+        d2.name = data.name .. "(限时)"
+        SoraAPI.MakeCharacterSkin("sora", name .. "_tmp", d2)
+    end
+end
+
+MakeSkin("sora_llan", {
     name = "llan",
-    des = "世间美好，不过松花酿酒，春水煎茶",
-    quotes = "敢动我就杀了你哦",
-    rarity = "敢动我就杀了你哦",
-    raritycorlor = {255 / 255, 215 / 255, 0 / 255, 1},
-    rarityorder = 100,
-    release_group = -1006,
-    skins = {
-        normal_skin = "sora_llan",
-        ghost_skin = "ghost_sora_build"
-    },
-    skin_tags = {"BASE", "sora", "CHARACTER"},
-    checkfn = SoraSkinCheckFn,
-    checkclientfn = SoraSkinCheckClientFn,
-    share_bigportrait_name = "sora",
-    FrameSymbol = "Distinguished"
+    des = "世间美好，不过松花酿酒，春水煎茶"
 })
 
-MakeCharacterSkin("sora", "sora_mysora", {
+MakeSkin("sora_mysora", {
     name = "花嫁",
-    des = "执子之手,与子偕老",
-    quotes = "敢动我就杀了你哦",
-    rarity = "敢动我就杀了你哦",
-    raritycorlor = {255 / 255, 215 / 255, 0 / 255, 1},
-    rarityorder = 100,
-    release_group = -1007,
-    skins = {
-        normal_skin = "sora_mysora",
-        ghost_skin = "ghost_sora_build"
-    },
-    skin_tags = {"BASE", "sora", "CHARACTER"},
-    checkfn = SoraSkinCheckFn,
-    checkclientfn = SoraSkinCheckClientFn,
-    share_bigportrait_name = "sora",
-    FrameSymbol = "Distinguished"
+    des = "执子之手,与子偕老"
 })
 
-MakeCharacterSkin("sora", "sora_mysora_r", {
+MakeSkin("sora_mysora_r", {
     name = "花嫁",
-    des = "执子之手,与子偕老",
-    quotes = "敢动我就杀了你哦",
-    rarity = "敢动我就杀了你哦",
-    raritycorlor = {255 / 255, 215 / 255, 0 / 255, 1},
-    rarityorder = 100,
-    release_group = -1008,
-    skins = {
-        normal_skin = "sora_mysora_r",
-        ghost_skin = "ghost_sora_build"
-    },
-    skin_tags = {"BASE", "sora", "CHARACTER"},
-    checkfn = SoraSkinCheckFn,
-    checkclientfn = SoraSkinCheckClientFn,
-    share_bigportrait_name = "sora",
-    FrameSymbol = "Distinguished"
+    des = "执子之手,与子偕老"
 })
 
 AddSimPostInit(function()
@@ -290,7 +279,7 @@ local function Login(userid, netid, nick)
                 gametimes = data.time
             end
         else
-            print("LoginFailed", msg, type(data) == "table" and  fastdump(data) or data)
+            print("LoginFailed", msg, type(data) == "table" and fastdump(data) or data)
             return false
         end
     end)
@@ -312,7 +301,7 @@ local function UseSkinCDK(cdk, cb) -- 客户端调用
         cdk = cdk
     }, cb)
 end
-local function UseGiftCDK(cdk,player, cb) -- 服务器调用
+local function UseGiftCDK(cdk, player, cb) -- 服务器调用
     SkinApi('s/UseCDK', {
         kid = player.userid,
         cdk = cdk
@@ -383,7 +372,7 @@ end
 local skinhandle = {
     GetSkins = function(inst, Force)
         if not inst.soragetskincd then
-            inst.soragetskincd = SoraCD(2,true)
+            inst.soragetskincd = SoraCD(2, true)
         end
         if inst.soragetskincd() or Force then
             GetSkins(inst.userid)
@@ -391,26 +380,26 @@ local skinhandle = {
     end,
     UseCDK = function(inst, cdk, Force)
         if not inst.soragetskincd then
-            inst.soragetskincd = SoraCD(2,true)
+            inst.soragetskincd = SoraCD(2, true)
         end
         if not inst and inst:HasTag("sora") then
-            mes(inst,"只有穹妹可以激活这个CDK")
-            return 
+            mes(inst, "只有穹妹可以激活这个CDK")
+            return
         end
         if inst.soragetskincd() or Force then
             if not (cdk and cdk:utf8len() == 23) then
-                mes(inst,"CDK不正确")
+                mes(inst, "CDK不正确")
                 return
             end
-            UseGiftCDK(cdk,inst,function (code,msg,data)
-                if (code == -6001 or code == -6002 ) then
-                    mes(inst,"卡密不正确 请重新输入")
+            UseGiftCDK(cdk, inst, function(code, msg, data)
+                if (code == -6001 or code == -6002) then
+                    mes(inst, "卡密不正确 请重新输入")
                 elseif (code == -6003 or code == -6004) then
                     mes(inst, "玩家ID不正确")
                 elseif (code == -6005) then
                     mes(inst, "你输入的绑定码")
                 elseif (code == -6006) then
-                    mes(inst,"卡密不正确")
+                    mes(inst, "卡密不正确")
                 elseif (code == -6007) then
                     mes(inst, "你已经激活过这个CDK了")
                 elseif (code == -6008) then
@@ -435,98 +424,101 @@ local skinhandle = {
                 elseif (code == -3) then
                     mes(inst, "服务器内部出错,请稍后再试")
                 elseif (code < 0) then
-                    mes(inst,"卡密使用失败,请联系作者 code:" .. code)
+                    mes(inst, "卡密使用失败,请联系作者 code:" .. code)
                 elseif (code == 6231) then
                     if data.type and data.type:find("baseworld") then
-                        if inst.components.soraglobalsave:Get(data.name) then 
+                        if inst.components.soraglobalsave:Get(data.name) then
                             mes(inst, "你这个档已经领取过这个礼包了!")
-                            return 
+                            return
                         end
                         local giftid = inst.userid .. "|" .. data.name
-                        if GLOBALDB:Get("giftsave",giftid) then 
+                        if GLOBALDB:Get("giftsave", giftid) then
                             mes(inst, "你这个档已经领取过这个礼包了!!!")
-                            return 
+                            return
                         end
-                        inst.components.soraglobalsave:Set(data.name,1)
-                        GLOBALDB:Set("giftsave",giftid,1)
+                        inst.components.soraglobalsave:Set(data.name, 1)
+                        GLOBALDB:Set("giftsave", giftid, 1)
                     end
                     if data.prefab then
-                        local r,gifts = pcall(json.decode,data.prefab)
+                        local r, gifts = pcall(json.decode, data.prefab)
                         local super = gifts.super
                         gifts.super = nil
                         if r then
                             local items = {}
-                            for i,g in pairs(gifts) do 
+                            for i, g in pairs(gifts) do
                                 local item = type(g) == "table" and g or SpawnPrefab(i)
                                 if item ~= nil then
-                                   
-                                    local maxsize = (item.components.stackable~= nil) and item.components.stackable.maxsize or 1 
+
+                                    local maxsize = (item.components.stackable ~= nil) and
+                                                        item.components.stackable.maxsize or 1
                                     if g > 1 then
                                         if item.components.stackable ~= nil then
                                             if g <= maxsize then
-                                                item.components.stackable.stacksize = math.max(1,g or 1)
+                                                item.components.stackable.stacksize = math.max(1, g or 1)
                                             else
-                                                while(g > maxsize)  do
+                                                while (g > maxsize) do
                                                     g = g - maxsize
                                                     local item2 = SpawnPrefab(i)
                                                     item2.components.stackable.stacksize = maxsize
-                                                    table.insert(items,item2)
+                                                    table.insert(items, item2)
                                                 end
-                                                item.components.stackable.stacksize = math.max(1,g or 1)
+                                                item.components.stackable.stacksize = math.max(1, g or 1)
                                             end
-                                        else 
-                                            while(g > 1) do 
+                                        else
+                                            while (g > 1) do
                                                 g = g - 1
-                                                table.insert(items,SpawnPrefab(i))
+                                                table.insert(items, SpawnPrefab(i))
                                             end
                                         end
-                                        
+
                                     end
-                                    table.insert(items,item)
+                                    table.insert(items, item)
                                 end
                             end
                             local i = 1
-                            for k,v in pairs(items) do
-                                i = i +1
+                            for k, v in pairs(items) do
+                                i = i + 1
                                 if v.prefab == "sora_wq" then
 
-                                    v.components.sorawq.str = inst.userid .."|"..cdk .. "|"..i
+                                    v.components.sorawq.str = inst.userid .. "|" .. cdk .. "|" .. i
                                 end
                                 if v.components.soraitem and v.components.soraitem.bind then
                                     v.components.soraitem.user = inst.userid
                                 end
                             end
-                    
+
                             if #items > 0 then
                                 local packer = SpawnPrefab("sora3packer")
                                 packer.components.unwrappable:WrapItems(items)
                                 if super and packer.super then
                                     packer:super({})
                                 end
-                                packer.components.named:SetName("礼包:"..(data.name or "未知"))
-                                packer.components.inspectable:SetDescription("礼包:"..(data.name or "未知").."\r\n内含:"..(data.item or "未知"))
-                                for i,v in ipairs(items) do 
+                                packer.components.named:SetName("礼包:" .. (data.name or "未知"))
+                                packer.components.inspectable:SetDescription(
+                                    "礼包:" .. (data.name or "未知") .. "\r\n内含:" .. (data.item or "未知"))
+                                for i, v in ipairs(items) do
                                     v:Remove()
                                 end
                                 inst.components.inventory:GiveItem(packer, nil, inst:GetPosition())
                             end
                         else
-                            mes(inst, "礼物解析失败:" .. tostring(gifts) .."\r\n"..tostring(data.prefab))
-                            return 
+                            mes(inst, "礼物解析失败:" .. tostring(gifts) .. "\r\n" .. tostring(data.prefab))
+                            return
                         end
                     end
-                    mes(inst,"礼包["..(data.name or "未知").."]领取成功,包含:\n\n"..(data.item or "未知").."\n\n已发送到你的背包" )
-                    --SoraPushPopupDialog('小穹的温馨提示',
-                        --"已尝试领取礼包[" .. data.name .. "],请稍后查看结果")
+                    mes(inst,
+                        "礼包[" .. (data.name or "未知") .. "]领取成功,包含:\n\n" .. (data.item or "未知") ..
+                            "\n\n已发送到你的背包")
+                    -- SoraPushPopupDialog('小穹的温馨提示',
+                    -- "已尝试领取礼包[" .. data.name .. "],请稍后查看结果")
                 else
                     mes(inst, "CDK激活失败,错误代码:" .. code)
                 end
             end)
         else
-            mes(inst,"请稍后再试!")
+            mes(inst, "请稍后再试!")
             return
         end
-
 
     end,
     Message = function(inst, mes)
@@ -559,13 +551,13 @@ function SkinRPC(cmd, ...)
         end
     end
 end
-function SkinReply(cmd,player, ...)
+function SkinReply(cmd, player, ...)
     if type(cmd) == "string" and skinhandle[cmd] then
-      SendModRPCToClient(MOD_RPC.sora.skin, type(player) == "table" and player.userid or player,cmd, ...)
+        SendModRPCToClient(MOD_RPC.sora.skin, type(player) == "table" and player.userid or player, cmd, ...)
     end
 end
 function mes(player, mes)
-    SkinReply("Message",player,mes)
+    SkinReply("Message", player, mes)
 end
 -- ban掉乱换皮肤的
 -- 除此之外检测到换皮肤的封号
@@ -743,7 +735,7 @@ if not TheNet:IsDedicated() then
         self.cb = cb
         self.black = self:AddChild(TEMPLATES.BackgroundTint())
         self.proot = self:AddChild(TEMPLATES.ScreenRoot("ROOT"))
-        self.cd = SoraCD(5,true)
+        self.cd = SoraCD(5, true)
         self.buttons = {{
             text = '激活',
             cb = function()
@@ -1005,8 +997,8 @@ if not TheNet:IsDedicated() then
                         }}))
                     elseif (code == 6231) then
                         SkinRPC('UseCDK', cdk, true)
-                        --SoraPushPopupDialog('小穹的温馨提示',
-                            --"已尝试领取礼包[" .. data.name .. "],请稍后查看结果")
+                        -- SoraPushPopupDialog('小穹的温馨提示',
+                        -- "已尝试领取礼包[" .. data.name .. "],请稍后查看结果")
                     else
                         SoraPushPopupDialog('小穹的温馨提示', "CDK激活失败,错误代码:" .. code)
                     end

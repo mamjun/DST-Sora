@@ -111,6 +111,9 @@ temp.clientfn = function(ns, db, userid)
     
     db:ListenForEvent("OpenLockUI", function(id, data, event, ent)
         if data.cmd == "close" then
+            if data.pass and ThePlayer.SoraLockUI and ThePlayer.SoraLockUI.SavePass then
+                ThePlayer.SoraLockUI:SavePass(data.pass)
+            end
             if ThePlayer.SoraLockUI then ThePlayer.SoraLockUI:Kill() end --ThePlayer.SoraLockUI = nil 
         else
             local a = ui(ThePlayer,ent,data and data.name or "未知")

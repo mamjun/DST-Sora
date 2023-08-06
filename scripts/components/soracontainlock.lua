@@ -49,6 +49,17 @@ local tohook = {
     },
     burnable = {}
 }
+
+local function passtest(str)
+    str = tostring(str)
+    if str:len() == 6 and str:match("^%d+$")  then
+        return true
+    else
+        return false
+    end   
+end 
+
+
 local function nilfn()
     -- body
     return true
@@ -133,10 +144,11 @@ function com:Close()
     end
 end
 
-function com:Open(doer)
+function com:Open(doer,pass)
     SoraAPI.r_event(doer, "OpenLockUI", {
         name = self.lockername,
-        cmd = "close"
+        cmd = "close",
+        pass = pass
     }, self.inst)
     self.hooks.container.Open(self.inst.components.container, doer)
     return true
@@ -148,7 +160,7 @@ function com:TryPass(doer, pass)
             -- self:Close()
             return Say(doer, "密码错误")
         end
-        self:Open(doer)
+        self:Open(doer,pass)
         return true
     end
     return true
@@ -172,6 +184,9 @@ function com:ChangePass(doer, pass)
         if self.lockeruserid ~= doer.userid then
             self:Close()
             return Say(doer, "这不是你的箱子")
+        end
+        if not passtest(pass) then
+            return Say(doer, "密码格式不正确")
         end
         self.pass = pass
         self:Close()
