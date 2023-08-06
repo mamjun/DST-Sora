@@ -98,6 +98,7 @@ end
 
 function com:LoadVersion()
     self.savepatch = u.LoadConfig("savepatch") or {}
+    if type(self.savepatch) ~= "table" then self.savepatch = {} end
     for k,v in pairs(self.savepatch) do
         if not self.ddata.patch[k] or self.ddata.patch[k] < v then
             self.ddata.patch[k] = v

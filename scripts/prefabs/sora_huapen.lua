@@ -137,6 +137,7 @@ local function fn()
     anim:SetBuild("sora_huapen")
     inst:AddTag("structure")
     inst:AddTag("flower")
+    inst:AddTag("nosteal")
     anim:PlayAnimation("idle", true)
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)

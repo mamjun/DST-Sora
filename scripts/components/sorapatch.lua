@@ -71,6 +71,16 @@ function c:OnSave()
 	return  data
 end
 
+function c:GetDebugString() 
+    local data = {}
+    if next(self.patch) then
+        for k,v in pairs(self.patch) do
+            table.insert(data,"k :"..(k or "unknow").." data={"..(v and json.encode(v) or " ").."|")
+        end
+    end
+	return  table.concat(data,"\n")
+end
+
 function c:OnLoad(data)       
     if data and data.patch then
         for k,v in pairs(data.patch) do

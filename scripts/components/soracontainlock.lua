@@ -27,48 +27,178 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
---[[专属交互
+]] --[[专属交互
 ]] --
-
+local Say = SoraAPI.Say
+local GetPlayerOnline = SoraAPI.GetPlayerOnline
 local com = Class(function(self, inst)
-
+    self.inst = inst
+    self.lockername = ""
+    self.lockeruserid = ""
+    self.pass = ""
+    self.hooks = {}
 end)
-
-function com:Init(inst)
-
+local tohook = {
+    container = {
+        Open = 1,
+        DropEverything = 1
+    },
+    workable = {
+        WorkedBy = 1,
+        WorkedBy_Internal = 1
+    },
+    burnable = {}
+}
+local function nilfn()
+    -- body
+    return true
 end
+function com:Init(doer, pass, name, id)
+    if not self.inst.components.container then
+        return
+    end
+    if self.pass ~= "" then
+        return
+    end
+    if TUNING.SORALOCK1 then
+        return
+    end
+    local cmp = self.inst.components
+    local container = self.inst.components.container
+    for k, v in pairs(tohook) do
 
-function com:FindSpawnPoint()
-    for i=1,10000 do
-        local x = math.random(-600,600)
-        local y = math.random(-600,600)
-        local yes = true 
-        local ents = TheSim:FindEntities(x,0,y,2,nil,{"FX","NOCLICK","NOBLOCK"})
-        yes = yes and #ents < 1
-        for ix = -2,2,1 do
-            for iy = -2,2,1 do
-                yes = yes and TheWorld.Map:CanPlantAtPoint(x+ix*4,0,y+iy*4)
-                yes = yes and TheWorld.Map:IsPassableAtPoint(x+ix*4,0,y+iy*4,false,true)
+        if cmp[k] then
+            if not self.hooks[k] then
+                self.hooks[k] = {}
+            end
+            for ik, iv in pairs(v) do
+                self.hooks[k][ik] = cmp[k][ik]
+                cmp[k][ik] = nilfn
             end
         end
-        
-        if yes then
-              local ix = math.random()
-              local iy = math.random()
-              x = x + ix
-              y = y + iy
-                print(i,x,y,ix,math.random())
-            return Vector3(x,0,y)
-        end
+
     end
-    return Vector3(math.random()*20,0,math.random()*20)
+    container.Open = function(s, doer, ...)
+        SoraAPI.r_event(doer, "OpenLockUI", {
+            name = self.lockername
+        }, s.inst)
+    end
+    self.inst:AddTag("nosteal")
+    self.inst:AddTag("soracontainlocked")
+    self.lockername = doer and doer.name or name
+    self.lockeruserid = doer and doer.userid or id
+    self.pass = pass
 end
 
+function com:Uninit(doer)
+    if not self.inst.components.container then
+        return
+    end
+    if self.pass == "" then
+        return
+    end
+    local container = self.inst.components.container
+    local cmp = self.inst.components
 
-function com:OnSave() return end
+    if doer and doer:HasTag("player") then
+        if not (self.lockeruserid == doer.userid or TUNING.SORALOCK2 and doer.Network:IsServerAdmin() or TUNING.SORALOCK3 > 0 and
+        GetPlayerOnline(self.lockeruserid) < (TheWorld.state.cycles- TUNING.SORALOCK3))  then
+            self:Close()
+            return Say(doer, "这不是你的箱子")
+        end
+        for k, v in pairs(tohook) do
+            if cmp[k] and self.hooks[k] then
+                for ik, iv in pairs(v) do
+                    cmp[k][ik] = self.hooks[k][ik]
+                end
+            end
+        end
+        self.pass = ""
+        self.lockername = ""
+        self.lockeruserid = ""
+        self.inst:RemoveTag("soracontainlocked")
+        SoraAPI.r_event(doer, "OpenLockUI", {
+            name = self.lockername,
+            cmd = "close"
+        }, self.inst)
+        return Say(doer, "成功解锁")
+    end
 
-function com:OnLoad(data) 
+    return true
+end
+
+function com:Close()
+    if self.inst and self.inst and self.inst.components and self.inst.components.container then
+        self.inst.components.container:Close()
+    end
+end
+
+function com:Open(doer)
+    SoraAPI.r_event(doer, "OpenLockUI", {
+        name = self.lockername,
+        cmd = "close"
+    }, self.inst)
+    self.hooks.container.Open(self.inst.components.container, doer)
+    return true
+end
+
+function com:TryPass(doer, pass)
+    if doer and doer:HasTag("player") then
+        if pass ~= self.pass then
+            -- self:Close()
+            return Say(doer, "密码错误")
+        end
+        self:Open(doer)
+        return true
+    end
+    return true
+end
+
+function com:OpenByUser(doer)
+    if doer and doer:HasTag("player") then
+        if not (self.lockeruserid == doer.userid or TUNING.SORALOCK2 and doer.Network:IsServerAdmin() or TUNING.SORALOCK3 > 0 and
+            GetPlayerOnline(self.lockeruserid)  < (TheWorld.state.cycles- TUNING.SORALOCK3))  then
+            self:Close()
+            return Say(doer, "这不是你的箱子")
+        end
+        self:Open(doer)
+        return true
+    end
+    return true
+end
+
+function com:ChangePass(doer, pass)
+    if doer and doer:HasTag("player") then
+        if self.lockeruserid ~= doer.userid then
+            self:Close()
+            return Say(doer, "这不是你的箱子")
+        end
+        self.pass = pass
+        self:Close()
+        return Say(doer, "密码修改成功")
+    end
+    return true
+end
+function com:OnSave()
+    return {
+        lockername = self.lockername,
+        lockeruserid = self.lockeruserid,
+        pass = self.pass,
+        add_component_if_missing = (self.pass ~= "") and 1 or nil
+    }
+end
+
+function com:OnLoad(data)
+    if not data then
+        return
+    end
+    if data.pass ~= "" then
+        self:Init(nil, data.pass, data.lockername, data.lockeruserid)
+    end
+end
+
+function com:GetDebugString()
+    return "name: " .. self.lockername .. " id: " .. self.lockeruserid .. " pass:" .. self.pass
 end
 
 return com

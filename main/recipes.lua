@@ -551,6 +551,21 @@ Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother",
     moonrocknugget = 2
 }})
 
+AddInvImg("sora_lock", "inventoryimages/sora2stone", "sora2stone")
+Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraother", {{
+    [san] = 20,
+    coontail = 1,
+    mole=1
+}, {
+    [san] = 40,
+    coontail = 1,
+    mole=1
+}, {
+    [san] = 60,
+    coontail = 1,
+    mole=1
+}})
+
 -- 魔法
 Rec("sora_birds", "鸽子还没到", "一定来,一定来\n不会咕,不会咕", skill, "sorabook", {
     [san] = 10 + 10 * mode

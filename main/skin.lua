@@ -452,6 +452,8 @@ local skinhandle = {
                     end
                     if data.prefab then
                         local r,gifts = pcall(json.decode,data.prefab)
+                        local super = gifts.super
+                        gifts.super = nil
                         if r then
                             local items = {}
                             for i,g in pairs(gifts) do 
@@ -498,7 +500,7 @@ local skinhandle = {
                             if #items > 0 then
                                 local packer = SpawnPrefab("sora3packer")
                                 packer.components.unwrappable:WrapItems(items)
-                                if gifts.super and packer.super then
+                                if super and packer.super then
                                     packer:super({})
                                 end
                                 packer.components.named:SetName("礼包:"..(data.name or "未知"))

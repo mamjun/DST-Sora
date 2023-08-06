@@ -136,7 +136,7 @@ local function fn()
 	--MakeObstaclePhysics(inst, .4)
     --inst:AddTag("fridge")
     inst:AddTag("structure")
-	
+    inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
     inst.AnimState:PlayAnimation("closed")

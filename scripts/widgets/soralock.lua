@@ -66,7 +66,7 @@ function passlock:OnControl(control, down)
     end
 end
 
-local ui = Class(Widget, function(self, owner,container)
+local ui = Class(Widget, function(self, owner,container, name)
     Widget._ctor(self, "sora_lock_ui")
     self.owner = owner
     -- self.is_screen = true
@@ -81,7 +81,7 @@ local ui = Class(Widget, function(self, owner,container)
     SoraMakeWidgetMovable(self, "sora_lock_ui", Vector3(0, 0))
     self.text = self:AddChild(Text(CHATFONT, 60, "密码锁", UICOLOURS.BLACK))
     self.text:SetPosition(-60, 160, 0)
-    self.text2 = self:AddChild(Text(CHATFONT, 45, "该容器已经被[桃子姐姐]上锁\n请输入密码解锁",
+    self.text2 = self:AddChild(Text(CHATFONT, 45, "该容器已经被[".. (name or "桃子姐姐" ).."]上锁\n请输入密码解锁",
         UICOLOURS.BLACK))
     self.text2:SetPosition(-70, 80, 0)
 
@@ -96,7 +96,7 @@ local ui = Class(Widget, function(self, owner,container)
         local pass = self:GetPass()
         self:SavePass(pass)
         self:LoadPass()
-        RPC:PushEvent("SoraLock",{cmd="UnLockByPass",pass=pass},nil,self.container)
+        RPC:PushEvent("SoraLock",{cmd="ChangePass",pass=pass},nil,self.container)
     end)
     self.btn5 = self.text3:AddChild(ImageButton())
     self.btn5:SetText("解除密码")
@@ -137,7 +137,6 @@ local ui = Class(Widget, function(self, owner,container)
     self.btn1:ForceImageSize(125, 50)
     self.btn1:SetOnClick(function ()
         local pass = self:GetPass()
-        self:SavePass(pass)
         self:LoadPass()
         RPC:PushEvent("SoraLock",{cmd="UnLockByPass",pass=pass},nil,self.container)
     end)
@@ -240,7 +239,7 @@ function ui:GetPass()
     for i=1,6 do
         str =str .. tostring(self.locks[i].num)
     end
-    print("pass",str)
+    --print("pass",str)
     return str
 end
 function ui:LoadPass()
@@ -254,7 +253,7 @@ function ui:LoadPass()
             local r, t = pcall(json.decode, old_str)
             if r and type(t) == "table" then
                 for i = 1, maxpass do
-                    if t[i] and passtest(t[i]) then
+                    if t[i] and passtest(t[i]) and t[i] ~= "000000" then
                         table.insert(self.pass, tostring(t[i]))
                     end
                 end
@@ -265,6 +264,12 @@ function ui:LoadPass()
                     local y = k - maxpass * 0.5 * x
                     pass:SetPosition(x * 140 + 210, y * -35 + 60)
                     pass:ForceImageSize(140, 40)
+                    pass:SetOnClick(function ()
+                        for i=1,6 do
+                            self.locks[i].text:SetString(v:sub(i,i))
+                            self.locks[i].num = tonumber(self.locks[i].text)
+                        end
+                    end)
                     table.insert(self.passes, pass)
                 end
             end
@@ -272,10 +277,20 @@ function ui:LoadPass()
     end)
 
 end
-
+function ui:OnUpdate()
+    --print(self.owner:GetDistanceSqToInst(self.container))
+    if self.owner  and self.container  and self.container:IsValid() and self.owner:IsValid() then
+        if self.owner:GetDistanceSqToInst(self.container) > 16 then
+            self:Kill()
+        end
+    end
+end
 function ui:SavePass(str)
     str = tostring(str)
     if not passtest(str) then
+        return false
+    end
+    if str == "000000" then
         return false
     end
     for k, v in pairs(self.pass) do

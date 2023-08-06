@@ -797,3 +797,13 @@ end)
 -- AddPlayerPostInit(function(inst)
 -- userdata.Hook(inst,hook1)
 -- end)
+
+AddComponentPostInit("thief",function (i)
+    local StealItem = i.StealItem
+    i.StealItem = function(s,vim,...)
+        if vim and (vim.components.soracontainlock or vim:HasTag("nosteal")) then
+            return false
+        end
+        return StealItem(s,vim,...)
+    end
+end)

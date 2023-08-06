@@ -37,20 +37,30 @@ local function fn()
     local anim = inst.entity:AddAnimState()
     MakeInventoryPhysics(inst)
     inst.entity:AddNetwork()
-    anim:SetBank("sora2plant")
-    anim:SetBuild("sora2plant")
-    anim:PlayAnimation("anim")
+    anim:SetBank("sora2stone")
+    anim:SetBuild("sora2stone")
+    anim:PlayAnimation("idle")
+    inst:AddTag("soracontainlock")
 
     if not TheWorld.ismastersim then
         return inst
     end
     inst:AddComponent("inspectable")
-    inst.components.inspectable:SetDescription([[桃子姐姐又在找借口\n咕咕我们了]])
+    inst.components.inspectable:SetDescription([[桃子姐姐又在找借口
+    咕咕我们了]])
     inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2plant.xml"
-    inst.components.inventoryitem.imagename = "sora2plant"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2stone.xml"
+    inst.components.inventoryitem.imagename = "sora2stone"
+
+    inst:AddComponent("soracontainlock")
+    
+    inst:AddComponent("stackable")
+    
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(0)
+    inst.fx = SpawnPrefab("sora_tmp_fx")
+    inst.fx:Bind(inst)
     return inst
 end
 

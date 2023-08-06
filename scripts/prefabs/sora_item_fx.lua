@@ -47,10 +47,43 @@ local function fn(Sim)
     inst.AnimState:PushAnimation("loop")
 	inst.AnimState:SetLayer(LAYER_WORLD_BACKGROUND)
 	inst:AddTag("FX")
-    inst:AddTag("NOCLOCK")
+    inst:AddTag("NOCLICK")
+	inst:AddTag("NOBLOCK")
     inst.Bind = Bind
 	inst.entity:SetPristine()
 	inst.persists = false
 	return inst
 end
-return Prefab( "sora_item_fx", fn, Assets )
+
+
+local tmpAssets =
+{
+	Asset("ANIM", "anim/soratmp.zip"),
+}
+local function tmpBind(inst,target,scale,offset)
+	local scale = scale or 1
+	local pos = offset or Point(0,0.5,0)
+    inst.entity:SetParent(target.entity)
+	inst.AnimState:SetScale(scale,scale,scale)
+	inst.Transform:SetPosition(pos.x,pos.y,pos.z)
+end
+local function tmpfn(Sim)
+	local inst = CreateEntity()
+	inst.entity:AddTransform()
+	inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+	inst.AnimState:SetBank("soratmp")
+	inst.AnimState:SetBuild("soratmp")
+	inst.AnimState:PlayAnimation("idle")
+	inst:AddTag("FX")
+    inst:AddTag("NOCLICK")
+	inst:AddTag("NOBLOCK")
+    inst.Bind = tmpBind
+	inst.entity:SetPristine()
+	inst.persists = false
+	return inst
+end
+
+
+
+return Prefab( "sora_item_fx", fn, Assets ),Prefab( "sora_tmp_fx", tmpfn, tmpAssets )

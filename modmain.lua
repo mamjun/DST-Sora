@@ -39,4 +39,4 @@ PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "s
                "sorahealing", "soratele", "sorabowknot", "sorabooks", "sorahealingstar", "soraprojectile", "sorameteor",
                "sora2buffer", "sora2prop", "sora2amulet", "sora2base", "sora2chest", "sora2tree", "sorafoods",
                "sorahair", "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
-               "sora_nizao"}
+               "sora_nizao","sora_lock"}

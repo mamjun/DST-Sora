@@ -46,6 +46,10 @@ GLOBAL.TUNING.SORAADD2 = GetModConfigData("add2")
 GLOBAL.TUNING.SORACHESTRANGE = GetModConfigData("chest") or 60
 GLOBAL.TUNING.SORAMODNAME = modname
 GLOBAL.TUNING.SORAVERSION = modinfo.version
+
+GLOBAL.TUNING.SORALOCK1 = GetModConfigData("lock1")
+GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
+GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
 -- 加载模块
 function mi(str)
     modimport("main/" .. str)
@@ -95,8 +99,6 @@ mi("ban")
 mi("kleibugfix")
 -- 自动更新
 modimport("scripts/soraupdate/main")
--- 注册全局API
-GLOBAL.SoraAPI = env
-GLOBAL.SORAAPI = env
+
 -- 添加角色
 AddModCharacter("sora", "FEMALE")

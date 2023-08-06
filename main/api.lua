@@ -30,6 +30,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] -- Upvaluehelper
 up = require("utils/soraupvaluehelper")
 GLOBAL.SoraUp = up
+-- 注册全局API
+GLOBAL.SoraAPI = env
+GLOBAL.SORAAPI = env
+
 userdata = require("utils/sorauserdatahook")
 GLOBAL.SoraUserData = userdata
 
@@ -683,4 +687,11 @@ function  CheckChestValid(inst)
             end
         end
     end
+end
+
+function Say(doer,str)
+    if doer and doer.components.talker then
+        doer.components.talker:Say(str)
+    end
+    return true
 end

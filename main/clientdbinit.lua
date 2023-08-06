@@ -20,14 +20,13 @@ temp.serverfn = function(ns, db, userid)
         end
     end)
     db.inst = TheWorld
-    db:BindMainDB("data",MailDB,"Players")
+    db:BindMainDB("data", MailDB, "Players")
 end
 
 temp.clientfn = function(ns, db, userid)
     CKDB = db -- 用于客户端取数据
     SoraClientDB.SoraClientCKDB = CKDB
 end
-
 
 local temp = CreateClientDBTemple("seed", 300, 1)
 temp:InitRoot("seeds")
@@ -39,7 +38,7 @@ temp.serverfn = function(ns, db, userid)
         if player and data and data.name then
             local staff = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
             if staff and staff.components.soraseedcontainer then
-                staff.components.soraseedcontainer:HandleGetSeeds(player,data.name)
+                staff.components.soraseedcontainer:HandleGetSeeds(player, data.name)
             end
         end
     end)
@@ -53,7 +52,7 @@ temp.serverfn = function(ns, db, userid)
         end
     end)
     db.inst = TheWorld
-    db:BindMainDB("seeds",SeedDB,"seeds")
+    db:BindMainDB("seeds", SeedDB, "seeds")
 end
 
 temp.clientfn = function(ns, db, userid)
@@ -62,28 +61,75 @@ temp.clientfn = function(ns, db, userid)
     SoraClientDB.SeedCDB = SeedCDB
 end
 
-
 local temp = CreateClientDBTemple("RPC", 300, 1)
 temp.serverfn = function(ns, db, userid)
 
-    db:ListenForEvent("SelectBook", function(id, data, event,ent)
+    db:ListenForEvent("SelectBook", function(id, data, event, ent)
         local player = UserToPlayer(id)
         if player and data and data.id and type(ent) == "table" and ent:IsValid() and ent.components.spellbook then
             ent.components.spellbook:SelectSpell(data.id)
         end
     end)
- 
+    db:ListenForEvent("SoraLock", function(id, data, event, ent)
+        print(id, data, event, ent)
+        if not (data and type(data) == "table" and ent) then
+            return
+        end
+        local cmd = data.cmd
+        local doer = UserToPlayer(id)
+        print(doer.userid,cmd,data.pass or "0")
+        if not (doer and ent and ent.components.soracontainlock) then
+            return
+        end
+        
+        if cmd == "UnLockByUser" then
+            ent.components.soracontainlock:OpenByUser(doer)
+        elseif cmd == "UnLockByClick" then
+            if not doer.SoraLockCD then
+                doer.SoraLockCD = SoraCD(30)
+            end
+            if doer.SoraLockCD() then
+                TheNet:Announce("各单位请注意: 「" .. doer.name .. "  」正在尝试开启「" ..
+                                    (ent.components.soracontainlock.lockername or "未知") ..
+                                    "」的保险，请及时处理！")
+            end
+        elseif cmd == "UndoPass" then
+            ent.components.soracontainlock:Uninit(doer)
+        elseif cmd == "ChangePass" then
+            ent.components.soracontainlock:ChangePass(doer, data.pass or "000000")
+        elseif cmd == "UnLockByPass" then
+            ent.components.soracontainlock:TryPass(doer, data.pass or "000000")
+        end
+    end)
     db.inst = TheWorld
 
 end
 
 temp.clientfn = function(ns, db, userid)
     SoraRPC = db -- 用于客户端取数据
+    local ui = require("widgets/soralock")
+    
+    db:ListenForEvent("OpenLockUI", function(id, data, event, ent)
+        if data.cmd == "close" then
+            if ThePlayer.SoraLockUI then ThePlayer.SoraLockUI:Kill() end --ThePlayer.SoraLockUI = nil 
+        else
+            local a = ui(ThePlayer,ent,data and data.name or "未知")
+            ThePlayer.HUD.controls.containerroot:AddChild(a)
+            ThePlayer.SoraLockUI = a 
+        end
+    end)
     db.inst = TheWorld
     SoraClientDB.SoraRPC = SoraRPC
 end
 
-
+function r_event(user, event, data, ent)
+    local db = user and GetClientDB("RPC", type(user) == "string" and user or user.userid, true) or SoraClientDB.SoraRPC
+    if not db then
+        -- print("ERROR R_EVENT",user,event,data,ent)
+        return
+    end
+    db:PushEvent(event, data, nil, ent)
+end
 --[[
 
 CDB = SoraAPI.CDB SDB = SoraAPI.SDB MDB = SoraAPI.MailDB

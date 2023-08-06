@@ -41,3 +41,23 @@ end
 
 AddLaterFn(TryToFixAllRecipes)
 AddSimPostInit(TryToFixAllRecipes)
+
+-- AddComponentPostInit("container",function (s)
+--     local Close = s.Close
+--     s.Close = function(ss,...)
+--         CheckChestValid(ss.inst)
+--         return Close(ss,...)
+--     end
+-- end)
+local function onowner(self,owner)
+    -- body
+    if not self.inst.replica.inventoryitem then
+        return 
+    end
+    self.inst.replica.inventoryitem:SetOwner(owner)
+end
+
+
+AddComponentPostInit("inventoryitem",function (self,inst)
+    addsetter(self,"owner",onowner)
+end)

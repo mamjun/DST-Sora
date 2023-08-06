@@ -262,7 +262,6 @@ local function GemTask(inst)
         for i = 1, container:GetNumSlots() do
             local item = container:GetItemInSlot(i)
             if item then
-                
                 if item.components.fueled then
                     item.components.fueled:DoDelta(50)
                 end
@@ -448,6 +447,7 @@ local function fn()
     -- inst:AddTag("fridge")
     inst:AddTag("structure")
     inst:AddTag("plantkin")
+    inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
     inst.AnimState:PlayAnimation("closed")
