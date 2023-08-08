@@ -517,6 +517,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         end
     end
     m.UpdatePosition = function(self, x, y)
+        if not s.parent then return end
         local sx, sy = s.parent.GetScale(s.parent):Get()
         local ox, oy = s.parent.GetWorldPosition(s.parent):Get()
         local nx = (x - ox) / sx

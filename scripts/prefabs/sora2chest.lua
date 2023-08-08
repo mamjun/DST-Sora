@@ -54,6 +54,13 @@ local allchest = {}
 local CheckChest
 local UpdateChest 
 local map = {}
+map['antliontrinket'] = 'trinket'
+map['boards'] = 'log'
+map['rope'] = 'cutgrass'
+map['cutstone'] = 'rocks'
+map['papyrus'] = 'cutreeds'
+
+
 local function FindPrefab() -- tools_1 tools_2 这样的自动合并
     for k, v in pairs(Prefabs) do
         if k then
@@ -149,6 +156,13 @@ if TUNING.SORACHESTRANGE > 2000 then
                     if not v:HasTag("bird") then
                         return 
                     end
+                else
+                    if v.components.knownlocations then     --有家就忘了 
+                        v.components.knownlocations:ForgetLocation("home")
+                    end
+                    if v.components.inventoryitem then
+                        v.components.inventoryitem:OnPickup(inst)
+                    end
                 end
             end
         end
@@ -165,6 +179,13 @@ else
                 if not (container:GiveItem(v, nil, nil, true)) then 
                     if not v:HasTag("bird") then
                         return 
+                    end
+                else
+                    if v.components.knownlocations then     --有家就忘了 
+                        v.components.knownlocations:ForgetLocation("home")
+                    end
+                    if v.components.inventoryitem then
+                        v.components.inventoryitem:OnPickup(inst)
                     end
                 end
             end

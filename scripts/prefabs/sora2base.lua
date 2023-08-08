@@ -217,8 +217,10 @@ local stafftask  = {
 		end
 		local enta = TheSim:FindEntities(pos.x, pos.y, pos.z,15,{"heatrock"})
 		for i, v in ipairs(enta) do
-			local temp = v.components.temperature.current 			
-			v.components.temperature:DoDelta(calcdest(inst,v) * (65-temp)/3)
+			if v.components.temperature then
+				local temp = v.components.temperature.current 			
+				v.components.temperature:DoDelta(calcdest(inst,v) * (65-temp)/3)
+			end
 		end
 	end,
 	opalstaff = function(inst)
@@ -230,8 +232,10 @@ local stafftask  = {
 		end
 		local enta = TheSim:FindEntities(pos.x, pos.y, pos.z,15,{"heatrock"})
 		for i, v in ipairs(enta) do
-			local temp = v.components.temperature.current 			
-			v.components.temperature:DoDelta(calcdest(inst,v) * (5-temp)/3 )
+			if v.components.temperature then
+				local temp = v.components.temperature.current 			
+				v.components.temperature:DoDelta(calcdest(inst,v) * (5-temp)/3 )
+			end
 		end
 	end,
 }

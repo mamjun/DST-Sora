@@ -273,6 +273,22 @@ local function PickFn(inst, doer, pos)
             v.components.workable:WorkedBy(doer, 10)
         end
     end
+
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"molebait", "MINE_workable"})
+    for k, v in pairs(ents) do
+        if v.prefab == "rock_avocado_fruit" and isNear(v, pos) and v.components.workable and v.components.stackable then
+            local mm = v.components.stackable.stacksize
+            local rocks = SpawnPrefab("rocks")
+            if rocks and rocks.components.stackable then
+                rocks.components.stackable.stacksize = math.min(rocks.components.stackable.maxsize, mm)
+                v:Remove()
+                doer.components.inventory:GiveItem(rocks, nil, doer:GetPosition())
+            else
+                rocks:Remove()
+            end
+        end
+    end
+
     -- 大作物 
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled"},
         {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
@@ -1047,14 +1063,15 @@ local function fxfn(Sim)
             end
             return "大小姐驾到，统统闪开！"
         end
-        if name == "安安" or name == "安深余"  then
+        if name == "安安" or name == "安深余" then
             return "介娘们不像啥好人呐"
         end
-        if name == "家妻二乃" or name == "家妻にの一生譲りません"  or name == "愛衣ちゃんの大勝利で"  then
+        if name == "家妻二乃" or name == "家妻にの一生譲りません" or name ==
+            "愛衣ちゃんの大勝利で" then
             return "噫~~~有hentai"
         end
 
-        if name == "笨蛋啾啾\n笨蛋柳漾" or name == "笨蛋啾啾"  or name == "笨蛋柳漾"  then
+        if name == "笨蛋啾啾\n笨蛋柳漾" or name == "笨蛋啾啾" or name == "笨蛋柳漾" then
             return "给这娘们介绍个对象吧"
         end
         return name .. "\n别偷懒!\n赶紧干活"

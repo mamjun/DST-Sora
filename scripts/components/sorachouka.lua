@@ -1,5 +1,5 @@
 --[[
-授权级别:开放级
+授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
 Steam平台：MySora 模组ID：workshop-1638724235
 WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
@@ -27,39 +27,74 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
--- 用于修复klei明知但是不愿意修的一些bug
-local newmeta = {__index = function() return 0 end}
-local function TryToFixAllRecipes()
-    for k,v in pairs(AllRecipes) do
-        local old = getmetatable(v.level)
-        if not old then
-            setmetatable(v.level,newmeta)
-        end
-    end
-end
-
-AddLaterFn(TryToFixAllRecipes)
-AddSimPostInit(TryToFixAllRecipes)
-
--- AddComponentPostInit("container",function (s)
---     local Close = s.Close
---     s.Close = function(ss,...)
---         CheckChestValid(ss.inst)
---         return Close(ss,...)
---     end
--- end)
-local function onowner(self,owner)
-    -- body
-    if not self.inst.replica.inventoryitem then
-        return 
-    end
-    self.inst.replica.inventoryitem:SetOwner(owner)
-end
-
-
-AddComponentPostInit("inventoryitem",function (self,inst)
-    addsetter(self,"owner",onowner)
+]] --[[专属交互
+]] --
+local com = Class(function(self, inst)
+    self.inst = inst
+    self.lockername = ""
+    self.lockeruserid = ""
+    self.pass = ""
+    self.hooks = {}
 end)
 
+function com:Init(doer, pass, name, id)
+    if not self.inst.components.container then
+        return
+    end
+    if self.pass ~= "" then
+        return
+    end
+    if TUNING.SORALOCK1 then
+        return
+    end
+    local cmp = self.inst.components
+    local container = self.inst.components.container
+    for k, v in pairs(tohook) do
 
+        if cmp[k] then
+            if not self.hooks[k] then
+                self.hooks[k] = {}
+            end
+            for ik, iv in pairs(v) do
+                self.hooks[k][ik] = cmp[k][ik]
+                cmp[k][ik] = nilfn
+            end
+        end
+
+    end
+    container.Open = function(s, doer, ...)
+        SoraAPI.r_event(doer, "OpenLockUI", {
+            name = self.lockername
+        }, s.inst)
+    end
+    self.inst:AddTag("nosteal")
+    self.inst:AddTag("soracontainlocked")
+    self.lockername = doer and doer.name or name
+    self.lockeruserid = doer and doer.userid or id
+    self.pass = pass
+end
+
+
+function com:OnSave()
+    return {
+        lockername = self.lockername,
+        lockeruserid = self.lockeruserid,
+        pass = self.pass,
+        add_component_if_missing = (self.pass ~= "") and 1 or nil
+    }
+end
+
+function com:OnLoad(data)
+    if not data then
+        return
+    end
+    if data.pass ~= "" then
+        self:Init(nil, data.pass, data.lockername, data.lockeruserid)
+    end
+end
+
+function com:GetDebugString()
+    return "name: " .. self.lockername .. " id: " .. self.lockeruserid .. " pass:" .. self.pass
+end
+
+return com

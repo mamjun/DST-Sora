@@ -700,6 +700,10 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
     Rec("petals", nil, "花花花花", maker, "sora", {
         petals_rose = 40
     }).numtogive = 40
+
+    Rec("cutstone", nil, "石石石石", maker, "sora", {
+        siving_rocks = 40
+    }).numtogive = 10
 end
 
 -- Rec("sora_butter", "拟造-黄油", "一份黄油蟹蟹!", DST, "sora", {
