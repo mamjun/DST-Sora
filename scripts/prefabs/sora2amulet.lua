@@ -220,7 +220,9 @@ local function fn()
     inst.components.waterproofer:SetEffectiveness(getsora("sora2amuletwat"))
 	--护甲
 
-	
+	inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(3)
+
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.NECK or EQUIPSLOTS.HEAD
     inst.components.equippable:SetOnEquip(onequip)

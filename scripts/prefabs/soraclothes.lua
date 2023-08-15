@@ -219,6 +219,8 @@ local function fn()
 	inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(0)
 	--护甲
+	inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(5)
     inst:AddComponent("armor")
 	--inst:AddTag("hide_percentage")
 	inst.abs=arm1

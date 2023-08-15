@@ -696,3 +696,8 @@ function Say(doer,str)
     end
     return true
 end
+
+
+function  NilFn()
+   return true
+end

@@ -163,14 +163,15 @@ local stafftask  = {
 	end,
 	icestaff = function(inst)
 		local pos = inst:GetPosition()
-		local ents = TheSim:FindEntities(pos.x, pos.y, pos.z,45,nil,{"campfire"}, { "fire","smolder" })
+		local ents = TheSim:FindEntities(pos.x, pos.y, pos.z,120,nil,{"campfire"}, { "fire","smolder" })
 		for i, v in ipairs(ents) do
             ---v:GetDebugString()
-			if v.components.burnable ~= nil then
+			if v.components.burnable ~= nil and v.prefab ~= "laozi_sp" then
 				v.components.burnable:Extinguish()
 			end
+
 		end
-		local enta = TheSim:FindEntities(pos.x, pos.y, pos.z,45,nil,nil, { "witherable"})
+		local enta = TheSim:FindEntities(pos.x, pos.y, pos.z,120,nil,nil, { "witherable"})
 		for i, v in ipairs(enta) do
 			if v.components.witherable ~= nil then
 				v.components.witherable:Protect(60)

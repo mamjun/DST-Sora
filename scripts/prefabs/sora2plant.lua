@@ -109,12 +109,24 @@ local function incd(inst, doer)
     return false
 end
 local names = require "utils/soragjrnames"
+local namesdes = {}
+for k, v in pairs(names) do
+    if v[1] and v[2] and v[2] ~= "" then
+        namesdes[v[1]] = v[2]
+    end
+end
+local function GetDes(name)
+    return namesdes[name]
+    -- body
+end
 local names_tmp = {}
 local function CacheNames(doer)
     local name = doer:GetDisplayName() or doer.name or ""
     for k, v in pairs(names) do
-        if v ~= name and v ~= "MySora" and v ~= "风铃草" and v ~= "☆风铃草☆" then
-            table.insert(names_tmp, v)
+        if v[1] and v[1] ~= "" then
+            if v[1] ~= name and v[1] ~= "MySora" and v[1] ~= "风铃草" and v[1] ~= "☆风铃草☆" then
+                table.insert(names_tmp, v[1])
+            end
         end
     end
     local t = TheNet:GetClientTable() or {}
@@ -189,6 +201,14 @@ local function FarmFn(inst, doer, pos, poss)
         a:Bind(GetName())
     end
 end
+local function IfChangeClearSeeds(inst, mode, doer)
+    -- body
+    if inst.seeds and next(inst.seeds) then
+        if #inst.seeds ~= mode then
+            Say(doer, "刨坑模式已变更，种子模板清空")
+        end
+    end
+end
 local function DoBig(fn, inst, doer, pos, ...)
     -- 1格还是9格
 
@@ -220,6 +240,7 @@ local function On3x3Fn(inst, doer, pos)
         return
     end
     CacheNames(doer)
+    IfChangeClearSeeds(inst, 9, doer)
     DoBig(FarmFn, inst, doer, pos, tillpos.M3x3)
 end
 local function On4x4Fn(inst, doer, pos)
@@ -228,6 +249,7 @@ local function On4x4Fn(inst, doer, pos)
         return
     end
     CacheNames(doer)
+    IfChangeClearSeeds(inst, 16, doer)
     DoBig(FarmFn, inst, doer, pos, tillpos.M4x4)
 end
 local function On10Fn(inst, doer, pos)
@@ -236,6 +258,7 @@ local function On10Fn(inst, doer, pos)
         return
     end
     CacheNames(doer)
+    IfChangeClearSeeds(inst, 10, doer)
     DoBig(FarmFn, inst, doer, pos, "M10")
 end
 local crops = {
@@ -629,6 +652,7 @@ local function fixCostController(self)
     self.donenutrient = true
     self.donetendable = true
 end
+
 local function FeiFn(inst, doer, pos)
     -- body
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil,
@@ -996,7 +1020,7 @@ local function fn()
     return inst
 end
 
-local function Bind(inst, name, isload)
+local function Bind(inst, name, isload, des)
     inst.components.named:SetName(name)
     inst.username = name
     if not isload then
@@ -1012,6 +1036,7 @@ local function Bind(inst, name, isload)
     inst.components.sorasavecmp:SetSave("name", {
         name = name
     })
+    inst.des = des or GetDes(name) or nil
 end
 local function fxfn(Sim)
     local inst = CreateEntity()
@@ -1074,6 +1099,9 @@ local function fxfn(Sim)
         if name == "笨蛋啾啾\n笨蛋柳漾" or name == "笨蛋啾啾" or name == "笨蛋柳漾" then
             return "给这娘们介绍个对象吧"
         end
+        if inst.des then
+            return inst.des
+        end
         return name .. "\n别偷懒!\n赶紧干活"
     end
 
@@ -1083,7 +1111,7 @@ local function fxfn(Sim)
         if data and data.name and type(data.name) == "string" then
             inst:DoTaskInTime(0, function()
 
-                inst:Bind(data.name, true)
+                inst:Bind(data.name, true, data.des)
             end)
         end
         return data

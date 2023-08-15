@@ -161,7 +161,9 @@ local function fn()
     inst.components.container:WidgetSetup("krampus_sack")
     inst:AddComponent("preserver")
     inst.components.preserver:SetPerishRateMultiplier(0.25)
-    
+    inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(3)
+
 	inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.BACK or EQUIPSLOTS.BODY
     inst.components.equippable:SetOnEquip(onequip)

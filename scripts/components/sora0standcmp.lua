@@ -1,3 +1,4 @@
+
 --[[
 授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
@@ -27,57 +28,32 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-
-local Widget = require "widgets/widget"
-local Text = require "widgets/text"
-
-local ui = Class(Widget, function(self)
-    Widget._ctor(self, "Sora2Chest Popup")
-    
-    
-
-    self.contents = self:AddChild(Widget("contents"))
-    self.contents:SetPosition(1130,-90 ,0)
-
-
-    self.bg = self.contents:AddChild(Image("images/hud.xml","craftingsubmenu_fullhorizontal.tex"))
-    --self.bg:SetPosition(630,-90,0)
-    self.bg:SetScale(1.75, 1.75, 1.75)
-
-
-    --self.lines = self.contents:AddChild(Widget("separators"))
-    self.spinner_bg = self.contents:AddChild(Image("images/hud.xml", "crafting_submenu_texture.tex"))
-    self.spinner_bg:SetScale(1.85, 7, 1)
-    self.spinner_bg:SetPosition(55, 0)
-    self.name = self.contents:AddChild(Text(UIFONT, 60))
-    self.name:SetString("强迫症箱子の说明书")
- 
-    self.name:SetPosition(60, 180, 0)
-    self.name:SetHAlign(ANCHOR_MIDDLE)
-    self.desc = self.contents:AddChild(Text(BODYTEXTFONT, 40))
-    self.desc:SetPosition(40, -55, 0)
-    self.desc:SetHAlign(ANCHOR_LEFT)
-    self.desc:SetString([[
-        最下面一排放入宝石可以获得如下效果:
-          ▶红 → 快速腐败效果
-          ▶蓝 → 些许返鲜效果
-          ▶紫 → 溢出物品自动打包
-          ▶绿 → 自动种植箱子里的种子
-          ▶橙 → 每隔一段时间收集物品
-          ▶黄 → 自动丢物品到附近的圣诞树
-          ▶彩 → 缓慢恢复耐久
-        多重效果可以叠加
-        重复可提升效果(紫黄除外)
-    ]])
-    self:StartUpdating()
+]] --[[专属交互
+]] --
+local com = Class(function(self, inst)
+    self.inst = inst
 end)
 
-function ui:OnUpdate()
-    if self.parent and not self.parent.isopen then
-        self:Kill()
-    end
+function com:Init(doer, pass, name, id)
+
 end
 
 
-return ui
+function com:OnSave()
+    return {
+        --add_component_if_missing = (self.pass ~= "") and 1 or nil
+    }
+end
+
+function com:OnLoad(data)
+    if not data then
+        return
+    end
+
+end
+
+function com:GetDebugString()
+    return ""
+end
+
+return com

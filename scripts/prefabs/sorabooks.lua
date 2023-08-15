@@ -467,8 +467,8 @@ local Magic_defs = {{
         local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 10, nil, {"INLIMBO"}, {"magicalbird"})
         if #ents > 100 then
             maker.components.talker:Say("周围鸟太多了")
-            local san = AllRecipes and AllRecipes.sora_birds and AllRecipes.sora_birds.character_ingredients[1] and
-                            AllRecipes.sora_birds.character_ingredients[1].amount or 50
+            local san = AllRecipes and AllRecipes.sora_birds_build_sora and AllRecipes.sora_birds_build_sora.character_ingredients[1] and
+                            AllRecipes.sora_birds_build_sora.character_ingredients[1].amount or 50
             maker.components.sanity:DoDelta(san)
         else
             local num = math.random(30, 50)

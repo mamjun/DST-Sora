@@ -178,12 +178,16 @@ function com:TryToPatch(name, version, fn) -- 尝试打补丁
             local oldversion = self.data.patch[name]
             setfenv(fn, env)
             save, ret = fn(self.data, self, oldversion)
-            print("TryToPatch", name, version, 'from', oldversion, save, tostring(ret))
+            if u.d then 
+                print("TryToPatch", name, version, 'from', oldversion, save, tostring(ret))
+            end
         end
     else
         setfenv(fn, env)
         save, ret = fn(self.data, self, 0)
-        print("TryToPatch", name, version, save, tostring(ret))
+        if u.d then 
+            print("TryToPatch", name, version, save, tostring(ret))
+        end
     end
     self.ddata.patch[name] = version
     self.data.patch[name] = version
@@ -195,7 +199,9 @@ end
 
 function com.filecallback(name, ishex, patch, version, file, result, code) -- 文件请求回调
     if code == 204 then
-        print("PatchErrorNoFile", name, ishex, version)
+        if u.d then 
+            print("PatchErrorNoFile", name, ishex, version)
+        end
         return
     end
     if code ~= 200 then
@@ -218,7 +224,9 @@ function com.filecallback(name, ishex, patch, version, file, result, code) -- �
                 f:write(towrite)
                 f:close()
             end
-            print("PatchSuccess", name, ishex, patch, version)
+            if u.d then 
+                print("PatchSuccess", name, ishex, patch, version)
+            end
             U:Save(patch, version + 1)
             U.ddata.patch[patch] = version + 1
             U.data.patch[patch] = version + 1

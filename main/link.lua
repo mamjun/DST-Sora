@@ -353,7 +353,8 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
                         end
                     else
                         local eln = FindClosestEntity(self.inst, 30, {"elaina"}) -- 魔女姐姐你离我这么近 会保护我的对吧
-                        return eln and eln.components.combat and  eln.components.combat:GetAttacked(doer, dam, cause, ...)
+                        return eln and eln.components.combat and
+                                   eln.components.combat:GetAttacked(doer, dam, cause, ...)
                     end
                     return -- 无事发生
                 end
@@ -366,13 +367,62 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
     end)
 end
 
-
-AddLaterFn(function()       --怎么想都是花花的错
+AddLaterFn(function() -- 怎么想都是花花的错
     local oldfn = ACTIONS.CASTAOE.stroverridefn
-    ACTIONS.CASTAOE.stroverridefn = function(act,...)
-        if act.invobject and act.invobject:HasTag("soraspellbook") and act.invobject.components.spellbook  then
+    ACTIONS.CASTAOE.stroverridefn = function(act, ...)
+        if act.invobject and act.invobject:HasTag("soraspellbook") and act.invobject.components.spellbook then
             return act.invobject.components.spellbook:GetSpellName()
         end
-        return  oldfn(act,...)
+        return oldfn(act, ...)
     end
 end)
+
+if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable("workshop-1909182187") then
+    AddPrefabPostInit("sora", function(inst)
+        local oldCanSoulhop = inst.CanSoulhop
+        inst.CanSoulhop = function(inst, souls, ...)
+            if oldCanSoulhop and oldCanSoulhop(inst, souls, ...) then
+                return true
+            end
+
+            if inst:HasTag("medal_map_blinker") then
+                inst.nosorasouldouble = 1
+                local has, num = inst.replica.inventory:Has("wortox_soul", souls or 1)
+                inst.nosorasouldouble = nil
+                num = num + math.floor(inst.replica.sanity:GetCurrent() / 5)
+                if num > (souls or 1) then
+                    local rider = inst.replica.rider
+                    if rider == nil or not rider:IsRiding() then
+                        return true
+                    end
+                end
+            end
+            return false
+        end
+        if TheWorld.ismastersim then
+            local oldinventoryHas = inst.components.inventory.Has
+            inst.components.inventory.Has = function(inv, item, amount, checkallcontainers, ...)
+                if item == "wortox_soul" and not inst.nosorasouldouble then
+                    local old, num = oldinventoryHas(inv, item, amount, checkallcontainers, ...)
+                    num = num + math.floor(inst.components.sanity.current / 5)
+                    return num >= amount, num
+                end
+                return oldinventoryHas(inv, item, amount, checkallcontainers, ...)
+            end
+
+            local oldinventoryConsumeByName = inst.components.inventory.ConsumeByName
+            inst.components.inventory.ConsumeByName = function(inv, item, amount, ...)
+                if item == "wortox_soul" then
+                    local old, num = oldinventoryHas(inv, item, amount, ...)
+                    local souls = math.min(num, amount)
+                    if souls < amount then
+                        inst.components.sanity:DoDelta(-5 * (amount - souls))
+                    end
+                    return oldinventoryConsumeByName(inv, item, souls, checkallcontainers, ...)
+                end
+                return oldinventoryConsumeByName(inv, item, amount, checkallcontainers, ...)
+            end
+
+        end
+    end)
+end

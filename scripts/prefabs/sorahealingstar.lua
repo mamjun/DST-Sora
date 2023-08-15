@@ -27,10 +27,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local PULSE_SYNC_PERIOD = 30
+]] local PULSE_SYNC_PERIOD = 30
 
---Needs to save/load time alive.
+-- Needs to save/load time alive.
 local player1 = getsora("sorahealingplayer1")
 local player2 = getsora("sorahealingplayer2")
 local lm1 = getsora("sorahealinglm1")
@@ -43,7 +42,7 @@ end
 local function kill_light(inst)
     inst.AnimState:PlayAnimation("disappear")
     inst:ListenForEvent("animover", kill_sound)
-    inst:DoTaskInTime(1, inst.Remove) --originally 0.6, padded for network
+    inst:DoTaskInTime(1, inst.Remove) -- originally 0.6, padded for network
     inst.persists = false
     inst._killed = true
 end
@@ -72,79 +71,92 @@ local function pulse_light(inst)
         inst.Light:Enable(true)
     end
 
-    --Client light modulation is enabled:
+    -- Client light modulation is enabled:
 
-    --local s = GetSineVal(0.05, true, inst)
+    -- local s = GetSineVal(0.05, true, inst)
     local s = math.abs(math.sin(PI * (timealive + inst._pulseoffs) * 0.05))
     local rad = Lerp(11, 12, s)
     local intentsity = Lerp(0.6, 0.4, s)
-    local falloff = Lerp(0.6, 0.4, s) 
+    local falloff = Lerp(0.6, 0.4, s)
     inst.Light:SetFalloff(falloff)
     inst.Light:SetIntensity(intentsity)
     inst.Light:SetRadius(rad)
 end
 local function heal(inst)
-	--玩家治疗
-	local pos = inst:GetPosition()
-	local enta = TheSim:FindEntities(pos.x, pos.y, pos.z,4, nil, {"playerghost" },{"player","sora2lm"})
-    local play = math.max(inst._level * player2 +player1,0)
-    local lm = math.max(inst._level * lm2 +lm1,0)
-	for i, v in ipairs(enta) do
-            if not v.components.health:IsDead() then
-                v.components.health:DoDelta(play/20)
-                if  v:HasTag("soralm") then
-                v.components.health:DoDelta(lm/20)
-                end
-                if not v:HasTag("Sora") and v.components.sanity  then
-                v.components.sanity:DoDelta(play/20)
-                end
-                if v.components.freezable then
-                v.components.freezable:AddColdness(-1*inst._level/2,5+inst._level)
+    -- 玩家治疗
+    local pos = inst:GetPosition()
+    local enta = TheSim:FindEntities(pos.x, pos.y, pos.z, 4, nil, {"playerghost"}, {"player", "sora2lm"})
+    local play = math.max(inst._level * player2 + player1, 0)
+    local lm = math.max(inst._level * lm2 + lm1, 0)
+    for i, v in ipairs(enta) do
+        if not v.components.health:IsDead() then
+            v.components.health:DoDelta(play / 20)
+            if v:HasTag("soralm") then
+                v.components.health:DoDelta(lm / 20)
+            end
+            if v.components.sanity then
+                v.components.sanity:DoDelta(play / 40)
+            end
+            if v.components.hunger then
+                v.components.hunger:DoDelta(30 / 40)
+            end
+            if v.components.freezable then
+                v.components.freezable:AddColdness(-1 * inst._level / 2, 5 + inst._level)
+            end
+        end
+    end
+    -- 玩家复活
+    if inst._level > 9 then
+        local entb = TheSim:FindEntities(pos.x, pos.y, pos.z, 4, {"playerghost"})
+        for i, v in ipairs(entb) do
+            v:PushEvent("respawnfromghost", {
+                source = inst._doer
+            })
+        end
+    end
+
+    local enta = TheSim:FindEntities(pos.x, pos.y, pos.z, 4, {"heatrock"})
+    for i, v in ipairs(enta) do
+        if v.components.temperature then
+            local temp = v.components.temperature.current
+            v.components.temperature:DoDelta((5 - temp) / 5)
+        end
+    end
+
+    -- 怪物冰冻
+    if inst._heal then
+        local entc = TheSim:FindEntities(pos.x, pos.y, pos.z, 4, nil, {"player", "sora2lm"})
+        for i, v in ipairs(entc) do
+            if v:IsValid() and v.entity:IsVisible() and not v:IsInLimbo() and v.components.health and
+                not v.components.health:IsDead() then
+                v.components.health:DoDelta(lm / 20)
+            end
+        end
+    else
+        if inst._level > 4 then
+            local entc = TheSim:FindEntities(pos.x, pos.y, pos.z, 4, nil, {"player", "sora2lm"})
+            for i, v in ipairs(entc) do
+                if v:IsValid() and v.entity:IsVisible() and not v:IsInLimbo() and v.components.freezable then
+                    v.components.freezable:AddColdness(inst._level / 2, 5 + inst._level)
                 end
             end
-	end
-	--玩家复活
-	if inst._level > 9 then
-		local entb = TheSim:FindEntities(pos.x, pos.y, pos.z,4, {"playerghost"})
-		for i, v in ipairs(entb) do
-			v:PushEvent("respawnfromghost", { source = inst._doer })
-		end
-	end
-	--怪物冰冻
-	if inst._heal then
-		local entc = TheSim:FindEntities(pos.x, pos.y, pos.z,4, nil, { "player" ,"sora2lm"})
-		for i, v in ipairs(entc) do
-			if v:IsValid() and v.entity:IsVisible() and not v:IsInLimbo() and v.components.health and not v.components.health:IsDead() then
-			v.components.health:DoDelta(lm/20)
-			end
         end
-	else
-	if inst._level > 4 then
-		local entc = TheSim:FindEntities(pos.x, pos.y, pos.z,4, nil, { "player" ,"sora2lm"})
-		for i, v in ipairs(entc) do
-			if v:IsValid() and v.entity:IsVisible() and not v:IsInLimbo() and v.components.freezable then
-            v.components.freezable:AddColdness(inst._level/2,5+inst._level)
-			end
-        end
-	end
-	end
+    end
+
 end
 
-local function Start(inst,doer,staff,healorice)
-	inst._doer = doer
-	inst._staff = staff
-	inst._level = staff.lbslevel
-	inst._heal = healorice
-	inst:DoPeriodicTask(0.5,heal)
+local function Start(inst, doer, staff, healorice)
+    inst._doer = doer
+    inst._staff = staff
+    inst._level = staff.lbslevel
+    inst._heal = healorice
+    inst:DoPeriodicTask(0.5, heal)
 end
 local function makestafflight(name, is_hot, anim, colour, idles, is_fx)
-    local assets =
-    {
-        Asset("ANIM", "anim/"..anim..".zip"),
-    }
+    local assets = {Asset("ANIM", "anim/" .. anim .. ".zip")}
 
     local PlayRandomStarIdle = #idles > 1 and function(inst)
-        --Don't if we're extinguished
+        -- Don't if we're extinguished
         if not inst._killed then
             inst.AnimState:PlayAnimation(idles[math.random(#idles)])
         end
@@ -170,7 +182,7 @@ local function makestafflight(name, is_hot, anim, colour, idles, is_fx)
         inst.Light:EnableClientModulation(true)
 
         inst.AnimState:SetBank(anim)
-		inst.AnimState:SetAddColour(100/255,unpack(colour))
+        inst.AnimState:SetAddColour(100 / 255, unpack(colour))
         inst.AnimState:SetBuild(anim)
         inst.AnimState:PlayAnimation("appear")
         if #idles == 1 then
@@ -180,7 +192,7 @@ local function makestafflight(name, is_hot, anim, colour, idles, is_fx)
 
         MakeInventoryPhysics(inst)
         inst.no_wet_prefix = true
-		inst.Start=Start
+        inst.Start = Start
         inst.SoundEmitter:PlaySound("dontstarve/common/staff_star_LP", "staff_star_loop")
 
         inst.entity:SetPristine()
@@ -193,11 +205,10 @@ local function makestafflight(name, is_hot, anim, colour, idles, is_fx)
         inst._pulsetime:set(inst:GetTimeAlive())
         inst._lastpulsesync = inst._pulsetime:value()
 
-
         inst:AddComponent("inspectable")
-		inst.components.inspectable:SetDescription([[治愈你的身体和灵魂]])
+        inst.components.inspectable:SetDescription([[治愈你的身体和灵魂]])
         inst:AddComponent("timer")
-        inst.components.timer:StartTimer("extinguish", 10)
+        inst.components.timer:StartTimer("extinguish", 20)
         inst:ListenForEvent("timerdone", ontimer)
 
         inst.SoundEmitter:PlaySound("dontstarve/common/staff_star_create")
@@ -212,4 +223,4 @@ local function makestafflight(name, is_hot, anim, colour, idles, is_fx)
     return Prefab(name, fn, assets)
 end
 
-return makestafflight("sorahealstar", true, "star_cold", { 255/255, 0/255, 150/255}, { "idle_loop" }, false)
+return makestafflight("sorahealstar", true, "star_cold", {255 / 255, 0 / 255, 150 / 255}, {"idle_loop"}, false)

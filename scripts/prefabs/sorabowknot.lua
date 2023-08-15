@@ -247,7 +247,8 @@ local function fn()
     inst.components.inventoryitem.onpickupfn = turnoff
     inst.components.inventoryitem.onputininventoryfn = turnoff
     inst.components.inventoryitem.ondropfn = turnoff
-    
+    inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(5)
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.NECK or EQUIPSLOTS.HEAD
 	--回脑残

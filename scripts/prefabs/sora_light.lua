@@ -27,36 +27,42 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local assets = {
-    Asset("ANIM", "anim/sora_light/sora_light_white.zip"),
-    Asset("ANIM", "anim/ui_lamp_1x4.zip"),
-    Asset("ATLAS", "images/inventoryimages/sora_light.xml"),
-    Asset("IMAGE", "images/inventoryimages/sora_light.tex"),
-    Asset("ATLAS_BUILD", "images/inventoryimages/sora_light.xml", 256)
-}
+]] local assets = {Asset("ANIM", "anim/sora_light/sora_light_white.zip"), Asset("ANIM", "anim/ui_lamp_1x4.zip"),
+                   Asset("ATLAS", "images/inventoryimages/sora_light.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sora_light.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora_light.xml", 256)}
+local TechTree = require("techtree")
 local prefabs = {}
-local color = {
-    "blue", "green", "orange", "pink", "rainbow", "red", "silvery", "violet",
-    "yellow"
-}
+local color = {"blue", "green", "orange", "pink", "rainbow", "red", "silvery", "violet", "yellow"}
 local sound = {
     toggle = "dontstarve/common/together/mushroom_lamp/lantern_2_on",
     colour = "dontstarve/common/together/mushroom_lamp/change_colour",
     craft = "dontstarve/common/together/mushroom_lamp/craft_2"
 }
-local light_str =
-{
-    {radius = 3.5, falloff = .88, intensity = 0.8},
-    {radius = 4.25, falloff = .88, intensity = 0.8},
-    {radius = 5.25, falloff = .88, intensity = 0.8},
-    {radius = 6.5, falloff = .88, intensity = 0.8},
-}
+local light_str = {{
+    radius = 4.5,
+    falloff = .88,
+    intensity = 0.8
+}, {
+    radius = 5.25,
+    falloff = .88,
+    intensity = 0.8
+}, {
+    radius = 7.25,
+    falloff = .88,
+    intensity = 0.8
+}, {
+    radius = 9.5,
+    falloff = .88,
+    intensity = 0.8
+}}
 
-local colour_tint = { 0.4, 0.3, 0.25, 0.2, 0.1 }
-local mult_tint = { 0.7, 0.6, 0.55, 0.5, 0.45 }
+local colour_tint = {0.4, 0.3, 0.25, 0.2, 0.1}
+local mult_tint = {0.7, 0.6, 0.55, 0.5, 0.45}
 
-local function IsLightOn(inst) return inst.Light:IsEnabled() end
+local function IsLightOn(inst)
+    return inst.Light:IsEnabled()
+end
 local function ClearSoundQueue(inst)
     if inst._soundtask ~= nil then
         inst._soundtask:Cancel()
@@ -68,37 +74,90 @@ local function OnQueuedSound(inst, soundname)
     inst.SoundEmitter:PlaySound(soundname)
 end
 local function QueueSound(inst, delay, soundname)
-    if inst._soundtask ~= nil then inst._soundtask:Cancel() end
+    if inst._soundtask ~= nil then
+        inst._soundtask:Cancel()
+    end
     inst._soundtask = inst:DoTaskInTime(delay, OnQueuedSound, soundname)
+end
+local treemap = {
+    blue = {
+        MAGIC = 5, -- 魔法本
+        BOOKCRAFT = 5
+    }, -- 书架
+    green = {
+        FISHING = 5, -- 钓鱼
+        HERMITCRABSHOP = 7
+    }, -- 奶奶
+    orange = {
+        CARTOGRAPHY = 5,
+        FOODPROCESSING = 5, -- 香料站
+    }, -- 制图桌
+    pink = {
+        PERDOFFERING = 5, -- 活动科技
+        WARGOFFERING = 5,
+        PIGOFFERING = 5,
+        CARRATOFFERING = 5,
+        BEEFOFFERING = 5,
+        CATCOONOFFERING = 5,
+        RABBITOFFERING = 5,
+        MADSCIENCE = 5,
+        CARNIVAL_PRIZESHOP = 5,
+        CARNIVAL_HOSTSHOP = 5,
+
+        WINTERSFEASTCOOKING = 5
+    },
+    red = {
+        SCIENCE = 5
+    }, -- 科技本
+    silvery = {
+        CELESTIAL = 5
+    }, -- 月亮
+    violet = {
+        ANCIENT = 5,
+        TURFCRAFTING = 5,
+        MASHTURFCRAFTING = 5
+    }, -- 远古
+    yellow = {
+        SEAFARING = 5
+    } -- 航海
+}
+treemap.rainbow = {}
+for k, v in pairs(treemap) do
+    for ik, iv in pairs(v) do
+        treemap.rainbow[ik] = math.max(treemap.rainbow[ik] or 0, iv)
+    end
 end
 local function UpdateLightState(inst)
 
     ClearSoundQueue(inst)
-    local num_batteries = #inst.components.container:FindItems( function(item) return item:HasTag("sora_light_batteries") end )
+    local num_batteries = 0
+    local trees = {}
+    for i = 1, 4 do
+        local item = inst.components.container:GetItemInSlot(i)
+        if item and item:HasTag("sora_light_batteries") then
+            num_batteries = num_batteries + 1
+            if item and item.type and treemap[item.type] then
+                for k, v in pairs(treemap[item.type]) do
+                    trees[k] = math.max(trees[k] or 0, v)
+                end
+            end
+        end
+    end
     local was_on = IsLightOn(inst)
 
+    inst.components.prototyper.trees = TechTree.Create(trees)
     if num_batteries > 0 then
         inst.Light:SetRadius(light_str[num_batteries].radius)
         inst.Light:SetFalloff(light_str[num_batteries].falloff)
         inst.Light:SetIntensity(light_str[num_batteries].intensity)
-        for i=1,4 do
+        for i = 1, 4 do
             local item = inst.components.container:GetItemInSlot(i)
             if item then
-                inst.AnimState:OverrideSymbol("flower"..i,item.prefab,"flower"..i)
+                inst.AnimState:OverrideSymbol("flower" .. i, item.prefab, "flower" .. i)
             else
-                inst.AnimState:ClearOverrideSymbol("flower"..i)
+                inst.AnimState:ClearOverrideSymbol("flower" .. i)
             end
         end
-        -- if not inst.onlywhite then
-            -- -- For the GlowCap, spores will tint the light colour to allow for a disco/rave in your base
-            -- local r = #inst.components.container:FindItems(IsRedSpore)
-            -- local g = #inst.components.container:FindItems(IsGreenSpore)
-            -- local b = #inst.components.container:FindItems(IsBlueSpore)
-
-            -- inst.Light:SetColour(colour_tint[g+b + 1] + r/11, colour_tint[r+b + 1] + g/11, colour_tint[r+g + 1] + b/11)
-            -- inst.AnimState:SetMultColour(mult_tint[g+b + 1], mult_tint[r+b + 1], mult_tint[r+g + 1], 1)
-        -- end
-
         if not was_on then
             inst.Light:Enable(true)
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
@@ -106,7 +165,7 @@ local function UpdateLightState(inst)
 
         if POPULATING then
             inst.AnimState:PlayAnimation("idle_on")
-        elseif not was_on  then
+        elseif not was_on then
             inst.AnimState:PlayAnimation("turn_on")
             inst.AnimState:PushAnimation("idle_on", false)
             inst.SoundEmitter:PlaySound(sound.toggle)
@@ -148,8 +207,7 @@ local function onhit(inst, worker, workleft)
     if workleft > 0 and not inst:HasTag("burnt") then
         ClearSoundQueue(inst)
         inst.AnimState:PlayAnimation(IsLightOn(inst) and "hit_on" or "hit")
-        inst.AnimState:PushAnimation(IsLightOn(inst) and "idle_on" or "idle",
-                                     false)
+        inst.AnimState:PushAnimation(IsLightOn(inst) and "idle_on" or "idle", false)
         if inst.components.container ~= nil then
             inst.components.container:DropEverything()
             inst.components.container:Close()
@@ -158,7 +216,9 @@ local function onhit(inst, worker, workleft)
 
 end
 
-local function getstatus(inst) return (IsLightOn(inst) and "ON") or "OFF" end
+local function getstatus(inst)
+    return (IsLightOn(inst) and "ON") or "OFF"
+end
 local function fn()
     local inst = CreateEntity()
     local trans = inst.entity:AddTransform()
@@ -176,12 +236,21 @@ local function fn()
     inst.Light:SetColour(.65, .65, .5)
     inst.Light:Enable(false)
     inst:AddTag("structure")
+    inst:AddTag("prototyper")
     inst.entity:SetPristine()
 
-    if not TheWorld.ismastersim then return inst end
+    if not TheWorld.ismastersim then
+        return inst
+    end
 
     inst:AddComponent("inspectable")
     inst.components.inspectable.getstatus = getstatus
+
+    inst:AddComponent("prototyper")
+    -- inst.components.prototyper.onturnon = SoraAPI.NilFn
+    -- inst.components.prototyper.onturnoff = SoraAPI.NilFn
+    inst.components.prototyper.trees = {}
+    -- inst.components.prototyper.onactivate = SoraAPI.NilFn
 
     inst:AddComponent("lootdropper")
     inst:AddComponent("workable")
@@ -201,17 +270,13 @@ local function fn()
 end
 
 table.insert(prefabs, Prefab("sora_light", fn, assets))
-table.insert(prefabs, MakePlacer("sora_light_placer", "sora_light_white",
-                                 "sora_light_white", "idle"))
-local function MakeLight(str)
+table.insert(prefabs, MakePlacer("sora_light_placer", "sora_light_white", "sora_light_white", "idle"))
+local function MakeLight(str,istrue)
     local name = "sora_light_" .. str
-    local assets = {
-        Asset("ANIM", "anim/sora_light/" .. name .. ".zip"),
-        Asset("ATLAS", "images/inventoryimages/sora_light/" .. name .. ".xml"),
-        Asset("IMAGE", "images/inventoryimages/sora_light/" .. name .. ".tex"),
-        Asset("ATLAS_BUILD",
-              "images/inventoryimages/sora_light/" .. name .. ".xml", 256)
-    }
+    local assets = {Asset("ANIM", "anim/sora_light/" .. name .. ".zip"),
+                    Asset("ATLAS", "images/inventoryimages/sora_light/" .. name .. ".xml"),
+                    Asset("IMAGE", "images/inventoryimages/sora_light/" .. name .. ".tex"),
+                    Asset("ATLAS_BUILD", "images/inventoryimages/sora_light/" .. name .. ".xml", 256)}
     local function fn()
         local inst = CreateEntity()
         local trans = inst.entity:AddTransform()
@@ -227,19 +292,24 @@ local function MakeLight(str)
         anim:SetBank(name)
         anim:SetBuild(name)
         anim:PlayAnimation("idle", true)
-        if not TheWorld.ismastersim then return inst end
+        if not TheWorld.ismastersim then
+            return inst
+        end
         inst:AddTag("sora_light_batteries")
+        inst.type = (istrue and str or "")
         inst:AddComponent("inspectable")
         inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.atlasname =
-            "images/inventoryimages/sora_light/" .. name .. ".xml"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/sora_light/" .. name .. ".xml"
         inst.components.inventoryitem.imagename = name
         inst:AddComponent("stackable")
         inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
         return inst
     end
-    return Prefab(name, fn, assets)
+    return Prefab(name .. (istrue and "_new" or ""), fn, assets)
 end
 
-for k, v in pairs(color) do table.insert(prefabs, MakeLight(v)) end
+for k, v in pairs(color) do
+    table.insert(prefabs, MakeLight(v))
+    table.insert(prefabs, MakeLight(v,true))
+end
 return unpack(prefabs)

@@ -59,8 +59,8 @@ map['boards'] = 'log'
 map['rope'] = 'cutgrass'
 map['cutstone'] = 'rocks'
 map['papyrus'] = 'cutreeds'
-
-
+map['myth_coin_box'] = 'myth_coin'
+map['thulecite_pieces'] = 'thulecite'
 local function FindPrefab() -- tools_1 tools_2 这样的自动合并
     for k, v in pairs(Prefabs) do
         if k then

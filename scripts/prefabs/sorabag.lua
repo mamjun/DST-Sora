@@ -278,6 +278,8 @@ local function fn()
 	inst:AddComponent("insulator")
     inst.components.insulator:SetInsulation(ice1)
 	inst.components.insulator:SetSummer()
+	inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(5)
 	
 	inst:AddComponent("sanityaura")
 	inst.components.sanityaura.aurafn = CalcSanityAura

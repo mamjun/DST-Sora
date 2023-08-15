@@ -98,6 +98,7 @@ function butterpickup(inst)
             inst.sora_huapen:RemoveEventCallback("onputininventory", butterpickup, inst)
             inst:StopWatchingWorldState("isday",butterday)
         end
+        inst.persists = true
     end
     inst.sora_huapen = nil
 end

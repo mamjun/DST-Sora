@@ -165,6 +165,8 @@ local function fn()
 	inst.components.inventoryitem.atlasname="images/inventoryimages/sora2hat.xml"
 	inst.components.inventoryitem.imagename="sora2hat"
 	--护甲
+    inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(3)
     inst:AddComponent("armor")
 	--inst:AddTag("hide_percentage")
     inst.components.armor:InitCondition(getsora("sora2hatarm2"),getsora("sora2hatarm1"))
@@ -219,6 +221,8 @@ local function armorfn()
 	inst.components.inventoryitem.atlasname="images/inventoryimages/sora2armor.xml"
 	inst.components.inventoryitem.imagename="sora2armor"
 	--护甲
+    inst:AddComponent("planardefense")
+	inst.components.planardefense:SetBaseDefense(3)
     inst:AddComponent("armor")
 	--inst:AddTag("hide_percentage")
     inst.components.armor:InitCondition(getsora("sora2armorarm2"),getsora("sora2armorarm1"))

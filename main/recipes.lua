@@ -60,7 +60,7 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     local build = prefab:lower() .. rec_back
     if prefabhas[prefab] then
         prefabhas[prefab] = prefabhas[prefab] + 1
-        build = build .."_" .. tostring(prefabhas[prefab])
+        build = build .. "_" .. tostring(prefabhas[prefab])
     else
         prefabhas[prefab] = 1
     end
@@ -102,9 +102,12 @@ AddSimPostInit(function()
     for k, v in pairs(AllSoraRec) do
         if v and v.ingredients then
             for ik, iv in pairs(v.ingredients) do
-                local ingxml = SoraGetImage(iv.type)
+                local ingxml = InvImg[iv.type] and InvImg[iv.type][1] or SoraGetImage(iv.type)
                 if ingxml and ingxml:match("images/inventoryimages/") then
                     iv.atlas = softresolvefilepath(ingxml)
+                end
+                if InvImg[iv.type] and InvImg[iv.type][2] then
+                    iv.image = InvImg[iv.type][2]
                 end
             end
         end
@@ -173,7 +176,6 @@ Rec("sorarepairer", "穹の缝纫包", "缝缝补补又三年", item, "sora", {{
     spider = 3,
     goldnugget = 3
 }}).numtogive = 4
-
 
 Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
     goose_feather = 5,
@@ -520,24 +522,68 @@ Rec("sora_huapen", "穹の花盆", "世界有你更美好", build, "soraother", 
 
 Rec("sora_light", "穹の玫瑰灯", "装饰你的灯吧", build, "soraother", {{
     livinglog = 3,
-    cutstone = 3,
-    goldnugget = 10
-}, {
-    livinglog = 10,
-    cutstone = 5,
+    cutstone = 10,
     goldnugget = 20
 }, {
-    livinglog = 40,
+    livinglog = 10,
     cutstone = 20,
-    goldnugget = 50
+    goldnugget = 40
+}, {
+    livinglog = 40,
+    cutstone = 40,
+    goldnugget = 80
 }})
+local lightdata = {
+    blue = {"隐藏着黑暗力量的钥匙啊\n在我面前显示你真正的力量", {
+        nightmarefuel = 40
+    }},
+    green = {"孤舟蓑笠翁", {
+        chum = 40
+    }},
+    orange = {"为什么我也要考证", {
+        compass = 20
+    }},
+    pink = {"永不停歇的脚步", {
+        lightbulb = 40
+    }},
+    red = {"科技与狠活", {
+        cutstone = 2,
+        boards = 4,
+        transistor = 2
+    }},
+    silvery = {"千里共婵娟", {
+        opalpreciousgem = 1,
+        moonglass = 40,
+        moonrocknugget = 40
+    }},
+    violet = {"上下五千年", {
+        thulecite = 20,
+        lightbulb = 40
+    }},
+    yellow = {"我们的征途是星辰大海", {
+        boards = 10,
+        stinger = 40
+    }},
 
+    rainbow = {"我们终将重逢", {
+        opalpreciousgem = 9
+    }}
+
+}
+
+for k, v in pairs({"blue", "green", "orange", "pink", "red", "silvery", "violet", "yellow"}) do
+    local lightname = "sora_light_" .. v .. "_new"
+    lightdata.rainbow[2][lightname] = 1
+end
 for k, v in pairs({"blue", "green", "orange", "pink", "rainbow", "red", "silvery", "violet", "yellow"}) do
-    local lightname = "sora_light_" .. v
-    AddInvImg(lightname, "inventoryimages/sora_light/" .. lightname)
-    Rec(lightname, "穹の玫瑰", "用来装饰你的灯", soralight, "soraother", {
+    local nizaoname = "sora_light_" .. v
+    AddInvImg(nizaoname, "inventoryimages/sora_light/" .. nizaoname)
+    Rec(nizaoname, "拟造の玫瑰", "拿去装饰你的灯吧", soralight, "soraother", {
         lightbulb = 10
     })
+    local lightname = nizaoname .. "_new"
+    AddInvImg(lightname, "inventoryimages/sora_light/" .. nizaoname, nizaoname)
+    Rec(lightname, "穹の玫瑰", lightdata[v][1], soralight, "soraother", lightdata[v][2])
 end
 
 Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother", {{
@@ -555,15 +601,15 @@ AddInvImg("sora_lock", "inventoryimages/sora2stone", "sora2stone")
 Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraother", {{
     [san] = 20,
     coontail = 1,
-    mole=1
+    mole = 1
 }, {
     [san] = 40,
     coontail = 1,
-    mole=1
+    mole = 1
 }, {
     [san] = 60,
     coontail = 1,
-    mole=1
+    mole = 1
 }})
 
 -- 魔法
@@ -953,6 +999,13 @@ UnlonkRecipes("waterplant_planter", {
 UnlonkRecipes("bullkelp_root", {
     fishmeat_small = 20
 }, "海带？海苔！").placer = "no"
+
+UnlonkRecipes("catcoonden", {
+    livinglog = 5,
+    rope=5,
+    surfnturf=3
+}, "灵猫九命！")
+
 UnlonkRecipes("rock_avocado_fruit_sprout", {
     rocks = 40
 }, "石头也能发芽吗?").placer = "no"

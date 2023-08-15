@@ -44,7 +44,7 @@ Help("beebox_hermit","bee_box_hermitcrab","bee_box_hermitcrab","idle")
 Help("meatrack_hermit","meatrack_hermit","meatrack_hermit","idle_empty")
 Help("seastack","water_rock01","water_rock_01","3_full")
 Help("saltstack","salt_pillar2","salt_pillar2","full")
-
+Help("catcoonden","catcoon_den","catcoon_den","idle")
 Help("stagehand","stagehand","stagehand","idle_loop_01")
 
 

@@ -142,7 +142,7 @@ params.sora2chest = {
         slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "sorachest",
-        pos = GLOBAL.Vector3(0, 300, 0),
+        pos = GLOBAL.Vector3(-300, 100, 0),
         side_align_tip = 120
 
     },
@@ -181,19 +181,31 @@ end
 
 params.sora_light = {
     widget = {
-        slotpos = {Vector3(0, 64 + 32 + 8 + 4, 0), Vector3(0, 32 + 4, 0), Vector3(0, -(32 + 4), 0),
-                   Vector3(0, -(64 + 32 + 8 + 4), 0)},
-        animbank = "ui_lamp_1x4",
-        animbuild = "ui_lamp_1x4",
+        slotpos = {},
+        animbank = "ui_chest_3x3",
+        animbuild = "sorachest",
         pos = Vector3(200, 0, 0),
         side_align_tip = 100
     },
-    acceptsstacks = false,
-    type = "cooker"
+    acceptsstacks = true,
+    type = "chest"
 }
-
+for z=1,5 do
+    for y=1,5 do
+        for x=1,5 do
+            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 1750+350*y,z*-75 +270, 0))
+        end
+    end
+end
+for x=1,4 do
+    table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(450, 240-75*x, 0))
+end
+for x=1,5 do
+    table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(530, 270-75*x, 0))
+end
 function params.sora_light.itemtestfn(container, item, slot)
-    return item:HasTag("sora_light_batteries")
+    print(container, item, slot)
+    return ( slot > 125 and slot < 130 and  item:HasTag("sora_light_batteries")) or ( slot > 129 and  item:HasTag("gem")) or slot < 126
 end
 
 params.sora_huapen = {
