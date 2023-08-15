@@ -30,7 +30,16 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] local assets = {Asset("ANIM", "anim/sora_light/sora_light_white.zip"), Asset("ANIM", "anim/ui_lamp_1x4.zip"),
                    Asset("ATLAS", "images/inventoryimages/sora_light.xml"),
                    Asset("IMAGE", "images/inventoryimages/sora_light.tex"),
-                   Asset("ATLAS_BUILD", "images/inventoryimages/sora_light.xml", 256)}
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora_light.xml", 256),
+
+                   Asset("ATLAS", "images/inventoryimages/sora_gem_bg.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sora_gem_bg.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora_gem_bg.xml", 256),
+
+                   Asset("ATLAS", "images/inventoryimages/sora_light_bg.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sora_light_bg.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora_light_bg.xml", 256)}
+
 local TechTree = require("techtree")
 local prefabs = {}
 local color = {"blue", "green", "orange", "pink", "rainbow", "red", "silvery", "violet", "yellow"}
@@ -90,7 +99,7 @@ local treemap = {
     }, -- 奶奶
     orange = {
         CARTOGRAPHY = 5,
-        FOODPROCESSING = 5, -- 香料站
+        FOODPROCESSING = 5 -- 香料站
     }, -- 制图桌
     pink = {
         PERDOFFERING = 5, -- 活动科技
@@ -271,7 +280,7 @@ end
 
 table.insert(prefabs, Prefab("sora_light", fn, assets))
 table.insert(prefabs, MakePlacer("sora_light_placer", "sora_light_white", "sora_light_white", "idle"))
-local function MakeLight(str,istrue)
+local function MakeLight(str, istrue)
     local name = "sora_light_" .. str
     local assets = {Asset("ANIM", "anim/sora_light/" .. name .. ".zip"),
                     Asset("ATLAS", "images/inventoryimages/sora_light/" .. name .. ".xml"),
@@ -310,6 +319,6 @@ end
 
 for k, v in pairs(color) do
     table.insert(prefabs, MakeLight(v))
-    table.insert(prefabs, MakeLight(v,true))
+    table.insert(prefabs, MakeLight(v, true))
 end
 return unpack(prefabs)

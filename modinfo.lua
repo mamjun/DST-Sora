@@ -27,8 +27,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] author = "FL"
-version = "11.29.12" -- 版本
+]]
+ author = "FL"
+version = "11.29.14" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -409,7 +410,7 @@ configuration_options = {maketitle("jichu", "基础设置"), {
     }, {
         description = "300",
         data = 300,
-        hover = "3000"
+        hover = "300"
     }, {
         description = "1000",
         data = 1000,

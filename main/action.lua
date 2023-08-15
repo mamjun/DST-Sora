@@ -200,13 +200,18 @@ SORAREPAIR.id = "SORAREPAIR"
 SORAREPAIR.str = "修复"
 SORAREPAIR.fn = function(act)
     if act.target ~= nil and act.doer ~= nil then
-        if act.invobject.components.sorarepairer:DoRepair(act.invobject, act.target, act.doer) then
+        local num = act.invobject.components.sorarepairer:DoRepair(act.invobject, act.target, act.doer)
+        if num > 0  then
             act.doer.components.talker:Say("跟新的一样")
             if act.invobject.components.stackable then
-                act.invobject.components.stackable:Get():Remove()
+                for i=1,num do
+                    act.invobject.components.stackable:Get():Remove()
+                end
             else
                 act.invobject:Remove()
             end
+        elseif num == -2 then
+            act.doer.components.talker:Say("需要更多的缝纫包才能修好")
         else
             act.doer.components.talker:Say("这个不需要修复")
         end

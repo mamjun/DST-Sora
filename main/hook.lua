@@ -807,3 +807,31 @@ AddComponentPostInit("thief",function (i)
         return StealItem(s,vim,...)
     end
 end)
+
+local fixlunarthrall = function(self,target)
+    if target and target:IsValid()  then
+       if  FindEntity(target,60,nil,{"sora2base"}) then return true end
+    end
+    return false
+end
+
+
+AddComponentPostInit("lunarthrall_plantspawner",function (i)
+    local SpawnGestalt = i.SpawnGestalt
+    i.SpawnGestalt= function(s,target,...)
+        if fixlunarthrall(s,target) then
+            return false
+        end
+        return SpawnGestalt(s,target,...)
+    end
+
+
+    local SpawnPlant = i.SpawnPlant
+    i.SpawnPlant= function(s,target,...)
+        if fixlunarthrall(s,target) then
+            return false
+        end
+        return SpawnPlant(s,target,...)
+    end
+
+end)

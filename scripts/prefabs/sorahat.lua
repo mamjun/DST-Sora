@@ -67,7 +67,7 @@ end
 
 local function OnRefuseItem(inst, giver, item)
 	if item then
-	local refusesay = "\t\t穹の护\n物\t数\t级\t属"
+	local refusesay = "\t\t穹の冠\n物\t数\t级\t属"
 			refusesay = refusesay..string.format("\n雨(眼):\t%d/"..inst.need * inst.maxlevel/2 .."\t%d\t%d",inst.yqnum,inst.yqlevel,(water1+water2*inst.yqlevel)*100)
 			refusesay = refusesay..string.format("\n甲(鳞):\t%d/"..inst.need * inst.maxlevel.."\t%d\t%d%%",inst.llnum,inst.lllevel,math.min(arm1+arm2*inst.lllevel,0.99) *100)
 		giver.components.talker:Say(refusesay)

@@ -38,34 +38,46 @@ local cantrepair = {
 }
 function sorarepairer:DoRepair(inst,target, doer)
     if not inst or not target or not doer or cantrepair[target.prefab] then
-        return false
+        return -1
     end
+    local size =inst and inst.components.stackable and inst.components.stackable.stacksize  or 1 
 
+    local num = 0 
     
     if target.components.finiteuses and target.components.finiteuses:GetPercent() < 1 then
-        target.components.finiteuses:Use(-1 * math.max(math.ceil(0.2*target.components.finiteuses.total),5))
+        local uses = target.components.finiteuses.total - target.components.finiteuses.current
+        local per = math.max(math.ceil(target.components.finiteuses.total*0.2),5)
+        num =  math.max(math.floor(uses / per ),1)
+
+        target.components.finiteuses:Use(-1 * per * num)
         if  target.components.finiteuses:GetPercent() > 1 then
             target.components.finiteuses:SetPercent(1)
         end
         doer:PushEvent("sorarepair",{inst=inst,target=target,doer=doer,type="finiteuses"})
-        return true
+        return num
     elseif target.components.fueled and target.components.fueled:GetPercent() < 1 then
-        target.components.fueled:DoDelta(  math.max(math.ceil(0.5*target.components.fueled.maxfuel),2),doer)
+        num = target.components.fueled:GetPercent() < 0.5 and 2 or 1 
+        if size < num then return -2 end
+        target.components.fueled:SetPercent(1)
         doer:PushEvent("sorarepair",{inst=inst,target=target,doer=doer,type="fueled"})
-        return true
+        return 1
     elseif target.components.perishable and target.components.perishable:GetPercent() < 1 then
-        target.components.perishable:ReducePercent(-0.5)
+        num = target.components.perishable:GetPercent() < 0.5 and 2 or 1 
+        if size < num then return -2 end
+        target.components.perishable:SetPercent(1)
         doer:PushEvent("sorarepair",{inst=inst,target=target,doer=doer,type="perishable"})
-        return true
+        return 1
     elseif target.components.armor and target.components.armor:GetPercent() < 1 then
-        target.components.armor:SetPercent(target.components.armor:GetPercent()+0.3)
+        num = target.components.armor:GetPercent() < 0.5 and 2 or 1
+        if size < num then return -2 end
+        target.components.armor:SetPercent(1)
         doer:PushEvent("sorarepair",{inst=inst,target=target,doer=doer,type="armor"})
-        return true
+        return num
     -- elseif arget.components.finiteuses and target.components.finiteuses:GetPercent() < 1 then
         -- target.components.finiteuses:Use(math.max(math.ceil(0.2*target.components.finiteuses.total),2))
         -- return true
     end
-    return false
+    return -1
 end
 
 return sorarepairer
