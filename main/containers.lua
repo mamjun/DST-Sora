@@ -221,8 +221,11 @@ for x=1,5 do
     table.insert(params.sora_light.widget.slotbg, {atlas = "images/inventoryimages/sora_gem_bg.xml",image="sora_gem_bg.tex"})
 end
 function params.sora_light.itemtestfn(container, item, slot)
-    print(container, item, slot)
-    return ( slot > sora_light_slot and slot < (sora_light_slot+5)  and  item:HasTag("sora_light_batteries")) or ( slot > (sora_light_slot+4) and  item:HasTag("gem")) or slot < 126
+    if not slot then 
+        return  true    --现在不能直接存放 和 shift存放
+    end
+    
+    return ( slot > sora_light_slot and slot < (sora_light_slot+5)  and  item:HasTag("sora_light_batteries")) or ( slot > (sora_light_slot+4) and  item:HasTag("gem")) or slot <= sora_light_slot
 end
 
 params.sora_huapen = {

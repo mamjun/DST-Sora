@@ -141,7 +141,7 @@ local function UpdateLightState(inst)
     ClearSoundQueue(inst)
     local num_batteries = 0
     local trees = {}
-    for i = 1, 4 do
+    for i = 151, 154 do
         local item = inst.components.container:GetItemInSlot(i)
         if item and item:HasTag("sora_light_batteries") then
             num_batteries = num_batteries + 1
