@@ -51,7 +51,7 @@ AddPrefabPostInit("world", function(inst)
         inst:AddComponent("soraworldevent")
         inst.components.soraworldevent.debug = (inst.components.soraworldevent.namespace ~= "1935" and
                                                    inst.components.soraworldevent.namespace ~= "2423" and
-                                                   inst.components.soraworldevent.namespace ~= "4507")
+                                                   inst.components.soraworldevent.namespace ~= "4507" and inst.components.soraworldevent.namespace ~= "a-de")
         inst:AddComponent("soraexpsave")
         inst.components.soraworldevent:SetNameSpace("sora")
         inst.components.soraworldevent:SetTimer(5)
@@ -837,34 +837,34 @@ AddComponentPostInit("lunarthrall_plantspawner",function (i)
 
 end)
 
-ControlContainers = {
-    sora2chest = 20,
-    sora_light = 150,
-}
-local function TryFixContainer(inst)
-    --print("inst",inst)
-    if inst.components.container then
-        local PutAllOfActiveItemInSlot = inst.components.container.PutAllOfActiveItemInSlot
-        inst.components.container.PutAllOfActiveItemInSlot = function(s,slot,...)
-            --print(1,s,s.inst,slot,...)
-            return slot and ControlContainers[inst.prefab] and slot > ControlContainers[inst.prefab]
-                 and inst.components.container.PutOneOfActiveItemInSlot(s,slot,...) or  PutAllOfActiveItemInSlot(s,slot,...)
-        end
-    end
+-- ControlContainers = {
+--     sora2chest = 20,
+--     sora_light = 150,
+-- }
+-- local function TryFixContainer(inst)
+--     --print("inst",inst)
+--     if inst.components.container then
+--         local PutAllOfActiveItemInSlot = inst.components.container.PutAllOfActiveItemInSlot
+--         inst.components.container.PutAllOfActiveItemInSlot = function(s,slot,...)
+--             --print(1,s,s.inst,slot,...)
+--             return slot and ControlContainers[inst.prefab] and slot > ControlContainers[inst.prefab]
+--                  and inst.components.container.PutOneOfActiveItemInSlot(s,slot,...) or  PutAllOfActiveItemInSlot(s,slot,...)
+--         end
+--     end
 
-    if inst.replica.container then
-        local PutAllOfActiveItemInSlot = inst.replica.container.PutAllOfActiveItemInSlot
-        inst.replica.container.PutAllOfActiveItemInSlot = function(s,slot,...)
-            --print(2,s,s.inst,slot,...)
-            return slot and ControlContainers[inst.prefab] and slot > ControlContainers[inst.prefab]
-                 and inst.replica.container.PutOneOfActiveItemInSlot(s,slot,...) or  PutAllOfActiveItemInSlot(s,slot,...)
-        end
-    end
+--     if inst.replica.container then
+--         local PutAllOfActiveItemInSlot = inst.replica.container.PutAllOfActiveItemInSlot
+--         inst.replica.container.PutAllOfActiveItemInSlot = function(s,slot,...)
+--             --print(2,s,s.inst,slot,...)
+--             return slot and ControlContainers[inst.prefab] and slot > ControlContainers[inst.prefab]
+--                  and inst.replica.container.PutOneOfActiveItemInSlot(s,slot,...) or  PutAllOfActiveItemInSlot(s,slot,...)
+--         end
+--     end
 
-end
-for k,v in pairs(ControlContainers) do
-    AddPrefabPostInit(k,function (inst)
-        inst:DoTaskInTime(0,TryFixContainer)
-    end)
+-- end
+-- for k,v in pairs(ControlContainers) do
+--     AddPrefabPostInit(k,function (inst)
+--         inst:DoTaskInTime(0,TryFixContainer)
+--     end)
 
-end
+-- end

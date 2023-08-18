@@ -171,7 +171,6 @@ function params.sora2chest.itemtestfn(container, item, slot)
     if not slot then 
         return  true    --现在不能直接存放 和 shift存放
     end
-    
     return ( slot > 20 and  item:HasTag("gem") ) or slot <= 20
 end
 

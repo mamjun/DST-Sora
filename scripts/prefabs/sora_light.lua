@@ -159,7 +159,6 @@ local function CheckChest(inst, doer)
             end
         end
     end
-    TheWorld.components.sorachestmanager:OnClose(inst, doer)
 end
 local function UpdateLightState(inst)
     local pos = Vector3(inst.Transform:GetWorldPosition())
@@ -256,6 +255,7 @@ end
 
 local function onclose(inst, doer)
     SoraAPI.CheckChestValid(inst)
+    CheckChest(inst, doer)
     TheWorld.components.sorachestmanager:OnClose(inst, doer)
 end
 

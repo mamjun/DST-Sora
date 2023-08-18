@@ -98,8 +98,7 @@ function SoraFoodMemory:SoraGetFoodMultiplier(inst)
         mul =  self.mults2
     end
     
-    local mul =  count > 0 and self.mults ~= nil and mul[math.min(#self.mults, count)] or 1
-    return 
+    return count > 0 and mul and mul[math.min(#mul, count)] or 1
 end
 function SoraFoodMemory:OnSave()
     if next(self.foods) ~= nil then
