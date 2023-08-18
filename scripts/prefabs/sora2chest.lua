@@ -106,6 +106,10 @@ local data2 = {
             end
             inst:RemoveComponent("container")
             inst:AddComponent("container")
+            if not inst.components.preserver then
+                inst:AddComponent("preserver")
+            end
+            inst.components.preserver:SetPerishRateMultiplier(1)
             for k, v in pairs(copy) do
                 inst.components.container[k] = copy[k]
             end
