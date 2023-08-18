@@ -35,8 +35,11 @@ local SoraFoodMemory = Class(function(self, inst)
     self.duration = TUNING.TOTAL_DAY_TIME * 3
     self.foods = {}
     self.mults = {0.6,0.2,-0.2,-0.6,-1}
+    self.mults2 = {0.6,0.2,0,0,0}
 end)
+local nothunger = {
 
+}
 function SoraFoodMemory:OnRemoveFromEntity()
     for k, v in pairs(self.foods) do
         v.task:Cancel()
@@ -90,7 +93,13 @@ end
 function SoraFoodMemory:SoraGetFoodMultiplier(inst)
     local prefab = inst.prefab
     local count = self:GetMemoryCount(prefab)
-    return count > 0 and self.mults ~= nil and self.mults[math.min(#self.mults, count)] or 1
+    local mul = self.mults
+    if inst.components.edible and inst.components.edible.healthvalue > 60 then
+        mul =  self.mults2
+    end
+    
+    local mul =  count > 0 and self.mults ~= nil and mul[math.min(#self.mults, count)] or 1
+    return 
 end
 function SoraFoodMemory:OnSave()
     if next(self.foods) ~= nil then

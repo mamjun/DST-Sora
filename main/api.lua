@@ -701,3 +701,24 @@ end
 function  NilFn()
    return true
 end
+
+
+function GetSoraPackLevel(data)
+    local level = 1
+    if data then
+        if data.sorapacklevel then
+            level = data.sorapacklevel
+        elseif data.data and data.data.sorapacklevel then
+            level = data.data.sorapacklevel
+        elseif data.components and data.components.unwrappable and data.components.unwrappable.itemdata then
+            for k,v in pairs(data.components.unwrappable.itemdata) do
+                level = math.max(level,GetSoraPackLevel(v)+1)
+            end
+        elseif data.data and data.data.unwrappable and data.data.unwrappable.itemdata then
+            for k,v in pairs(data.data.unwrappable.itemdata) do
+                level = math.max(level,GetSoraPackLevel(v)+1)
+            end
+        end
+    end
+    return level 
+end

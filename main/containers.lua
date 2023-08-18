@@ -136,10 +136,14 @@ for y = 4, 0, -1 do
         table.insert(params.sorafire.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
-
+local  gemblack = {
+    greemgem=1,
+    purplegem=1,
+}
 params.sora2chest = {
     widget = {
         slotpos = {},
+        slotbg = {},
         animbank = "ui_chest_3x3",
         animbuild = "sorachest",
         pos = GLOBAL.Vector3(-300, 100, 0),
@@ -151,12 +155,26 @@ params.sora2chest = {
 for y = 4, 0, -1 do
     for x = 0, 4 do
         table.insert(params.sora2chest.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
+        if y==0 then
+            table.insert(params.sora2chest.widget.slotbg, {atlas = "images/inventoryimages/sora_gem_bg.xml",image="sora_gem_bg.tex"})
+        else
+            table.insert(params.sora2chest.widget.slotbg, {atlas = "images/hud.xml",image="inv_slot.tex"})
+        end
     end
 end
 local sora2chestpopup = require "widgets/sora2chestpopup"
 function params.sora2chest.widget:OnOpenFn(inst)
     self.text = self:AddChild(sora2chestpopup())
 end
+
+function params.sora2chest.itemtestfn(container, item, slot)
+    if not slot then 
+        return  true    --现在不能直接存放 和 shift存放
+    end
+    
+    return ( slot > 20 and  item:HasTag("gem") ) or slot <= 20
+end
+
 
 params.sorabase = {
     widget = {
@@ -225,7 +243,7 @@ function params.sora_light.itemtestfn(container, item, slot)
         return  true    --现在不能直接存放 和 shift存放
     end
     
-    return ( slot > sora_light_slot and slot < (sora_light_slot+5)  and  item:HasTag("sora_light_batteries")) or ( slot > (sora_light_slot+4) and  item:HasTag("gem")) or slot <= sora_light_slot
+    return ( slot > sora_light_slot and slot < (sora_light_slot+5)  and  item:HasTag("sora_light_batteries")) or ( slot > (sora_light_slot+4) and  item:HasTag("gem") and not gemblack[item.prefab]) or slot <= sora_light_slot
 end
 
 params.sora_huapen = {

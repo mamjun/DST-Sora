@@ -166,7 +166,7 @@ local stafftask  = {
 		local ents = TheSim:FindEntities(pos.x, pos.y, pos.z,120,nil,{"campfire"}, { "fire","smolder" })
 		for i, v in ipairs(ents) do
             ---v:GetDebugString()
-			if v.components.burnable ~= nil and v.prefab ~= "laozi_sp" then
+			if v.components.burnable ~= nil and v.prefab ~= "laozi_sp" and v.prefab ~= "book_myth" then
 				v.components.burnable:Extinguish()
 			end
 

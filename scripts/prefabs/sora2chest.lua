@@ -50,369 +50,6 @@ local assets = {
 
 local prefabs = {"collapse_small"}
 
-local allchest = {}
-local CheckChest
-local UpdateChest 
-local map = {}
-map['antliontrinket'] = 'trinket'
-map['boards'] = 'log'
-map['rope'] = 'cutgrass'
-map['cutstone'] = 'rocks'
-map['papyrus'] = 'cutreeds'
-map['myth_coin_box'] = 'myth_coin'
-map['thulecite_pieces'] = 'thulecite'
-local function FindPrefab() -- tools_1 tools_2 这样的自动合并
-    for k, v in pairs(Prefabs) do
-        if k then
-            local p = k:match("^(.+)%D%d+$")
-            if p then map[k] = p end
-            if k:match("winter_ornament") then
-                map[k] = "winter_ornament"
-            end
-        end
-    end
-end
-for k,v in pairs({"bfmt","yzmn","clzy","rlsn","clzx","ygpy","cbzh","jyqy"}) do
-    for ik,iv in pairs({"flower","plume","sands","goblet","circlet"}) do
-        map[v.."_"..iv] = v
-    end
-end
-
-local function cachetoprefab(prefab) return map[prefab] or prefab end
-
-local function toprefab(...) -- 第一次调用的时候 遍历prefab 然后归一处理
-    FindPrefab()
-    toprefab = cachetoprefab
-    return toprefab(...)
-end
-
-local notdrop = {
-    gift = 1,
-    bundle = 1,
-    redpouch = 1,
-    redpouch_yotp = 1,
-    wetpouch = 1,
-    sora3packer = 1,
-    sorapacker = 1
-}
-local items = {}
-local TryPut
-
-if TUNING.SORACHESTRANGE > 2000 then
-    function TryPut(inst,chest)
-        local p = toprefab(inst.prefab)
-        for k,v in pairs(chest) do
-            if v == p then
-                k.components.container:GiveItem(inst, nil, nil, true)
-                return 
-            end
-        end
-    end
-else
-    local maxrange = TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE
-    function TryPut(inst,chest)
-        local p = toprefab(inst.prefab)
-        for k,v in pairs(chest) do
-            if v == p and inst:GetDistanceSqToInst(k) < maxrange  then
-                k.components.container:GiveItem(inst, nil, nil, true)
-                return 
-            end
-        end
-    end
-end
-
-local function DayUpdate()
-    local chest = {}
-    for k,v in pairs(allchest) do
-        chest[k] = CheckChest(k,true)
-    end
-    for k,v in pairs(Ents) do
-        if type(v) == "table" and v.IsValid  and v:IsValid() and v.components.inventoryitem and
-                not v:IsInLimbo() and
-                not v.components.inventoryitem.owner then
-                
-                TryPut(v,chest)
-        end
-    end
-end
-SoarChestDayUpdate = DayUpdate
-local GetItem
-local function catch(inst)
-    if inst:IsValid() and not inst:IsInLimbo() 
-        and inst.components.inventoryitem and not inst.components.inventoryitem.owner
-        and not (inst.components.health and inst.components.health:IsDead())
-        then return true
-    end
-    
-    return false
-end
-if TUNING.SORACHESTRANGE > 2000 then
-    function GetItem(inst, prefab)
-        local p = toprefab(prefab)
-        local container = inst.components.container
-        for k, v in pairs(Ents) do
-            if type(v) == "table" and v.IsValid and catch(v) and toprefab(v.prefab) == p then
-                if not (container:GiveItem(v, nil, nil, true)) then 
-                    if not v:HasTag("bird") then
-                        return 
-                    end
-                else
-                    if v.components.knownlocations then     --有家就忘了 
-                        v.components.knownlocations:ForgetLocation("home")
-                    end
-                    if v.components.inventoryitem then
-                        v.components.inventoryitem:OnPickup(inst)
-                    end
-                end
-            end
-        end
-    end
-else
-    function GetItem(inst, prefab)
-        local p = toprefab(prefab)
-        local pos = Vector3(inst.Transform:GetWorldPosition())
-        local ents = TheSim:FindEntities(pos.x, pos.y, pos.z,
-                                         TUNING.SORACHESTRANGE)
-        local container = inst.components.container
-        for k, v in pairs(ents) do
-            if catch(v) and toprefab(v.prefab) == p then
-                if not (container:GiveItem(v, nil, nil, true)) then 
-                    if not v:HasTag("bird") then
-                        return 
-                    end
-                else
-                    if v.components.knownlocations then     --有家就忘了 
-                        v.components.knownlocations:ForgetLocation("home")
-                    end
-                    if v.components.inventoryitem then
-                        v.components.inventoryitem:OnPickup(inst)
-                    end
-                end
-            end
-        end
-    end
-end
-
-function CheckChest(inst,dontpick)
-    if not inst:IsValid() then return end
-    SoraAPI.CheckChestValid(inst)
-    local container = inst.components.container
-    local first
-    local drop_first 
-    local pos = Vector3(inst.Transform:GetWorldPosition())
-    for i = 1, container:GetNumSlots() do
-        local item = container:GetItemInSlot(i)
-        if item then
-            local p = toprefab(item.prefab)
-            if notdrop[item.prefab] then
-                drop_first = drop_first or p
-            elseif not first and not (i >20 and item.prefab:match("gem") ) then
-                first = p
-            else
-                if p ~= first and not (p:match("gem") and i>20 )then
-                    local itemdrop = container:RemoveItem(item, true)
-                    if itemdrop then
-                        itemdrop.Transform:SetPosition(pos:Get())
-                        if itemdrop.components.inventoryitem then
-                            itemdrop.components.inventoryitem:OnDropped(true)
-                        end
-                        itemdrop.prevcontainer = nil
-                        itemdrop.prevslot = nil
-                        inst:PushEvent("dropitem", {item = itemdrop})
-                    end
-                end
-            end
-        end
-    end
-    for i =21,25 do
-        local item = container:GetItemInSlot(i)
-        if item and item.prefab:match("gem") then
-            if item.components.stackable and item.components.stackable.stacksize >1 then
-                local itemdrop = item.components.stackable:Get(item.components.stackable.stacksize-1)
-                if itemdrop then
-                    itemdrop.Transform:SetPosition(pos:Get())
-                    if itemdrop.components.inventoryitem then
-                        itemdrop.components.inventoryitem:OnDropped(true)
-                    end
-                    itemdrop.prevcontainer = nil
-                    itemdrop.prevslot = nil
-                    inst:PushEvent("dropitem", {item = itemdrop})
-                end
-            end
-        end
-    end
-    first = first or drop_first
-    if first and not dontpick then GetItem(inst, first) end
-    
-    return not container:IsFull()and first
-end
-
-local function GetPackLevel(data)
-    local level = 1
-    if data then
-        if data.sorapacklevel then
-            level = data.sorapacklevel
-        elseif data.data and data.data.sorapacklevel then
-            level = data.data.sorapacklevel
-        elseif data.components and data.components.unwrappable and data.components.unwrappable.itemdata then
-            for k,v in pairs(data.components.unwrappable.itemdata) do
-                level = math.max(level,GetPackLevel(v)+1)
-            end
-        elseif data.data and data.data.unwrappable and data.data.unwrappable.itemdata then
-            for k,v in pairs(data.data.unwrappable.itemdata) do
-                level = math.max(level,GetPackLevel(v)+1)
-            end
-        end
-    end
-    return level 
-end
-    
-    
-local function GemTask(inst)
-    inst.GemTime.orangegem =( inst.GemTime.orangegem or 50 ) - inst.Gem.orangegem * inst.Gem.orangegem
-    inst.GemTime.opalpreciousgem =( inst.GemTime.opalpreciousgem or 100 ) - inst.Gem.opalpreciousgem * inst.Gem.opalpreciousgem
-    inst.GemTime.opalpreciousgem2 =( inst.GemTime.opalpreciousgem2 or 1000 ) - (inst.Gem.opalpreciousgem *0.5+0.5)
-    if inst.GemTime.orangegem <= 0 then
-        inst.GemTime.orangegem = 50
-        CheckChest(inst)
-    end
-    
-    if inst.GemTime.opalpreciousgem <= 0 then
-        inst.GemTime.opalpreciousgem = 100
-        local container = inst.components.container
-        for i = 1, container:GetNumSlots() do
-            local item = container:GetItemInSlot(i)
-            if item then
-                if item.components.fueled then
-                    item.components.fueled:DoDelta(50)
-                end
-                if item.components.armor then
-                    item.components.armor:SetPercent(item.components.armor:GetPercent()+0.1)
-                end
-            end
-        end
-    end
-    
-    if inst.GemTime.opalpreciousgem2 <= 0 then
-        inst.GemTime.opalpreciousgem2 = 1000
-        local container = inst.components.container
-        for i = 1, container:GetNumSlots() do
-            local item = container:GetItemInSlot(i)
-            if item and item.components.finiteuses then
-                item.components.finiteuses:Use(-1)
-                if  item.components.finiteuses:GetPercent() > 1 then
-                    item.components.finiteuses:SetPercent(1)
-                end
-            end
-        end
-    end            
-                
-    if inst.Gem.purplegem > 0 then
-        if inst.components.container:IsFull() then
-            local gift = SpawnPrefab("sora3packer")
-            local gifts = {}
-            local maxlevel = 1 
-            for n=2,25 do
-                local item = inst.components.container:GetItemInSlot(n)
-                local level = GetPackLevel(item)
-                
-                if item and not (n >20 and item.prefab:match("gem")) and level < 21 then
-                    item = inst.components.container:RemoveItem(item, true)
-                    table.insert(gifts,item)
-                    maxlevel = math.max(maxlevel,level+1)
-                end
-            end
-            gift.components.unwrappable:WrapItems(gifts)
-            gift.sorapacklevel = maxlevel
-            
-            for k, v in pairs(gifts) do if v then v:Remove() end end
-            inst.components.container:GiveItem(gift)
-        end
-    end           
-end
-local function CanDeployAnyWhere()
-    return true
-end
-local function HeLiMiZhi(inst,m,doer)
-    
-    local x,y,z = inst.Transform:GetWorldPosition()
-    x, y, z = TheWorld.Map:GetTileCenterPoint(x+4, 0, z)
-    local ents = TheSim:FindEntities(x,y,z,2,nil,{"FX","NOBLOCK","NOCLICK","player","INLIMBO"})
-    local num = #ents
-    local pos = Vector3(x,y,z)
-    for n=1,25 do 
-        local item = inst.components.container:GetItemInSlot(n)
-        if item and not item.prefab:match("gem") and item.components.deployable and not item.prefab:match("^turf_") and not (item.components.deployable.mode == DEPLOYMODE.TURF)  then
-             if num >= m then return  end
-             item = inst.components.container:RemoveItem(item, true)
-             if item.components.stackable then
-                for i=1,item.components.stackable.stacksize do
-                    if num >= m then if item and item:IsValid() then inst.components.container:GiveItem(item) end return  end
-                    local one = item.components.stackable:Get()
-                    one.components.deployable.CanDeploy = CanDeployAnyWhere
-                    one.components.deployable:Deploy(pos,doer or inst)
-                    num = num +1
-                end
-             else
-             num = num +1
-             item.components.deployable.CanDeploy = CanDeployAnyWhere
-             item.components.deployable:Deploy(pos,doer or inst)
-             end
-        end
-    end
-
-end
-function UpdateChest(inst,doer) 
-    local container = inst.components.container
-    local gem = {
-        purplegem  = 0,
-        bluegem    = 0,
-        redgem     = 0,
-        orangegem  = 0,
-        yellowgem  = 0,
-        greengem   = 0,
-        opalpreciousgem    = 0,
-    }
-    for i=21,25 do
-        local item = container:GetItemInSlot(i)
-        if item then
-            local p = item.prefab
-            if gem[p] then gem[p] = gem[p] +1 end
-        end
-    end
-    local rate = gem.redgem * gem.redgem  + gem.bluegem * gem.bluegem * -1 +0.5
-    inst.components.preserver:SetPerishRateMultiplier(rate*2)
-    
-    if (gem.orangegem + gem.opalpreciousgem + inst.Gem.purplegem) > 0 then
-        if not inst.UpdateTask then
-            inst.UpdateTask = inst:DoPeriodicTask(1,GemTask)
-        end
-    else
-        if inst.UpdateTask then
-            inst.UpdateTask:Cancel()
-            inst.UpdateTask = nil
-        end
-    end
-    inst.Gem = gem 
-    if gem.greengem > 0 and inGamePlay  and doer then
-        HeLiMiZhi(inst,gem.greengem * gem.greengem * 2,doer)
-    end
-    if gem.yellowgem > 0 then
-        local pos = inst:GetPosition()
-        local ents = TheSim:FindEntities(pos.x,pos.y,pos.z,30,{"sora2tree"})
-        if ents and #ents > 0 then
-            for i=2,20 do
-                local it = container:GetItemInSlot(i)
-                if it then
-                    local item = inst.components.container:RemoveItem(it, true)
-                    ents[1].components.container:GiveItem(item)
-                    ents[1].components.soragift:GetItem()
-                end
-            end
-            
-        end
-    end
-end
 
 local function onopen(inst)
     SoraAPI.CheckChestValid(inst)
@@ -422,12 +59,7 @@ end
 
 local function onclose(inst,doer)
     SoraAPI.CheckChestValid(inst)
-    inst:DoTaskInTime(0, CheckChest)
-    if doer and doer:HasTag("player") then
-        inst:DoTaskInTime( 0.1 , function ()
-            UpdateChest(inst,doer)
-        end )
-    end
+    TheWorld.components.sorachestmanager:OnClose(inst,doer)
     inst.AnimState:PlayAnimation("close")
     inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
@@ -453,6 +85,14 @@ local function onbuilt(inst)
     inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_craft")
 end
+local cmp = require "components/sorachestmanager"
+local data = {
+    containers = {{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20}},
+    controls = {21,22,23,24,25},
+    pri=50,
+    overfull = 1,
+}
+cmp:RegType("sora2chest", data)
 
 local function fn()
     local inst = CreateEntity()
@@ -464,17 +104,13 @@ local function fn()
     inst.entity:AddNetwork()
 
     inst.MiniMapEntity:SetIcon("sora2fire.tex")
-    -- MakeObstaclePhysics(inst, .4)
-    -- inst:AddTag("fridge")
     inst:AddTag("structure")
-    inst:AddTag("plantkin")
+    --inst:AddTag("plantkin")
     inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
     inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
-
-    -- MakeSnowCoveredPristine(inst)
 
     inst.entity:SetPristine()
 
@@ -491,17 +127,12 @@ local function fn()
     inst.components.container:WidgetSetup("sora2chest")
     inst.components.container.onopenfn = onopen
     inst.components.container.onclosefn = onclose
+
+    inst.prefab = "sora2chest"
+    TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
+
     inst:AddComponent("preserver")
     inst.components.preserver:SetPerishRateMultiplier(1)
-    if not TheWorld.sorachestdayupdate then
-        TheWorld:WatchWorldState("cycles", function() 
-            inst:DoTaskInTime(1, DayUpdate) 
-            inst:DoTaskInTime(2, DayUpdate) 
-            inst:DoTaskInTime(3, DayUpdate) 
-            end)
-        
-        TheWorld.sorachestdayupdate = true
-    end
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(4)
@@ -519,9 +150,6 @@ local function fn()
     }
     inst:ListenForEvent("onbuilt", onbuilt)
     if TUNING.SMART_SIGN_DRAW_ENABLE then SMART_SIGN_DRAW(inst) end
-    allchest[inst] = 1
-    inst:ListenForEvent("OnRemove", function() allchest[inst] = nil end)
-    inst:DoTaskInTime(0, UpdateChest)
     inst:ListenForEvent("itemget",function(i,data)
         if data.item and not data.item.prefab:match("gem") and not data.item:HasTag("bird") and data.slot >1 then
             if inst.Gem.yellowgem > 0 then

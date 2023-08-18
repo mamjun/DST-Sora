@@ -131,13 +131,38 @@ local treemap = {
     } -- 航海
 }
 treemap.rainbow = {}
+local itemmap = {}
 for k, v in pairs(treemap) do
     for ik, iv in pairs(v) do
         treemap.rainbow[ik] = math.max(treemap.rainbow[ik] or 0, iv)
     end
 end
-local function UpdateLightState(inst)
+local function CheckChest(inst, doer)
 
+    local pos = Vector3(inst.Transform:GetWorldPosition())
+    for i = 151, 154 do
+        local item = inst.components.container:GetItemInSlot(i)
+        if item and item:HasTag("sora_light_batteries") then
+            if item.components.stackable and item.components.stackable.stacksize > 1 then
+                local itemdrop = item.components.stackable:Get(item.components.stackable.stacksize - 1)
+                if itemdrop then
+                    itemdrop.Transform:SetPosition(pos:Get())
+                    if itemdrop.components.inventoryitem then
+                        itemdrop.components.inventoryitem:OnDropped(true)
+                    end
+                    itemdrop.prevcontainer = nil
+                    itemdrop.prevslot = nil
+                    inst:PushEvent("dropitem", {
+                        item = itemdrop
+                    })
+                end
+            end
+        end
+    end
+    TheWorld.components.sorachestmanager:OnClose(inst, doer)
+end
+local function UpdateLightState(inst)
+    local pos = Vector3(inst.Transform:GetWorldPosition())
     ClearSoundQueue(inst)
     local num_batteries = 0
     local trees = {}
@@ -152,6 +177,7 @@ local function UpdateLightState(inst)
             end
         end
     end
+
     local was_on = IsLightOn(inst)
 
     inst.components.prototyper.trees = TechTree.Create(trees)
@@ -159,12 +185,12 @@ local function UpdateLightState(inst)
         inst.Light:SetRadius(light_str[num_batteries].radius)
         inst.Light:SetFalloff(light_str[num_batteries].falloff)
         inst.Light:SetIntensity(light_str[num_batteries].intensity)
-        for i = 1, 4 do
+        for i = 151, 154 do
             local item = inst.components.container:GetItemInSlot(i)
             if item then
-                inst.AnimState:OverrideSymbol("flower" .. i, item.prefab, "flower" .. i)
+                inst.AnimState:OverrideSymbol("flower" .. (i - 150), itemmap[item.prefab] or "", "flower" .. (i - 150))
             else
-                inst.AnimState:ClearOverrideSymbol("flower" .. i)
+                inst.AnimState:ClearOverrideSymbol("flower" .. (i - 150))
             end
         end
         if not was_on then
@@ -224,10 +250,28 @@ local function onhit(inst, worker, workleft)
     end
 
 end
+local function onopen(inst)
+    SoraAPI.CheckChestValid(inst)
+end
+
+local function onclose(inst, doer)
+    SoraAPI.CheckChestValid(inst)
+    TheWorld.components.sorachestmanager:OnClose(inst, doer)
+end
 
 local function getstatus(inst)
     return (IsLightOn(inst) and "ON") or "OFF"
 end
+local cmp = require "components/sorachestmanager"
+local data = {
+    containers = {},
+    controls = {155, 156, 157, 158, 159},
+    pri = 100
+}
+for i = 1, 30 do
+    table.insert(data.containers, {i * 5 - 4, i * 5 - 3, i * 5 - 2, i * 5 - 1, i * 5})
+end
+cmp:RegType("sora_light", data)
 local function fn()
     local inst = CreateEntity()
     local trans = inst.entity:AddTransform()
@@ -235,7 +279,7 @@ local function fn()
     inst.entity:AddSoundEmitter()
     inst.entity:AddLight()
     inst.entity:AddNetwork()
-    MakeObstaclePhysics(inst, 0.4)
+    -- MakeObstaclePhysics(inst, 0.4)
 
     anim:SetBank("sora_light_white")
     anim:SetBuild("sora_light_white")
@@ -245,6 +289,8 @@ local function fn()
     inst.Light:SetColour(.65, .65, .5)
     inst.Light:Enable(false)
     inst:AddTag("structure")
+    --inst:AddTag("plantkin")
+    inst:AddTag("nosteal")
     inst:AddTag("prototyper")
     inst.entity:SetPristine()
 
@@ -267,10 +313,14 @@ local function fn()
     inst.components.workable:SetWorkLeft(4)
     inst.components.workable:SetOnFinishCallback(onhammered)
     inst.components.workable:SetOnWorkCallback(onhit)
-
+    inst:AddComponent("preserver")
+    inst.components.preserver:SetPerishRateMultiplier(1)
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sora_light")
-
+    inst.components.container.onopenfn = onopen
+    inst.components.container.onclosefn = onclose
+    inst.prefab = "sora_light"
+    TheWorld.components.sorachestmanager:RegByType(inst, "sora_light")
     inst:ListenForEvent("onbuilt", onbuilt)
     inst:ListenForEvent("itemget", UpdateLightState)
     inst:ListenForEvent("itemlose", UpdateLightState)
@@ -282,6 +332,7 @@ table.insert(prefabs, Prefab("sora_light", fn, assets))
 table.insert(prefabs, MakePlacer("sora_light_placer", "sora_light_white", "sora_light_white", "idle"))
 local function MakeLight(str, istrue)
     local name = "sora_light_" .. str
+    itemmap[name .. (istrue and "_new" or "")] = name
     local assets = {Asset("ANIM", "anim/sora_light/" .. name .. ".zip"),
                     Asset("ATLAS", "images/inventoryimages/sora_light/" .. name .. ".xml"),
                     Asset("IMAGE", "images/inventoryimages/sora_light/" .. name .. ".tex"),
@@ -316,6 +367,12 @@ local function MakeLight(str, istrue)
     end
     return Prefab(name .. (istrue and "_new" or ""), fn, assets)
 end
+-- PROTOTYPER_DEFS.sora_light = {
+--         icon_atlas = CRAFTING_ICONS_ATLAS,
+--         icon_image = "filter_none.tex",
+--         is_crafting_station = true,
+--         filter_text = STRINGS.UI.CRAFTING_STATION_FILTERS.ANCIENT
+--     }
 
 for k, v in pairs(color) do
     table.insert(prefabs, MakeLight(v))

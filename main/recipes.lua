@@ -521,17 +521,20 @@ Rec("sora_huapen", "穹の花盆", "世界有你更美好", build, "soraother", 
 }})
 
 Rec("sora_light", "穹の玫瑰灯", "装饰你的灯吧", build, "soraother", {{
-    livinglog = 3,
-    cutstone = 10,
-    goldnugget = 20
-}, {
-    livinglog = 10,
-    cutstone = 20,
+    livinglog = 5,
+    cutstone = 40,
+    boards=40,
     goldnugget = 40
 }, {
+    livinglog = 10,
+    cutstone = 100,
+    boards = 100,
+    goldnugget = 100
+}, {
     livinglog = 40,
-    cutstone = 40,
-    goldnugget = 80
+    cutstone = 200,
+    boards = 200,
+    goldnugget = 200
 }})
 local lightdata = {
     blue = {"隐藏着黑暗力量的钥匙啊\n在我面前显示你真正的力量", {
@@ -571,21 +574,25 @@ local lightdata = {
 
 }
 
-for k, v in pairs({"blue", "green", "orange", "pink", "red", "silvery", "violet", "yellow"}) do
+for k, v in pairs({"red", "blue", "violet", "silvery", "orange", "yellow", "green", "pink"}) do
     local lightname = "sora_light_" .. v .. "_new"
     lightdata.rainbow[2][lightname] = 1
 end
-for k, v in pairs({"blue", "green", "orange", "pink", "rainbow", "red", "silvery", "violet", "yellow"}) do
+for k, v in pairs({"red", "blue", "violet", "silvery", "orange", "yellow", "green", "pink", "rainbow"}) do
     local nizaoname = "sora_light_" .. v
-    AddInvImg(nizaoname, "inventoryimages/sora_light/" .. nizaoname)
-    Rec(nizaoname, "拟造の玫瑰", "拿去装饰你的灯吧", soralight, "soraother", {
-        lightbulb = 10
-    })
+
     local lightname = nizaoname .. "_new"
     AddInvImg(lightname, "inventoryimages/sora_light/" .. nizaoname, nizaoname)
     Rec(lightname, "穹の玫瑰", lightdata[v][1], soralight, "soraother", lightdata[v][2])
 end
 
+for k, v in pairs({"red", "blue", "violet", "silvery", "orange", "yellow", "green", "pink", "rainbow"}) do
+    local nizaoname = "sora_light_" .. v
+    AddInvImg(nizaoname, "inventoryimages/sora_light/" .. nizaoname)
+    Rec(nizaoname, "拟造の玫瑰", "拿去装饰你的灯吧", soralight, "soraother", {
+        lightbulb = 10
+    })
+end
 Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother", {{
     goldnugget = 2
 }, {
@@ -1002,8 +1009,8 @@ UnlonkRecipes("bullkelp_root", {
 
 UnlonkRecipes("catcoonden", {
     livinglog = 5,
-    rope=5,
-    surfnturf=3
+    rope = 5,
+    surfnturf = 3
 }, "灵猫九命！")
 
 UnlonkRecipes("rock_avocado_fruit_sprout", {
