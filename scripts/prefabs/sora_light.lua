@@ -157,6 +157,36 @@ local function CheckChest(inst, doer)
                     })
                 end
             end
+        elseif item then
+            local itemdrop = inst.components.container:RemoveItem(item, true)
+            if itemdrop then
+                itemdrop.Transform:SetPosition(pos:Get())
+                if itemdrop.components.inventoryitem then
+                    itemdrop.components.inventoryitem:OnDropped(true)
+                end
+                itemdrop.prevcontainer = nil
+                itemdrop.prevslot = nil
+                inst:PushEvent("dropitem", {
+                    item = itemdrop
+                })
+            end
+        end
+    end
+    for i = 155, 159 do
+        local item = inst.components.container:GetItemInSlot(i)
+        if item and item.prefab == "greemgem" then
+            local itemdrop = inst.components.container:RemoveItem(item, true)
+            if itemdrop then
+                itemdrop.Transform:SetPosition(pos:Get())
+                if itemdrop.components.inventoryitem then
+                    itemdrop.components.inventoryitem:OnDropped(true)
+                end
+                itemdrop.prevcontainer = nil
+                itemdrop.prevslot = nil
+                inst:PushEvent("dropitem", {
+                    item = itemdrop
+                })
+            end
         end
     end
 end
@@ -287,7 +317,7 @@ local function fn()
     inst.Light:SetColour(.65, .65, .5)
     inst.Light:Enable(false)
     inst:AddTag("structure")
-    --inst:AddTag("plantkin")
+    -- inst:AddTag("plantkin")
     inst:AddTag("nosteal")
     inst:AddTag("prototyper")
     inst.entity:SetPristine()

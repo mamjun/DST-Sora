@@ -138,7 +138,6 @@ for y = 4, 0, -1 do
 end
 local  gemblack = {
     greemgem=1,
-    purplegem=1,
 }
 params.sora2chest = {
     widget = {
