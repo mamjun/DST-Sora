@@ -516,6 +516,7 @@ function UpdateEnts() -- 尝试缓存有用的实体 减少运算量
     if TheWorld.components.sorachestmanager.UpdateAllEntsCD() then
         UpdateAllEnts()
     end
+    print("缓存实体")
     cacheents = {}
     for k, v in pairs(Ents) do
         if not v.SoraChestSkip then
@@ -639,11 +640,11 @@ end
 local ChestData = SoraAPI.ChestData
 local com = Class(function(self, inst)
     self.inst = inst
-    inst:DoPeriodicTask(0, FindPrefab)
-    inst:DoPeriodicTask(1, UpdateAllChest)
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
-    inst:DoPeriodicTask(1, UpdateEnts)
+    self.FindPrefabTask = inst:DoTaskInTime(0, FindPrefab)
+    self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
+    --self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
     inst:WatchWorldState("cycles", function()
         inst:DoTaskInTime(1, DayUpdate)
         inst:DoTaskInTime(3, DayUpdate)
