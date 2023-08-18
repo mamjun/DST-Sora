@@ -53,7 +53,7 @@ local function onopen(inst)
 end
 
 local function onclose(inst, doer)
-    TheWorld.components.sorachestmanager:OnClose(inst, doer)
+    --TheWorld.components.sorachestmanager:OnClose(inst, doer)
     inst.AnimState:PlayAnimation("close")
     inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")

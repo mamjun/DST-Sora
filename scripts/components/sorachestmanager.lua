@@ -513,7 +513,7 @@ local function TryCacheEnt(inst, all) -- 尝试缓存下来
 end
 local function UpdateAllEnts() -- 尝试清除所有实体的跳过标记
     for k, v in pairs(Ents) do
-        if v.SoraChestSkip and v.replica and v.replica.container then
+        if v.SoraChestSkip and v.replica and v.replica.inventoryitem then
             v.SoraChestSkip = nil
         end
     end
@@ -646,6 +646,7 @@ local function OnOpen(inst, event)
 end
 local function OnClose(inst, event)
     local doer = event and event.doer
+    ResetChestData(inst, doer)
     if not (doer and doer:HasTag("player")) then
         return
     end
@@ -723,7 +724,6 @@ function com:UpdateChest(chest)
     UpdateChest(chest)
 end
 function com:OnClose(chest, doer)
-    ResetChestData(chest, doer)
     OnClose(chest, doer)
 end
 function com:UpdateChest(chest)

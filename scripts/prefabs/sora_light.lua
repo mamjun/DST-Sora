@@ -284,7 +284,7 @@ end
 
 local function onclose(inst, doer)
     CheckChest(inst, doer)
-    TheWorld.components.sorachestmanager:OnClose(inst, doer)
+    --TheWorld.components.sorachestmanager:OnClose(inst, doer)
 end
 
 local function getstatus(inst)
