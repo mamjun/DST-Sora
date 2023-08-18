@@ -201,10 +201,10 @@ SORAREPAIR.str = "修复"
 SORAREPAIR.fn = function(act)
     if act.target ~= nil and act.doer ~= nil then
         local num = act.invobject.components.sorarepairer:DoRepair(act.invobject, act.target, act.doer)
-        if num > 0  then
+        if num > 0 then
             act.doer.components.talker:Say("跟新的一样")
             if act.invobject.components.stackable then
-                for i=1,num do
+                for i = 1, num do
                     act.invobject.components.stackable:Get():Remove()
                 end
             else
@@ -336,7 +336,6 @@ local SORALOCK = GLOBAL.Action({
 })
 SORALOCK.id = "SORALOCK"
 SORALOCK.str = "上锁"
-local exp = {5000, 2000, 1000}
 
 SORALOCK.fn = function(act)
     local target = act.target
@@ -380,3 +379,59 @@ end)
 
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORALOCK, "dolongaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORALOCK, "dolongaction"))
+
+local SORACHESTPATCH = GLOBAL.Action({
+    priority = 99
+})
+SORACHESTPATCH.id = "SORACHESTPATCH"
+SORACHESTPATCH.str = "上强迫"
+
+SORACHESTPATCH.fn = function(act)
+    local target = act.target
+    local invobject = act.invobject
+    local doer = act.doer
+    if not invobject then
+        return true
+    end
+    if TUNING.SORATOCHEST then
+        Say(doer, "现在禁止上强迫")
+        return true
+    end
+    if target ~= nil and target:IsValid() then
+        if not target:HasTag("_container") and not target:HasTag("fire") and not target:HasTag("burnt") then
+            Say(doer, "这个箱子现在不能上强迫")
+            return true
+        end
+        if not (target.components.container and not target.components.container:IsOpen()) then
+            Say(doer, "箱子打开时不能上强迫")
+            return true
+        end
+        if target.components.soracontainlock and target.components.soracontainlock.lockeruserid ~= doer.userid then
+            Say(doer, "箱子的主人不是你")
+            return true
+        end
+        if not target.components.sorapatch then
+            target:AddComponent("sorapatch")
+        end
+        target.components.sorapatch:ApplyPatch("sora2chest")
+        if invobject.components.stackable then
+            invobject.components.stackable:Get():Remove()
+        else
+            invobject:Remove()
+        end
+        Say(doer, "成功上强迫症")
+        return true
+    end
+end
+
+AddAction(SORACHESTPATCH)
+AddComponentAction("USEITEM", "sorapatch", function(inst, doer, target, actions)
+    if inst.prefab == "sora_tochest" and target.prefab == "treasurechest" and not target:HasTag("sora2chest") and
+        not target:HasTag("fire") and not target:HasTag("burnt") then
+        table.insert(actions, ACTIONS.SORACHESTPATCH)
+    end
+end)
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
+

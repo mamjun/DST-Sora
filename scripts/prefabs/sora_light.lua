@@ -250,11 +250,9 @@ local function onhit(inst, worker, workleft)
 
 end
 local function onopen(inst)
-    SoraAPI.CheckChestValid(inst)
 end
 
 local function onclose(inst, doer)
-    SoraAPI.CheckChestValid(inst)
     CheckChest(inst, doer)
     TheWorld.components.sorachestmanager:OnClose(inst, doer)
 end

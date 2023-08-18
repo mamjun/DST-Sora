@@ -234,10 +234,15 @@ if TUNING.SORACHESTRANGE > 2000 then
             end
         end
         TryPutToContainer(chest, ents, container)
+        local first = true
         if overfull and next(ents) then
             for item, v in pairs(ents) do
                 if not overfullfn(chest, item) then
-                    return
+                    if first then
+                        first = false
+                    else
+                        return
+                    end
                 end
                 if item.components.inventoryitem then
                     item.components.inventoryitem:OnPickup(chest)
@@ -285,10 +290,15 @@ else
             end
         end
         TryPutToContainer(chest, ents, container)
+        local first = true
         if overfull and next(ents) then
             for item, v in pairs(ents) do
                 if not overfullfn(chest, item) then
-                    return
+                    if first then
+                        first = false
+                    else
+                        return
+                    end
                 end
                 if item.components.inventoryitem then
                     item.components.inventoryitem:OnPickup(chest)
@@ -516,7 +526,6 @@ function UpdateEnts() -- 尝试缓存有用的实体 减少运算量
     if TheWorld.components.sorachestmanager.UpdateAllEntsCD() then
         UpdateAllEnts()
     end
-    print("缓存实体")
     cacheents = {}
     for k, v in pairs(Ents) do
         if not v.SoraChestSkip then
@@ -555,6 +564,19 @@ local function ResetChestData(inst, doer)
                         item = itemdrop
                     })
                 end
+            end
+        elseif item then 
+            local itemdrop = container:RemoveItem(item, true)
+            if itemdrop then
+                itemdrop.Transform:SetPosition(pos:Get())
+                if itemdrop.components.inventoryitem then
+                    itemdrop.components.inventoryitem:OnDropped(true)
+                end
+                itemdrop.prevcontainer = nil
+                itemdrop.prevslot = nil
+                inst:PushEvent("dropitem", {
+                    item = itemdrop
+                })
             end
         end
     end
@@ -619,10 +641,15 @@ local function ResetChestData(inst, doer)
         updatechests[inst] = nil
     end
 end
-local function OnClose(inst, doer)
+local function OnOpen(inst, event)
+    SoraAPI.CheckChestValid(inst)
+end
+local function OnClose(inst, event)
+    local doer = event and event.doer
     if not (doer and doer:HasTag("player")) then
         return
     end
+    SoraAPI.CheckChestValid(inst)
     if not inst.sorachestdata then
         return
     end
@@ -677,11 +704,15 @@ function com:RegByType(chest, type)
         allchest[chest.prefab][chest] = deepcopy(ChestData[type])
         chest.sorachestdata = allchest[chest.prefab][chest]
         chest:DoTaskInTime(0, ResetChestData)
+        chest:ListenForEvent("onopen",OnOpen)
+        chest:ListenForEvent("onclose",OnClose)
         chest:ListenForEvent("onremove", OnChestRemove)
     end
 end
 function com:UnReg(chest)
     if allchest[chest.prefab] then
+        chest:RemoveEventCallback("onopen",OnOpen)
+        chest:RemoveEventCallback("onclose",OnClose)
         updatechests[chest] = nil
         chest.sorachestdata = nil
         allchest[chest.prefab][chest] = nil

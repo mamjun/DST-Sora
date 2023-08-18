@@ -868,3 +868,15 @@ end)
 --     end)
 
 -- end
+
+
+AddPrefabPostInit("treasurechest",function (inst)
+    inst.sora2chest = net_bool(inst.GUID,"sora2chest","sora2chestdirty")
+    if not TheWorld.ismastersim then
+		inst:ListenForEvent("sora2chestdirty", function (inst)
+            if inst.sora2chest:value() then
+                inst.replica.container:WidgetSetup("sora2chest")
+            end
+        end)
+    end
+end)

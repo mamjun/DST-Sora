@@ -27,8 +27,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-require "prefabutil"
+]] require "prefabutil"
 --[[
 ▶红 → 快速腐败效果
   ▶蓝 → 些许返鲜效果
@@ -41,25 +40,20 @@ require "prefabutil"
 重复可提升效果(紫黄除外)
 ]] --
 
-local assets = {
-    Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2fire.zip"),
-    Asset("ATLAS", "images/inventoryimages/sora2fire.xml"),
-    Asset("IMAGE", "images/inventoryimages/sora2fire.tex"),
-    Asset("ATLAS_BUILD", "images/inventoryimages/sora2fire.xml", 256)
-}
+local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2fire.zip"),
+                Asset("ATLAS", "images/inventoryimages/sora2fire.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2fire.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2fire.xml", 256)}
 
 local prefabs = {"collapse_small"}
 
-
 local function onopen(inst)
-    SoraAPI.CheckChestValid(inst)
     inst.AnimState:PlayAnimation("open")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
 
-local function onclose(inst,doer)
-    SoraAPI.CheckChestValid(inst)
-    TheWorld.components.sorachestmanager:OnClose(inst,doer)
+local function onclose(inst, doer)
+    TheWorld.components.sorachestmanager:OnClose(inst, doer)
     inst.AnimState:PlayAnimation("close")
     inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
@@ -87,13 +81,53 @@ local function onbuilt(inst)
 end
 local cmp = require "components/sorachestmanager"
 local data = {
-    containers = {{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20}},
-    controls = {21,22,23,24,25},
-    pri=50,
-    overfull = 1,
+    containers = {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}},
+    controls = {21, 22, 23, 24, 25},
+    pri = 50,
+    overfull = 1
 }
 cmp:RegType("sora2chest", data)
-
+local cmp2 = require "components/sorapatch"
+local tocopy = {
+    onopenfn = 1,
+    onclosefn = 1,
+    skipclosesnd = 1,
+    skipopensnd = 1
+}
+local data2 = {
+    patch = function(self)
+        local inst = self.inst
+        if inst.components.container then
+            local items = inst.components.container:RemoveAllItems()
+            inst.components.container:Close()
+            local copy = {}
+            for k, v in pairs(tocopy) do
+                copy[k] = inst.components.container[k]
+            end
+            inst:RemoveComponent("container")
+            inst:AddComponent("container")
+            for k, v in pairs(copy) do
+                inst.components.container[k] = copy[k]
+            end
+            inst.components.container:WidgetSetup("sora2chest")
+            for k, v in pairs(items) do
+                inst.components.container:GiveItem(v)
+            end
+            inst.sora2chest:set_local(false)
+            inst.sora2chest:set(true)
+            if not inst.prefab then inst.prefab = "treasurechest" end
+            TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
+            inst:AddTag("sora2chest")
+        end
+    end,
+    data = {},
+    unpatch = function(self)
+        -- 不给卸载 老子没写 嚣张
+    end
+}
+ if not TUNING.SORATOCHEST then
+    cmp2:RegPatch("sora2chest", data2)
+ end
 local function fn()
     local inst = CreateEntity()
 
@@ -105,7 +139,6 @@ local function fn()
 
     inst.MiniMapEntity:SetIcon("sora2fire.tex")
     inst:AddTag("structure")
-    --inst:AddTag("plantkin")
     inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
@@ -138,33 +171,41 @@ local function fn()
     inst.components.workable:SetWorkLeft(4)
     inst.components.workable:SetOnFinishCallback(onhammered)
     inst.components.workable:SetOnWorkCallback(onhit)
-    inst.GemTime = {}
-    inst.Gem = {
-        purplegem  = 0,
-        bluegem    = 0,
-        redgem     = 0,
-        orangegem  = 0,
-        yellowgem  = 0,
-        greengem   = 0,
-        opalpreciousgem    = 0,
-    }
     inst:ListenForEvent("onbuilt", onbuilt)
-    if TUNING.SMART_SIGN_DRAW_ENABLE then SMART_SIGN_DRAW(inst) end
-    inst:ListenForEvent("itemget",function(i,data)
-        if data.item and not data.item.prefab:match("gem") and not data.item:HasTag("bird") and data.slot >1 then
-            if inst.Gem.yellowgem > 0 then
-                local pos = i:GetPosition()
-                local ents = TheSim:FindEntities(pos.x,pos.y,pos.z,30,{"sora2tree"})
-                if ents and #ents > 0 then
-                    local item = i.components.container:RemoveItem(data.item, true)
-                    ents[1].components.container:GiveItem(item)
-                    ents[1].components.soragift:GetItem()
-                end
-            end
-        end
-    end)
+    if TUNING.SMART_SIGN_DRAW_ENABLE then
+        SMART_SIGN_DRAW(inst)
+    end
+    return inst
+end
+local function tochestfn()
+    local inst = CreateEntity()
+    local trans = inst.entity:AddTransform()
+    local anim = inst.entity:AddAnimState()
+    MakeInventoryPhysics(inst)
+    inst.entity:AddNetwork()
+    anim:SetBank("sora2stone")
+    anim:SetBuild("sora2stone")
+    anim:PlayAnimation("idle")
+    inst:AddTag("soracontainlock")
+
+    if not TheWorld.ismastersim then
+        return inst
+    end
+    inst:AddComponent("inspectable")
+    inst.components.inspectable:SetDescription([[原来你也有强迫症]])
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2stone.xml"
+    inst.components.inventoryitem.imagename = "sora2stone"
+
+    inst:AddComponent("sorapatch")
+    inst:AddComponent("stackable")
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(0)
+    inst.fx = SpawnPrefab("sora_tmp_fx")
+    inst.fx:Bind(inst)
     return inst
 end
 
-return Prefab("sora2chest", fn, assets, prefabs),
-       MakePlacer("sora2chest_placer", "chest", "treasure_chest", "closed")
+return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "chest", "treasure_chest", "closed"),
+    Prefab("sora_tochest", tochestfn, assets, prefabs)

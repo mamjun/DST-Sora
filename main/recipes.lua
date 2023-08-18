@@ -619,6 +619,20 @@ Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraot
     mole = 1
 }})
 
+AddInvImg("sora_tochest", "inventoryimages/sora2stone", "sora2stone")
+Rec("sora_tochest", "原来你也有强迫症", "原来你也有强迫症", item, "soraother", {{
+    [san] = 10,
+    boards=3,
+}, {
+    [san] = 20,
+    boards=3,
+    cutstone= 3,
+}, {
+    [san] = 30,
+    boards=10,
+    cutstone= 10,
+}})
+
 -- 魔法
 Rec("sora_birds", "鸽子还没到", "一定来,一定来\n不会咕,不会咕", skill, "sorabook", {
     [san] = 10 + 10 * mode
