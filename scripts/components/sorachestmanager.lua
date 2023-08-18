@@ -235,7 +235,7 @@ if TUNING.SORACHESTRANGE > 2000 then
         end
         TryPutToContainer(chest, ents, container)
         if overfull and next(ents) then
-            for item, v in paris(ents) do
+            for item, v in pairs(ents) do
                 if not overfullfn(chest, item) then
                     return
                 end

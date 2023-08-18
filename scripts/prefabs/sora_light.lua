@@ -348,7 +348,7 @@ local function MakeLight(str, istrue)
         inst.Light:SetRadius(0.5)
         inst.Light:SetColour(237 / 255, 237 / 255, 209 / 255)
         inst.Light:Enable(true)
-
+        MakeInventoryPhysics(inst)
         anim:SetBank(name)
         anim:SetBuild(name)
         anim:PlayAnimation("idle", true)
