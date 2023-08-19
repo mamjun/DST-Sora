@@ -158,11 +158,11 @@ local function fn()
     inst.components.soragift.levelchangefn = decor
     
     inst:AddComponent("lootdropper")
-    inst:AddComponent("workable")
-    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-    inst.components.workable:SetWorkLeft(2)
-    inst.components.workable:SetOnFinishCallback(onhammered)
-    inst.components.workable:SetOnWorkCallback(onhit) 
+    -- inst:AddComponent("workable")
+    -- inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+    -- inst.components.workable:SetWorkLeft(2)
+    -- inst.components.workable:SetOnFinishCallback(onhammered)
+    -- inst.components.workable:SetOnWorkCallback(onhit) 
     inst:ListenForEvent("onbuilt", onbuilt)
     
     return inst

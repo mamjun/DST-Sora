@@ -27,19 +27,16 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local spicedfoods = require("spicedfoods")
+]] local spicedfoods = require("spicedfoods")
 
 local SoraFoodMemory = Class(function(self, inst)
     self.inst = inst
     self.duration = TUNING.TOTAL_DAY_TIME * 3
     self.foods = {}
-    self.mults = {0.6,0.2,-0.2,-0.6,-1}
-    self.mults2 = {0.6,0.2,0,0,0}
+    self.mults = {0.6, 0.2, -0.2, -0.6, -1}
+    self.mults2 = {0.6, 0.2, 0, 0, 0}
 end)
-local nothunger = {
-
-}
+local nothunger = {}
 function SoraFoodMemory:OnRemoveFromEntity()
     for k, v in pairs(self.foods) do
         v.task:Cancel()
@@ -61,8 +58,12 @@ function SoraFoodMemory:GetBaseFood(prefab)
 end
 
 function SoraFoodMemory:SoraRememberFood(inst)
-    if inst:HasTag("sorafood") then return end
-    if inst.components.edible and inst.components.edible.hungervalue < 5 then return end
+    if inst:HasTag("sorafood") then
+        return
+    end
+    if inst.components.edible and inst.components.edible.hungervalue < 5 then
+        return
+    end
     local prefab = inst.prefab
     local rec = self.foods[prefab]
     if rec ~= nil then
@@ -70,16 +71,15 @@ function SoraFoodMemory:SoraRememberFood(inst)
         rec.task:Cancel()
         rec.task = self.inst:DoTaskInTime(self.duration, OnForgetFood, self, prefab)
     else
-        self.foods[prefab] =
-        {
+        self.foods[prefab] = {
             count = 1,
-            task = self.inst:DoTaskInTime(self.duration, OnForgetFood, self, prefab),
+            task = self.inst:DoTaskInTime(self.duration, OnForgetFood, self, prefab)
         }
     end
 end
 
 function SoraFoodMemory:Clear()
-    self.foods = {}  
+    self.foods = {}
 end
 
 function SoraFoodMemory:GetMemoryCount(prefab)
@@ -94,23 +94,29 @@ function SoraFoodMemory:SoraGetFoodMultiplier(inst)
     local prefab = inst.prefab
     local count = self:GetMemoryCount(prefab)
     local mul = self.mults
-    if inst.components.edible and inst.components.edible.healthvalue > 60 then
-        mul =  self.mults2
+    if inst.components.edible and
+        ((inst.components.edible.healthvalue or 0) > 60 or (inst.components.edible.sanityvalue or 0) > 60) then
+        mul = self.mults2
     end
-    
+
     return count > 0 and mul and mul[math.min(#mul, count)] or 1
 end
 function SoraFoodMemory:OnSave()
     if next(self.foods) ~= nil then
         local foods = {}
         for k, v in pairs(self.foods) do
-            foods[k] = { count = v.count, t = GetTaskRemaining(v.task) }
+            foods[k] = {
+                count = v.count,
+                t = GetTaskRemaining(v.task)
+            }
         end
-        return { foods = foods }
+        return {
+            foods = foods
+        }
     end
 end
 
-function SoraFoodMemory:OnLoad(data)--, ents)
+function SoraFoodMemory:OnLoad(data) -- , ents)
     if data.foods ~= nil then
         for k, v in pairs(data.foods) do
             local rec = self.foods[k]
@@ -119,8 +125,7 @@ function SoraFoodMemory:OnLoad(data)--, ents)
                 rec.task:Cancel()
                 rec.task = self.inst:DoTaskInTime(v.t or self.duration, OnForgetFood, self, k)
             else
-                self.foods[k] =
-                {
+                self.foods[k] = {
                     count = v.count or 1,
                     task = self.inst:DoTaskInTime(v.t or self.duration, OnForgetFood, self, k)
                 }

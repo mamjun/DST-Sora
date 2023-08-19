@@ -157,29 +157,32 @@ local function TryPutToContainer(chest, ents, container, fn)
     if not next(ents) then
         return true
     end
-    local i = 1
+    local i = {}
     local con = chest.components.container
     local pos = chest:GetPosition()
     local puted = {}
     for k, v in pairs(ents) do
+        i[k.prefab] = 1
+    end
+    for k, v in pairs(ents) do
         local over = false
-        while catch(k) and i <= #container and not over and (not fn or fn and fn(chest, k)) do
-            local item = con:GetItemInSlot(container[i])
+        while catch(k) and i[k.prefab] <= #container and not over and (not fn or fn and fn(chest, k)) do
+            local item = con:GetItemInSlot(container[i[k.prefab]])
             if CanStack(item, k) then
                 if item.components.inventoryitem ~= nil and item.components.inventoryitem.owner ~= nil then
                     item.components.inventoryitem.owner:PushEvent("gotnewitem", {
                         item = item,
-                        slot = container[i]
+                        slot = container[i[k.prefab]]
                     })
                 end
                 local ret = item.components.stackable:Put(k, pos)
                 if not ret then
                     puted[k] = 1
                     over = true
-                    i = i - 1
+                    i[k.prefab] = i[k.prefab] - 1
                 end
             elseif not item then
-                con:GiveItem(k, container[i], nil, true)
+                con:GiveItem(k, container[i[k.prefab]], nil, true)
                 if k.components.knownlocations then -- 有家就忘了 
                     k.components.knownlocations:ForgetLocation("home")
                 end
@@ -189,9 +192,9 @@ local function TryPutToContainer(chest, ents, container, fn)
 
                 puted[k] = 1
                 over = true
-                i = i - 1
+                i[k.prefab] = i[k.prefab] - 1
             end
-            i = i + 1
+            i[k.prefab] = i[k.prefab] + 1
         end
     end
     for k, v in pairs(puted) do
@@ -339,7 +342,7 @@ local updategem = {
 local GemTask = {
     opalpreciousgem = function(inst, data, v)
         local con = inst.components.container
-        local use = (v % 60) == 0
+        local use = (v % 30) == 0
         for k, container in pairs(data.containers) do
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
@@ -347,13 +350,16 @@ local GemTask = {
                     if it.components.fueled and  it.components.fueled:GetPercent() < 1   then
                         it.components.fueled:DoDelta(50)
                     end
-                    if it.components.armor and  it.components.armor:GetPercent() < 10  then
-                        it.components.armor:SetPercent(it.components.armor:GetPercent() +(it.components.armor:GetPercent() < 1 and  0.1 or 0.01))
+                    if it.components.armor and not it.components.armor.indestructible and  it.components.armor:GetPercent() < 10 then
+                        local rep = it.components.armor:GetPercent() < 1  and 0.1 or 0.01
+                        rep = it.components.armor.maxcondition * rep 
+                        it.components.armor.condition = it.components.armor.condition + rep 
+                        it:PushEvent("percentusedchange", {  percent = it.components.armor:GetPercent() })
                     end
                     if use and it.components.finiteuses  and  it.components.finiteuses:GetPercent() < 10 then
                         local peruse = math.ceil(it.components.finiteuses.total * ( it.components.finiteuses:GetPercent() < 1 and 0.2 or 0.02) )
                         peruse = math.max(peruse, 1)
-                        if peruse > 1 or  ((v % 300) == 0) or it.components.finiteuses:GetPercent() < 1  then
+                        if peruse > 1 or  ((v % 180) == 0) or it.components.finiteuses:GetPercent() < 1  then
                             it.components.finiteuses:Use(-peruse)
                         end
                     end
@@ -671,7 +677,7 @@ local com = Class(function(self, inst)
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
     self.FindPrefabTask = inst:DoTaskInTime(0, FindPrefab)
-    self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
+    self.UpdateAllChestTask = inst:DoPeriodicTask(0, UpdateAllChest)
     --self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
     inst:WatchWorldState("cycles", function()
         inst:DoTaskInTime(1, DayUpdate)

@@ -305,7 +305,7 @@ local function PickFn(inst, doer, pos)
         end
     end
 
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"molebait", "MINE_workable"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"molebait", "MINE_workable"},{"INLIMBO"})
     for k, v in pairs(ents) do
         if v.prefab == "rock_avocado_fruit" and isNear(v, pos) and v.components.workable and v.components.stackable then
             local mm = v.components.stackable.stacksize
@@ -319,12 +319,22 @@ local function PickFn(inst, doer, pos)
             end
         end
     end
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"farm_plant","pickable"})
+    for k, v in pairs(ents) do
+        if v.components.pickable and v:IsValid() then 
+			v.components.pickable:Pick(doer)
+        end
+    end
+    if #ents > 0 then
+        return 
+    end
 
     -- 大作物 
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled"},
         {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
     local prefabs = {}
     local items = {}
+
     for k, v in pairs(ents) do
         if isNear(v, pos) then
             if crops[v.prefab] then
@@ -343,7 +353,11 @@ local function PickFn(inst, doer, pos)
                 prefabs[v.prefab].num = prefabs[v.prefab].num + 1
                 v:Remove()
             elseif v.prefab == "medal_gift_fruit_oversized" then
-
+                if v.components.workable then
+                    v.components.workable:WorkedBy_Internal(doer,10)
+                end
+            elseif v.components.workable then
+                v.components.workable:WorkedBy_Internal(doer,10)
             end
         end
     end
