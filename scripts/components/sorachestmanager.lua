@@ -344,7 +344,7 @@ local GemTask = {
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
                 if it then
-                    if it.components.fueled and  it.components.armor:GetPercent() < 1   then
+                    if it.components.fueled and  it.components.fueled:GetPercent() < 1   then
                         it.components.fueled:DoDelta(50)
                     end
                     if it.components.armor and  it.components.armor:GetPercent() < 10  then
