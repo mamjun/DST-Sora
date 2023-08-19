@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
  author = "FL"
-version = "11.29.24" -- 版本
+version = "11.29.25" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -519,8 +519,8 @@ configuration_options = {maketitle("jichu", "基础设置"), {
                          makeconfig("san1", "基础回SAN", "%s", 0, -5, 0.5, 30),
                          makeconfig("san2", "升级回SAN", "%s", 0.2, 0, 0.1, 50),
                          makeconfig("san3", "特殊回SAN", "%s", 10, -5, 1, 55),
-                         makeconfig("foodd1", "基础反鲜", "%s", 0.25, -1, 0.05, 30),
-                         makeconfig("foodd2", "升级反鲜", "%s", -0.1, -0.5, 0.1, 20),
+                         makeconfig("foodd1", "基础反鲜(负的才是返鲜,正的是腐烂)", "%s", 0.25, -1, 0.05, 30),
+                         makeconfig("foodd2", "升级反鲜(负的才是返鲜,正的是腐烂)", "%s", -0.1, -0.5, 0.1, 20),
                          makeconfig("spe", "移速", "%s%%", 1.1, 0.7, 0.05, 16, 1),
                          makeconfig("water", "防水", "%s%%", 0, 0, 0.05, 20, 0),
                          maketitle("sorabowknot", "穹の蝴蝶结"),

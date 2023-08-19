@@ -37,6 +37,7 @@ local com = Class(function(self, inst)
     self.lockeruserid = ""
     self.pass = ""
     self.hooks = {}
+    self.openpass = {}
 end)
 local tohook = {
     container = {
@@ -90,9 +91,15 @@ function com:Init(doer, pass, name, id)
 
     end
     container.Open = function(s, doer, ...)
+        if not (doer and doer:HasTag("player")) then return end
+        local last = GetTick() - (self.openpass[doer.userid or "nil"] or 0 )
+        if last < 60 * 30  then
+            self:Open(doer)
+        else 
         SoraAPI.r_event(doer, "OpenLockUI", {
             name = self.lockername
         }, s.inst)
+        end
     end
     self.inst:AddTag("nosteal")
     self.inst:AddTag("soracontainlocked")
@@ -150,6 +157,7 @@ function com:Open(doer,pass)
         cmd = "close",
         pass = pass
     }, self.inst)
+    self.openpass[doer.userid or "unknow"] = GetTick()
     self.hooks.container.Open(self.inst.components.container, doer)
     return true
 end
@@ -189,6 +197,7 @@ function com:ChangePass(doer, pass)
             return Say(doer, "密码格式不正确")
         end
         self.pass = pass
+        self.openpass = {}
         self:Close()
         return Say(doer, "密码修改成功")
     end

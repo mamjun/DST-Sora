@@ -99,7 +99,7 @@ local treemap = {
     }, -- 奶奶
     orange = {
         CARTOGRAPHY = 5,
-        FOODPROCESSING = 5 -- 香料站
+         -- 香料站
     }, -- 制图桌
     pink = {
         PERDOFFERING = 5, -- 活动科技
@@ -194,7 +194,7 @@ local function UpdateLightState(inst)
     local pos = Vector3(inst.Transform:GetWorldPosition())
     ClearSoundQueue(inst)
     local num_batteries = 0
-    local trees = {}
+    local trees = {FOODPROCESSING = 5}
     for i = 151, 154 do
         local item = inst.components.container:GetItemInSlot(i)
         if item and item:HasTag("sora_light_batteries") then
@@ -332,15 +332,15 @@ local function fn()
     inst:AddComponent("prototyper")
     -- inst.components.prototyper.onturnon = SoraAPI.NilFn
     -- inst.components.prototyper.onturnoff = SoraAPI.NilFn
-    inst.components.prototyper.trees = {}
+    inst.components.prototyper.trees = {FOODPROCESSING = 5}
     -- inst.components.prototyper.onactivate = SoraAPI.NilFn
 
     inst:AddComponent("lootdropper")
-    inst:AddComponent("workable")
-    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-    inst.components.workable:SetWorkLeft(4)
-    inst.components.workable:SetOnFinishCallback(onhammered)
-    inst.components.workable:SetOnWorkCallback(onhit)
+    -- inst:AddComponent("workable")
+    -- inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+    -- inst.components.workable:SetWorkLeft(4)
+    -- inst.components.workable:SetOnFinishCallback(onhammered)
+    -- inst.components.workable:SetOnWorkCallback(onhit)
     inst:AddComponent("preserver")
     inst.components.preserver:SetPerishRateMultiplier(1)
     inst:AddComponent("container")
@@ -395,12 +395,12 @@ local function MakeLight(str, istrue)
     end
     return Prefab(name .. (istrue and "_new" or ""), fn, assets)
 end
--- PROTOTYPER_DEFS.sora_light = {
---         icon_atlas = CRAFTING_ICONS_ATLAS,
---         icon_image = "filter_none.tex",
---         is_crafting_station = true,
---         filter_text = STRINGS.UI.CRAFTING_STATION_FILTERS.ANCIENT
---     }
+PROTOTYPER_DEFS.sora_light = {
+        icon_atlas = CRAFTING_ICONS_ATLAS,
+        icon_image = "filter_none.tex",
+        is_crafting_station = true,
+        filter_text = STRINGS.UI.CRAFTING_FILTERS.CRAFTING_STATION
+    }
 
 for k, v in pairs(color) do
     table.insert(prefabs, MakeLight(v))

@@ -136,6 +136,18 @@ for y = 4, 0, -1 do
         table.insert(params.sorafire.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
+local function OnQiangBoClose(player, inst)
+    print(player, inst)
+    if inst and type(inst) == "table" and inst.GUID and inst.components.container ~= nil then
+        if not player then return end
+        if not player.sora2chestcd  then player.sora2chestcd = SoraCD(1) end
+        if player.sora2chestcd() then
+            TheWorld.components.sorachestmanager:OnClose(inst,player)
+        end
+    end
+end
+AddModRPCHandler("sora", "sora2chestclose", OnQiangBoClose)
+
 local  gemblack = {
     greemgem=1,
 }
@@ -146,8 +158,11 @@ params.sora2chest = {
         animbank = "ui_chest_3x3",
         animbuild = "sorachest",
         pos = GLOBAL.Vector3(-300, 100, 0),
-        side_align_tip = 120
-
+        side_align_tip = 120,
+        buttoninfo = {
+            text = "收集",
+            position = GLOBAL.Vector3(80, -290, 0)
+        }
     },
     type = "chest"
 }
@@ -172,7 +187,13 @@ function params.sora2chest.itemtestfn(container, item, slot)
     end
     return ( slot > 20 and  item:HasTag("gem") ) or slot <= 20
 end
-
+function params.sora2chest.widget.buttoninfo.fn(inst)
+    if inst.components.container ~= nil and ThePlayer then
+        OnQiangBoClose(ThePlayer,inst)
+    elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
+        SendModRPCToServer(MOD_RPC["sora"]["sora2chestclose"], inst)
+    end
+end
 
 params.sorabase = {
     widget = {
@@ -202,7 +223,11 @@ params.sora_light = {
         bgatlas = "images/quagmire_recipebook.xml",
         bgimage = "quagmire_recipe_menu_bg.tex",
         pos = Vector3(200, 0, 0),
-        side_align_tip = 100
+        side_align_tip = 100,
+        buttoninfo = {
+            text = "收集",
+            position = GLOBAL.Vector3(530, 40, 0)
+        }
     },
     acceptsstacks = true,
     type = "chest"
@@ -211,7 +236,7 @@ local sora_light_slot = 0
 for z=1,5 do
     for y=1,3 do
         for x=1,5 do
-            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 930+350*y,z*-70 +395, 0))
+            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 933+350*y,z*-70 +395, 0))
             table.insert(params.sora_light.widget.slotbg, {atlas = "images/hud.xml",image="inv_slot.tex"})
             sora_light_slot = sora_light_slot +1
         end
@@ -221,7 +246,7 @@ end
 for z=1,5 do
     for y=1,3 do
         for x=1,5 do
-            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 930+350*y,z*-70 +30, 0))
+            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 933+350*y,z*-70 +30, 0))
             table.insert(params.sora_light.widget.slotbg, {atlas = "images/hud.xml",image="inv_slot.tex"})
             sora_light_slot = sora_light_slot +1
         end
@@ -229,11 +254,11 @@ for z=1,5 do
 end
 
 for x=1,4 do
-    table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(530, 360-70*x, 0))
+    table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(530-3, 395-70*x, 0))
     table.insert(params.sora_light.widget.slotbg, {atlas = "images/inventoryimages/sora_light_bg.xml",image="sora_light_bg.tex"})
 end
 for x=1,5 do
-    table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(530, 30-70*x, 0))
+    table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(530-3, 30-70*x, 0))
     table.insert(params.sora_light.widget.slotbg, {atlas = "images/inventoryimages/sora_gem_bg.xml",image="sora_gem_bg.tex"})
 end
 function params.sora_light.itemtestfn(container, item, slot)
@@ -243,6 +268,8 @@ function params.sora_light.itemtestfn(container, item, slot)
     
     return ( slot > sora_light_slot and slot < (sora_light_slot+5)  and  item:HasTag("sora_light_batteries")) or ( slot > (sora_light_slot+4) and  item:HasTag("gem") and not gemblack[item.prefab]) or slot <= sora_light_slot
 end
+params.sora_light.widget.buttoninfo.fn =  params.sora2chest.widget.buttoninfo.fn
+
 
 params.sora_huapen = {
     widget = {

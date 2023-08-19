@@ -344,18 +344,17 @@ local GemTask = {
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
                 if it then
-                    if it.components.fueled then
+                    if it.components.fueled and  it.components.armor:GetPercent() < 1   then
                         it.components.fueled:DoDelta(50)
                     end
-                    if it.components.armor then
-                        it.components.armor:SetPercent(math.min(it.components.armor:GetPercent() + 0.1, 1))
+                    if it.components.armor and  it.components.armor:GetPercent() < 10  then
+                        it.components.armor:SetPercent(it.components.armor:GetPercent() +(it.components.armor:GetPercent() < 1 and  0.1 or 0.01))
                     end
-                    if use and it.components.finiteuses then
-                        local peruse = math.ceil(it.components.finiteuses.total * 0.2)
+                    if use and it.components.finiteuses  and  it.components.finiteuses:GetPercent() < 10 then
+                        local peruse = math.ceil(it.components.finiteuses.total * ( it.components.finiteuses:GetPercent() < 1 and 0.2 or 0.02) )
                         peruse = math.max(peruse, 1)
-                        it.components.finiteuses:Use(-peruse)
-                        if it.components.finiteuses:GetPercent() > 1 then
-                            it.components.finiteuses:SetPercent(1)
+                        if peruse > 1 or  ((v % 300) == 0) or it.components.finiteuses:GetPercent() < 1  then
+                            it.components.finiteuses:Use(-peruse)
                         end
                     end
                 end
@@ -650,13 +649,14 @@ local function OnClose(inst, event)
     if not (doer and doer:HasTag("player")) then
         return
     end
-    SoraAPI.CheckChestValid(inst)
+    
     if not inst.sorachestdata then
         return
     end
     if not inst.components.container then
         return
     end
+    SoraAPI.CheckChestValid(inst)
     local data = inst.sorachestdata
     GetItem(inst, data)
     if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") then
@@ -724,7 +724,7 @@ function com:UpdateChest(chest)
     UpdateChest(chest)
 end
 function com:OnClose(chest, doer)
-    OnClose(chest, doer)
+    OnClose(chest, {doer=doer})
 end
 function com:UpdateChest(chest)
     UpdateChest(chest)

@@ -206,21 +206,29 @@ local function IfChangeClearSeeds(inst, mode, doer)
     if inst.seeds and next(inst.seeds) then
         if #inst.seeds ~= mode then
             Say(doer, "刨坑模式已变更，种子模板清空")
-        end
+            inst.seeds = nil
+        end 
     end
 end
 local function DoBig(fn, inst, doer, pos, ...)
     -- 1格还是9格
 
     local rr = {}
+    local tosay
     if inst.isbig:value() and doer:HasTag("sora") then
-        for x = -4, 4, 4 do
-            for y = -4, 4, 4 do
-                local newpos = Point(pos.x + x, 0, pos.z + y)
+        for x = 0, 2, 1 do
+            for y = 0, 2, 1 do
+                local newpos = Point(pos.x + 4* x-4, 0, pos.z + 4 * y-4)
                 local r, msg = fn(inst, doer, newpos, ...)
                 table.insert(rr, r)
                 table.insert(rr, msg)
+                if not r and type(msg) == "string" then
+                    tosay = (tosay or "" )..(x*3+y+1).."号位".. msg.. "\n"
+                end
             end
+        end
+        if tosay then
+            Say(doer,tosay)
         end
     else
         local r, str = fn(inst, doer, pos, ...)
@@ -510,7 +518,7 @@ local function SeedFn(inst, doer, pos)
     if not TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) then
         return false, "只能在农田里使用"
     end
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"soil"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"soil"},{"NOCLICK","NOBLOCK"})
     local newents = {}
     for k, v in pairs(ents) do
         if isNear(v, pos) then
