@@ -36,6 +36,7 @@ for k, mod in pairs(ModManager.mods) do -- 遍历已开启的mod
             mod.postinitfns.PrefabPostInit.sora2ice = mod.postinitfns.PrefabPostInit.treasurechest -- 给我整一个！
             mod.postinitfns.PrefabPostInit.sora2fire = mod.postinitfns.PrefabPostInit.treasurechest -- 给我也整一个！
             mod.postinitfns.PrefabPostInit.sora2chest = mod.postinitfns.PrefabPostInit.treasurechest -- 给我也整一个！
+            mod.postinitfns.PrefabPostInit.sora_light = mod.postinitfns.PrefabPostInit.treasurechest -- 给我也整一个！
         end
     end
 end
