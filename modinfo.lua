@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
  author = "FL"
-version = "11.30.2" -- 版本
+version = "11.30.3" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -231,7 +231,7 @@ configuration_options = {maketitle("jichu", "基础设置"), {
     default = true
 }, {
     name = "wiki",
-    label = "是否默认显示wiki图标",
+    label = "是否默认显示wiki图标(需要玩家自己在mod设置里设置)",
     options = {{
         description = "默认显示",
         data = true,
@@ -243,6 +243,19 @@ configuration_options = {maketitle("jichu", "基础设置"), {
     }},
     default = true
 }, {
+    name = "chestui",
+    label = "是否显示强迫症箱子介绍(需要玩家自己在mod设置里设置)",
+    options = {{
+        description = "显示",
+        data = true,
+        hover = "显示强迫症箱子介绍"
+    }, {
+        description = "隐藏",
+        data = false,
+        hover = "隐藏强迫症箱子介绍"
+    }},
+    default = true
+},{
     name = "add",
     label = "扩展打包纸，允许打包落水洞等物品，\n但是请不要带这些东西跳世界，会出问题",
     options = {{

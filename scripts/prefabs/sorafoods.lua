@@ -27,36 +27,27 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local assets =
-{
-    Asset("ANIM", "anim/cook_pot_food.zip"),
-}
+]] local assets = {Asset("ANIM", "anim/cook_pot_food.zip")}
 
-local prefabs =
-{
-    "spoiled_food",
-}
+local prefabs = {"spoiled_food"}
 
 local function MakePreparedFood(data)
-     local realname = data.basename or data.name
-     local foodassets = {}
-     if data.sorafood then
-     foodassets = {
-        Asset("ANIM", "anim/"..realname..".zip"),
-        Asset("ATLAS", "images/inventoryimages/"..realname..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..realname..".tex"),
-        Asset("ATLAS_BUILD", "images/inventoryimages/"..realname..".xml", 256),
-    }
+    local realname = data.basename or data.name
+    local foodassets = {}
+    if data.sorafood then
+        foodassets = {Asset("ANIM", "anim/" .. realname .. ".zip"),
+                      Asset("ATLAS", "images/inventoryimages/" .. realname .. ".xml"),
+                      Asset("IMAGE", "images/inventoryimages/" .. realname .. ".tex"),
+                      Asset("ATLAS_BUILD", "images/inventoryimages/" .. realname .. ".xml", 256)}
     else
-        
+
     end
     local spicename = data.spice ~= nil and string.lower(data.spice) or nil
     if spicename ~= nil then
         foodassets = shallowcopy(assets)
         table.insert(foodassets, Asset("ANIM", "anim/spices.zip"))
         table.insert(foodassets, Asset("ANIM", "anim/plate_food.zip"))
-        table.insert(foodassets, Asset("INV_IMAGE", spicename.."_over"))
+        table.insert(foodassets, Asset("INV_IMAGE", spicename .. "_over"))
     end
 
     local foodprefabs = prefabs
@@ -70,7 +61,9 @@ local function MakePreparedFood(data)
     end
 
     local function DisplayNameFn(inst)
-        return subfmt(STRINGS.NAMES[data.spice.."_FOOD"], { food = STRINGS.NAMES[string.upper(data.basename)] })
+        return subfmt(STRINGS.NAMES[data.spice .. "_FOOD"], {
+            food = STRINGS.NAMES[string.upper(data.basename)]
+        })
     end
 
     local function fn()
@@ -91,20 +84,22 @@ local function MakePreparedFood(data)
 
             -- inst.inv_image_bg = { image = (data.basename or data.name)..".tex" }
             -- inst.inv_image_bg.atlas = GetInventoryItemAtlas(inst.inv_image_bg.image)
-            local atlas,image = SoraGetImage(realname)
+            local atlas, image = SoraGetImage(realname)
             if atlas and image then
-                inst.inv_image_bg = { atlas = atlas, image = image }
+                inst.inv_image_bg = {
+                    atlas = atlas,
+                    image = image
+                }
             end
         else
-        inst.AnimState:SetBuild(data.name)
-        inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:SetBank(data.name)
         end
         inst.AnimState:PlayAnimation("idle")
         inst.AnimState:OverrideSymbol("swap_food", data.basename or "cook_pot_food", realname)
 
-        
         if data.tags ~= nil then
-            for i,v in pairs(data.tags) do
+            for i, v in pairs(data.tags) do
                 inst:AddTag(v)
             end
         end
@@ -132,7 +127,7 @@ local function MakePreparedFood(data)
 
         inst:AddComponent("edible")
         inst.components.edible.healthvalue = data.health or 0
-        --inst.components.edible.healthvalue = inst.components.edible.healthvalue +10000
+        -- inst.components.edible.healthvalue = inst.components.edible.healthvalue +10000
         inst.components.edible.hungervalue = data.hunger or 0
         inst.components.edible.foodtype = data.foodtype or FOODTYPE.GENERIC
         inst.components.edible.sanityvalue = data.sanity or 0
@@ -146,14 +141,14 @@ local function MakePreparedFood(data)
         inst.wet_prefix = data.wet_prefix
 
         inst:AddComponent("inventoryitem")
-        
+
         if spicename ~= nil then
-            inst.components.inventoryitem:ChangeImageName(spicename.."_over")
+            inst.components.inventoryitem:ChangeImageName(spicename .. "_over")
         elseif data.basename ~= nil then
             inst.components.inventoryitem:ChangeImageName(data.basename)
         else
-            inst.components.inventoryitem.atlasname="images/inventoryimages/"..realname..".xml"
-            inst.components.inventoryitem.imagename=realname
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/" .. realname .. ".xml"
+            inst.components.inventoryitem.imagename = realname
         end
 
         inst:AddComponent("stackable")
@@ -181,11 +176,113 @@ for k, v in pairs(require("preparedfoods_sora")) do
 end
 
 -- for k, v in pairs(require("preparedfoods_warly")) do
-    -- table.insert(prefs, MakePreparedFood(v))
+-- table.insert(prefs, MakePreparedFood(v))
 -- end
 
 for k, v in pairs(require("spicedfoods_sora")) do
     table.insert(prefs, MakePreparedFood(v))
 end
+if TUNING.NEVER_FINISH_SERIES_ENABLED then
 
+    local foodtag = "mi_nfs_food_tag"
+
+    local function MakePreparedFood_Nerver(data)
+        local realname = data.basename or data.name
+        local foodassets = {}
+        if data.sorafood then
+            foodassets = {Asset("ANIM", "anim/" .. realname .. ".zip"),
+                          Asset("ATLAS", "images/inventoryimages/" .. realname .. ".xml"),
+                          Asset("IMAGE", "images/inventoryimages/" .. realname .. ".tex"),
+                          Asset("ATLAS_BUILD", "images/inventoryimages/" .. realname .. ".xml", 256)}
+        else
+
+        end
+        local foodprefabs = prefabs
+        if data.prefabs ~= nil then
+            foodprefabs = shallowcopy(prefabs)
+            for i, v in ipairs(data.prefabs) do
+                if not table.contains(foodprefabs, v) then
+                    table.insert(foodprefabs, v)
+                end
+            end
+        end
+
+        local function DisplayNameFn(inst)
+            return "绝对吃不完的" .. STRINGS.NAMES[string.upper(data.name)]
+        end
+        STRINGS.NAMES[string.upper("mi_nfs_"..data.name)] = "绝对吃不完的" .. STRINGS.NAMES[string.upper(data.name)]
+        local function fn()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
+
+            MakeInventoryPhysics(inst)
+
+                inst.AnimState:SetBuild(data.name)
+                inst.AnimState:SetBank(data.name)
+            inst.AnimState:PlayAnimation("idle")
+            inst.AnimState:OverrideSymbol("swap_food", data.basename or "cook_pot_food", realname)
+
+            if data.tags ~= nil then
+                for i, v in pairs(data.tags) do
+                    inst:AddTag(v)
+                end
+            end
+            inst:AddTag(foodtag)
+            if not inst:HasTag("spice") then
+                inst:AddTag("preparedfood")
+            end
+            if data.basename ~= nil then
+                inst:SetPrefabNameOverride(data.basename)
+            end
+            inst.displaynamefn = DisplayNameFn
+            if data.floater ~= nil then
+                MakeInventoryFloatable(inst, data.floater[1], data.floater[2], data.floater[3])
+            else
+                MakeInventoryFloatable(inst)
+            end
+
+            inst.entity:SetPristine()
+
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst:AddComponent("edible")
+            inst.components.edible.healthvalue = data.health or 0
+            -- inst.components.edible.healthvalue = inst.components.edible.healthvalue +10000
+            inst.components.edible.hungervalue = data.hunger or 0
+            inst.components.edible.foodtype = data.foodtype or FOODTYPE.GENERIC
+            inst.components.edible.sanityvalue = data.sanity or 0
+            inst.components.edible.temperaturedelta = data.temperature or 0
+            inst.components.edible.temperatureduration = data.temperatureduration or 0
+            inst.components.edible.nochill = data.nochill or nil
+            inst.components.edible.spice = data.spice
+            inst.components.edible:SetOnEatenFn(data.oneatenfn)
+
+            inst:AddComponent("inspectable")
+            inst.wet_prefix = data.wet_prefix
+
+            inst:AddComponent("inventoryitem")
+
+            if data.basename ~= nil then
+                inst.components.inventoryitem:ChangeImageName(data.basename)
+            else
+                inst.components.inventoryitem.atlasname = "images/inventoryimages/" .. realname .. ".xml"
+                inst.components.inventoryitem.imagename = realname
+            end
+            inst:AddComponent("bait")
+            inst:AddComponent("tradable")
+            return inst
+        end
+
+        return Prefab("mi_nfs_"..data.name, fn, foodassets, foodprefabs)
+    end
+
+    for k, v in pairs(require("preparedfoods_sora")) do
+        table.insert(prefs, MakePreparedFood_Nerver(v))
+    end
+end
 return unpack(prefs)

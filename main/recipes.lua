@@ -523,7 +523,7 @@ Rec("sora_huapen", "穹の花盆", "世界有你更美好", build, "soraother", 
 Rec("sora_light", "穹の玫瑰灯", "装饰你的灯吧", build, "soraother", {{
     livinglog = 5,
     cutstone = 40,
-    boards=40,
+    boards = 40,
     goldnugget = 40
 }, {
     livinglog = 10,
@@ -622,15 +622,15 @@ Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraot
 AddInvImg("sora_tochest", "inventoryimages/sora2stone", "sora2stone")
 Rec("sora_tochest", "原来你也有强迫症", "原来你也有强迫症", item, "soraother", {{
     [san] = 10,
-    boards=3,
+    boards = 3
 }, {
     [san] = 20,
-    boards=3,
-    cutstone= 3,
+    boards = 3,
+    cutstone = 3
 }, {
     [san] = 30,
-    boards=10,
-    cutstone= 10,
+    boards = 10,
+    cutstone = 10
 }})
 
 -- 魔法
@@ -1042,3 +1042,18 @@ UnlonkRecipes("wormhole_help", {
     purplegem = 5
 }, "一对虫洞")
 
+if IsModEnable("2916137510") or IsModEnable("2199027653598541321") then
+    local food = require "preparedfoods_sora"
+    --if tab and food then
+        for k, v in pairs(food) do
+            local name = v.basename or v.name
+            local nfsname = "mi_nfs_" .. name
+            local des = "绝对吃不完的" .. (STRINGS.NAMES[name:upper()] or "")
+            AddInvImg2(nfsname, "images/inventoryimages/" .. name .. ".xml", name..".tex")
+            Rec(nfsname, des, des,item, "sora", {
+                [name] = 300
+            })
+            print(name,nfsname,"ADDRECC")
+        end
+    --end
+end

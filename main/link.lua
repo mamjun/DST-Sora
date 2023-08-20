@@ -427,3 +427,5 @@ if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable
         end
     end)
 end
+
+

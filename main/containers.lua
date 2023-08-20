@@ -213,7 +213,9 @@ for y = 4, 0, -1 do
 end
 local soratreepopup = require "widgets/soratreepopup"
 function params.sorabase.widget:OnOpenFn(inst)
-    self.text = self:AddChild(soratreepopup())
+    if TUNING.SORACHESTUI then 
+        self.text = self:AddChild(soratreepopup())
+    end
 end
 
 params.sora_light = {

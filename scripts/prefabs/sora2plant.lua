@@ -1083,6 +1083,7 @@ local function fxfn(Sim)
     -- inst:AddTag("FX")
     inst:AddTag("NOBLOCK")
     inst.entity:SetPristine()
+    inst.wet_prefix = ""
     if not TheWorld.ismastersim then
         return inst
     end
@@ -1127,7 +1128,9 @@ local function fxfn(Sim)
         end
         return name .. "\n别偷懒!\n赶紧干活"
     end
-
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(0)
+    
     inst:AddComponent("sorasavecmp")
 
     inst.components.sorasavecmp:AddLoad("name", function(i, data)
