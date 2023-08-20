@@ -120,7 +120,7 @@ end
 function c:AddSeed(name, num)
     local db = self:GetDB()
     local old = db:Get("seeds", name, 0)
-    old = math.max(old + num,0)
+    old = math.max(old + num, 0)
     db:Set("seeds", name, old)
     return old
 end
@@ -169,7 +169,6 @@ function c:HandleGetSeeds(player, name)
             player.components.inventory:GiveItem(inst, nil, player:GetPosition())
         end
     end
-    print("call GetSeeds", name)
 
 end
 local function TestSeeds(inst)
@@ -177,7 +176,6 @@ local function TestSeeds(inst)
     -- body
 end
 function c:HandleCollectAllSeeds(player)
-    print("call HandleCollectAllSeeds")
     local db = self:GetDB()
     if player and player.components.health and not player.components.health:IsDead() then
         local all = {}
@@ -186,8 +184,8 @@ function c:HandleCollectAllSeeds(player)
             if v and v:IsValid() then
                 all[v.prefab] = (all[v.prefab] or 0) +
                                     (v.components.stackable and v.components.stackable.stacksize or 1)
-                                    player.components.inventory:RemoveItem(v,true,true)
-                                    v:Remove()
+                player.components.inventory:RemoveItem(v, true, true)
+                v:Remove()
             end
         end
         local containers = player.components.inventory.opencontainers
@@ -198,14 +196,23 @@ function c:HandleCollectAllSeeds(player)
                 if v and v:IsValid() then
                     all[v.prefab] = (all[v.prefab] or 0) +
                                         (v.components.stackable and v.components.stackable.stacksize or 1)
-                    container:RemoveItem(v,true,true)
-                                        v:Remove()
+                    container:RemoveItem(v, true, true)
+                    v:Remove()
                 end
             end
         end
+        local pos = player:GetPosition()
+        local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 4, {"_inventoryitem"}, {"INLIMBO"})
+        for k, v in pairs(ents or {}) do
+            if v and v:IsValid() and allseeds[v.prefab] then
+                all[v.prefab] = (all[v.prefab] or 0) +
+                                    (v.components.stackable and v.components.stackable.stacksize or 1)
+                v:Remove()
+            end
+        end
 
-        for k,v in pairs(all) do
-            self:AddSeed(k,v)
+        for k, v in pairs(all) do
+            self:AddSeed(k, v)
         end
     end
 end

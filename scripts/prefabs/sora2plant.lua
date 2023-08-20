@@ -405,8 +405,12 @@ local function OnPickFn(inst, doer, pos)
     if incd(inst, doer) then
         return
     end
+    local old = TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST
+    TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST = 0
     DoBig(PickPickFn, inst, doer, pos)
+    inst.components.soraseedcontainer:HandleCollectAllSeeds(doer)
     local rr = DoBig(PickFn, inst, doer, pos)
+    TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST = old
     local items = {}
     local seeditems = {}
     for k, v in pairs(rr) do
