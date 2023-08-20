@@ -207,7 +207,7 @@ local function IfChangeClearSeeds(inst, mode, doer)
         if #inst.seeds ~= mode then
             Say(doer, "刨坑模式已变更，种子模板清空")
             inst.seeds = nil
-        end 
+        end
     end
 end
 local function DoBig(fn, inst, doer, pos, ...)
@@ -218,17 +218,17 @@ local function DoBig(fn, inst, doer, pos, ...)
     if inst.isbig:value() and doer:HasTag("sora") then
         for x = 0, 2, 1 do
             for y = 0, 2, 1 do
-                local newpos = Point(pos.x + 4* x-4, 0, pos.z + 4 * y-4)
+                local newpos = Point(pos.x + 4 * x - 4, 0, pos.z + 4 * y - 4)
                 local r, msg = fn(inst, doer, newpos, ...)
                 table.insert(rr, r)
                 table.insert(rr, msg)
                 if not r and type(msg) == "string" then
-                    tosay = (tosay or "" )..(x*3+y+1).."号位".. msg.. "\n"
+                    tosay = (tosay or "") .. (x * 3 + y + 1) .. "号位" .. msg .. "\n"
                 end
             end
         end
         if tosay then
-            Say(doer,tosay)
+            Say(doer, tosay)
         end
     else
         local r, str = fn(inst, doer, pos, ...)
@@ -295,8 +295,7 @@ for k, v in pairs(crops) do
     seedcrops[k .. "_seeds"] = 1
 end
 crops = bigcrops
-
-local function PickFn(inst, doer, pos)
+local function PickPickFn(inst, doer, pos)
     -- 刨树根
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"stump", "DIG_workable"})
     for k, v in pairs(ents) do
@@ -305,7 +304,7 @@ local function PickFn(inst, doer, pos)
         end
     end
 
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"molebait", "MINE_workable"},{"INLIMBO"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"molebait", "MINE_workable"}, {"INLIMBO"})
     for k, v in pairs(ents) do
         if v.prefab == "rock_avocado_fruit" and isNear(v, pos) and v.components.workable and v.components.stackable then
             local mm = v.components.stackable.stacksize
@@ -319,16 +318,14 @@ local function PickFn(inst, doer, pos)
             end
         end
     end
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"farm_plant","pickable"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"farm_plant", "pickable"})
     for k, v in pairs(ents) do
-        if v.components.pickable and v:IsValid() then 
-			v.components.pickable:Pick(doer)
+        if v.components.pickable and v:IsValid() then
+            v.components.pickable:Pick(doer)
         end
     end
-    if #ents > 0 then
-        return 
-    end
-
+end
+local function PickFn(inst, doer, pos)
     -- 大作物 
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled"},
         {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
@@ -354,10 +351,10 @@ local function PickFn(inst, doer, pos)
                 v:Remove()
             elseif v.prefab == "medal_gift_fruit_oversized" then
                 if v.components.workable then
-                    v.components.workable:WorkedBy_Internal(doer,10)
+                    v.components.workable:WorkedBy_Internal(doer, 10)
                 end
             elseif v.components.workable then
-                v.components.workable:WorkedBy_Internal(doer,10)
+                v.components.workable:WorkedBy_Internal(doer, 10)
             end
         end
     end
@@ -408,7 +405,7 @@ local function OnPickFn(inst, doer, pos)
     if incd(inst, doer) then
         return
     end
-
+    DoBig(PickPickFn, inst, doer, pos)
     local rr = DoBig(PickFn, inst, doer, pos)
     local items = {}
     local seeditems = {}
@@ -532,7 +529,7 @@ local function SeedFn(inst, doer, pos)
     if not TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) then
         return false, "只能在农田里使用"
     end
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"soil"},{"NOCLICK","NOBLOCK"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"soil"}, {"NOCLICK", "NOBLOCK"})
     local newents = {}
     for k, v in pairs(ents) do
         if isNear(v, pos) then
@@ -819,7 +816,7 @@ local ui = require("widgets/soraseed")
 local SPELLS = {{
     label = "收", -- 批量收取大作物的产出 仅限穹妹 且可以铲树根 
     onselect = function(inst)
-        inst.components.spellbook:SetSpellName("收大作物")
+        inst.components.spellbook:SetSpellName("收农作物")
         Setreticule(inst)
         if TheWorld.ismastersim then
             inst.components.aoespell:SetSpellFn(OnPickFn)
