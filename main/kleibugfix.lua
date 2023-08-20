@@ -27,14 +27,17 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
--- 用于修复klei明知但是不愿意修的一些bug
-local newmeta = {__index = function() return 0 end}
+]] -- 用于修复klei明知但是不愿意修的一些bug
+local newmeta = {
+    __index = function()
+        return 0
+    end
+}
 local function TryToFixAllRecipes()
-    for k,v in pairs(AllRecipes) do
+    for k, v in pairs(AllRecipes) do
         local old = getmetatable(v.level)
         if not old then
-            setmetatable(v.level,newmeta)
+            setmetatable(v.level, newmeta)
         end
     end
 end
@@ -49,17 +52,36 @@ AddSimPostInit(TryToFixAllRecipes)
 --         return Close(ss,...)
 --     end
 -- end)
-local function onowner(self,owner)
+local function onowner(self, owner)
     -- body
     if not self.inst.replica.inventoryitem then
-        return 
+        return
     end
     self.inst.replica.inventoryitem:SetOwner(owner)
 end
 
-
-AddComponentPostInit("inventoryitem",function (self,inst)
-    addsetter(self,"owner",onowner)
+AddComponentPostInit("inventoryitem", function(self, inst)
+    addsetter(self, "owner", onowner)
 end)
 
+if getsora("fixyzhou") then
+    function GLOBAL.distsq(v1, v2, v3, v4)
+        if v4 and v3 and v2 and v1 then
+            local dx = v1 - v3
+            local dy = v2 - v4
+            return dx * dx + dy * dy
+        end
+        local dx = (v1.x or v1[1]) - (v2.x or v2[1])
+        local dz = (v1.z or v1[3]) - (v2.z or v2[3])
+        return dx * dx + dz * dz
+    end
+end
 
+if getsora("fixwork") then
+    AddComponentPostInit("workable",function (self)
+        local oldWorkedBy_Internal = self.WorkedBy_Internal
+        self.WorkedBy_Internal = function(s,...)
+            return (s.workleft or 0) > 0  and oldWorkedBy_Internal (s,...) or true
+        end
+    end)
+end

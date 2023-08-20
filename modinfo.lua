@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
  author = "FL"
-version = "11.29.29" -- 版本
+version = "11.29.30" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -295,18 +295,44 @@ configuration_options = {maketitle("jichu", "基础设置"), {
     }},
     default = false
 }, {
-    name = "lock1",
-    label = "禁止上锁(开启此选项会使已有锁失效)",
+    name = "tochest",
+    label = "禁止上强迫症(开启此选项会使已上强迫症失效)",
     options = {{
         description = "禁止",
         data = true,
-        hover = "不允许上锁"
+        hover = "不允许上强迫症"
     }, {
         description = "允许",
         data = false,
-        hover = "允许上锁"
+        hover = "允许上强迫症"
     }},
     default = false
+},{
+    name = "fixwork",
+    label = "修复三叉戟的某些官方bug",
+    options = {{
+        description = "修复",
+        data = true,
+        hover = "修复"
+    }, {
+        description = "不修复",
+        data = false,
+        hover = "不修复"
+    }},
+    default = true
+},{
+    name = "fixyzhou",
+    label = "修复飞行状态下距离判定",
+    options = {{
+        description = "修复",
+        data = true,
+        hover = "修复"
+    }, {
+        description = "不修复",
+        data = false,
+        hover = "不修复"
+    }},
+    default = true
 }, {
     name = "lock2",
     label = "允许管理员开锁",
