@@ -347,19 +347,23 @@ local GemTask = {
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
                 if it then
-                    if it.components.fueled and  it.components.fueled:GetPercent() < 1   then
+                    if it.components.fueled and it.components.fueled:GetPercent() < 1 then
                         it.components.fueled:DoDelta(50)
                     end
-                    if it.components.armor and not it.components.armor.indestructible and  it.components.armor:GetPercent() < 10 then
-                        local rep = it.components.armor:GetPercent() < 1  and 0.1 or 0.01
-                        rep = it.components.armor.maxcondition * rep 
-                        it.components.armor.condition = it.components.armor.condition + rep 
-                        it:PushEvent("percentusedchange", {  percent = it.components.armor:GetPercent() })
+                    if it.components.armor and not it.components.armor.indestructible and
+                        it.components.armor:GetPercent() < 10 then
+                        local rep = it.components.armor:GetPercent() < 1 and 0.1 or 0.01
+                        rep = it.components.armor.maxcondition * rep
+                        it.components.armor.condition = it.components.armor.condition + rep
+                        it:PushEvent("percentusedchange", {
+                            percent = it.components.armor:GetPercent()
+                        })
                     end
-                    if use and it.components.finiteuses  and  it.components.finiteuses:GetPercent() < 10 then
-                        local peruse = math.ceil(it.components.finiteuses.total * ( it.components.finiteuses:GetPercent() < 1 and 0.2 or 0.02) )
+                    if use and it.components.finiteuses and it.components.finiteuses:GetPercent() < 10 then
+                        local peruse = math.ceil(it.components.finiteuses.total *
+                                                     (it.components.finiteuses:GetPercent() < 1 and 0.2 or 0.02))
                         peruse = math.max(peruse, 1)
-                        if peruse > 1 or  ((v % 180) == 0) or it.components.finiteuses:GetPercent() < 1  then
+                        if peruse > 1 or ((v % 180) == 0) or it.components.finiteuses:GetPercent() < 1 then
                             it.components.finiteuses:Use(-peruse)
                         end
                     end
@@ -570,7 +574,7 @@ local function ResetChestData(inst, doer)
                     })
                 end
             end
-        elseif item then 
+        elseif item then
             local itemdrop = container:RemoveItem(item, true)
             if itemdrop then
                 itemdrop.Transform:SetPosition(pos:Get())
@@ -603,35 +607,37 @@ local function ResetChestData(inst, doer)
         data.gemtask.purplegem = 59
     end
     data.c = {}
-    for k, slots in pairs(data.containers) do
-        local first
-        local drop_first
-        for ik, slot in pairs(slots) do
-            local item = container:GetItemInSlot(slot)
-            if item then
-                local p = toprefab(item.prefab)
-                if notdrop[p] then
-                    drop_first = drop_first or p
-                else
-                    first = first or p
-                end
-                if first ~= p and not notdrop[p] then -- 丢弃多余的 
-                    local itemdrop = container:RemoveItem(item, true)
-                    if itemdrop then
-                        itemdrop.Transform:SetPosition(pos:Get())
-                        if itemdrop.components.inventoryitem then
-                            itemdrop.components.inventoryitem:OnDropped(true)
+    if InGamePlay then
+        for k, slots in pairs(data.containers) do
+            local first
+            local drop_first
+            for ik, slot in pairs(slots) do
+                local item = container:GetItemInSlot(slot)
+                if item then
+                    local p = toprefab(item.prefab)
+                    if notdrop[p] then
+                        drop_first = drop_first or p
+                    else
+                        first = first or p
+                    end
+                    if first ~= p and not notdrop[p] then -- 丢弃多余的 
+                        local itemdrop = container:RemoveItem(item, true)
+                        if itemdrop then
+                            itemdrop.Transform:SetPosition(pos:Get())
+                            if itemdrop.components.inventoryitem then
+                                itemdrop.components.inventoryitem:OnDropped(true)
+                            end
+                            itemdrop.prevcontainer = nil
+                            itemdrop.prevslot = nil
+                            inst:PushEvent("dropitem", {
+                                item = itemdrop
+                            })
                         end
-                        itemdrop.prevcontainer = nil
-                        itemdrop.prevslot = nil
-                        inst:PushEvent("dropitem", {
-                            item = itemdrop
-                        })
                     end
                 end
             end
+            data.c[k] = first or drop_first -- 选定拾取的
         end
-        data.c[k] = first or drop_first -- 选定拾取的
     end
     -- data.pick = 1
     local needupdate = false
@@ -655,7 +661,7 @@ local function OnClose(inst, event)
     if not (doer and doer:HasTag("player")) then
         return
     end
-    
+
     if not inst.sorachestdata then
         return
     end
@@ -671,14 +677,15 @@ local function OnClose(inst, event)
         end
     end
 end
+FindPrefab()
 local ChestData = SoraAPI.ChestData
 local com = Class(function(self, inst)
     self.inst = inst
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
-    self.FindPrefabTask = inst:DoTaskInTime(0, FindPrefab)
+    
     self.UpdateAllChestTask = inst:DoPeriodicTask(0, UpdateAllChest)
-    --self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
+    -- self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
     inst:WatchWorldState("cycles", function()
         inst:DoTaskInTime(1, DayUpdate)
         inst:DoTaskInTime(3, DayUpdate)
@@ -711,15 +718,15 @@ function com:RegByType(chest, type)
         allchest[chest.prefab][chest] = deepcopy(ChestData[type])
         chest.sorachestdata = allchest[chest.prefab][chest]
         chest:DoTaskInTime(0, ResetChestData)
-        chest:ListenForEvent("onopen",OnOpen)
-        chest:ListenForEvent("onclose",OnClose)
+        chest:ListenForEvent("onopen", OnOpen)
+        chest:ListenForEvent("onclose", OnClose)
         chest:ListenForEvent("onremove", OnChestRemove)
     end
 end
 function com:UnReg(chest)
     if allchest[chest.prefab] then
-        chest:RemoveEventCallback("onopen",OnOpen)
-        chest:RemoveEventCallback("onclose",OnClose)
+        chest:RemoveEventCallback("onopen", OnOpen)
+        chest:RemoveEventCallback("onclose", OnClose)
         updatechests[chest] = nil
         chest.sorachestdata = nil
         allchest[chest.prefab][chest] = nil
@@ -730,7 +737,9 @@ function com:UpdateChest(chest)
     UpdateChest(chest)
 end
 function com:OnClose(chest, doer)
-    OnClose(chest, {doer=doer})
+    OnClose(chest, {
+        doer = doer
+    })
 end
 function com:UpdateChest(chest)
     UpdateChest(chest)
