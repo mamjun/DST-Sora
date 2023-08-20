@@ -684,7 +684,7 @@ local com = Class(function(self, inst)
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
     
-    self.UpdateAllChestTask = inst:DoPeriodicTask(0, UpdateAllChest)
+    self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
     -- self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
     inst:WatchWorldState("cycles", function()
         inst:DoTaskInTime(1, DayUpdate)
