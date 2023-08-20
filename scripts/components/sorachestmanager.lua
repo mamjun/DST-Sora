@@ -407,9 +407,7 @@ local GemTask = {
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
                 if it then
-                    if it.components.stackable and not it.components.stackable:IsFull() then
-                        full = false
-                    end
+                    
                 else
                     full = false
                 end
