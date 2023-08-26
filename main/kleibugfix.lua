@@ -77,11 +77,10 @@ if getsora("fixyzhou") then
     end
 end
 
-if getsora("fixwork") then
-    AddComponentPostInit("workable",function (self)
-        local oldWorkedBy_Internal = self.WorkedBy_Internal
-        self.WorkedBy_Internal = function(s,...)
-            return (s.workleft or 0) > 0  and oldWorkedBy_Internal (s,...) or true
-        end
-    end)
-end
+AddComponentPostInit("workable",function (self)
+    local oldWorkedBy_Internal = self.WorkedBy_Internal
+    self.WorkedBy_Internal = function(s,...)
+        return (s.workleft or 0) > 0  and oldWorkedBy_Internal (s,...) or true
+     end
+end)
+

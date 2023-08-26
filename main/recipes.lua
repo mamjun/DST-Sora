@@ -1041,8 +1041,9 @@ UnlonkRecipes("wormhole_help", {
     goldenshovel = 40,
     purplegem = 5
 }, "一对虫洞")
-
-if IsModEnable("2916137510") or IsModEnable("2199027653598541321") then
+local nfsmodname = IsModEnable("2916137510") and "workshop-2916137510" or IsModEnable("2199027653598541321") and "workshop-2199027653598541321"
+if  nfsmodname then
+    --GetModConfigData()
     local food = require "preparedfoods_sora"
     --if tab and food then
         for k, v in pairs(food) do

@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
  author = "FL"
-version = "11.30.3" -- 版本
+version = "11.30.4" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -320,19 +320,6 @@ configuration_options = {maketitle("jichu", "基础设置"), {
         hover = "允许上强迫症"
     }},
     default = false
-},{
-    name = "fixwork",
-    label = "修复三叉戟的某些官方bug",
-    options = {{
-        description = "修复",
-        data = true,
-        hover = "修复"
-    }, {
-        description = "不修复",
-        data = false,
-        hover = "不修复"
-    }},
-    default = true
 },{
     name = "fixyzhou",
     label = "修复飞行状态下距离判定",

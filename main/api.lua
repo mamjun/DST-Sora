@@ -434,14 +434,12 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     -- 第一个参数为UI实体 第二个参数为 位置存档的名称 注意如果是一个UI的多个实体 记得不同名称
     -- 第三个参数为默认位置 要求为Vector3 或者为空
     -- 第四个参数为扩展属性 是一个table 或者 nil 描述了实体的对齐的问题
-    s.onikirimovable = {}
-    local m = s.onikirimovable
+    s.soramovable = {}
+    local m = s.soramovable
     m.nullfn = function()
     end
     m.name = name or "default"
     m.self = s
-    m.downtime = 0
-    m.whiletime = 0.4
     m.cd = SoraCD(0.5)
     m.dpos = pos or Vector3(0, 0, 0)
     m.pos = pos or Vector3(0, 0, 0)
@@ -463,18 +461,8 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     s:SetPosition(m.pos:Get())
     m.OnControl = s.OnControl or m.nullfn
     s.OnControl = function(self, control, down)
-        if self.focus and control == CONTROL_ACCEPT then
-            if down then
-                if not m.down then
-                    m.down = true
-                    m.downtime = 0
-                end
-            else
-                if m.down then
-                    m.down = false
-                    m.OnClick(self)
-                end
-            end
+        if self.focus and control == CONTROL_SECONDARY then
+            m.OnClick(self,down)
         end
         return m.OnControl(self, control, down)
     end
@@ -487,77 +475,52 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         return m.OnRawKey(self, key, down, ...)
     end
 
-    m.OnClick = function(self)
-        m:StopFollowMouse()
-        if m.downtime > m.whiletime then
-            local newpos = self:GetPosition()
-            if TUNING.FLDEBUGCOMMAND then
-                print(s, name, newpos:Get())
-            end
-            TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
-        end
-        if m.lastx and m.lasty and s.o_pos then
-            s.o_pos = Vector3(m.lastx, m.lasty, 0)
+    m.OnClick = function(self,down)
+        if down then 
+            m.FollowMouse(self)
+        else
+            m.StopFollowMouse(self)
         end
     end
 
-    m.OnUpdate = s.OnUpdate or m.nullfn
-    s.OnUpdate = function(self, dt)
-        if m.down then
-            if m.whiledown then
-                m.whiledown(self)
-            end
+    m.SetMovePosition = function(self, x, y,z)
+        if not (s.parent and self.ppos and self.mousepos)then
+            return
         end
-        return m.OnUpdate(self, dt)
-    end
-    m.whiledown = function(self)
-        m.downtime = m.downtime + 0.033
-        if m.downtime > m.whiletime then
-            m.FollowMouse(self)
-        end
-    end
-    m.UpdatePosition = function(self, x, y)
-        if not s.parent then return end
-        local sx, sy = s.parent.GetScale(s.parent):Get()
-        local ox, oy = s.parent.GetWorldPosition(s.parent):Get()
-        local nx = (x - ox) / sx
-        if m.ha == 0 then
-            x = x - m.x / 2
-            nx = (x - ox) / sx
-        elseif m.ha == 2 then
-            x = x - m.x
-            nx = (x - ox) / sx
-        end
-        local ny = (y - oy) / sy
-        if m.va == 0 then
-            y = y - m.y / 2
-            ny = (y - oy) / sy
-        elseif m.va == 1 then
-            y = y - m.y
-            ny = (y - oy) / sy
-        end
-        m.lastx = nx
-        m.lasty = ny
-        s.SetPosition(self, nx, ny, 0)
+        local pos
+		if type(x) == "number" then
+			pos = Vector3(x, y, 0)
+		else
+			pos = x
+		end
+        local self_scale=self:GetScale()
+        local offset=data and data.drag_offset or 1--偏移修正(容器是0.6)
+		local newpos=self.ppos+(pos-self.mousepos)/(self_scale.x/offset)--修正偏移值       
+        s.SetPosition(self, newpos)
     end
     m.FollowMouse = function(self)
+        self.mousepos = TheInput:GetScreenPosition() 
+        self.ppos = self:GetPosition()
         if m.followhandler == nil then
             m.followhandler = TheInput:AddMoveHandler(function(x, y)
-                m.UpdatePosition(self, x, y)
+                m.SetMovePosition(self,x,y,0)
+				if not TheInput:IsMouseDown(MOUSEBUTTON_RIGHT) then
+					m.StopFollowMouse(self)
+				end
             end)
-            local spos = TheInput:GetScreenPosition()
-            m.UpdatePosition(self, spos.x, spos.y)
-            -- self:SetPosition()
         end
     end
 
     m.StopFollowMouse = function(self)
+        self.mousepos = nil
         if m.followhandler ~= nil then
             m.followhandler:Remove()
             m.followhandler = nil
         end
+        local newpos = self:GetPosition()
+        print("结束save",string.format("return Vector3(%f,%f,%f)", newpos:Get()))
+        TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
     end
-    s:StartUpdating()
 end
 
 -- 配置读取函数
@@ -668,7 +631,7 @@ function TryLoadUI(str, ...) -- MakePcallFn
         lastui:Kill()
         lastui = nil
     end
-    package.loaded["widgets/" .. str]= nil
+    package.loaded["widgets/" .. str] = nil
     local ui = require("widgets/" .. str)
     local uiinst = ui(...)
     GLOBAL.TheUI = uiinst
@@ -677,8 +640,7 @@ function TryLoadUI(str, ...) -- MakePcallFn
     return uiinst
 end
 
-
-function  CheckChestValid(inst)
+function CheckChestValid(inst)
     if inst and inst:IsValid() and inst.components.container then
         local container = inst.components.container
         for i = 1, container:GetNumSlots() do
@@ -690,18 +652,16 @@ function  CheckChestValid(inst)
     end
 end
 
-function Say(doer,str)
+function Say(doer, str)
     if doer and doer.components.talker then
         doer.components.talker:Say(str)
     end
     return true
 end
 
-
-function  NilFn()
-   return true
+function NilFn()
+    return true
 end
-
 
 function GetSoraPackLevel(data)
     local level = 1
@@ -711,14 +671,14 @@ function GetSoraPackLevel(data)
         elseif data.data and data.data.sorapacklevel then
             level = data.data.sorapacklevel
         elseif data.components and data.components.unwrappable and data.components.unwrappable.itemdata then
-            for k,v in pairs(data.components.unwrappable.itemdata) do
-                level = math.max(level,GetSoraPackLevel(v)+1)
+            for k, v in pairs(data.components.unwrappable.itemdata) do
+                level = math.max(level, GetSoraPackLevel(v) + 1)
             end
         elseif data.data and data.data.unwrappable and data.data.unwrappable.itemdata then
-            for k,v in pairs(data.data.unwrappable.itemdata) do
-                level = math.max(level,GetSoraPackLevel(v)+1)
+            for k, v in pairs(data.data.unwrappable.itemdata) do
+                level = math.max(level, GetSoraPackLevel(v) + 1)
             end
         end
     end
-    return level 
+    return level
 end

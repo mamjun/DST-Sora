@@ -32,7 +32,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]--
 
 local function dropitem(doer,inst)
-    if inst and inst.components.inventoryitem then
+    if inst and inst.components.inventoryitem and doer and doer.components.inventory then
         doer.components.inventory:DropItem(inst)
     end
 end

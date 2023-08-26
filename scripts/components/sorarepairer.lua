@@ -41,14 +41,12 @@ function sorarepairer:DoRepair(inst,target, doer)
         return -1
     end
     local size =inst and inst.components.stackable and inst.components.stackable.stacksize  or 1 
-
     local num = 0 
-    
     if target.components.finiteuses and target.components.finiteuses:GetPercent() < 1 then
         local uses = target.components.finiteuses.total - target.components.finiteuses.current
         local per = math.max(math.ceil(target.components.finiteuses.total*0.2),5)
         num =  math.max(math.floor(uses / per ),1)
-
+        if size < num then return -2 end
         target.components.finiteuses:Use(-1 * per * num)
         if  target.components.finiteuses:GetPercent() > 1 then
             target.components.finiteuses:SetPercent(1)
