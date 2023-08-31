@@ -29,7 +29,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
     --请提前一键global 然后 modimport导入
-    --verion = 1.05
+    --verion = 1.06
+    --v1.06 更新 新增对 [API] Modded Skins 的捕获逃逸
     --v1.05 更新 修复兼容性问题
     --v1.04 更新 兼容R20版本
     --v1.03 更新 增加了对 share_bigportrait_name和 FrameSymbol的支持
@@ -68,7 +69,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     请打开下面的开关 recipe_help
     
     ]]
-    
+    local CreatePrefabSkin       --重新定义一下自己的 试图绕过Modded API的截取 在文件结尾有重新定义
     local recipe_help = true
     --人物皮肤API
     local characterskins = {}
@@ -527,4 +528,84 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     end
     function GetSkin(name)
         return characterskins[name] or itemskins[name] or nil
+    end
+
+    local oldCreatePrefabSkin = GLOBAL.CreatePrefabSkin
+    local fninfo = debug.getinfo(oldCreatePrefabSkin)
+    if fninfo and fninfo.source and not fninfo.source:match("scripts/prefabskin%.lua") then     --不是官方的就用自己的
+        print("UseMySelfCreatePrefabSkin")
+        function CreatePrefabSkin(name, info)
+            local prefab_skin = Prefab(name, nil, info.assets, info.prefabs)
+            prefab_skin.is_skin = true
+            --Hack to deal with mods with bad data. Type is now required, and who knows how many character mods are missing this field.
+            if info.type == nil then
+                info.type = "base"
+            end
+            prefab_skin.base_prefab         = info.base_prefab
+            prefab_skin.type                = info.type
+            prefab_skin.skin_tags           = info.skin_tags
+            prefab_skin.init_fn             = info.init_fn
+            prefab_skin.build_name_override = info.build_name_override
+            prefab_skin.bigportrait         = info.bigportrait
+            prefab_skin.rarity              = info.rarity
+            prefab_skin.rarity_modifier     = info.rarity_modifier
+            prefab_skin.skins               = info.skins
+            prefab_skin.skin_sound          = info.skin_sound
+            prefab_skin.is_restricted       = info.is_restricted
+            prefab_skin.granted_items       = info.granted_items
+            prefab_skin.marketable			= info.marketable
+            prefab_skin.release_group       = info.release_group
+            prefab_skin.linked_beard        = info.linked_beard
+            prefab_skin.share_bigportrait_name = info.share_bigportrait_name
+            if info.torso_tuck_builds ~= nil then
+                for _,base_skin in pairs(info.torso_tuck_builds) do
+                    BASE_TORSO_TUCK[base_skin] = "full"
+                end
+            end
+            if info.torso_untuck_builds ~= nil then
+                for _,base_skin in pairs(info.torso_untuck_builds) do
+                    BASE_TORSO_TUCK[base_skin] = "untucked"
+                end
+            end
+            if info.torso_untuck_wide_builds ~= nil then
+                for _,base_skin in pairs(info.torso_untuck_wide_builds) do
+                    BASE_TORSO_TUCK[base_skin] = "untucked_wide"
+                end
+            end
+            if info.has_alternate_for_body ~= nil then
+                for _,base_skin in pairs(info.has_alternate_for_body) do
+                    BASE_ALTERNATE_FOR_BODY[base_skin] = true
+                end
+            end
+            if info.has_alternate_for_skirt ~= nil then
+                for _,base_skin in pairs(info.has_alternate_for_skirt) do
+                    BASE_ALTERNATE_FOR_SKIRT[base_skin] = true
+                end
+            end
+            if info.one_piece_skirt_builds ~= nil then
+                for _,base_skin in pairs(info.one_piece_skirt_builds) do
+                    ONE_PIECE_SKIRT[base_skin] = true
+                end
+            end
+            if info.legs_cuff_size ~= nil then
+                for base_skin,size in pairs(info.legs_cuff_size) do
+                    BASE_LEGS_SIZE[base_skin] = size
+                end
+            end
+            if info.feet_cuff_size ~= nil then
+                for base_skin,size in pairs(info.feet_cuff_size) do
+                    BASE_FEET_SIZE[base_skin] = size
+                end
+            end
+            if info.skin_sound ~= nil then
+                SKIN_SOUND_FX[name] = info.skin_sound
+            end
+            if info.fx_prefab ~= nil then
+                SKIN_FX_PREFAB[name] = info.fx_prefab
+            end
+            if info.type ~= "base" then
+                prefab_skin.clear_fn = _G[prefab_skin.base_prefab.."_clear_fn"]
+            end
+            return prefab_skin
+        end
     end

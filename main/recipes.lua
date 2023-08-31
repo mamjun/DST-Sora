@@ -30,6 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] -- 添加物品栏
 local TechTree = require("techtree")
 local InvImg = {}
+local NoRec 
 rec_back = "_build_sora"
 local AllSoraRec = {}
 local recmode = GetModConfigData("recmode") > 0 and GetModConfigData("recmode") or mode
@@ -57,6 +58,8 @@ end
 local prefabhas = {}
 function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     name = name or ""
+    local BUILD = build:upper()
+    local PREFAB = prefab:upper()
     local build = prefab:lower() .. rec_back
     if prefabhas[prefab] then
         prefabhas[prefab] = prefabhas[prefab] + 1
@@ -65,9 +68,12 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
         prefabhas[prefab] = 1
     end
     des = des or ""
-
-    local BUILD = build:upper()
-    local PREFAB = prefab:upper()
+    STRINGS.NAMES[PREFAB] = STRINGS.NAMES[PREFAB] or name
+    STRINGS.NAMES[BUILD] = STRINGS.NAMES[BUILD] or STRINGS.NAMES[PREFAB] or name
+    STRINGS.CHARACTERS.GENERIC.DESCRIBE[PREFAB] = STRINGS.CHARACTERS.GENERIC.DESCRIBE[PREFAB] or des
+    STRINGS.RECIPE_DESC[PREFAB] = STRINGS.RECIPE_DESC[PREFAB] or des
+    if not tab then return end
+    
     local recings = {}
     if #ings > 0 then -- 是数组 则区分难度
         ings = ings[recmode]
@@ -75,6 +81,7 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     for k, v in pairs(ings) do
         table.insert(recings, Ingredient(k, v))
     end
+    
     local config = {}
     config.min_spacing = 1
     config.product = prefab
@@ -89,10 +96,7 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
         rec.atlas = softresolvefilepath("images/inventoryimages/" .. prefab .. ".xml")
     end
 
-    STRINGS.NAMES[PREFAB] = STRINGS.NAMES[PREFAB] or name
-    STRINGS.NAMES[BUILD] = STRINGS.NAMES[BUILD] or STRINGS.NAMES[PREFAB] or name
-    STRINGS.CHARACTERS.GENERIC.DESCRIBE[PREFAB] = STRINGS.CHARACTERS.GENERIC.DESCRIBE[PREFAB] or des
-    STRINGS.RECIPE_DESC[PREFAB] = STRINGS.RECIPE_DESC[PREFAB] or des
+    
 
     -- rec.description = des or STRINGS.RECIPE_DESC[PREFAB]
     AllSoraRec[prefab] = rec
@@ -756,6 +760,15 @@ Rec("sora_lightflier", "拟造-萤火", "这是什么呀?", DST, "sora", {
     fireflies = 3,
     [san] = 30
 })
+
+AddInvImg2("sora_sign_item", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item.tex")
+Rec("sora_sign", "拟造-木牌", "这还能藏东西的?", NoRec)
+Rec("sora_sign_item", "拟造-木牌", "这还能藏东西的?", DST, "sora", {
+    boards = 3,
+    livinglog = 2,
+}).placer = "no"
+
+
 if IsModEnable("Legion") or IsModEnable("棱镜") then
 
     Rec("petals", nil, "花花花花", maker, "sora", {

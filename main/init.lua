@@ -66,7 +66,7 @@ mi("maindbinit")
 mi("clientdb")
 mi("clientdbinit")
 -- 导入皮肤api
-mi("skins")
+mi("skinapi")
 mi("skin")
 -- 资源加载
 mi("assets")

@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
  author = "FL"
-version = "11.30.4" -- 版本
+version = "11.30.5" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -308,19 +308,6 @@ configuration_options = {maketitle("jichu", "基础设置"), {
     }},
     default = false
 }, {
-    name = "tochest",
-    label = "禁止上强迫症(开启此选项会使已上强迫症失效)",
-    options = {{
-        description = "禁止",
-        data = true,
-        hover = "不允许上强迫症"
-    }, {
-        description = "允许",
-        data = false,
-        hover = "允许上强迫症"
-    }},
-    default = false
-},{
     name = "fixyzhou",
     label = "修复飞行状态下距离判定",
     options = {{

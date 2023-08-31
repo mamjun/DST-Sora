@@ -316,6 +316,17 @@ function params.sora_light.widget:OnOpenFn(inst)
         })
     end
 end
+params.sora_sign = {
+    widget = {
+        slotpos = {Vector3(0, 15, 0)},
+        animbank = "ui_alterguardianhat_1x1",
+        animbuild = "ui_alterguardianhat_1x1",
+        pos = Vector3(100, 0, 0),
+        side_align_tip = 100
+    },
+    acceptsstacks = false,
+    type = "chest"
+}
 
 params.sora_huapen = {
     widget = {

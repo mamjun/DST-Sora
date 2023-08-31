@@ -307,4 +307,94 @@ function makelightflier_cat()
     return Prefab("sora_lightflier_cat", lightflier_catfn)
 end
 table.insert(All, makelightflier_cat())
+
+
+local assets =
+{
+    Asset("ANIM", "anim/sign_home.zip"),
+    Asset("ANIM", "anim/ui_board_5x3.zip"),
+    Asset("MINIMAP_IMAGE", "sign"),
+}
+local function OnDismantle(inst,doer)
+    if not(doer and doer:HasTag("player"))then return end
+    if not (inst.components.container and inst.components.container:IsEmpty()) then 
+        return SoraAPI.Say(doer,"牌子里有物品哦") 
+    end
+    local item = SpawnPrefab("sora_sign_item")
+    if item then 
+        doer.components.inventory:GiveItem(item,nil,doer:GetPosition())
+        inst:Remove()
+    end
+end
+local function fn()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+    MakeObstaclePhysics(inst, .2)
+    inst.AnimState:SetBank("sign_home")
+    inst.AnimState:SetBuild("sign_home")
+    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:Show("WRITING")
+    inst:AddTag("NOBLOCK")
+    inst:AddTag("soratargetthis")
+    inst.entity:SetPristine()
+    
+    if not TheWorld.ismastersim then
+        return inst
+    end
+    inst:AddComponent("inspectable")
+    inst:AddComponent("portablestructure")
+    inst.components.portablestructure:SetOnDismantleFn(OnDismantle)
+    inst:AddComponent("container")
+    return inst
+end
+local function ondeploy(inst, pt, deployer)
+    local blender = SpawnPrefab("sora_sign")
+    if blender ~= nil then
+        blender.Physics:SetCollides(false)
+        blender.Physics:Teleport(pt.x, 0, pt.z)
+        blender.Physics:SetCollides(true)
+        blender.AnimState:PlayAnimation("idle", false)
+        inst.components.stackable:Get():Remove()
+    end
+end
+
+local function item_fn()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+    MakeInventoryPhysics(inst)
+    inst.AnimState:SetBank("portable_blender")
+    inst.AnimState:SetBuild("portable_blender")
+    inst.AnimState:PlayAnimation("idle_ground")
+    inst:AddTag("portableitem")
+    MakeInventoryFloatable(inst, nil, 0.05, 0.7)
+
+    inst.entity:SetPristine()
+
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("inspectable")
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.atlasname = GetInventoryItemAtlas("minisign_item.tex")
+	inst.components.inventoryitem.imagename = "minisign_item"
+    inst:AddComponent("stackable")
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+    inst:AddComponent("deployable")
+    inst.components.deployable.ondeploy = ondeploy
+    inst.components.deployable:SetDeployMode(DEPLOYMODE.ANYWHERE)
+    inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.NONE)
+    return inst
+end
+
+table.insert(All, Prefab("sora_sign", fn, assets))
+table.insert(All, Prefab("sora_sign_item", item_fn, assets))
+table.insert(All, MakePlacer("sora_sign_placer", "sign_home", "sign_home", "idle"))
+table.insert(All, MakePlacer("sora_sign_item_placer", "sign_home", "sign_home", "idle"))
+
 return unpack(All)

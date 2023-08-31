@@ -27,14 +27,12 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
---[[专属交互
+]] --[[专属交互
 ]] --
-
 local com = Class(function(self, inst)
     self.inst = inst
     self.has = false
-    inst:DoTaskInTime(0,function()
+    inst:DoTaskInTime(0, function()
         self:Init()
     end)
 end)
@@ -43,52 +41,63 @@ function com:Init()
     if not self.has then
         local pos = self:FindSpawnPoint()
         if pos then
-            local fl = SpawnAt("sora_fl",pos)
-                fl.components.sorabind:Bind(self.inst.userid,self.inst.name)
+            local fl = SpawnAt("sora_fl", pos)
+            fl.components.sorabind:Bind(self.inst.userid, self.inst.name)
             self.has = true
             return fl
-        end 
+        end
     end
 end
-
+-- function com:TestPoint()
+--     local pos = self:FindSpawnPoint()
+--     self.inst.Transform:SetPosition(pos:Get())
+-- end
 function com:FindSpawnPoint()
-    for i=1,10000 do
-        local x = math.random(-600,600)
-        local y = math.random(-600,600)
-        local yes = true 
-        local ents = TheSim:FindEntities(x,0,y,2,nil,{"FX","NOCLICK","NOBLOCK"})
+    for i = 1, 10000 do
+        local x = math.random(-600, 600)
+        local y = math.random(-600, 600)
+        local yes = true
+        local ents = TheSim:FindEntities(x, 0, y, 2, nil, {"FX", "NOCLICK", "NOBLOCK"})
         yes = yes and #ents < 1
-        for ix = -2,2,1 do
-            for iy = -2,2,1 do
-                yes = yes and TheWorld.Map:CanPlantAtPoint(x+ix*4,0,y+iy*4)
-                yes = yes and TheWorld.Map:IsPassableAtPoint(x+ix*4,0,y+iy*4,false,true)
+        yes = yes and (i > 7000 or (self.inst:GetDistanceSqToPoint(x, 0, y) > 6400))
+        local tile = TheWorld.Map:GetTileAtPoint(x, 0, y)
+        yes = yes and (i > 5000 or (tile > 4 and tile < 8))
+        if yes then
+            for ix = -2, 2, 1 do
+                for iy = -2, 2, 1 do
+                    yes = yes and TheWorld.Map:CanPlantAtPoint(x + ix * 4, 0, y + iy * 4)
+                    yes = yes and TheWorld.Map:IsPassableAtPoint(x + ix * 4, 0, y + iy * 4, false, true)
+                end
             end
         end
-        
         if yes then
-              local ix = math.random()
-              local iy = math.random()
-              x = x + ix
-              y = y + iy
-                print(i,x,y,ix,math.random())
-            return Vector3(x,0,y)
+            local ix = math.random()
+            local iy = math.random()
+            x = x + ix
+            y = y + iy
+            print(i,x,0,y,tile)
+            return Vector3(x, 0, y)
         end
     end
-    return Vector3(math.random()*20,0,math.random()*20)
+    return Vector3(math.random() * 20, 0, math.random() * 20)
 end
 
+function com:OnSave()
+    return {
+        has = self.has,
+        link = self.link
+    }
+end
 
-function com:OnSave() return {has = self.has,link = self.link} end
-
-function com:OnLoad(data) 
-    if data then 
-        if  data.has then 
-            self.has = data.has 
-        end 
-        if  data.link then 
+function com:OnLoad(data)
+    if data then
+        if data.has then
+            self.has = data.has
+        end
+        if data.link then
             self.link = data.link
-        end 
-    end 
+        end
+    end
 end
 
 return com

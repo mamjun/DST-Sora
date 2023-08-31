@@ -129,6 +129,7 @@ local black = {
     sora_mysora = 1,
     sora_mysora_r = 1
 }
+
 local function MakeSkin(name, data, notemp)
     local d = {}
     d.quotes = "敢动我就杀了你哦"
