@@ -382,20 +382,13 @@ if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable
     AddPrefabPostInit("sora", function(inst)
         local oldCanSoulhop = inst.CanSoulhop
         inst.CanSoulhop = function(inst, souls, ...)
-            if oldCanSoulhop and oldCanSoulhop(inst, souls, ...) then
-                return true
-            end
-
+            if oldCanSoulhop and oldCanSoulhop(inst, souls, ...) then return true end
             if inst:HasTag("medal_map_blinker") then
-                inst.nosorasouldouble = 1
-                local has, num = inst.replica.inventory:Has("wortox_soul", souls or 1)
-                inst.nosorasouldouble = nil
+                inst.nosorasouldouble = 1 local has, num = inst.replica.inventory:Has("wortox_soul", souls or 1)  inst.nosorasouldouble = nil
                 num = num + math.floor(inst.replica.sanity:GetCurrent() / 5)
                 if num > (souls or 1) then
                     local rider = inst.replica.rider
-                    if rider == nil or not rider:IsRiding() then
-                        return true
-                    end
+                    if rider == nil or not rider:IsRiding() then return true end
                 end
             end
             return false
@@ -410,22 +403,59 @@ if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable
                 end
                 return oldinventoryHas(inv, item, amount, checkallcontainers, ...)
             end
-
             local oldinventoryConsumeByName = inst.components.inventory.ConsumeByName
             inst.components.inventory.ConsumeByName = function(inv, item, amount, ...)
                 if item == "wortox_soul" then
-                    local old, num = oldinventoryHas(inv, item, amount, ...)
-                    local souls = math.min(num, amount)
-                    if souls < amount then
-                        inst.components.sanity:DoDelta(-5 * (amount - souls))
-                    end
+                    local old, num = oldinventoryHas(inv, item, amount, ...)  local souls = math.min(num, amount)
+                    if souls < amount then  inst.components.sanity:DoDelta(-5 * (amount - souls)) end
                     return oldinventoryConsumeByName(inv, item, souls, checkallcontainers, ...)
                 end
                 return oldinventoryConsumeByName(inv, item, amount, checkallcontainers, ...)
             end
-
+        end
+    end)
+    local function FixDoDeltaMedalDelayDamage(inst)
+        if inst.components.health and  inst.components.health.DoDeltaMedalDelayDamage then
+            local oldDoDeltaMedalDelayDamage = inst.components.health.DoDeltaMedalDelayDamage
+            function inst.components.health:DoDeltaMedalDelayDamage(amount,...)
+                if amount > 0 then
+                    if inst:HasTag("sora") then
+                        amount = amount * 0.7
+                    end
+                    if inst.components.inventory then
+                        inst.components.inventory:ForEachEquipment(function (item)
+                            if item and item.sorashizhishang then
+                                amount = amount - item.sorashizhishang
+                            end
+                        end)
+                    end
+                    amount = math.max(0,math.floor(amount))
+                    if amount == 0 then
+                        return 
+                    end
+                end
+                return oldDoDeltaMedalDelayDamage(self,amount,...)
+            end
+        end
+    end
+    local sorashizhishang = {
+        sora2bag=3,
+        sora2armot =3,
+        sora2hat=3,
+        sora2amulet=3,
+        soraclothes = 5,
+        sorahat=5,
+        sorabag=5,
+        sorabowknot=5,
+    }
+    for k,v in pairs(sorashizhishang) do
+        AddPrefabPostInit(k,function (inst)
+            inst.sorashizhishang = v
+        end)
+    end
+    AddPlayerPostInit(function (inst)
+        if TheWorld.ismastersim then
+            inst:DoTaskInTime(0,FixDoDeltaMedalDelayDamage) 
         end
     end)
 end
-
-

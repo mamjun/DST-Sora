@@ -27,8 +27,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local Tags = {}
+]] local Tags = {}
 local key = modname .. "fixtag" -- 默认用modname 做key 防止冲突
 
 function RegTag(tag) -- 必须先注册 主客机一起注册 注册后的tag会被截留
@@ -71,16 +70,40 @@ local function HasTag(inst, stag, ...)
     end
 end
 
+function HasTags(inst, stags, ...)
+    for i = 1, #stags do
+        local key = stags[i]
+        local fn = HasTag or inst[key].HasTag
+        if not fn(inst, key, ...) then return false end
+    end
+    return true
+end
+
+function HasOneOfTags(inst, stags, ...)
+    for i = 1, #stags do
+        local key = stags[i]
+        local fn = HasTag or inst[key].HasTag
+
+        if fn(inst, key, ...) then return true end
+    end
+    return false
+end
+
 function FixTag(inst) -- 传入实体 主客机一起调用
     inst[key] = {
         AddTag = inst.AddTag,
         HasTag = inst.HasTag,
         RemoveTag = inst.RemoveTag,
+        HasTags = inst.HasTags,
+        HasOneOfTags = inst.HasOneOfTags,
         Tags = {}
     }
     inst.AddTag = AddTag
     inst.HasTag = HasTag
     inst.RemoveTag = RemoveTag
+    inst.HasTags = HasTags
+    inst.HasOneOfTags = HasOneOfTags
+
     for k, v in pairs(Tags) do
         inst[key].Tags[k] = net_bool(inst.GUID, key .. "." .. k, GUID,
                                      key .. "." .. k .. "dirty")
@@ -100,6 +123,6 @@ AddPlayerPostInit(function(inst) -- 默认只扩展人物的
 end)
 
 -- return {
-    -- RegTag = RegTag, -- 用于注册tag   --需要主客机一起调用 注册后的tag会被截留
-    -- FixTag = FixTag -- 用来扩展实体的tag槽位
+-- RegTag = RegTag, -- 用于注册tag   --需要主客机一起调用 注册后的tag会被截留
+-- FixTag = FixTag -- 用来扩展实体的tag槽位
 -- }

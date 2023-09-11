@@ -762,10 +762,12 @@ Rec("sora_lightflier", "拟造-萤火", "这是什么呀?", DST, "sora", {
 })
 
 AddInvImg2("sora_sign_item", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item.tex")
-Rec("sora_sign", "拟造-木牌", "这还能藏东西的?", NoRec)
-Rec("sora_sign_item", "拟造-木牌", "这还能藏东西的?", DST, "sora", {
-    boards = 3,
-    livinglog = 2,
+Rec("sora_sign", "拟造-木牌", "为什么看了就像打他?", NoRec)
+Rec("sora_sign_item", "拟造-木牌", "为什么看了就像打他?", DST, "sora", {
+    boards = 20,
+    livinglog = 10,
+    nightmarefuel=20,
+    [san]=100
 }).placer = "no"
 
 

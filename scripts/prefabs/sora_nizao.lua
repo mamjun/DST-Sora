@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] local All = {}
-
+local IsValid = SoraAPI.IsValid
 local function OnDropped(inst)
 
     if inst.components.workable ~= nil then
@@ -73,12 +73,12 @@ function makebutter(ismoon)
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
         inst:AddTag("NOBLOCK")
-       
+
         inst.Transform:SetTwoFaced()
         inst.AnimState:SetBuild(ismoon and "butterfly_moon" or "butterfly_basic")
         inst.AnimState:SetBank("butterfly")
         inst.AnimState:PlayAnimation("idle_flight_loop", true)
-        if ismoon then 
+        if ismoon then
             inst.entity:AddLight()
             inst.Light:SetFalloff(.8)
             inst.Light:SetIntensity(.5)
@@ -86,10 +86,10 @@ function makebutter(ismoon)
             inst.Light:SetColour(0.3, 0.55, 0.45)
             inst.Light:Enable(true)
             inst.Light:EnableClientModulation(true)
-        
+
         end
         inst.entity:SetPristine()
-        
+
         if not TheWorld.ismastersim then
             return inst
         end
@@ -191,7 +191,7 @@ function makelightflier()
         inst.AnimState:SetBuild("lightflier")
         inst.AnimState:SetBank("lightflier")
         inst.AnimState:PlayAnimation("sleep_loop", true)
-        
+
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             return inst
@@ -276,10 +276,10 @@ function makelightflier_cat()
         inst.components.container.canbeopened = false
         inst:AddComponent("preserver")
         inst.components.preserver:SetPerishRateMultiplier(-5000)
-        inst:DoTaskInTime(0,function ()
+        inst:DoTaskInTime(0, function()
             if not inst.components.container.canbeopened then
                 local items = inst.components.container:RemoveAllItems()
-                for k,v in pairs(items) do
+                for k, v in pairs(items) do
                     v:Remove()
                 end
             end
@@ -308,21 +308,15 @@ function makelightflier_cat()
 end
 table.insert(All, makelightflier_cat())
 
-
-local assets =
-{
-    Asset("ANIM", "anim/sign_home.zip"),
-    Asset("ANIM", "anim/ui_board_5x3.zip"),
-    Asset("MINIMAP_IMAGE", "sign"),
-}
-local function OnDismantle(inst,doer)
-    if not(doer and doer:HasTag("player"))then return end
-    if not (inst.components.container and inst.components.container:IsEmpty()) then 
-        return SoraAPI.Say(doer,"牌子里有物品哦") 
+local assets = {Asset("ANIM", "anim/sign_home.zip"), Asset("ANIM", "anim/ui_board_5x3.zip"),
+                Asset("MINIMAP_IMAGE", "sign")}
+local function OnDismantle(inst, doer)
+    if not (doer and doer:HasTag("player")) then
+        return
     end
     local item = SpawnPrefab("sora_sign_item")
-    if item then 
-        doer.components.inventory:GiveItem(item,nil,doer:GetPosition())
+    if item then
+        doer.components.inventory:GiveItem(item, nil, doer:GetPosition())
         inst:Remove()
     end
 end
@@ -337,17 +331,58 @@ local function fn()
     inst.AnimState:SetBuild("sign_home")
     inst.AnimState:PlayAnimation("idle")
     inst.AnimState:Show("WRITING")
+    inst.AnimState:SetMultColour(0/255, 0/255, 0/255, 0.75)
     inst:AddTag("NOBLOCK")
     inst:AddTag("soratargetthis")
+    inst:AddTag("sorastopbrain")
     inst.entity:SetPristine()
-    
+
     if not TheWorld.ismastersim then
         return inst
     end
     inst:AddComponent("inspectable")
+    inst:AddComponent("combat")
+    inst:AddComponent("health")
+    inst.components.health:SetMaxHealth(10000)
+    inst.components.health.DoDelta = function()
+        return 0
+    end
+    inst.components.health.SetVal = function()
+        return 0
+    end
+    inst.components.health.Kill = function()
+        return 0
+    end
+    inst:DoPeriodicTask(2, function(inst)
+        if inst:IsAsleep() then
+            return
+        end
+        if inst:IsInLimbo() then
+            return
+        end
+        local x, y, z = inst.Transform:GetWorldPosition()
+        if not (x and y and z) then
+            return
+        end
+        local MUST_TAGS = {"_combat", "_health"}
+        local CANT_TAGS = {"player", "INLIMBO","beefalo", "structure", "butterfly", "wall", "balloon", "groundspike", "smashable",
+                           "companion", "abigail", "shadowminion", "mone_dummytarget", "bird"}
+        local ents = TheSim:FindEntities(x, y, z, 20, MUST_TAGS, CANT_TAGS);
+        for k, v in ipairs(ents) do
+            if IsValid(v) and v.components.combat then
+                if v.components.combat.target then
+                    if v.components.combat.target.prefab ~= inst.prefab then
+                        v.components.combat:SetTarget(inst)
+                    end
+                elseif v.components.combat.target == nil then
+                    v.components.combat:SetTarget(inst)
+                end
+            end
+        end
+    end)
     inst:AddComponent("portablestructure")
     inst.components.portablestructure:SetOnDismantleFn(OnDismantle)
-    inst:AddComponent("container")
+    -- inst:AddComponent("container")
     return inst
 end
 local function ondeploy(inst, pt, deployer)
@@ -382,7 +417,7 @@ local function item_fn()
     inst:AddComponent("inspectable")
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.atlasname = GetInventoryItemAtlas("minisign_item.tex")
-	inst.components.inventoryitem.imagename = "minisign_item"
+    inst.components.inventoryitem.imagename = "minisign_item"
     inst:AddComponent("stackable")
     inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
     inst:AddComponent("deployable")

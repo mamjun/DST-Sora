@@ -95,7 +95,7 @@ local overfullfn = function(chest, inst)
     return inst:HasTag("bird")
 end
 local function toprefab(prefab)
-    return map[prefab] or prefab
+    return map[prefab] or prefab or "unknow prefab"
 end
 local function CanStack(a, b)
     return a and b and a.components.stackable and b.components.stackable and a.prefab == b.prefab and a.skinname ==

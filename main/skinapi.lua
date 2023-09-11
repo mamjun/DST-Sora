@@ -608,4 +608,6 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             end
             return prefab_skin
         end
+    else
+        CreatePrefabSkin = oldCreatePrefabSkin
     end

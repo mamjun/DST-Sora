@@ -89,6 +89,16 @@ end
 local imagecache = {}
 local repl = {}
 local notimagecache = {}
+for k, v in pairs({"tomato", "onion"}) do
+    imagecache[v] = {
+        atlas = GetInventoryItemAtlas("quagmire_" .. v .. ".tex"),
+        image = "quagmire_" .. v .. ".tex"
+    }
+    imagecache[v .. "_cooked"] = {
+        atlas = GetInventoryItemAtlas("quagmire_" .. v .. "_cooked.tex"),
+        image = "quagmire_" .. v .. "_cooked.tex"
+    }
+end
 function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
     local name = repl[na] or na
     local t = name
@@ -101,54 +111,13 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
     if imagecache[name] then
         return imagecache[name].atlas, imagecache[name].image
     end
-    if TheSim:AtlasContains("images/inventoryimages.xml", t) then
+    local atlas = GetInventoryItemAtlas(t, true)
+    if atlas and not atlas:find("/cookbookimages/") and TheSim:AtlasContains(softresolvefilepath(atlas), t) then
         imagecache[name] = {
-            atlas = "images/inventoryimages.xml",
+            atlas = atlas,
             image = t
         }
-        return "images/inventoryimages.xml", t
-    elseif TheSim:AtlasContains("images/inventoryimages1.xml", t) then
-        imagecache[name] = {
-            atlas = "images/inventoryimages1.xml",
-            image = t
-        }
-        return "images/inventoryimages1.xml", t
-    elseif TheSim:AtlasContains("images/inventoryimages2.xml", t) then
-        imagecache[name] = {
-            atlas = "images/inventoryimages2.xml",
-            image = t
-        }
-        return "images/inventoryimages2.xml", t
-    elseif TheSim:AtlasContains("images/inventoryimages3.xml", t) then
-        imagecache[name] = {
-            atlas = "images/inventoryimages3.xml",
-            image = t
-        }
-        return "images/inventoryimages3.xml", t
-    elseif TheSim:AtlasContains("images/inventoryimages.xml", 'quagmire_' .. t) then
-        imagecache[name] = {
-            atlas = "images/inventoryimages.xml",
-            image = 'quagmire_' .. t
-        }
-        return "images/inventoryimages.xml", 'quagmire_' .. t
-    elseif TheSim:AtlasContains("images/inventoryimages1.xml", 'quagmire_' .. t) then
-        imagecache[name] = {
-            atlas = "images/inventoryimages1.xml",
-            image = 'quagmire_' .. t
-        }
-        return "images/inventoryimages1.xml", 'quagmire_' .. t
-    elseif TheSim:AtlasContains("images/inventoryimages2.xml", 'quagmire_' .. t) then
-        imagecache[name] = {
-            atlas = "images/inventoryimages2.xml",
-            image = 'quagmire_' .. t
-        }
-        return "images/inventoryimages2.xml", 'quagmire_' .. t
-    elseif TheSim:AtlasContains("images/inventoryimages3.xml", 'quagmire_' .. t) then
-        imagecache[name] = {
-            atlas = "images/inventoryimages3.xml",
-            image = 'quagmire_' .. t
-        }
-        return "images/inventoryimages3.xml", 'quagmire_' .. t
+        return atlas, t
     else
         if GLOBAL.Prefabs[name] then
             local assets = GLOBAL.Prefabs[name].assets or {}
@@ -164,7 +133,6 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
                 end
             end
         end
-
         local trueatlas = softresolvefilepath("images/inventoryimages/" .. name .. ".xml")
         if trueatlas and TheSim:AtlasContains(trueatlas, t) then
             imagecache[name] = {
@@ -172,14 +140,6 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
                 image = t
             }
             return "images/inventoryimages/" .. name .. ".xml", t
-        end
-        trueatlas = GetInventoryItemAtlas(t, true)
-        if trueatlas and TheSim:AtlasContains(trueatlas, t) then
-            imagecache[name] = {
-                atlas = trueatlas,
-                image = t
-            }
-            return trueatlas, t
         end
         trueatlas = softresolvefilepath("images/" .. name .. ".xml")
         if trueatlas and TheSim:AtlasContains(trueatlas, t) then
@@ -211,15 +171,6 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
             }
             return trueatlas, t
         end
-
-        if trueatlas and TheSim:AtlasContains(softresolvefilepath(trueatlas), 'quagmire_' .. t) then
-            imagecache[name] = {
-                atlas = trueatlas,
-                image = 'quagmire_' .. t
-            }
-            return trueatlas, 'quagmire_' .. t
-        end
-
         for k, v in pairs(GLOBAL.Prefabs) do
             if k and k:match("MOD_") then
                 local assets = v.assets or {}
@@ -462,7 +413,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     m.OnControl = s.OnControl or m.nullfn
     s.OnControl = function(self, control, down)
         if self.focus and control == CONTROL_SECONDARY then
-            m.OnClick(self,down)
+            m.OnClick(self, down)
         end
         return m.OnControl(self, control, down)
     end
@@ -475,38 +426,38 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         return m.OnRawKey(self, key, down, ...)
     end
 
-    m.OnClick = function(self,down)
-        if down then 
+    m.OnClick = function(self, down)
+        if down then
             m.FollowMouse(self)
         else
             m.StopFollowMouse(self)
         end
     end
 
-    m.SetMovePosition = function(self, x, y,z)
-        if not (s.parent and self.ppos and self.mousepos)then
+    m.SetMovePosition = function(self, x, y, z)
+        if not (s.parent and self.ppos and self.mousepos) then
             return
         end
         local pos
-		if type(x) == "number" then
-			pos = Vector3(x, y, 0)
-		else
-			pos = x
-		end
-        local self_scale=self:GetScale()
-        local offset=data and data.drag_offset or 1--偏移修正(容器是0.6)
-		local newpos=self.ppos+(pos-self.mousepos)/(self_scale.x/offset)--修正偏移值       
+        if type(x) == "number" then
+            pos = Vector3(x, y, 0)
+        else
+            pos = x
+        end
+        local self_scale = self:GetScale()
+        local offset = data and data.drag_offset or 1 -- 偏移修正(容器是0.6)
+        local newpos = self.ppos + (pos - self.mousepos) / (self_scale.x / offset) -- 修正偏移值       
         s.SetPosition(self, newpos)
     end
     m.FollowMouse = function(self)
-        self.mousepos = TheInput:GetScreenPosition() 
+        self.mousepos = TheInput:GetScreenPosition()
         self.ppos = self:GetPosition()
         if m.followhandler == nil then
             m.followhandler = TheInput:AddMoveHandler(function(x, y)
-                m.SetMovePosition(self,x,y,0)
-				if not TheInput:IsMouseDown(MOUSEBUTTON_RIGHT) then
-					m.StopFollowMouse(self)
-				end
+                m.SetMovePosition(self, x, y, 0)
+                if not TheInput:IsMouseDown(MOUSEBUTTON_RIGHT) then
+                    m.StopFollowMouse(self)
+                end
             end)
         end
     end
@@ -518,7 +469,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
             m.followhandler = nil
         end
         local newpos = self:GetPosition()
-        print("结束save",string.format("return Vector3(%f,%f,%f)", newpos:Get()))
+        print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
         TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
     end
 end
@@ -681,4 +632,11 @@ function GetSoraPackLevel(data)
         end
     end
     return level
+end
+
+function IsValid(ent)
+    if ent and type(ent) == "table" and ent.entity and ent.entity:IsValid() then
+        return true
+    end
+    return false
 end

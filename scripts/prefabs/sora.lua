@@ -296,14 +296,14 @@ local function GetExp(inst, num, code, dmaxexp, once)
     else
         local maxexp = dmaxexp or 120
         local t = TheWorld.state.cycles
-        if (t - inst.soraday) > 0 then
+        if ((t - inst.soraday) > 0 or t < inst.soraday)then
             local olddayexp = inst.soradayexp -- getexppatch
             inst.soradayexp = {}
             for k, v in pairs(olddayexp) do
-                if k and v and v >= (maxexp * 0.75) then
-                    inst.soradayexp[k] = math.random(maxexp * 0.8, maxexp * 0.95)
+                if k and v and v >= (maxexp * 0.9) then
+                    inst.soradayexp[k] = math.random(maxexp * 0.6, maxexp * 0.8)
                 else
-                    inst.soradayexp[k] = math.random(maxexp * 0.1, maxexp * 0.3)
+                    inst.soradayexp[k] = math.random(0, maxexp * 0.2)
                 end
             end
             inst.soraday = t
