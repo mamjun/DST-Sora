@@ -881,17 +881,17 @@ AddPrefabPostInit("treasurechest",function (inst)
     end
 end)
 
-AddLaterFn(function ()
-    if GLOBAL.BT then
-        local old = GLOBAL.BT.GetSleepTime
-        GLOBAL.BT.GetSleepTime = function(self,...)
-            if self.inst and self.inst.components.combat then
-                local cmp = self.inst.components.combat
-                if cmp.target and cmp.target:HasTag("sorastopbrain") then
-                    return 3
-                end
-            end
-            return old(self,...)
-        end
-    end
-end)
+-- AddLaterFn(function ()
+--     if GLOBAL.BT then
+--         local old = GLOBAL.BT.GetSleepTime
+--         GLOBAL.BT.GetSleepTime = function(self,...)
+--             if self.inst and self.inst.components.combat then
+--                 local cmp = self.inst.components.combat
+--                 if cmp.target and cmp.target:HasTag("sorastopbrain") then
+--                     return 3
+--                 end
+--             end
+--             return old(self,...)
+--         end
+--     end
+-- end)

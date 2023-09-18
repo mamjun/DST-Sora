@@ -87,6 +87,7 @@ local data = {
     overfull = 1
 }
 cmp:RegType("sora2chest", data)
+
 local cmp2 = require "components/sorapatch"
 local tocopy = {
     onopenfn = 1,

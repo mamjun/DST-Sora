@@ -57,7 +57,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             self.SoraWiki.cd =SoraCD(0.5)
             self.SoraWiki:SetOnClick(function()
                 if not self.SoraWiki.cd() then
-                    VisitURL("http://wikil.fl.lovetly.top/url.php?id=sora")
+                    VisitURL("http://wikil.fl.lovetly.top/url.php?id=sora",false)
                 end
             end)
             self.SoraWiki:SetOnDown(function() self.SoraWiki.cd()  end) --按下

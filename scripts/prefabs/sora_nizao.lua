@@ -320,6 +320,60 @@ local function OnDismantle(inst, doer)
         inst:Remove()
     end
 end
+local cantarget = {
+    -- 狗
+    hound = 1,
+    firehound = 1,
+    icehound = 1,
+    -- 猪人兔人
+    pigman = 1,
+    bunnyman = 1,
+    -- 小偷
+    medal_naughty_krampus = 1,
+    krampus = 1,
+    -- 三基佬
+    shadow_knight = 1,
+    shadow_bishop = 1,
+    shadow_rook = 1,
+    -- 杀人蜂
+    killerbee = 1,
+    -- 嗡嗡蜜蜂
+    beeguard = 1,
+    nightmarebeak = 1,
+    crawlingnightmare = 1,
+    -- 月猪月狗
+    moonpig = 1,
+    moonhound = 1,
+    -- 青蛙
+    frog = 1,
+    -- 火鸡
+    perd = 1,
+    -- 姜饼狗
+    clayhound = 1,
+    -- 僵尸狗
+    mutatedhound = 1,
+    -- 蜘蛛们
+    spider = 1,
+    spider_dropper = 1,
+    spider_hider = 1,
+    spider_moon = 1,
+    spider_spitter = 1,
+    spider_warrior = 1,
+    spider_healer = 1,
+    spider_water = 1,
+
+    monkey = 1,
+    lavae = 1,
+    fruitfly = 1,
+    birchnutdrake = 1,
+    fruitdragon = 1,
+    bird_mutant = 1,
+    bird_mutant_spitter = 1,
+    medal_bee = 1,
+    medal_beeguard = 1,
+    wonkey = 1
+}
+local soracrazy = require "brains/soracrazybrain"
 local function fn()
     local inst = CreateEntity()
     inst.entity:AddTransform()
@@ -331,7 +385,7 @@ local function fn()
     inst.AnimState:SetBuild("sign_home")
     inst.AnimState:PlayAnimation("idle")
     inst.AnimState:Show("WRITING")
-    inst.AnimState:SetMultColour(0/255, 0/255, 0/255, 0.75)
+    inst.AnimState:SetMultColour(0 / 255, 0 / 255, 0 / 255, 0.75)
     inst:AddTag("NOBLOCK")
     inst:AddTag("soratargetthis")
     inst:AddTag("sorastopbrain")
@@ -365,16 +419,16 @@ local function fn()
             return
         end
         local MUST_TAGS = {"_combat", "_health"}
-        local CANT_TAGS = {"player", "INLIMBO","beefalo", "structure", "butterfly", "wall", "balloon", "groundspike", "smashable",
-                           "companion", "abigail", "shadowminion", "mone_dummytarget", "bird"}
+        local CANT_TAGS = {"player", "INLIMBO", "structure", "wall", "companion", "bird"}
         local ents = TheSim:FindEntities(x, y, z, 20, MUST_TAGS, CANT_TAGS);
         for k, v in ipairs(ents) do
             if IsValid(v) and v.components.combat then
-                if v.components.combat.target then
-                    if v.components.combat.target.prefab ~= inst.prefab then
-                        v.components.combat:SetTarget(inst)
+                if cantarget[v.prefab] then
+                    if not v:HasTag("soracrazy") then
+                        v:AddTag("soracrazy")
+                        v:SetBrain(soracrazy)
+                        v.components.combat:SetKeepTargetFunction(nil)
                     end
-                elseif v.components.combat.target == nil then
                     v.components.combat:SetTarget(inst)
                 end
             end
@@ -402,9 +456,9 @@ local function item_fn()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
     MakeInventoryPhysics(inst)
-    inst.AnimState:SetBank("portable_blender")
-    inst.AnimState:SetBuild("portable_blender")
-    inst.AnimState:PlayAnimation("idle_ground")
+    inst.AnimState:SetBank("sign_mini")
+    inst.AnimState:SetBuild("sign_mini")
+    inst.AnimState:PlayAnimation("item")
     inst:AddTag("portableitem")
     MakeInventoryFloatable(inst, nil, 0.05, 0.7)
 

@@ -374,32 +374,7 @@ local function PickFn(inst, doer, pos)
     return items
 end
 local function makepacker(inst, doer, items)
-    local ents = {}
-    for k, v in pairs(items) do
-        -- print("items", k, v)
-        local num = v
-        while num > 0 do
-            local it = SpawnPrefab(k)
-            local inum = 1
-            if it then
-                if it.components.stackable then
-                    inum = math.min(it.components.stackable.maxsize, num)
-                    it.components.stackable:SetStackSize(inum)
-                end
-                table.insert(ents, it)
-            end
-            num = num - inum
-        end
-    end
-    if not next(ents) then
-        return
-    end
-    local packer = SpawnPrefab("sora3packer")
-    packer.components.unwrappable:WrapItems(ents)
-    for k, v in pairs(ents) do
-        v:Remove()
-    end
-    return packer
+    return SoraAPI.Gift(items)
 end
 local function OnPickFn(inst, doer, pos)
     if incd(inst, doer) then

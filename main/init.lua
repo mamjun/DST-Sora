@@ -58,6 +58,7 @@ end
 -- 日志上传
 mi("logupload")
 -- 相关API 提供给mod使用
+mi("soraenv")
 mi("api")
 -- 导入maindb
 mi("maindb")

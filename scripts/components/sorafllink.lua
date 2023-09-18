@@ -27,16 +27,14 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
---[[专属交互
+]] --[[专属交互
 ]] --
-
 local com = Class(function(self, inst)
     self.inst = inst
     self.link = false
-    local items = {"soratele","sorapick","soramagic","sorahealing","soraclothes","sorahat","sorabowknot"}
-    self.item = items[math.random(1,#items)]
-    inst:DoTaskInTime(0,function()
+    local items = {"soratele", "sorapick", "soramagic", "sorahealing", "soraclothes", "sorahat", "sorabowknot"}
+    self.item = items[math.random(1, #items)]
+    inst:DoTaskInTime(0, function()
         self:Init()
     end)
 end)
@@ -48,68 +46,80 @@ function com:Init()
 end
 
 function com:FindSpawnPoint()
-    for i=1,10000 do
-        local x = math.random(-600,600)
-        local y = math.random(-600,600)
-        local yes = true 
-        local ents = TheSim:FindEntities(x,0,y,2,nil,{"FX","NOCLICK","NOBLOCK"})
+    for i = 1, 10000 do
+        local x = math.random(-600, 600)
+        local y = math.random(-600, 600)
+        local yes = true
+        local ents = TheSim:FindEntities(x, 0, y, 2, nil, {"FX", "NOCLICK", "NOBLOCK"})
         yes = yes and #ents < 1
-        for ix = -2,2,1 do
-            for iy = -2,2,1 do
-                yes = yes and TheWorld.Map:CanPlantAtPoint(x+ix*4,0,y+iy*4)
-                yes = yes and TheWorld.Map:IsPassableAtPoint(x+ix*4,0,y+iy*4,false,true)
+        for ix = -2, 2, 1 do
+            for iy = -2, 2, 1 do
+                yes = yes and TheWorld.Map:CanPlantAtPoint(x + ix * 4, 0, y + iy * 4)
+                yes = yes and TheWorld.Map:IsPassableAtPoint(x + ix * 4, 0, y + iy * 4, false, true)
             end
         end
-        
+
         if yes then
-              local ix = math.random()
-              local iy = math.random()
-              x = x + ix
-              y = y + iy
-            return Vector3(x,0,y)
+            local ix = math.random()
+            local iy = math.random()
+            x = x + ix
+            y = y + iy
+            return Vector3(x, 0, y)
         end
     end
-    return Vector3(0,0,0)
+    return Vector3(0, 0, 0)
 end
 
-
 function com:Link(doer)
-    --local doer = self.inst
-    if not (doer:HasTag("sora") and not self.link) then return end
-    
-    
+    -- local doer = self.inst
+    if not (doer:HasTag("sora") and not self.link) then
+        return
+    end
+
     local e = 500
     if TheWorld.state.cycles then
         e = e + TheWorld.state.cycles * 10
     end
     if doer.components.age then
-        e = e + doer.components.age:GetAgeInDays()* 20
+        e = e + doer.components.age:GetAgeInDays() * 20
     end
-    doer:GetExp(e,"sorabind",nil,true)
+    doer:GetExp(e, "sorabind", nil, true)
     local item = SpawnPrefab(self.item)
     if item.components.sorawq then
-        item.components.sorawq.str = (doer.userid or "unknow").."|sora_fl"
-        
+        item.components.sorawq.str = (doer.userid or "unknow") .. "|sora_fl"
+
     end
     if item.components.soraitem and item.components.soraitem.bind then
         item.components.soraitem.user = doer.userid
     end
-    doer.components.inventory:GiveItem(item)
+    local pos = doer:GetPosition()
+    if item.components.inventoryitem then
+        doer.components.inventory:GiveItem(item)
+    elseif item.Transform then
+        item.Transform:SetPosition(pos:Get())
+    else
+        item:Remove()
+    end
     self.inst:RemoveTag("soranotlink")
     self.link = true
 end
 
-function com:OnSave() return {link = self.link,item = self.item} end
+function com:OnSave()
+    return {
+        link = self.link,
+        item = self.item
+    }
+end
 
-function com:OnLoad(data) 
-    if data then 
-        if  data.link then 
+function com:OnLoad(data)
+    if data then
+        if data.link then
             self.link = data.link
-        end 
+        end
         if data.item then
             self.item = data.item
         end
-    end 
+    end
 end
 
 return com

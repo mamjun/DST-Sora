@@ -296,7 +296,7 @@ local function GetExp(inst, num, code, dmaxexp, once)
     else
         local maxexp = dmaxexp or 120
         local t = TheWorld.state.cycles
-        if ((t - inst.soraday) > 0 or t < inst.soraday)then
+        if (t ~= inst.soraday)then
             local olddayexp = inst.soradayexp -- getexppatch
             inst.soradayexp = {}
             for k, v in pairs(olddayexp) do

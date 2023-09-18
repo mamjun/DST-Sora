@@ -27,18 +27,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] local Widget = require "widgets/widget"
-local Image = require "widgets/image"
-local ImageButton = require "widgets/imagebutton"
-local TextButton = require "widgets/textbutton"
-local Button = require "widgets/button"
-local UIAnim = require "widgets/uianim"
-local Text = require "widgets/text"
-local Grid = require "widgets/grid"
-local Spinner = require "widgets/spinner"
+]] SoraEnv()
 local ItemSlot = require "widgets/itemslot"
-local ItemTile = require "widgets/itemtile"
-local TEMPLATES = require "widgets/redux/templates"
+
 local seedinfo = Class(Button, function(self, seeddata)
     Button._ctor(self, "sora_seed_info")
     local btn = self:AddChild(ItemSlot("images/hud.xml", "inv_slot.tex"))

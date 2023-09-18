@@ -29,13 +29,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
 
-local Widget = require "widgets/widget"
-local Image = require "widgets/image"
-local ImageButton = require "widgets/imagebutton"
-local UIAnim = require "widgets/uianim"
-local Text = require "widgets/text"
-local Grid = require "widgets/grid"
-local Spinner = require "widgets/spinner"
+SoraEnv()
+
 
 local TEMPLATES = require "widgets/redux/templates"
 local function MakeDetailsLine(self, x, y, scale, image_override)

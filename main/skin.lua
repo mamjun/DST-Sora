@@ -442,65 +442,18 @@ local skinhandle = {
                     end
                     if data.prefab then
                         local r, gifts = pcall(json.decode, data.prefab)
-                        local super = gifts.super
-                        gifts.super = nil
+                        local config = {}
                         if r then
-                            local items = {}
-                            for i, g in pairs(gifts) do
-                                local item = type(g) == "table" and g or SpawnPrefab(i)
-                                if item ~= nil then
-
-                                    local maxsize = (item.components.stackable ~= nil) and
-                                                        item.components.stackable.maxsize or 1
-                                    if g > 1 then
-                                        if item.components.stackable ~= nil then
-                                            if g <= maxsize then
-                                                item.components.stackable.stacksize = math.max(1, g or 1)
-                                            else
-                                                while (g > maxsize) do
-                                                    g = g - maxsize
-                                                    local item2 = SpawnPrefab(i)
-                                                    item2.components.stackable.stacksize = maxsize
-                                                    table.insert(items, item2)
-                                                end
-                                                item.components.stackable.stacksize = math.max(1, g or 1)
-                                            end
-                                        else
-                                            while (g > 1) do
-                                                g = g - 1
-                                                table.insert(items, SpawnPrefab(i))
-                                            end
-                                        end
-
-                                    end
-                                    table.insert(items, item)
-                                end
-                            end
-                            local i = 1
-                            for k, v in pairs(items) do
-                                i = i + 1
-                                if v.prefab == "sora_wq" then
-
-                                    v.components.sorawq.str = inst.userid .. "|" .. cdk .. "|" .. i
-                                end
-                                if v.components.soraitem and v.components.soraitem.bind then
-                                    v.components.soraitem.user = inst.userid
-                                end
-                            end
-
-                            if #items > 0 then
-                                local packer = SpawnPrefab("sora3packer")
-                                packer.components.unwrappable:WrapItems(items)
-                                if super and packer.super then
-                                    packer:super({})
-                                end
-                                packer.components.named:SetName("礼包:" .. (data.name or "未知"))
-                                packer.components.inspectable:SetDescription(
-                                    "礼包:" .. (data.name or "未知") .. "\r\n内含:" .. (data.item or "未知"))
-                                for i, v in ipairs(items) do
-                                    v:Remove()
-                                end
-                                inst.components.inventory:GiveItem(packer, nil, inst:GetPosition())
+                            config.super = gifts.super and {} or nil
+                            gifts.super = nil
+                            config.open = gifts.open
+                            gifts.open = nil
+                            config.name = "礼包:" .. (data.name or "未知")
+                            config.des  = "礼包:" .. (data.name or "未知") .. "\r\n内含:" .. (data.item or "未知")
+                            local packer = SoraAPI.Gift(gifts, config, inst)
+                            inst.components.inventory:GiveItem(packer, nil, inst:GetPosition())
+                            if config.open then
+                                packer.components.unwrappable:Unwrap(inst)
                             end
                         else
                             mes(inst, "礼物解析失败:" .. tostring(gifts) .. "\r\n" .. tostring(data.prefab))

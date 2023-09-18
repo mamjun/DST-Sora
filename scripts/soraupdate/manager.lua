@@ -165,6 +165,7 @@ function com:TryToUpdate()
     })
     if postjson then
         postjson = postjson:gsub("\\'", "'")
+        --print("post",postjson)
         TheSim:QueryServer(self.api, self.callback, "POST", postjson) -- 检测更新
     else
         self:Redata() -- 如果json打包失败就重新生成元数据

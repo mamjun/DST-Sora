@@ -29,8 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
 
-local Widget = require "widgets/widget"
-local Text = require "widgets/text"
+SoraEnv()
 
 local ui = Class(Widget, function(self)
     Widget._ctor(self, "SoraTree  Popup")

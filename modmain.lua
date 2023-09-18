@@ -32,6 +32,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         return GLOBAL.rawget(GLOBAL, k)
     end
 })
+
 modimport("main/init")
 -- prefab文件列表
 PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "sorahat", "sora2hat", "sora2bag",

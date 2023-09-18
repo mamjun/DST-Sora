@@ -577,6 +577,7 @@ end
 MakePcallFn = Pfn
 local lastui = nil
 global("TheUI")
+
 function TryLoadUI(str, ...) -- MakePcallFn
     if lastui then
         lastui:Kill()
@@ -584,7 +585,18 @@ function TryLoadUI(str, ...) -- MakePcallFn
     end
     package.loaded["widgets/" .. str] = nil
     local ui = require("widgets/" .. str)
-    local uiinst = ui(...)
+    local old = ui._ctor
+    local uiinst
+    ui._ctor = function(obj, ...)
+        uiinst = obj
+        return old(obj, ...)
+    end
+    local t, r = pcall(ui, ...)
+    if t then
+        uiinst = r
+    else
+        print("uiload", t, r)
+    end
     GLOBAL.TheUI = uiinst
     lastui = uiinst
     ThePlayer.HUD.controls.containerroot:AddChild(uiinst)
@@ -639,4 +651,77 @@ function IsValid(ent)
         return true
     end
     return false
+end
+
+-- items = {log=1}
+--[[data = {
+
+}]]
+function Gift(gifts, data, doer)
+    local items = {}
+    data = data or {}
+    for k, v in pairs(gifts) do
+        local item = type(k) == "table" and v or SpawnPrefab(k)
+        if item ~= nil then
+            local maxsize = (item.components.stackable ~= nil) and item.components.stackable.maxsize or 1
+            if v > 1 then
+                if item.components.stackable ~= nil then
+                    if v <= maxsize then
+                        item.components.stackable.stacksize = math.max(1, v or 1)
+                    else
+                        while (v > maxsize) do
+                            v = v - maxsize
+                            local item2 = SpawnPrefab(k)
+                            item2.components.stackable.stacksize = maxsize
+                            table.insert(items, item2)
+                        end
+                        item.components.stackable.stacksize = math.max(1, v or 1)
+                    end
+                else
+                    while (v > 1) do
+                        v = v - 1
+                        table.insert(items, SpawnPrefab(k))
+                    end
+                end
+            end
+            table.insert(items, item)
+        end
+    end
+
+    local i = 1
+    if doer then
+        for k, v in pairs(items) do
+            i = i + 1
+            if v.prefab == "sora_wq" then
+                v.components.sorawq.str = doer.userid .. "|" .. cdk .. "|" .. i
+            end
+            if v.components.soraitem and v.components.soraitem.bind then
+                v.components.soraitem.user = doer.userid
+            end
+        end
+    end
+    if data.itemfn then 
+        for k, v in pairs(items) do
+            data.itemfn(v,data,doer)
+        end
+    end
+    if #items > 0 then
+        local packer = SpawnPrefab("sora3packer")
+        packer.components.unwrappable:WrapItems(items)
+        if data.super and packer.super then
+            packer:super(data.super)
+        end
+        if data.name then
+            packer.components.named:SetName(data.name)
+            packer.components.inspectable:SetDescription(data.des or data.name)
+        end
+        for i, v in ipairs(items) do
+            v:Remove()
+        end
+        if data.giftfn then 
+            packer.giftfn(packer,data,doer)
+        end
+        return packer
+    end
+    return
 end

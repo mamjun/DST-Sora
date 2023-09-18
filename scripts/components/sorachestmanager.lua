@@ -327,7 +327,7 @@ local function GetItem(inst, data) -- 箱子收东西
 end
 
 local function GetData(inst)
-    return allchest[inst.prefab] and allchest[inst.prefab][inst] and allchest[inst.prefab][inst].data
+    return allchest[inst.sorachesttype] and allchest[inst.sorachesttype][inst] and allchest[inst.sorachesttype][inst].data
 end
 local function OnChestRemove(chest)
     TheWorld.components.sorachestmanager:UnReg(chest)
@@ -477,19 +477,19 @@ end
 
 local function UpdateAllChest()
     local UnReg = {}
-    for prefab, chests in pairs(allchest) do -- 统计失效箱子
+    for type, chests in pairs(allchest) do -- 统计失效箱子
         for k, v in pairs(chests) do
             if not k:IsValid() then
-                if not UnReg[prefab] then
-                    UnReg[prefab] = {}
+                if not UnReg[type] then
+                    UnReg[type] = {}
                 end
-                UnReg[prefab][v] = 1
+                UnReg[type][v] = 1
             end
         end
     end
-    for prefab, chests in pairs(UnReg) do -- 清理失效箱子
+    for type, chests in pairs(UnReg) do -- 清理失效箱子
         for k, v in pairs(chests) do
-            allchest[prefab][v] = nil
+            allchest[type][v] = nil
             updatechests[v] = nil
         end
     end
@@ -506,6 +506,10 @@ local function TryCacheEnt(inst, all) -- 尝试缓存下来
     if not inst.replica.inventoryitem then
         inst.SoraChestSkip = true
         return
+    end
+    if inst.components.projectile then  --投射物
+        inst.SoraChestSkip = true
+        return 
     end
     if inst:IsInLimbo() then -- 不可见实体
         return true
@@ -685,6 +689,7 @@ local com = Class(function(self, inst)
     self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
     -- self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
     inst:WatchWorldState("cycles", function()
+        UpdateAllEnts()
         inst:DoTaskInTime(1, DayUpdate)
         inst:DoTaskInTime(3, DayUpdate)
         inst:DoTaskInTime(5, DayUpdate)
@@ -710,11 +715,12 @@ end
 
 function com:RegByType(chest, type)
     if ChestData[type] then
-        if not allchest[chest.prefab] then
-            allchest[chest.prefab] = {}
+        if not allchest[type] then
+            allchest[type] = {}
         end
-        allchest[chest.prefab][chest] = deepcopy(ChestData[type])
-        chest.sorachestdata = allchest[chest.prefab][chest]
+        allchest[type][chest] = deepcopy(ChestData[type])
+        chest.sorachestdata = allchest[type][chest]
+        chest.sorachesttype = type
         chest:DoTaskInTime(0, ResetChestData)
         chest:ListenForEvent("onopen", OnOpen)
         chest:ListenForEvent("onclose", OnClose)
@@ -722,12 +728,12 @@ function com:RegByType(chest, type)
     end
 end
 function com:UnReg(chest)
-    if allchest[chest.prefab] then
+    if chest.sorachesttype and allchest[chest.sorachesttype] then
         chest:RemoveEventCallback("onopen", OnOpen)
         chest:RemoveEventCallback("onclose", OnClose)
         updatechests[chest] = nil
         chest.sorachestdata = nil
-        allchest[chest.prefab][chest] = nil
+        allchest[chest.sorachesttype][chest] = nil
     end
 end
 
