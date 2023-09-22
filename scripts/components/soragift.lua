@@ -126,10 +126,12 @@ function soragift:GiveGift(doer)
         local gifts = type(giftconfig.gifts) == "function" and giftconfig.gifts(self, doer, giftconfig.gifts) or
                           giftconfig.gifts
         local packer = SoraAPI.Gift(gifts, giftconfig, doer)
-        doer.components.inventory:GiveItem(packer, nil, self.inst:GetPosition())
-        self.giftexp = self.giftexp - giftconfig.exp
-        if giftconfig.givefn then
-            giftconfig.givefn(self.inst, doer, packer, giftconfig)
+        if packer then
+            doer.components.inventory:GiveItem(packer, nil, self.inst:GetPosition())
+            self.giftexp = self.giftexp - giftconfig.exp
+            if giftconfig.givefn then
+               giftconfig.givefn(self.inst, doer, packer, giftconfig)
+            end
         end
         self.inst.SoundEmitter:PlaySound("dontstarve/creatures/together/deer/chain")
     end

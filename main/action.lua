@@ -151,7 +151,7 @@ local SORAGIFT = GLOBAL.Action({
 SORAGIFT.id = "SORAGIFT"
 SORAGIFT.str = "领取礼物"
 SORAGIFT.fn = function(act)
-    if act.target ~= nil and act.target.components.soragift ~= nil then
+    if act.doer and act.target ~= nil and act.target.components.soragift ~= nil then
         act.target.components.soragift:GiveGift(act.doer)
     end
     return true

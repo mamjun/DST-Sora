@@ -199,7 +199,7 @@ AddGift({rocks=100},5,1,0)
 AddGift({flint=100},5,1,0)
 AddGift({nitre=100},5,1,0)
 AddGift({goldnugget=40},5,1,0)
-AddGift({charcoa=100},3,1,0)
+AddGift({charcoal=100},3,1,0)
 AddGift({ice=100},3,1,0)
 
 AddGift({dug_grass=3},1,1,0)
