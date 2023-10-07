@@ -188,6 +188,15 @@ end)
 
 -- 网络部分
 local ThankYouPopup = require "screens/thankyoupopup"
+local function PushThankYouPopup(item)
+    local map = GetSkinMapByBase(item)
+    local data = {}
+    for k,v in pairs(map) do 
+        table.insert(data,{item=k,item_id=1,gifttype = "SORASSKIN"})
+    end
+   TheFrontEnd:PushScreen(ThankYouPopup(data))
+
+end
 local apiurl = "http://skin.fl.lovetly.top/api/Dst"
 local token = ""
 local tokentime = 0
@@ -585,11 +594,7 @@ if not TheNet:IsDedicated() then
                 if code == 5011 then
                     SkinRPC('GetSkins', true)
                     GetSkins(selfid)
-                    TheFrontEnd:PushScreen(ThankYouPopup({{
-                        item = "sora_dress",
-                        item_id = 0,
-                        gifttype = "SORASKIN"
-                    }}))
+                    PushThankYouPopup("sora_dress")
                 end
             end)
         end)
@@ -848,11 +853,7 @@ if not TheNet:IsDedicated() then
                     if code == 5021 then
                         SkinRPC('GetSkins', true)
                         GetSkins(selfid)
-                        TheFrontEnd:PushScreen(ThankYouPopup({{
-                            item = "sora_gete",
-                            item_id = 0,
-                            gifttype = "SORASKIN"
-                        }}))
+                        PushThankYouPopup("sora_gete")
                     elseif code == 5020 then
                         SoraPushPopupDialog('小穹的温馨提示',
                             "你已经拥有了[穹妹-哥特萝莉],不需要重复激活")
@@ -944,11 +945,7 @@ if not TheNet:IsDedicated() then
                         SkinRPC('GetSkins', true)
                         GetSkins(selfid)
                         TheFrontEnd:PopScreen(self)
-                        TheFrontEnd:PushScreen(ThankYouPopup({{
-                            item = data.skinprefab,
-                            item_id = 0,
-                            gifttype = "SORASKIN"
-                        }}))
+                        PushThankYouPopup(data.skinprefab)
                     elseif (code == 6231) then
                         SkinRPC('UseCDK', cdk, true)
                         -- SoraPushPopupDialog('小穹的温馨提示',

@@ -327,6 +327,20 @@ params.sora_sign = {
     acceptsstacks = false,
     type = "chest"
 }
+local function OnHuaPen(player, inst)
+    if inst and type(inst) == "table" and inst.GUID and inst.components.container ~= nil then
+        if not player then
+            return
+        end
+        if not player.sora2chestcd then
+            player.sora2chestcd = SoraCD(1)
+        end
+        if player.sora2chestcd() and inst.CollectFood then
+            inst:CollectFood(player)
+        end
+    end
+end
+AddModRPCHandler("sora", "sora_huapen", OnHuaPen)
 
 params.sora_huapen = {
     widget = {
@@ -334,7 +348,11 @@ params.sora_huapen = {
         animbank = "ui_alterguardianhat_1x1",
         animbuild = "ui_alterguardianhat_1x1",
         pos = Vector3(100, 0, 0),
-        side_align_tip = 100
+        side_align_tip = 100,
+        buttoninfo = {
+            text = "收集",
+            position = GLOBAL.Vector3(0, -40, 0)
+        }
     },
     acceptsstacks = true,
     type = "chest"
@@ -343,6 +361,18 @@ function params.sora_huapen.itemtestfn(container, item, slot)
     return item and item.prefab ~= "sora_flh" and
                (item:HasTag("sorafood") or item.prefab == "butterfly" or item.prefab == "moonrocknugget" or item.prefab ==
                    "moonglass" or item.prefab == "petals" or item.prefab == "opalpreciousgem")
+end
+
+function params.sora_huapen.widget.buttoninfo.fn(inst)
+    if inst.components.container ~= nil and ThePlayer then
+        OnHuaPen(ThePlayer, inst)
+    elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
+        SendModRPCToServer(MOD_RPC["sora"]["sora_huapen"], inst)
+    end
+end
+
+function params.sora_huapen.widget.buttoninfo.validfn(inst)
+    return inst.replica.container ~= nil and not inst.replica.container:IsEmpty() 
 end
 
 params.sora_lightflier_cat = {

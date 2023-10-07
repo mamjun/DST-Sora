@@ -27,7 +27,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] local assets = {}
+]] local assets = {Asset("ANIM", "anim/sora_lock.zip"), Asset("ATLAS", "images/inventoryimages/sora_lock.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sora_lock.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora_lock.xml", 256)}
 
 local prefabs = {}
 
@@ -37,8 +39,8 @@ local function fn()
     local anim = inst.entity:AddAnimState()
     MakeInventoryPhysics(inst)
     inst.entity:AddNetwork()
-    anim:SetBank("sora2stone")
-    anim:SetBuild("sora2stone")
+    anim:SetBank("sora_lock")
+    anim:SetBuild("sora_lock")
     anim:PlayAnimation("idle")
     inst:AddTag("soracontainlock")
 
@@ -49,18 +51,18 @@ local function fn()
     inst.components.inspectable:SetDescription([[桃子姐姐又在找借口
     咕咕我们了]])
     inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2stone.xml"
-    inst.components.inventoryitem.imagename = "sora2stone"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora_lock.xml"
+    inst.components.inventoryitem.imagename = "sora_lock"
 
     inst:AddComponent("soracontainlock")
-    
+
     inst:AddComponent("stackable")
-    
+
     inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(0)
-    inst.fx = SpawnPrefab("sora_tmp_fx")
-    inst.fx:Bind(inst)
+    -- inst.fx = SpawnPrefab("sora_tmp_fx")
+    -- inst.fx:Bind(inst)
     return inst
 end
 

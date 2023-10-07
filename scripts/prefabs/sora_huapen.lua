@@ -64,8 +64,8 @@ local function Onisfullmoon(inst, var)
     if var and inst and inst.components.container then
         local item = inst.components.container:GetItemInSlot(1)
         if not (item and item:IsValid()) then
-            inst.components.container.slots[1]=nil
-            return 
+            inst.components.container.slots[1] = nil
+            return
         end
         local stacksize = item and item.components.stackable and item.components.stackable.stacksize or 1
         if item and (item.prefab == "butterfly" or item.prefab == "petals") then
@@ -89,14 +89,14 @@ local function Onisfullmoon(inst, var)
     end
 end
 local butterflybrain = require "brains/butterflybrain"
-local butterpickup, buttersleep,butterday 
+local butterpickup, buttersleep, butterday
 function butterpickup(inst)
     if inst.sora_huapen then
         inst:SetBrain(butterflybrain)
         if inst.sora_huapen:IsValid() then
             inst.sora_huapen:RemoveEventCallback("entitysleep", buttersleep, inst)
             inst.sora_huapen:RemoveEventCallback("onputininventory", butterpickup, inst)
-            inst:StopWatchingWorldState("isday",butterday)
+            inst:StopWatchingWorldState("isday", butterday)
         end
         inst.persists = true
     end
@@ -113,20 +113,72 @@ function buttersleep(inst)
             if inst.sora_huapen:IsValid() then
                 inst.sora_huapen:RemoveEventCallback("entitysleep", buttersleep, inst)
                 inst.sora_huapen:RemoveEventCallback("onputininventory", butterpickup, inst)
-                inst:StopWatchingWorldState("isday",butterday)
+                inst:StopWatchingWorldState("isday", butterday)
             end
             inst.sora_huapen.components.container:GiveItem(inst)
-            return 
+            return
         end
     end
     inst.sora_huapen = nil
     inst:Remove()
 end
-function butterday(inst,data)
+function butterday(inst, data)
     if inst and not data then
         buttersleep(inst)
     end
 end
+local Say = SoraAPI.Say
+SoraAPI.AllHuaPen = {}
+local function CollectFood(inst, player)
+    if not (inst.components.container) then
+        Say(player, "这个花盆里没有格子")
+        return
+    end
+    local item = inst.components.container:GetItemInSlot(1)
+    if not item then
+        Say(player, "这个花盆里没有东西")
+        return
+    end
+    if not item:HasTag("sorafood") then
+        Say(player, "这个花盆里没有食物")
+        return
+    end
+    local pre = item.prefab
+    if not (item.components.stackable and not item.components.stackable:IsFull()) then
+        Say(player, "这个花盆里满了")
+        return
+    end
+    local less = item.components.stackable.maxsize - item.components.stackable.stacksize
+    local tonil = {}
+    for k,v in pairs(SoraAPI.AllHuaPen) do
+        if not (k  and k:IsValid()) then
+            tonil[k]=1
+        end
+    end
+    for k,v in pairs(tonil) do
+        SoraAPI.AllHuaPen[k]=nil
+    end
+
+    for k, v in pairs(SoraAPI.AllHuaPen) do
+        if k ~= inst and k  and k:IsValid() and k.components.container then
+            local it = k.components.container:GetItemInSlot(1)
+            if it and it.prefab == pre then
+                if it.components.stackable and it.components.stackable.stacksize > 1 then
+                    local get = math.min(less, it.components.stackable.stacksize - 1)
+                    print(get,less,it.components.stackable.stacksize,item.components.stackable.stacksize)
+                    it.components.stackable:SetStackSize(it.components.stackable.stacksize - get)
+                    item.components.stackable:SetStackSize(item.components.stackable.stacksize + get)
+                    less = less - get
+                    if less < 1 then
+                        break
+                    end
+                end
+            end
+        end
+    end
+    
+end
+
 local function fn()
     local inst = CreateEntity()
     local trans = inst.entity:AddTransform()
@@ -148,7 +200,7 @@ local function fn()
         return inst
     end
     inst.SetSkin = SetSkin
-
+    SoraAPI.AllHuaPen[inst] = 1
     inst:AddComponent("sanityaura")
     inst.components.sanityaura.GetAura = function()
         return 10 / 60
@@ -157,7 +209,7 @@ local function fn()
     inst.components.inspectable:SetDescription("怎么想都是花花的错!")
 
     inst:AddComponent("lootdropper")
-
+    inst.CollectFood = CollectFood
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sora_huapen")
     inst.components.container.onopenfn = onopen

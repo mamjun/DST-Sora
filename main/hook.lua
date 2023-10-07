@@ -874,7 +874,7 @@ AddPrefabPostInit("treasurechest",function (inst)
     inst.sora2chest = net_bool(inst.GUID,"sora2chest","sora2chestdirty")
     if not TheWorld.ismastersim then
 		inst:ListenForEvent("sora2chestdirty", function (inst)
-            if inst.sora2chest:value() then
+            if inst.sora2chest:value() and inst.replica and inst.replica.container then
                 inst.replica.container:WidgetSetup("sora2chest")
             end
         end)

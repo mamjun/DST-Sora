@@ -292,7 +292,7 @@ local function soramagicfn(staff, target, pos)
             if v.components.weighable then
                 v.components.weighable:SetPlayerAsOwner(caster)
             end
-            caster:PushEvent("medal_oceanfishingcollect",{fish=v})
+            caster:PushEvent("medal_fishingcollect",{fish=v})
             local projectile = v.components.oceanfishable:MakeProjectile()
             local ae_cp = v.components.complexprojectile
             if ae_cp then

@@ -608,7 +608,7 @@ Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother",
     moonrocknugget = 2
 }})
 
-AddInvImg("sora_lock", "inventoryimages/sora2stone", "sora2stone")
+--AddInvImg("sora_lock", "inventoryimages/sora2stone", "sora2stone")
 Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraother", {{
     [san] = 20,
     coontail = 1,

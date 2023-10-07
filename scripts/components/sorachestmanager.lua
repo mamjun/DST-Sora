@@ -55,9 +55,15 @@ map['cutstone'] = 'rocks'
 map['papyrus'] = 'cutreeds'
 map['myth_coin_box'] = 'myth_coin'
 map['thulecite_pieces'] = 'thulecite'
+for i=1,31 do
+    map['trinket_'..tostring(i)] = 'trinket'
+end
+for i=32,46 do
+    map['trinket_'..tostring(i)] = 'hallow_trinket'
+end
 local function FindPrefab() -- tools_1 tools_2 这样的自动合并
     for k, v in pairs(Prefabs) do
-        if k then
+        if k and not map[k] then
             local p = k:match("^(.+)%D%d+$")
             if p then
                 map[k] = p
@@ -111,7 +117,7 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
     local x, y, z = inst.Transform:GetWorldPosition()
     -- x, y, z = TheWorld.Map:GetTileCenterPoint(x+4, 0, z)
     x = x + 4
-    local ents = TheSim:FindEntities(x, y, z, 1.5, nil, {"FX", "NOBLOCK", "NOCLICK", "player", "INLIMBO"})
+    local ents = TheSim:FindEntities(x, y, z, 1.5, nil, {"FX", "NOBLOCK", "NOCLICK", "player", "INLIMBO","_inventoryitem"})
     local num = #ents
     local pos = Vector3(x, y, z)
     for k, n in pairs(container) do
@@ -189,7 +195,6 @@ local function TryPutToContainer(chest, ents, container, fn)
                 if k.components.inventoryitem then
                     k.components.inventoryitem:OnPickup(chest)
                 end
-
                 puted[k] = 1
                 over = true
                 i[k.prefab] = i[k.prefab] - 1
@@ -324,6 +329,7 @@ local function GetItem(inst, data) -- 箱子收东西
             GetOneItem(inst, data.containers[k], v, data.overfull)
         end
     end
+
 end
 
 local function GetData(inst)
@@ -507,7 +513,7 @@ local function TryCacheEnt(inst, all) -- 尝试缓存下来
         inst.SoraChestSkip = true
         return
     end
-    if inst.components.projectile then  --投射物
+    if inst.components.projectile and (inst.components.projectile.target or inst.components.projectile.dest) then  --投射物
         inst.SoraChestSkip = true
         return 
     end

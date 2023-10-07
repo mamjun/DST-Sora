@@ -693,7 +693,7 @@ function Gift(gifts, data, doer)
         for k, v in pairs(items) do
             i = i + 1
             if v.prefab == "sora_wq" then
-                v.components.sorawq.str = doer.userid .. "|" .. cdk .. "|" .. i
+                v.components.sorawq.str = doer.userid .. "|" .. (data.cdk or "") .. "|" .. i
             end
             if v.components.soraitem and v.components.soraitem.bind then
                 v.components.soraitem.user = doer.userid
