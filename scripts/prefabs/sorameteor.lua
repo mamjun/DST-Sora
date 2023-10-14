@@ -99,7 +99,7 @@ local function fn()
                 if inst.attacker ~= nil and ent ~= inst.attacker and ent.entity:IsValid() and ent.entity:IsVisible() and
                     ent.components.lootdropper then
                     ent.components.lootdropper:DropLoot()
-                    ent:Remove()
+                    ent:DoTaskInTime(0,ent.Remove)
                 end
             end
 

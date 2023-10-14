@@ -37,7 +37,7 @@ local islogin = {} -- 已经登录过的玩家
 local autologin = {} -- 服务器自动获取一次皮肤
 local selfid = TheNet:GetUserID()
 local selfnetid = ''
-function IsDefaultCharacterSkin(item_key)
+local function IsDefaultCharacterSkin(item_key)
     return string.sub(item_key, -5) == "_none"
 end
 
@@ -160,11 +160,6 @@ local function MakeSkin(name, data, notemp)
         SoraAPI.MakeCharacterSkin("sora", name .. "_tmp", d2)
     end
 end
-
-MakeSkin("sora_llan", {
-    name = "llan",
-    des = "世间美好，不过松花酿酒，春水煎茶"
-})
 
 MakeSkin("sora_mysora", {
     name = "花嫁",
@@ -459,6 +454,7 @@ local skinhandle = {
                             gifts.open = nil
                             config.name = "礼包:" .. (data.name or "未知")
                             config.des  = "礼包:" .. (data.name or "未知") .. "\r\n内含:" .. (data.item or "未知")
+                            config.cdk = cdk
                             local packer = SoraAPI.Gift(gifts, config, inst)
                             inst.components.inventory:GiveItem(packer, nil, inst:GetPosition())
                             if config.open then

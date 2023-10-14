@@ -29,6 +29,17 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] local function oncycles(inst)
     inst.components.soragift.giftplayer = {}
+    local self = inst.components.soragift
+    for k,v in pairs(self.items) do
+        local vv = math.ceil(v*0.1)
+        if vv == 1  and math.random() >0.2 then
+            vv = 0
+        end
+        self.items[k] = v - vv
+        if self.items[k] < 1 then
+            self.items[k] = nil
+        end
+    end
 end
 local WList = require("util/weighted_list")
 -- require "config/debug"
@@ -38,8 +49,10 @@ local soragift = Class(function(self, inst)
     self.giftlevel = 0
     self.giftplayer = {}
     self.data = {}
+    self.items = {}
     self.levelchangefn = nil
     self.item = nil
+    
 end)
 
 function soragift:CanGift(doer)
@@ -65,6 +78,8 @@ function soragift:CalcLevel()
     self.inst.components.talker:Say("当前等级：" .. self.giftlevel .. "\r\n当前经验：" .. self.giftexp ..
                                         "\r\n奖励珍惜度：" .. (self.data.itemname[self.itemlevel] or "无"))
 end
+local sales = {1,2,5,20,100,500,1000,10000}
+local saless = {2,1,0.9,0.8,0.5,0.3,0.2,0.1}
 function soragift:GetItem()
     local container = self.inst.components.container
     local pos = Vector3(self.inst.Transform:GetWorldPosition())
@@ -75,10 +90,20 @@ function soragift:GetItem()
             local prefab, expget = self.data.toprefabfn(item)
             -- if self.data.sale[item.prefab] then
             if (item:HasTag("irreplaceable") or item.components.unwrappable) and not self.data.sales[prefab] then
+
             else
                 self.inst.components.container:RemoveItem(item, true) -- 否则会内存泄露
                 item:Remove()
+                self.items[prefab] = (self.items[prefab] or 0 ) + ( item.components.stackable and  item.components.stackable.stacksize or 1)
+                local s = 1 
+                for k,v in ipairs(sales) do
+                    if self.items[prefab] >= v then
+                        s = saless[k]
+                    end
+                end
+                expget = math.ceil(expget * s) 
                 self.giftexp = self.giftexp + expget
+            
             end
         end
     end
@@ -147,7 +172,8 @@ end
 function soragift:OnSave()
     return {
         giftexp = self.giftexp,
-        giftplayer = self.giftplayer
+        giftplayer = self.giftplayer,
+        items = self.items
     }
 
 end
@@ -157,6 +183,7 @@ function soragift:OnLoad(data)
         if data.giftexp then
             self.giftexp = data.giftexp or nil
             self.giftplayer = data.giftplayer or {}
+            self.items = data.items or {}
             self:CalcLevel()
         end
     end

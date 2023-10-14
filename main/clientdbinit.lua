@@ -71,13 +71,13 @@ temp.serverfn = function(ns, db, userid)
         end
     end)
     db:ListenForEvent("SoraLock", function(id, data, event, ent)
-        print(id, data, event, ent)
+        --print(id, data, event, ent)
         if not (data and type(data) == "table" and ent) then
             return
         end
         local cmd = data.cmd
         local doer = UserToPlayer(id)
-        print(doer.userid,cmd,data.pass or "0")
+        --print(doer.userid,cmd,data.pass or "0")
         if not (doer and ent and ent.components.soracontainlock) then
             return
         end

@@ -99,6 +99,6 @@ function c:OnLoad(data)
     self.str = data.str 
 end
 function c:GetDebugString()
-    return "level:"..self.level
+    return "level:"..self.level  .. "  str:" .. tostring(self.str)
 end
 return c

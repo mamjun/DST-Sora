@@ -66,7 +66,7 @@ function c:OnSave()
     local data = {}
     if next(self.patch) then
         data.patch = self.patch
-        data.add_component_if_missing = 1 
+        data.add_component_if_missing_sora = 1 
     end
 	return  data
 end

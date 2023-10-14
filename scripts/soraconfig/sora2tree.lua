@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 local c = {}
 --等级
-c.level = {0,500,3000,10000,30000,100000,300000,1000000}
+c.level = {0,500,3000,10000,30000,70000,200000,500000}
 --珍惜度
 c.itemname = {"普通","常用","稀有","珍惜"}
 c.sales = {
@@ -113,31 +113,33 @@ c.namesales = {
 }
 
 c.toprefabfn  = function(item)
-    for k,v in pairs(c.tagsales) do
-        if item:HasTag(k) then
-            return k,v
-        end
-    end
-    for k,v in pairs(c.tagsales) do
-        if item.prefab:match(k) then
-            return k,v
-        end
-    end
     if c.sales[item.prefab] then
         return  item.prefab,c.sales[item.prefab] * ( item.components.stackable and  item.components.stackable.stacksize or 1)
     end
+    
+    for k,v in pairs(c.tagsales) do
+        if item:HasTag(k) then
+            return k,v * ( item.components.stackable and  item.components.stackable.stacksize or 1)
+        end
+    end
+    for k,v in pairs(c.namesales) do
+        if item.prefab:match(k) then
+            return item.prefab,v * ( item.components.stackable and  item.components.stackable.stacksize or 1)
+        end
+    end
+    
     local p = 1
     if item.components.equippable then
-       p = p + 20
+       p = p + 10
     end
     if item.components.tool then
-       p = p + 20
+       p = p + 10
     end
     if item.components.armor then
-       p = p + 20
+       p = p + 10
     end
     if item.components.weapon then
-       p = p + 20
+       p = p + 10
     end
     if item.components.edible then
         p = p + 5
@@ -157,7 +159,7 @@ c.toprefabfn  = function(item)
     if item.components.health then
         p = p +20
     end
-    p = p * ( item.components.stackable and  item.components.stackable.stacksize or 10)
+    p = p * ( item.components.stackable and  item.components.stackable.stacksize or 5)
     return item.prefab,p
 end
 c.gift = {}

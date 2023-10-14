@@ -6,6 +6,10 @@ end)
 function SoraCrazyAttack:__tostring()
     return string.format("target %s", tostring(self.inst.components.combat.target))
 end
+function SoraCrazyAttack:ForcePetrify()
+
+end
+
 function SoraCrazyAttack:Visit()
     local combat = self.inst.components.combat
     if self.status == READY then

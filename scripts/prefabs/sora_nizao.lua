@@ -361,7 +361,17 @@ local cantarget = {
     spider_warrior = 1,
     spider_healer = 1,
     spider_water = 1,
-
+    --蝙蝠
+    bat=1,
+    --触手
+    --tentacle_pillar=1,
+    --tentacle=1,
+    --tentacle_pillar_arm=1,
+    --树精
+    leif=1,
+    leif_sparse=1,
+    --桦栗果精
+    birchnutdrake=1,
     monkey = 1,
     lavae = 1,
     fruitfly = 1,
@@ -371,7 +381,12 @@ local cantarget = {
     bird_mutant_spitter = 1,
     medal_bee = 1,
     medal_beeguard = 1,
-    wonkey = 1
+    --胡萝卜鼠
+    carrat=1,
+    powder_wonkey = 1,
+    smallbird=1,
+    teenbird=1,
+    tallbird=1,
 }
 local soracrazy = require "brains/soracrazybrain"
 local function fn()

@@ -51,7 +51,8 @@ AddPrefabPostInit("world", function(inst)
         inst:AddComponent("soraworldevent")
         inst.components.soraworldevent.debug = (inst.components.soraworldevent.namespace ~= "1935" and
                                                    inst.components.soraworldevent.namespace ~= "2423" and
-                                                   inst.components.soraworldevent.namespace ~= "4507" and inst.components.soraworldevent.namespace ~= "a-de")
+                                                   inst.components.soraworldevent.namespace ~= "4507" and
+                                                   inst.components.soraworldevent.namespace ~= "a-de")
         inst:AddComponent("soraexpsave")
         inst.components.soraworldevent:SetNameSpace("sora")
         inst.components.soraworldevent:SetTimer(5)
@@ -799,40 +800,40 @@ end)
 -- userdata.Hook(inst,hook1)
 -- end)
 
-AddComponentPostInit("thief",function (i)
+AddComponentPostInit("thief", function(i)
     local StealItem = i.StealItem
-    i.StealItem = function(s,vim,...)
+    i.StealItem = function(s, vim, ...)
         if vim and (vim.components.soracontainlock or vim:HasTag("nosteal")) then
             return false
         end
-        return StealItem(s,vim,...)
+        return StealItem(s, vim, ...)
     end
 end)
 
-local fixlunarthrall = function(self,target)
-    if target and target:IsValid()  then
-       if  FindEntity(target,60,nil,{"sora2base"}) then return true end
+local fixlunarthrall = function(self, target)
+    if target and target:IsValid() then
+        if FindEntity(target, 60, nil, {"sora2base"}) then
+            return true
+        end
     end
     return false
 end
 
-
-AddComponentPostInit("lunarthrall_plantspawner",function (i)
+AddComponentPostInit("lunarthrall_plantspawner", function(i)
     local SpawnGestalt = i.SpawnGestalt
-    i.SpawnGestalt= function(s,target,...)
-        if fixlunarthrall(s,target) then
+    i.SpawnGestalt = function(s, target, ...)
+        if fixlunarthrall(s, target) then
             return false
         end
-        return SpawnGestalt(s,target,...)
+        return SpawnGestalt(s, target, ...)
     end
 
-
     local SpawnPlant = i.SpawnPlant
-    i.SpawnPlant= function(s,target,...)
-        if fixlunarthrall(s,target) then
+    i.SpawnPlant = function(s, target, ...)
+        if fixlunarthrall(s, target) then
             return false
         end
-        return SpawnPlant(s,target,...)
+        return SpawnPlant(s, target, ...)
     end
 
 end)
@@ -869,17 +870,27 @@ end)
 
 -- end
 
-
-AddPrefabPostInit("treasurechest",function (inst)
-    inst.sora2chest = net_bool(inst.GUID,"sora2chest","sora2chestdirty")
+AddPrefabPostInit("treasurechest", function(inst)
+    inst.sora2chest = net_bool(inst.GUID, "sora2chest", "sora2chestdirty")
     if not TheWorld.ismastersim then
-		inst:ListenForEvent("sora2chestdirty", function (inst)
+        inst:ListenForEvent("sora2chestdirty", function(inst)
             if inst.sora2chest:value() and inst.replica and inst.replica.container then
                 inst.replica.container:WidgetSetup("sora2chest")
             end
         end)
     end
 end)
+local oldSetPersistData = EntityScript.SetPersistData
+EntityScript.SetPersistData = function(self, data, newents, ...)
+    if data then
+        for k, v in pairs(data) do
+            if v and type(v) == "table" and v.add_component_if_missing_sora then
+                v.add_component_if_missing = true
+            end
+        end
+    end
+    return oldSetPersistData(self, data, newents, ...)
+end
 
 -- AddLaterFn(function ()
 --     if GLOBAL.BT then

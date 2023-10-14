@@ -795,9 +795,27 @@ end
 -- })
 
 TUNING.SORAUNLOCKRECIPES = {}
+TUNING.SORAUNLOCKRECIPESKEYMAP = {}
+function UnlonkRecipesMap(key,map)
+    if not  table.contains(TUNING.SORAUNLOCKRECIPES,key) then
+        table.insert(TUNING.SORAUNLOCKRECIPES,key)
+    end
+    if not TUNING.SORAUNLOCKRECIPESKEYMAP[key] then
+        TUNING.SORAUNLOCKRECIPESKEYMAP[key] = {}
+    end
+    table.insert(TUNING.SORAUNLOCKRECIPESKEYMAP[key],map .. rec_back)
+end
 function UnlonkRecipes(name, ings, des)
     local recname = name .. rec_back
-    table.insert(TUNING.SORAUNLOCKRECIPES, recname)
+    local map = false
+    for k,v in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP) do
+        if table.contains(v,recname) then
+            map = true
+        end
+    end
+    if not map then
+        table.insert(TUNING.SORAUNLOCKRECIPES, recname)
+    end
     local rec = Rec(name, nil, des, maker, "sora", ings or {})
     rec.level = TechTree.Create(TECH.LOST)
     if not ings and AllRecipes[name] then
@@ -879,6 +897,9 @@ UnlonkRecipes("hermit_pearl", {
 }, "比珍珠还珍")
 
 -- 鱼池
+UnlonkRecipesMap("ponds","pond")
+UnlonkRecipesMap("ponds","pond_cave")
+UnlonkRecipesMap("ponds","lava_pond")
 AddInvImg2("pond", "minimap/minimap_data.xml", "pond.png")
 UnlonkRecipes("pond", {
     shovel = 1,
@@ -900,11 +921,20 @@ UnlonkRecipes("lava_pond", {
     chum = 50
 }, "挖?这玩意真是挖出来的?")
 -- 远古配方
+UnlonkRecipesMap("gemruins","orangeamulet")
+UnlonkRecipesMap("gemruins","greenamulet")
+UnlonkRecipesMap("gemruins","orangestaff")
+UnlonkRecipesMap("gemruins","yellowstaff")
+UnlonkRecipesMap("gemruins","greenstaff")
+
 UnlonkRecipes("orangeamulet")
 UnlonkRecipes("greenamulet")
 UnlonkRecipes("orangestaff")
 UnlonkRecipes("yellowstaff")
 UnlonkRecipes("greenstaff")
+UnlonkRecipesMap("ruins","nutrientsgoggleshat")
+UnlonkRecipesMap("ruins","ruinshat")
+UnlonkRecipesMap("ruins","armorruins")
 UnlonkRecipes("nutrientsgoggleshat")
 UnlonkRecipes("ruinshat")
 UnlonkRecipes("armorruins")
@@ -988,6 +1018,7 @@ for k, v in pairs({"marble", "stone", "moonglass"}) do
         local rname = "chesspiece_" .. iv
         STRINGS.NAMES[name:upper()] = STRINGS.NAMES[rname:upper() .. "_BUILDER"]
         STRINGS.RECIPE_DESC[name:upper()] = STRINGS.RECIPE_DESC[rname:upper() .. "_BUILDER"]
+        UnlonkRecipesMap(rname,name)
         local r = UnlonkRecipes(name, {
             [ing] = 3
         })
@@ -1001,6 +1032,7 @@ STRINGS.NAMES["GLASSSPIKE_TALL"] = STRINGS.NAMES.GLASSSPIKE .. "_高"
 for k, v in pairs({"short", "med", "tall"}) do
     local name = "glassspike_" .. v
     AddInvImg(name, "inventoryimages1", "glassspike")
+    UnlonkRecipesMap("glassspike",name)
     UnlonkRecipes(name, {
         cutstone = 3
     }, "你想被刺穿吗")
@@ -1069,7 +1101,6 @@ if  nfsmodname then
             Rec(nfsname, des, des,item, "sora", {
                 [name] = 300
             })
-            print(name,nfsname,"ADDRECC")
         end
     --end
 end

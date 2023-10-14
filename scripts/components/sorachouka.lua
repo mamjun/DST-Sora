@@ -80,7 +80,7 @@ function com:OnSave()
         lockername = self.lockername,
         lockeruserid = self.lockeruserid,
         pass = self.pass,
-        add_component_if_missing = (self.pass ~= "") and 1 or nil
+        add_component_if_missing_sora = (self.pass ~= "") and 1 or nil
     }
 end
 

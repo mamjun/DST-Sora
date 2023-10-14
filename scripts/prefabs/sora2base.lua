@@ -249,7 +249,7 @@ local function OnStaffGiven(inst, item)
 			inst._staffstar:Remove()
 			inst._staffstar= nil
 		end
-        inst.AnimState:PlayAnimation("full_"..item)
+        --inst.AnimState:PlayAnimation("full_"..item)
         inst._staffstar = SpawnPrefab("sorastafflight")
         inst._staffstar.entity:SetParent(inst.entity)
         inst._staffstar.sl:set(inst.showlight and item or 0)
@@ -266,7 +266,7 @@ end
 
 local function OnStaffTaken(inst)
     CancelStaffBuffer(inst)
-	inst.AnimState:PlayAnimation("full")
+	--inst.AnimState:PlayAnimation("full")
 end
 
 local function onhit(inst, worker)
@@ -308,7 +308,7 @@ local function fn()
 	inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2base")
     inst.AnimState:SetBuild("sora2base")
-    inst.AnimState:PlayAnimation("full")
+    inst.AnimState:PlayAnimation("idle")
     inst.AnimState:SetFinalOffset(1)
 
     inst.MiniMapEntity:SetPriority(4)

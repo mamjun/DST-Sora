@@ -1095,9 +1095,6 @@ local function fxfn(Sim)
             return "噫~~~有hentai"
         end
 
-        if name == "笨蛋啾啾\n笨蛋柳漾" or name == "笨蛋啾啾" or name == "笨蛋柳漾" then
-            return "给这娘们介绍个对象吧"
-        end
         if inst.des then
             return inst.des
         end

@@ -90,14 +90,14 @@ local function onrefresh(inst)
 end
 
 local function onopen(inst)
-    inst.AnimState:PlayAnimation("open")
+    --inst.AnimState:PlayAnimation("open")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
 
 local function onclose(inst)
 	onrefresh(inst)
-    inst.AnimState:PlayAnimation("close")
-	inst.AnimState:PlayAnimation("closed")
+    --inst.AnimState:PlayAnimation("close")
+	--inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
 end
 
@@ -111,15 +111,15 @@ local function onhammered(inst, worker)
 end
 
 local function onhit(inst, worker)
-    inst.AnimState:PlayAnimation("hit")
+    --inst.AnimState:PlayAnimation("hit")
     inst.components.container:DropEverything()
-    inst.AnimState:PushAnimation("closed", false)
+    --inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()
 end
 
 local function onbuilt(inst)
-    inst.AnimState:PlayAnimation("place")
-    inst.AnimState:PlayAnimation("closed")
+    --inst.AnimState:PlayAnimation("place")
+    --inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_craft")
 end
 
@@ -139,7 +139,7 @@ local function fn()
     inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
-    inst.AnimState:PlayAnimation("closed")
+    inst.AnimState:PlayAnimation("idle")
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     --MakeSnowCoveredPristine(inst)
@@ -176,4 +176,4 @@ local function fn()
 end
 
 return Prefab("sora2fire", fn, assets, prefabs),
-    MakePlacer("sora2fire_placer", "chest", "treasure_chest", "closed")
+    MakePlacer("sora2fire_placer", "sora2fire", "sora2fire", "idle")

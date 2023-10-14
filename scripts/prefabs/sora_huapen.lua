@@ -150,33 +150,36 @@ local function CollectFood(inst, player)
     end
     local less = item.components.stackable.maxsize - item.components.stackable.stacksize
     local tonil = {}
-    for k,v in pairs(SoraAPI.AllHuaPen) do
-        if not (k  and k:IsValid()) then
-            tonil[k]=1
+    for k, v in pairs(SoraAPI.AllHuaPen) do
+        if not (k and k:IsValid()) then
+            tonil[k] = 1
         end
     end
-    for k,v in pairs(tonil) do
-        SoraAPI.AllHuaPen[k]=nil
+    for k, v in pairs(tonil) do
+        SoraAPI.AllHuaPen[k] = nil
     end
 
     for k, v in pairs(SoraAPI.AllHuaPen) do
-        if k ~= inst and k  and k:IsValid() and k.components.container then
-            local it = k.components.container:GetItemInSlot(1)
-            if it and it.prefab == pre then
-                if it.components.stackable and it.components.stackable.stacksize > 1 then
-                    local get = math.min(less, it.components.stackable.stacksize - 1)
-                    print(get,less,it.components.stackable.stacksize,item.components.stackable.stacksize)
-                    it.components.stackable:SetStackSize(it.components.stackable.stacksize - get)
-                    item.components.stackable:SetStackSize(item.components.stackable.stacksize + get)
-                    less = less - get
-                    if less < 1 then
-                        break
+        if k ~= inst and k and k:IsValid() and k.components.container then
+            if not (k.ownerlist and k.ownerlist.master and k.ownerlist.master ~= player.userid) and
+                not (k.components.soracontainlock and k.components.soracontainlock.lockeruserid ~= player.userid) then
+                local it = k.components.container:GetItemInSlot(1)
+                if it and it.prefab == pre then
+                    if it.components.stackable and it.components.stackable.stacksize > 1 then
+                        local get = math.min(less, it.components.stackable.stacksize - 1)
+                        it.components.stackable:SetStackSize(it.components.stackable.stacksize - get)
+                        item.components.stackable:SetStackSize(item.components.stackable.stacksize + get)
+                        less = less - get
+                        if less < 1 then
+                            break
+                        end
                     end
                 end
             end
+
         end
     end
-    
+
 end
 
 local function fn()

@@ -70,16 +70,37 @@ local function fn(Sim)
 	inst.components.edible.sanityvalue = 1024
     inst.components.edible.oneaten = function(i,doer)
         if doer and doer:HasTag("sora") then
-            for i=1,100 do
-                local rec = TUNING.SORAUNLOCKRECIPES[math.random(1,#TUNING.SORAUNLOCKRECIPES)]
-                if not doer.components.builder:KnowsRecipe(rec) then
-                    doer.components.builder:AddRecipe(rec)
-                    doer.components.talker:Say("好像学会了新东西")
-                    return 
-                end
-            
-            end
-            doer.components.talker:Say("好像都掌握了")
+			local all = true
+			local unknow = {}
+			for k,v in pairs(TUNING.SORAUNLOCKRECIPES) do
+				if TUNING.SORAUNLOCKRECIPESKEYMAP[v] then
+					for ik,iv in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP[v]) do
+						if not doer.components.builder:KnowsRecipe(iv) then
+							all = false
+							table.insert(unknow,v)
+							break
+						end
+					end
+				else
+					if not doer.components.builder:KnowsRecipe(v) then
+						all = false
+						table.insert(unknow,v)
+					end
+				end
+			end
+			if all then
+            	doer.components.talker:Say("好像都掌握了")
+			else
+				local rec = unknow[math.random(1,#unknow)]
+				if TUNING.SORAUNLOCKRECIPESKEYMAP[rec] then
+					for k,v in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP[rec]) do
+						doer.components.builder:AddRecipe(v)
+					end
+				else
+					doer.components.builder:AddRecipe(rec)
+				end
+				doer.components.talker:Say("好像学会了新东西")
+			end
         end
     end
 	inst:AddComponent("inspectable")
@@ -89,7 +110,6 @@ local function fn(Sim)
 	inst.components.inventoryitem.imagename = "sora_flh"
 	inst:AddComponent("stackable")
 	inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
-	
 	return inst
 end
 

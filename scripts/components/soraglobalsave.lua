@@ -31,7 +31,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local c = Class(function (self, inst,type)
     self.inst = inst
     self.type = type or 1       --1 跟随存档  2 跟随服务器目录 3跟随data目录  暂未实现 2和3 
-    self.data = {add_component_if_missing = 1}
+    self.data = {add_component_if_missing_sora = 1}
 end)
 function c:Get(k,v) 
     if not k then return end

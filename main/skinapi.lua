@@ -544,7 +544,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
                 if item then
                     local skin = GetSkin(item)
                     if skin and skin.swap_icon then
-                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", softresolvefilepath(skin.swap_icon.build), skin.swap_icon.image)
+                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.swap_icon.build, skin.swap_icon.image)
                     elseif skin and skin.image and skin.atlas then
                         self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", softresolvefilepath(skin.atlas), skin.image .. ".tex")
                     end

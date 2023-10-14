@@ -92,7 +92,7 @@ function com:Init(doer, pass, name, id)
     end
     container.Open = function(s, doer, ...)
         if not (doer and doer:HasTag("player")) then return end
-        local last = GetTick() - (self.openpass[doer.userid or "nil"] or 0 )
+        local last = GetTick() - (self.openpass[doer.userid or "nil"] or -20000 )
         if last < 60 * 30  then
             self:Open(doer)
         else 
@@ -208,7 +208,7 @@ function com:OnSave()
         lockername = self.lockername,
         lockeruserid = self.lockeruserid,
         pass = self.pass,
-        add_component_if_missing = (self.pass ~= "") and 1 or nil
+        add_component_if_missing_sora = (self.pass ~= "") and 1 or nil
     }
 end
 

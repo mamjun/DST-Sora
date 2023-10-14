@@ -48,14 +48,14 @@ local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2fi
 local prefabs = {"collapse_small"}
 
 local function onopen(inst)
-    inst.AnimState:PlayAnimation("open")
+    --inst.AnimState:PlayAnimation("open")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
 
 local function onclose(inst, doer)
     --TheWorld.components.sorachestmanager:OnClose(inst, doer)
-    inst.AnimState:PlayAnimation("close")
-    inst.AnimState:PlayAnimation("closed")
+    --inst.AnimState:PlayAnimation("close")
+    --inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
 end
 
@@ -68,15 +68,15 @@ local function onhammered(inst, worker)
 end
 
 local function onhit(inst, worker)
-    inst.AnimState:PlayAnimation("hit")
+    --inst.AnimState:PlayAnimation("hit")
     inst.components.container:DropEverything()
-    inst.AnimState:PushAnimation("closed", false)
+    --inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()
 end
 
 local function onbuilt(inst)
-    inst.AnimState:PlayAnimation("place")
-    inst.AnimState:PlayAnimation("closed")
+    --inst.AnimState:PlayAnimation("place")
+    --inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_craft")
 end
 local cmp = require "components/sorachestmanager"
@@ -147,7 +147,7 @@ local function fn()
     inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
-    inst.AnimState:PlayAnimation("closed")
+    inst.AnimState:PlayAnimation("idle")
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     inst.entity:SetPristine()
@@ -212,5 +212,5 @@ local function tochestfn()
     return inst
 end
 
-return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "chest", "treasure_chest", "closed"),
+return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2fire", "sora2fire", "idle"),
     Prefab("sora_tochest", tochestfn, assets, prefabs)

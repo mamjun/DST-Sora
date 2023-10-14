@@ -893,6 +893,12 @@ MakeSkin("sora_gete", {
     quotes = '最喜欢悠了'
 })
 
+
+MakeSkin("sora_llan", {
+    name = "llan",
+    des = "世间美好，不过松花酿酒，春水煎茶"
+})
+
 MakeSkin("sora_zhizheng", {
     name = "执政官",
     des = '愿我的世界总有你\n  ----献给那些热心奉献的人们',
