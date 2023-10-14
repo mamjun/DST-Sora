@@ -34,6 +34,7 @@ local assets =
     Asset("ANIM", "anim/sorachest.zip"),
 	Asset( "IMAGE", "images/inventoryimages/sora2base.tex" ),
     Asset( "ATLAS", "images/inventoryimages/sora2base.xml" ),
+	Asset( "ATLAS_BUILD", "images/inventoryimages/sora2base.xml" ,256),
 }
 
 local stoneassets = {
@@ -310,7 +311,7 @@ local function fn()
     inst.AnimState:SetBuild("sora2base")
     inst.AnimState:PlayAnimation("idle")
     inst.AnimState:SetFinalOffset(1)
-
+	inst.AnimState:SetScale(0.7,0.7,0.7)
     inst.MiniMapEntity:SetPriority(4)
     inst.MiniMapEntity:SetIcon("sora2base.tex")
 
@@ -637,10 +638,34 @@ local function stonefn()
     --inst.components.instrument:SetOnHeardFn(HearHorn)
     return inst
 end
-
+local items = {
+	{0.5,"small","小"},
+	--{0.7,"medium","中"},
+	{1,"big","大"},
+}
+for k,v in pairs(items) do
+	local name = "sora2base_"..v[2]
+SoraAPI.MakeItemSkin("sora2base", name, {
+	name = v[3].."号祭坛",
+	atlas = "images/inventoryimages/sora2base.xml",
+	image = "sora2base",
+	build = "sora2base",
+	bank = "sora2base",
+	basebuild = "sora2base",
+	basebank = "sora2base",
+	init_fn = function(inst)
+		inst.AnimState:SetScale(v[1],v[1],v[1])
+	end,
+	cleanfn = function(inst)
+		inst.AnimState:SetScale(0.7,0.7,0.7)
+	end,
+	checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+end
 
 return Prefab("sora2base", fn, assets, prefabs),
 	Prefab("sora2stone", stonefn, stoneassets),
-    MakePlacer("sora2base_placer", "sora2base", "sora2base", "full"),
+    MakePlacer("sora2base_placer", "sora2base", "sora2base", "idle",nil,nil,nil,0.7),
 	makestafflight("sorastafflight") -- , { 223 / 255, 208 / 255, 69 / 255 } 
 	--makestafflight("stafflight_opal",  { 64 / 255, 64 / 255, 208 / 255 })
