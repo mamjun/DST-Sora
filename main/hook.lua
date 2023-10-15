@@ -906,3 +906,42 @@ end
 --         end
 --     end
 -- end)
+
+
+AddComponentPostInit("freezable",function (self)
+    for k,v in pairs({"AddColdness","Freeze"}) do
+        local old = self[v]
+        self[v] = function (s,...)
+            local inst = s.inst 
+            if inst and inst:HasTag("player") and inst.components.inventory and inst.components.inventory:HasItemWithTag("sora_unfreeze",1) then
+                return 
+            end
+            return old(s,...)
+        end
+    end
+end)
+
+AddComponentPostInit("grogginess",function (self)
+    for k,v in pairs({"AddGrogginess","GoToSleep"}) do
+        local old = self[v]
+        self[v] = function (s,...)
+            local inst = s.inst 
+            if inst and inst:HasTag("player") and inst.components.inventory and inst.components.inventory:HasItemWithTag("sora_unsleep",1) then
+                return 
+            end
+            return old(s,...)
+        end
+    end
+end)
+
+AddStategraphPostInit("wilson",function (sg)
+    if sg.events and sg.events['yawn'] then
+        local old = sg.events['yawn'].fn 
+        sg.events['yawn'].fn = function(inst,...)
+            if inst and inst:HasTag("player") and inst.components.inventory and inst.components.inventory:HasItemWithTag("sora_unsleep",1) then
+                return true
+            end
+            return old(inst,...)
+        end
+    end
+end)

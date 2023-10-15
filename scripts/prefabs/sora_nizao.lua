@@ -495,10 +495,50 @@ local function item_fn()
     inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.NONE)
     return inst
 end
+local function pearlfn()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+    MakeInventoryPhysics(inst)
+    inst.AnimState:SetBank("hermit_pearl")
+    inst.AnimState:SetBuild("hermit_pearl")
+    inst.AnimState:PlayAnimation("idle")
+    MakeInventoryFloatable(inst, "med", .15, 0.7)
+    inst:AddTag("heatrock")
+    inst:AddTag("HASHEATER")
+    inst:AddTag("sora_unfreeze")
+    inst:AddTag("sora_unsleep")
+    inst.entity:SetPristine()
+
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.atlasname = GetInventoryItemAtlas("hermit_pearl.tex")
+    inst.components.inventoryitem.imagename = "hermit_pearl"
+
+    inst:AddComponent("heater")
+    inst.components.heater.carriedheat = 30
+    inst.components.heater.carriedheatmultiplier = 10
+    inst.components.heater:SetThermics(true, true)
+    inst:ListenForEvent("onpickup",function (inst,data)
+        if data and data.owner and data.owner.components then
+            if  data.owner.components.freezable and data.owner.components.freezable:IsFrozen() then
+                data.owner.components.freezable:Unfreeze()
+            end
+        end
+    end)
+    return inst
+end
+
 
 table.insert(All, Prefab("sora_sign", fn, assets))
 table.insert(All, Prefab("sora_sign_item", item_fn, assets))
 table.insert(All, MakePlacer("sora_sign_placer", "sign_home", "sign_home", "idle"))
 table.insert(All, MakePlacer("sora_sign_item_placer", "sign_home", "sign_home", "idle"))
-
+table.insert(All, Prefab("sora_pearl", pearlfn, assets))
 return unpack(All)

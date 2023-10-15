@@ -769,7 +769,11 @@ Rec("sora_sign_item", "拟造-木牌", "为什么看了就像打他?", DST, "sor
     nightmarefuel=20,
     [san]=100
 }).placer = "no"
-
+AddInvImg2("sora_pearl", GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl.tex")
+Rec("sora_pearl", "拟造-珍珠", "咦,好温暖,还有一种清醒的感觉", DST, "sora", {
+    opalpreciousgem = 3,
+    heatrock=10,
+})
 
 if IsModEnable("Legion") or IsModEnable("棱镜") then
 

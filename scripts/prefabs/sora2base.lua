@@ -656,7 +656,7 @@ SoraAPI.MakeItemSkin("sora2base", name, {
 	init_fn = function(inst)
 		inst.AnimState:SetScale(v[1],v[1],v[1])
 	end,
-	cleanfn = function(inst)
+	clear_fn = function(inst)
 		inst.AnimState:SetScale(0.7,0.7,0.7)
 	end,
 	checkfn = SoraAPI.SoraSkinCheckFn,
