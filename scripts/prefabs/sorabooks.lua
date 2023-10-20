@@ -485,8 +485,12 @@ local Magic_defs = {{
                             if bird.components.periodicspawner then
                                 bird.cage = cage and 1 or 0
                                 bird.components.periodicspawner:SetPrefab(SpawnPrefabChooser)
-                                bird.components.periodicspawner:SetDensityInRange(nil, nil)
-                                bird.components.periodicspawner:SetMinimumSpacing(nil)
+                                if cage then
+                                    bird.components.periodicspawner:SetDensityInRange(3, 10)
+                                    bird.components.periodicspawner:SetMinimumSpacing(0.1)
+                                else
+                                    bird.components.periodicspawner:SetDensityInRange(3, 0)
+                                end
                             end
                         end
                     end

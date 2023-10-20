@@ -719,13 +719,17 @@ local function FeiFn(inst, doer, pos)
             end
         end
     end
-    local x, y = TheWorld.Map:GetTileCoordsAtPoint(pos.x, pos.y, pos.z)
-    TheWorld.components.farming_manager:AddTileNutrients(x, y, 100, 100, 100) -- 加满 蟹蟹
-    TheWorld.components.farming_manager:AddSoilMoistureAtPoint(pos.x, pos.y, pos.z, 200)
-    if doer and doer:HasTag("sora") and doer.GetExp then
-        doer:GetExp(5, "pour_water", 30)
-        doer:GetExp(5, "tendto", 30)
+
+    if TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) then
+        local x, y = TheWorld.Map:GetTileCoordsAtPoint(pos.x, pos.y, pos.z)
+        TheWorld.components.farming_manager:AddTileNutrients(x, y, 100, 100, 100) -- 加满 蟹蟹
+        TheWorld.components.farming_manager:AddSoilMoistureAtPoint(pos.x, pos.y, pos.z, 200)
+        if doer and doer:HasTag("sora") and doer.GetExp then
+            doer:GetExp(5, "pour_water", 30)
+            doer:GetExp(5, "tendto", 30)
+        end
     end
+    return
 end
 local function OnFeiFn(inst, doer, pos)
     if incd(inst, doer) then
@@ -1102,7 +1106,7 @@ local function fxfn(Sim)
     end
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(0)
-    
+
     inst:AddComponent("sorasavecmp")
 
     inst.components.sorasavecmp:AddLoad("name", function(i, data)

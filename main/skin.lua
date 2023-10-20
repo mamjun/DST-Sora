@@ -840,7 +840,7 @@ if not TheNet:IsDedicated() then
         self.characterprogress:SetString(string.format("当前进度: %0.1f%%", pro * 100))
 
         self.cb = function(s, i)
-            if gametimes > 300 then
+            if gametimes >= 300 then
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
                 SkinApi('c/ActiveSkin', {
                     skin = 'sora_gete'

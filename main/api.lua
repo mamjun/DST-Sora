@@ -541,6 +541,10 @@ function RandomInst:Get(num)
         r = (RandomInstA * self.last + RandomInstB) % 10000
         self.last = r
         self.hasget = self.hasget + 1
+        if (self.hasget % 9999 == 0) then
+            r = (r + RandomInstB) % 10000
+            self.last = r
+        end
     end
     return r
 end

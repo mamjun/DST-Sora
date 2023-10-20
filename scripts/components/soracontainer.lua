@@ -1,3 +1,4 @@
+
 --[[
 授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
@@ -27,58 +28,22 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] --[[专属交互
+]] --[[随身容器
 ]] --
 local com = Class(function(self, inst)
     self.inst = inst
-    self.seed = hash(TheWorld.meta.session_identifier .. inst.userid or "" )    --抽卡种子
-    self.num = 0    --已经抽了多少发了
-    self.yuan = 0   --还有多少发
-    self.gifts = {} --未领取的礼物
-    self.up5 = "soratele"    --当前五星UP的池子
-    self.up5s = {"soratele","sorabowknot","sora_wq","sora_fl"}   --五星轮换池子
-    self.up4 = {}   --当前UP的四星
-    self.up4s = {}  --四星轮换池子
-    self.up3s = {}  --三星池子
-    self.ran = RandomInst()
-    self:Init()
-    self:NewPool()
 end)
-function com:Init()  --配置池子
-    --四星
-    local function Add(name,num)
-        table.insert(self.up4s,{name,num or 1})
-    end
-    Add("sora3sword")   --银白
-    Add("sora2sword")   --奇妙
-    Add("sora2hat")     --银白头
-    Add("sora2armor")   --银白甲
-    Add("sora2amulet")  --荣誉护符
-    Add("sora2chest")   --强迫症箱子
-    Add("sora_huapen")   --花盆
-    Add("sora_flh")   --风铃花
-    Add("sora2base")   --秘法祭坛
-    Add("sora_light")   --玫瑰灯
-    Add("sora2pack",4)   --打包纸4个
-    Add("sora2ice")   --寒冰箱子
-    Add("sora2ice")   --烈焰箱子
-    Add("sora_tongluoshao",10)   --铜锣烧
-    --三星池子
-    local function Add(name,num)
-        table.insert(self.up3s,{name,num})
-    end
-end
-function com:NewPool()  --轮换池子
 
-end
-function com:Get()  --单抽出奇迹！！
+function com:Init(doer, pass, name, id)
 
 end
 
-
+function com:HasBuff()
+    return true
+end
 function com:OnSave()
     return {
-        seed = self.seed,
+        add_component_if_missing_sora = 1
     }
 end
 
@@ -86,7 +51,7 @@ function com:OnLoad(data)
     if not data then
         return
     end
-
+    
 end
 
 function com:GetDebugString()

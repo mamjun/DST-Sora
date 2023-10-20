@@ -133,8 +133,8 @@ local lexpget = {
 local lexpget2 = {
 	lightbulb = 1,
 	fireflies = 3,
-	wormlight = 5,
-	wormlight_lesser = 10,
+	wormlight = 10,
+	wormlight_lesser = 5,
 }
 local function AcceptTest(inst, item)
 	if lexpget2[item.prefab] then

@@ -177,9 +177,9 @@ local function fn()
     inst.components.workable:SetOnFinishCallback(onhammered)
     inst.components.workable:SetOnWorkCallback(onhit)
     inst:ListenForEvent("onbuilt", onbuilt)
-    if TUNING.SMART_SIGN_DRAW_ENABLE then
-        SMART_SIGN_DRAW(inst)
-    end
+    -- if TUNING.SMART_SIGN_DRAW_ENABLE then
+    --     SMART_SIGN_DRAW(inst)
+    -- end
     return inst
 end
 local function tochestfn()

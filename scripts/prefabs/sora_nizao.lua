@@ -375,7 +375,6 @@ local cantarget = {
     monkey = 1,
     lavae = 1,
     fruitfly = 1,
-    birchnutdrake = 1,
     fruitdragon = 1,
     bird_mutant = 1,
     bird_mutant_spitter = 1,
@@ -520,6 +519,11 @@ local function pearlfn()
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.atlasname = GetInventoryItemAtlas("hermit_pearl.tex")
     inst.components.inventoryitem.imagename = "hermit_pearl"
+    inst:AddComponent("temperature")
+    inst.components.temperature.current = 30 
+    inst.components.temperature.maxtemp = 30 
+    inst.components.temperature.mintemp = 30 
+    inst.components.temperature.SetTemperature = function() return true end
 
     inst:AddComponent("heater")
     inst.components.heater.carriedheat = 30

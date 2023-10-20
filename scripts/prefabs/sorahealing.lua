@@ -316,8 +316,6 @@ local function fn()
     inst.components.spellcaster.canuseonpoint = true
     -- inst.components.spellcaster.CanCast = function() return true end
     inst.components.spellcaster:SetSpellFn(soramagicfn)
-    inst:AddComponent("rechargeable")
-    inst.components.rechargeable:SetMaxCharge(inst.cd)
     inst.cd2 = GetTime() - 300
     -- inst.magicfx.entity:SetParent(inst.entity)
     inst:AddComponent("weapon")

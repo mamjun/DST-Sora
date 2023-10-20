@@ -4,7 +4,9 @@ local brain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
 end)
 
+function brain:ForcePetrify()
 
+end
 function brain:OnStart()
     local root =
     PriorityNode({
