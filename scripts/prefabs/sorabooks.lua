@@ -296,6 +296,9 @@ local changelist = {
     cutted_lilybush = "dug_rosebush",
     monkeytail = "reeds",
     reeds = "monkeytail",
+    ccs_sakura1 = "ccs_sakura2",
+    ccs_sakura2 = "ccs_sakura3",
+    ccs_sakura3 = "ccs_sakura1",
 }
 local crops = {
     asparagus = 1,
@@ -511,6 +514,12 @@ local Magic_defs = {{
             TheWorld:PushEvent("ms_forceprecipitation", false)
         else
             TheWorld:PushEvent("ms_forceprecipitation", true)
+        end
+        if TheWorld.state.islunarhailing and TheWorld.net.components.weather then
+            local _lunarhaillevel = SoraUp.Get(TheWorld.net.components.weather.GetDebugString,"_lunarhaillevel") 
+            if _lunarhaillevel and _lunarhaillevel.set then
+                _lunarhaillevel:set_local(0.01)
+            end
         end
         inst:Remove()
         return true

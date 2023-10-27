@@ -946,3 +946,6 @@ AddStategraphPostInit("wilson",function (sg)
     end
 end)
 
+AddComponentPostInit("playercontroller",function (self)
+    self.remote_authority = false
+end)

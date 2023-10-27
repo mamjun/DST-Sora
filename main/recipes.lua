@@ -145,6 +145,15 @@ if IsMythEnable() then
     Rec("myth_flyskill", nil, nil, {CRAFTING_FILTERS.CHARACTER.name}, "soraflyer", {
         [san] = 15
     }).level = TechTree.Create(TECH.LOST)
+
+
+    AddInvImg("myth_coin_box", "inventoryimages/myth_coin_box", "myth_coin_box")
+    local rec = Rec("myth_coin_box", "铜钱串", "怎么想都是花花的错", maker, "sora", {
+        goldnugget = 800
+    })
+    rec.numtogive = 10
+    rec.level = TechTree.Create(TECH.LOST)
+
 end
 
 Rec("sorapocky", "百奇", "看起来很好吃", item, "sora", {{

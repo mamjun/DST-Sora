@@ -36,7 +36,12 @@ SORA_SPEECH_EXTEND = {
 		{
 			GENERIC = "你需要来点HCl吗，%s？",
 		},
+		CCS = {
+			GENERIC = "大鼻子路猪，%s？",
+		},
+
     },
+	
     ANNOUNCE_EAT =
 	{
 		GENERIC = "没有悠做的好吃!",

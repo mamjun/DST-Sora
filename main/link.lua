@@ -95,6 +95,9 @@ if IsMythEnable() then
             if not inst.components.builder:KnowsRecipe("myth_flyskill_sora" .. rec_back) then
                 inst.components.talker:Say("恰花花,学仙术")
                 inst.components.builder:UnlockRecipe("myth_flyskill_sora" .. rec_back)
+            elseif not inst.components.builder:KnowsRecipe("myth_coin_box" .. rec_back) then
+                inst.components.talker:Say("怎么想都是花花的错")
+                inst.components.builder:UnlockRecipe("myth_coin_box" .. rec_back)
             end
         end
     end
@@ -132,6 +135,39 @@ if IsMythEnable() then
         end)
 
     end)
+    local data = {
+        owner_prefab = "sora",
+        speed = 20 / 6,
+        build = "mk_cloudfxsora",
+        scale = 1.65,
+        animspeed = 0.8,
+        sanity_penalty = 0,
+        radius = 1, -- 半径更大
+        tail = {
+            build = "mk_cloudfxsora",
+            changealpha = true,
+            changescale = true,
+            scale = 1.5,
+            fadetime = 1
+        }
+    }
+    local first
+    AddComponentPostInit("mk_flyer", function(self)     --怎么想都是花花的错
+        if not first then
+            first = true
+            if self.SetMyClond then     --都怪花花写错字母
+                self:SetMyClond(data)
+            elseif self.SetMyCloud then
+                self:SetMyCloud(data)
+            else
+                local t = up.Get(self.SetFlying, "FlyConfig")
+                if t then
+                    t:AddData(data)
+                end
+            end
+        end
+    end)
+
     AddLaterFn(function()
         local function helperfn()
             return SpawnPrefab("myth_flyskill_pg")
@@ -146,10 +182,8 @@ if IsMythEnable() then
                     if ii.components.builder and ii.components.builder:CanLearn("myth_flyskill_sora" .. rec_back) and
                         not ii.components.builder:KnowsRecipe("myth_flyskill_sora" .. rec_back) then
                         ii.components.builder:UnlockRecipe("myth_flyskill_sora" .. rec_back)
-
                     end
                 end
-
             end
         end)
 
@@ -158,33 +192,7 @@ if IsMythEnable() then
             myth_flyskill_soraflyer.image = "myth_flyskill.tex"
             myth_flyskill_soraflyer.tab = AllRecipes.myth_flyskill.tab
         end
-        local data = {
-            owner_prefab = "sora",
-            speed = 20 / 6,
-            build = "mk_cloudfxsora",
-            scale = 1.65,
-            animspeed = 0.8,
-            sanity_penalty = 0,
-            radius = 1, -- 半径更大
-            tail = {
-                build = "mk_cloudfxsora",
-                changealpha = true,
-                changescale = true,
-                scale = 1.5,
-                fadetime = 1
-            }
-        }
-        local fs = require("components/mk_flyer")
-        if fs.SetMyClond then
-            fs:SetMyClond(data)
-        elseif fs.SetMyCloud then
-            fs:SetMyCloud(data)
-        else
-            local t = up.Get(fs.SetFlying, "FlyConfig")
-            if t then
-                t:AddData(data)
-            end
-        end
+
         local t = up.Get(ACTIONS.READ_FLY_BOOK.fn, "skills", "mythhouse")
         if t then
             t.sora = {"myth_flyskill_sora" .. rec_back}
@@ -382,13 +390,19 @@ if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable
     AddPrefabPostInit("sora", function(inst)
         local oldCanSoulhop = inst.CanSoulhop
         inst.CanSoulhop = function(inst, souls, ...)
-            if oldCanSoulhop and oldCanSoulhop(inst, souls, ...) then return true end
+            if oldCanSoulhop and oldCanSoulhop(inst, souls, ...) then
+                return true
+            end
             if inst:HasTag("medal_map_blinker") then
-                inst.nosorasouldouble = 1 local has, num = inst.replica.inventory:Has("wortox_soul", souls or 1)  inst.nosorasouldouble = nil
+                inst.nosorasouldouble = 1
+                local has, num = inst.replica.inventory:Has("wortox_soul", souls or 1)
+                inst.nosorasouldouble = nil
                 num = num + math.floor(inst.replica.sanity:GetCurrent() / 5)
                 if num > (souls or 1) then
                     local rider = inst.replica.rider
-                    if rider == nil or not rider:IsRiding() then return true end
+                    if rider == nil or not rider:IsRiding() then
+                        return true
+                    end
                 end
             end
             return false
@@ -406,8 +420,11 @@ if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable
             local oldinventoryConsumeByName = inst.components.inventory.ConsumeByName
             inst.components.inventory.ConsumeByName = function(inv, item, amount, ...)
                 if item == "wortox_soul" then
-                    local old, num = oldinventoryHas(inv, item, amount, ...)  local souls = math.min(num, amount)
-                    if souls < amount then  inst.components.sanity:DoDelta(-5 * (amount - souls)) end
+                    local old, num = oldinventoryHas(inv, item, amount, ...)
+                    local souls = math.min(num, amount)
+                    if souls < amount then
+                        inst.components.sanity:DoDelta(-5 * (amount - souls))
+                    end
                     return oldinventoryConsumeByName(inv, item, souls, checkallcontainers, ...)
                 end
                 return oldinventoryConsumeByName(inv, item, amount, checkallcontainers, ...)
@@ -415,47 +432,47 @@ if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable
         end
     end)
     local function FixDoDeltaMedalDelayDamage(inst)
-        if inst.components.health and  inst.components.health.DoDeltaMedalDelayDamage then
+        if inst.components.health and inst.components.health.DoDeltaMedalDelayDamage then
             local oldDoDeltaMedalDelayDamage = inst.components.health.DoDeltaMedalDelayDamage
-            function inst.components.health:DoDeltaMedalDelayDamage(amount,...)
+            function inst.components.health:DoDeltaMedalDelayDamage(amount, ...)
                 if amount > 0 then
                     if inst:HasTag("sora") then
                         amount = amount * 0.7
                     end
                     if inst.components.inventory then
-                        inst.components.inventory:ForEachEquipment(function (item)
+                        inst.components.inventory:ForEachEquipment(function(item)
                             if item and item.sorashizhishang then
                                 amount = amount - item.sorashizhishang
                             end
                         end)
                     end
-                    amount = math.max(0,math.floor(amount))
+                    amount = math.max(0, math.floor(amount))
                     if amount == 0 then
-                        return 
+                        return
                     end
                 end
-                return oldDoDeltaMedalDelayDamage(self,amount,...)
+                return oldDoDeltaMedalDelayDamage(self, amount, ...)
             end
         end
     end
     local sorashizhishang = {
-        sora2bag=3,
-        sora2armot =3,
-        sora2hat=3,
-        sora2amulet=3,
+        sora2bag = 3,
+        sora2armot = 3,
+        sora2hat = 3,
+        sora2amulet = 3,
         soraclothes = 5,
-        sorahat=5,
-        sorabag=5,
-        sorabowknot=5,
+        sorahat = 5,
+        sorabag = 5,
+        sorabowknot = 5
     }
-    for k,v in pairs(sorashizhishang) do
-        AddPrefabPostInit(k,function (inst)
+    for k, v in pairs(sorashizhishang) do
+        AddPrefabPostInit(k, function(inst)
             inst.sorashizhishang = v
         end)
     end
-    AddPlayerPostInit(function (inst)
+    AddPlayerPostInit(function(inst)
         if TheWorld.ismastersim then
-            inst:DoTaskInTime(0,FixDoDeltaMedalDelayDamage) 
+            inst:DoTaskInTime(0, FixDoDeltaMedalDelayDamage)
         end
     end)
 end
