@@ -312,7 +312,18 @@ end)
 
 AddLaterFn(function()
     local old = up.Get(EntityScript.CollectActions, 'COMPONENT_ACTIONS', "componentactions.lua")
-    if old and old.SCENE and old.INVENTORY then
+    if not old then return end
+    if old.SCENE and old.INVENTORY then
+        local oldSCENEfn = old.SCENE.prototyper
+        if oldSCENEfn then
+            old.SCENE.prototyper = function(inst, doer, ...)
+             if inst and inst:HasTag("sora_light") then
+                    return
+                end
+                return oldSCENEfn(inst, doer, ...)
+            end
+        end
+
         local oldSCENEfn = old.SCENE.bundlemaker
         old.SCENE.bundlemaker = function(inst, doer, ...)
             if inst and inst:HasTag("sorabowknot") and not (doer and doer:HasTag("sora")) then
@@ -948,4 +959,32 @@ end)
 
 AddComponentPostInit("playercontroller",function (self)
     self.remote_authority = false
+end)
+--开扶光不关箱子！
+AddClassPostConstruct("screens/playerhud",function (self)
+    local oldOpenSpellWheel  = self.OpenSpellWheel 
+    if not oldOpenSpellWheel then return end
+    local oldCloseAllChestContainerWidgets = up.Get(oldOpenSpellWheel,"CloseAllChestContainerWidgets","playerhud")
+    if not oldCloseAllChestContainerWidgets then return end
+    local function CloseAllChestContainerWidgets(self,...)
+        if self.soraspellbook then return end
+        return oldCloseAllChestContainerWidgets(self,...)
+    end
+    up.Set(oldOpenSpellWheel,"CloseAllChestContainerWidgets",CloseAllChestContainerWidgets,"playerhud")
+    self.OpenSpellWheel  = function(s,item,...)
+        if item and item:HasTag("soraspellbook") then
+            s.soraspellbook = true
+        else
+            s.soraspellbook = nil
+        end
+        return oldOpenSpellWheel(s,item,...)
+    end
+end)
+
+AddComponentPostInit("inventory",function(self) 
+    local CloseAllChestContainers = self.CloseAllChestContainers
+    function self.CloseAllChestContainers(s,...)
+        if s:EquipHasTag("soraspellbook") then return end
+        return CloseAllChestContainers(s,...)
+    end
 end)
