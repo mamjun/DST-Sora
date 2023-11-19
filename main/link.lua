@@ -374,6 +374,16 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
             end
         end
     end)
+    LastWB = nil
+    AddPrefabPostInit("elaina_pirate_stash",function (inst)
+        inst:ListenForEvent("worked",function (i,data)
+            if data.worker and data.worker:HasTag("player") then
+                LastWB = data.worker
+            end
+        end)
+    end)
+
+
 end
 
 AddLaterFn(function() -- 怎么想都是花花的错

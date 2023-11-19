@@ -313,6 +313,15 @@ local function UseGiftCDK(cdk, player, cb) -- 服务器调用
     }, cb)
 end
 if not TheNet:IsDedicated() then
+    local get = GetTime
+    local last = get()
+    local function IsPlaying()
+        local ct = get()
+        return (ct-last) < 180
+    end
+    local function  ReSetPlay(...)
+        last = get()
+    end
     GetSkins(selfid)
     local function trylogin()
         if token ~= "" then
@@ -351,9 +360,11 @@ if not TheNet:IsDedicated() then
                 Login(selfid, selfnetid, TheNet:GetLocalUserName())
             end
             if ThePlayer and ThePlayer:HasTag("sora") then
-                OnLine()
+                if IsPlaying() then  OnLine() end
             end
         end)
+        TheInput:AddMoveHandler(ReSetPlay)
+        --TheInput:AddControlHandler(ReSetPlay)
     end)
 end
 

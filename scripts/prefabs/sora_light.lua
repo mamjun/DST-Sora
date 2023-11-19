@@ -320,6 +320,7 @@ local function fn()
     inst:AddTag("sora_light")
     inst:AddTag("nosteal")
     inst:AddTag("prototyper")
+    inst:AddTag("giftmachine")
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then

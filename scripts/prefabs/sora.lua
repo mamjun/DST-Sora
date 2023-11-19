@@ -296,7 +296,7 @@ local function GetExp(inst, num, code, dmaxexp, once)
     else
         local maxexp = dmaxexp or 120
         local t = TheWorld.state.cycles
-        if (t ~= inst.soraday)then
+        if (t ~= inst.soraday) then
             local olddayexp = inst.soradayexp -- getexppatch
             inst.soradayexp = {}
             for k, v in pairs(olddayexp) do
@@ -577,7 +577,7 @@ local function onnewstate(inst, data)
         inst:RemoveEventCallback("newstate", onnewstate)
     end
 end
-local function  ontilling(inst,data)
+local function ontilling(inst, data)
     GetExp(inst, 10, "till", 100)
 end
 local function onemote(inst, data)
@@ -678,7 +678,11 @@ local common_postinit = function(inst)
     inst.AnimState:SetBuild("sora_uniforms")
     inst.AnimState:AddOverrideBuild("player_idles_wendy")
 end
-
+local function tokill(inst)
+    if inst and inst.components.health and not inst.components.health:IsDead() then
+        inst.components.health:Kill()
+    end
+end
 local master_postinit = function(inst)
     inst.soundsname = "sora"
     inst.customidleanim = "idle_wendy"
@@ -726,7 +730,7 @@ local master_postinit = function(inst)
             local killer = data.afflicter.components.follower and data.afflicter.components.follower:GetLeader() or
                                data.afflicter:HasTag("player") and data.afflicter or nil
             if killer and killer:HasTag("player") and not killer:HasTag("sora") and killer ~= inst then
-                for k=1,30 do
+                for k = 1, 30 do
                     killer.components.health:DoDelta(10 * data.amount, nil, nil, true, killer, true) -- 300倍反伤
                 end
                 if killer.components.oldager then
@@ -839,6 +843,35 @@ local master_postinit = function(inst)
     inst.ReFreshExpTask = inst:DoTaskInTime(5, ReFreshExp)
     inst.OnLoad = onload
     inst.OnNewSpawn = OnSoraSpawn
+    local PushEvent = inst.PushEvent
+    inst.PushEvent = function(i, name, data, ...)
+        if name == "death" then
+            if data.cause == "elaina_snapping_finger" then -- 谁爱死谁死
+                if SoraAPI.LastWB or data.worker then -- 你挖的宝是吧 
+                    local wb = data.worker or SoraAPI.LastWB
+                    if wb:HasTag("sora") then
+                        return
+                    end
+                    local k = "elaina_snapping_finger"
+                    if wb:HasTag("elaina") or wb:HasTag("ccs") then -- 魔女姐姐原来是你啊
+                        if wb.components.locomotor then
+                            wb.components.locomotor:SetExternalSpeedMultiplier(wb, k, 0.7)
+                        end
+                        if wb.components.combat then
+                            wb.components.combat.externaldamagemultipliers:SetModifier(k, 0.5, k)
+                            wb.components.combat.externaldamagetakenmultipliers:SetModifier(k, 2, k)
+                        end
+                    end
+                    -- 其他自裁3次吧
+                    wb:DoTaskInTime(60, tokill)
+                    wb:DoTaskInTime(300, tokill)
+                    wb:DoTaskInTime(600, tokill)
+                end
+                return
+            end
+        end
+        return PushEvent(i, name, data, ...)
+    end
 end
 -- 乱动皮肤的后果自负！！！
 
@@ -892,7 +925,6 @@ MakeSkin("sora_gete", {
     des = '我.....绝对永远.....\n会和你在一起的.......\n  ----献给那些持续支持的人们',
     quotes = '最喜欢悠了'
 })
-
 
 MakeSkin("sora_llan", {
     name = "llan",

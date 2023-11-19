@@ -93,6 +93,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     AddMinimapAtlas("images/inventoryimages/sora2armor.xml")
     AddMinimapAtlas("images/inventoryimages/sora2bag.xml")
     AddMinimapAtlas("images/inventoryimages/sora2fire.xml")
+    AddMinimapAtlas("images/inventoryimages/sora2chest.xml")
     AddMinimapAtlas("images/inventoryimages/sora2hat.xml")
     AddMinimapAtlas("images/inventoryimages/sora2ice.xml")
     AddMinimapAtlas("images/inventoryimages/sora2sword.xml")

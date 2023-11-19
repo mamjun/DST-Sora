@@ -988,3 +988,81 @@ AddComponentPostInit("inventory",function(self)
         return CloseAllChestContainers(s,...)
     end
 end)
+
+local oldRegisterPrefabs = ModManager.RegisterPrefabs 
+
+ModManager.RegisterPrefabs = function(self)
+	oldRegisterPrefabs(self)
+	if TUNING.SMART_SIGN_DRAW_ENABLE then return end  --小木牌兼容
+    enabledmods = ModManager.enabledmods
+    local Assets = {}
+	for i,modname in ipairs(enabledmods) do
+		local mod = ModManager:GetMod(modname)
+		--检索 modmain里注册的资源
+		if mod.Assets then 
+			local modatlas = {}
+			local modatlas_build = {}
+			--检索所有的贴图
+			for k,v in ipairs (mod.Assets) do
+				if v.type == "ATLAS" then 
+					table.insert(modatlas,v.file)
+				elseif v.type == "ATLAS_BUILD" then 
+					table.insert(modatlas_build,v.file)
+				end
+			end
+			--判断是否有对应的ATLAS_BUILD
+			for k,v in ipairs(modatlas) do
+				local notfind = true
+				for x,y in ipairs(modatlas_build) do
+					if v == y then
+						notfind = false
+						break
+					end
+				end
+				if notfind then
+				--没有就插入
+				--因为注册的时候会自动搜索路径，所以自己注册的时候要还原回原来的路径
+				v = string.gsub(v,"%.%./mods/[^/]+/","",1)
+				table.insert(Assets,Asset("ATLAS_BUILD",v,256))
+				end
+			end
+		end
+		
+		--检索 prefabs 里注册的资源
+		if mod.Prefabs then
+			for n,prefab in pairs(mod.Prefabs) do
+				local modatlas = {}
+				local modatlas_build = {}
+				--检索所有的贴图
+				if prefab.assets then
+					for k,v in pairs (prefab.assets) do
+						if v.type == "ATLAS" then 
+							table.insert(modatlas,v.file)
+						elseif v.type == "ATLAS_BUILD" then 
+							table.insert(modatlas_build,v.file)
+						end
+					end
+				end
+				--判断是否有对应的ATLAS_BUILD
+				for k,v in ipairs(modatlas) do
+					local notfind = true
+					for x,y in ipairs(modatlas_build) do
+						if v == y then
+							notfind = false
+							break
+						end
+					end
+					if notfind then
+					--没有就插入
+					v = string.gsub(v,"%.%./mods/[^/]+/","",1)
+					table.insert(Assets,Asset("ATLAS_BUILD",v,256))
+					end
+				end
+			end
+		end
+	end
+	--注册资源
+	RegisterPrefabs(Prefab("MOD_SORASIGNOTHER",nil,Assets,nil,true))
+    TheSim:LoadPrefabs({"MOD_SORASIGNOTHER"})
+	table.insert(self.loadedprefabs,"MOD_SORASIGNOTHER")
+end

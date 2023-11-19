@@ -40,10 +40,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 重复可提升效果(紫黄除外)
 ]] --
 
-local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2fire.zip"),
-                Asset("ATLAS", "images/inventoryimages/sora2fire.xml"),
-                Asset("IMAGE", "images/inventoryimages/sora2fire.tex"),
-                Asset("ATLAS_BUILD", "images/inventoryimages/sora2fire.xml", 256)}
+local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2chest.zip"),
+                Asset("ATLAS", "images/inventoryimages/sora2chest.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2chest.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest.xml", 256)}
 
 local prefabs = {"collapse_small"}
 
@@ -66,10 +66,45 @@ local function onhammered(inst, worker)
     fx:SetMaterial("metal")
     inst:Remove()
 end
-
+local function updatesign(inst)
+    local sign = nil
+    for k=1,25 do
+        local v  = inst.components.container:GetItemInSlot(k)
+        if v and v.prefab and v.components.inventoryitem then
+            sign = {name=v.prefab}
+            sign.image = v.replica.inventoryitem:GetImage() --v.components.inventoryitem.imagename and (v.components.inventoryitem.imagename ..".tex") or 
+            sign.atlas = v.replica.inventoryitem:GetAtlas() --v.components.inventoryitem.atlasname or 
+            if v.inv_image_bg and v.inv_image_bg.image then
+                sign.bgimage = v.inv_image_bg.image
+                sign.bgatlas = v.inv_image_bg.atlas
+            end
+            break
+        end
+    end
+    sign = sign or inst.sorasign
+    if sign then
+        inst.AnimState:Show("chestitem_bg")
+        inst.AnimState:Show("swap_item")
+        inst.AnimState:OverrideSymbol("swap_item",sign.atlas,sign.image)
+        if sign.bgimage then
+            inst.AnimState:Show("swap_item_bg")
+            inst.AnimState:OverrideSymbol("swap_item_bg",sign.bgatlas,sign.bgimage)
+        else
+            inst.AnimState:Hide("swap_item_bg")
+        end
+    else
+        inst.AnimState:Hide("chestitem_bg")
+        inst.AnimState:Hide("swap_item_bg")
+        inst.AnimState:Hide("swap_item")
+    end
+    inst.sorasign = sign
+ end
 local function onhit(inst, worker)
-    --inst.AnimState:PlayAnimation("hit")
+    inst.sorasign = nil
+    updatesign(inst)
+    if inst.hitcount and inst.hitcount > 1 then
     inst.components.container:DropEverything()
+    end
     --inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()
 end
@@ -133,6 +168,7 @@ local data2 = {
  if not TUNING.SORATOCHEST then
     cmp2:RegPatch("sora2chest", data2)
  end
+
 local function fn()
     local inst = CreateEntity()
 
@@ -142,15 +178,18 @@ local function fn()
     inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
 
-    inst.MiniMapEntity:SetIcon("sora2fire.tex")
+    inst.MiniMapEntity:SetIcon("sora2chest.tex")
     inst:AddTag("structure")
     inst:AddTag("nosteal")
-    inst.AnimState:SetBank("sora2fire")
-    inst.AnimState:SetBuild("sora2fire")
+    inst.AnimState:SetBank("sora2chest")
+    inst.AnimState:SetBuild("sora2chest")
     inst.AnimState:PlayAnimation("idle")
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     inst.entity:SetPristine()
+    inst.AnimState:Hide("chestitem_bg")
+    inst.AnimState:Hide("swap_item_bg")
+    inst.AnimState:Hide("swap_item")
 
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
@@ -158,14 +197,25 @@ local function fn()
         end
         return inst
     end
-
     inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription("好奇怪的箱子")
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sora2chest")
     inst.components.container.onopenfn = onopen
     inst.components.container.onclosefn = onclose
-
+    inst:ListenForEvent("onclose", updatesign)
+    inst:AddComponent("sorasavecmp")
+    inst.components.sorasavecmp:AddSave("sign",function (inst)
+        return inst.sorasign and {sign = inst.sorasign}
+    end)
+    inst.components.sorasavecmp:AddLoad("sign",function (inst,data)
+        if data and data.sign then
+            if Prefabs[data.sign.name] then 
+                inst.sorasign = data.sign
+            end
+        end
+    end)
+    inst:DoTaskInTime(0,updatesign)
     inst.prefab = "sora2chest"
     TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
 
@@ -211,6 +261,11 @@ local function tochestfn()
     inst.fx:Bind(inst)
     return inst
 end
-
-return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2fire", "sora2fire", "idle"),
+local function placer_help(inst)
+    inst.AnimState:Hide("chestitem_bg")
+    inst.AnimState:Hide("swap_item_bg")
+    inst.AnimState:Hide("swap_item")
+    -- body
+end
+return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle"),
     Prefab("sora_tochest", tochestfn, assets, prefabs)

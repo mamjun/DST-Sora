@@ -476,7 +476,7 @@ Rec("sora2fire", "烈焰の箱子", "外焦里嫩！", build, "soraother", {{
     cutstone = 40,
     redgem = 20
 }})
-AddInvImg("sora2chest", "inventoryimages/sora2fire", "sora2fire")
+AddInvImg("sora2chest", "inventoryimages/sora2chest", "sora2chest")
 Rec("sora2chest", "强迫の箱子", "一个有着强迫症的箱子", build, "soraother", {{
     boards = 2,
     cutstone = 2

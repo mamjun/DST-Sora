@@ -152,7 +152,7 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
 end
 
 local function catch(inst)
-    if not inst:IsInLimbo() and inst.components.inventoryitem and not inst.components.inventoryitem.owner and
+    if not inst:IsInLimbo() and not inst:HasTag("decorationitem") and inst.components.inventoryitem and not inst.components.inventoryitem.owner and
         not (inst.components.health and inst.components.health:IsDead()) and inst:IsValid() then
         return true
     end
@@ -455,12 +455,9 @@ local GemTask = {
                         end
                     end
                 end
-
             end
         end
-
     end
-
 }
 local function UpdateChest(inst, data)
     for k, v in pairs(data.gem) do
@@ -510,6 +507,10 @@ local function TryCacheEnt(inst, all) -- 尝试缓存下来
         return
     end
     if not inst.replica.inventoryitem then
+        inst.SoraChestSkip = true
+        return
+    end
+    if inst:HasTag("decorationitem") then
         inst.SoraChestSkip = true
         return
     end
@@ -645,6 +646,9 @@ local function ResetChestData(inst, doer)
                 end
             end
             data.c[k] = first or drop_first -- 选定拾取的
+            if not data.c[k] and inst.sorasign then
+                data.c[k] = toprefab(inst.sorasign.name)
+            end
         end
     end
     -- data.pick = 1
@@ -686,12 +690,33 @@ local function OnClose(inst, event)
     end
 end
 FindPrefab()
+
+local function HitProtect(inst,data)
+    if not inst.components.workable then
+        return 
+    end
+    if not inst.hitcount  then
+        inst.hitcount =  0 
+        inst.hitcd = SoraCD(30)
+    end
+    if inst.hitcd() then
+        inst.hitcount =  0 
+        inst.components.workable.workleft = 10
+    else
+        inst.hitcount = inst.hitcount + 1
+        if inst.hitcount > 4 then
+            inst.components.workable.workleft = 0
+        else
+            inst.components.workable.workleft = 10
+        end
+    end
+end
+
 local ChestData = SoraAPI.ChestData
 local com = Class(function(self, inst)
     self.inst = inst
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
-    
     self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
     -- self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
     inst:WatchWorldState("cycles", function()
@@ -731,12 +756,14 @@ function com:RegByType(chest, type)
         chest:ListenForEvent("onopen", OnOpen)
         chest:ListenForEvent("onclose", OnClose)
         chest:ListenForEvent("onremove", OnChestRemove)
+        chest:ListenForEvent("worked", HitProtect)
     end
 end
 function com:UnReg(chest)
     if chest.sorachesttype and allchest[chest.sorachesttype] then
         chest:RemoveEventCallback("onopen", OnOpen)
         chest:RemoveEventCallback("onclose", OnClose)
+        chest:RemoveEventCallback("worked", HitProtect)
         updatechests[chest] = nil
         chest.sorachestdata = nil
         allchest[chest.sorachesttype][chest] = nil
