@@ -847,8 +847,8 @@ local master_postinit = function(inst)
     inst.PushEvent = function(i, name, data, ...)
         if name == "death" then
             if data.cause == "elaina_snapping_finger" then -- 谁爱死谁死
-                if SoraAPI.LastWB or data.worker then -- 你挖的宝是吧 
-                    local wb = data.worker or SoraAPI.LastWB
+                if SoraAPI.LastWB or data.afflicter then -- 你挖的宝是吧 
+                    local wb = data.afflicter or SoraAPI.LastWB
                     if wb:HasTag("sora") then
                         return
                     end
