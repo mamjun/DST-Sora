@@ -30,6 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] --[[专属交互
 ]] --
 SoraAPI.ChestData = {}
+local cmp 
 local orderData = {}
 local allchest = {}
 --[[prefab = {
@@ -214,6 +215,7 @@ local TryPut
 local GetOneItem
 if TUNING.SORACHESTRANGE > 2000 then
     function DayUpdate() -- 只负责收东西
+        if cmp:IsStop() then return end
         UpdateEnts()
         local topick = {}
         for ent, v in pairs(cacheents) do
@@ -268,6 +270,7 @@ if TUNING.SORACHESTRANGE > 2000 then
 else
     local maxrange = TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE
     function DayUpdate(inst, chest, container)
+        if cmp:IsStop() then return end
         UpdateEnts()
         local topick = {}
         for ent, v in pairs(cacheents) do
@@ -323,6 +326,7 @@ else
     end
 end
 local function GetItem(inst, data) -- 箱子收东西
+    if cmp:IsStop() then return end
     UpdateEnts()
     for k, v in pairs(data.c) do
         if v then
@@ -715,6 +719,8 @@ end
 local ChestData = SoraAPI.ChestData
 local com = Class(function(self, inst)
     self.inst = inst
+    cmp = self
+    self.stoptime = 0
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
     self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
@@ -726,6 +732,35 @@ local com = Class(function(self, inst)
         inst:DoTaskInTime(5, DayUpdate)
     end)
 end)
+function com:SetStopTime(time)
+    self.stoptime = time + GetTime()
+end
+function com:Pause(yes)
+    self.stoptime = yes and -1 or 0
+end
+function com:IsStop()
+    if self.stoptime < 0 then
+        return true
+    elseif self.stoptime == 0 then
+        return false
+    else 
+        return self.stoptime > GetTime()
+    end
+end
+function com:GetStopTime(doer)
+    local tosay = ""
+    if  self.stoptime == 0 then
+        tosay = "正常收集中"
+    elseif self.stoptime < 0 then
+        tosay = "暂停收集中"
+    else
+        tosay = tostring(math.floor(self.stoptime - GetTime())) ..  "s后恢复收集"
+    end
+    if doer then 
+        SoraAPI.Say(doer,tosay)
+    end
+    return tosay
+end
 function com:RegType(type, data)
     data.controls = data.controls or {}
     data.containers = data.containers or {}
@@ -788,6 +823,7 @@ end
 
 function com:GetDebugString()
     local str = {"\nSoraChest"}
+    table.insert(str, "collect:" ..self:GetStopTime())
     table.insert(str, "-----allchest-------")
     local trace = true
     for k, v in pairs(allchest) do

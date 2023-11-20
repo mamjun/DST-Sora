@@ -77,8 +77,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             oldOpen(self,...)
             if self.container and self.container.replica.container then
                 local widget = self.container.replica.container:GetWidget()
-                if widget and widget.OnOpenFn then 
-                    widget.OnOpenFn(self,...)
+                if widget and widget.SoraOnOpenFn then 
+                    widget.SoraOnOpenFn(self,...)
                 end
             end
         end
@@ -86,8 +86,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         self.Close = function(self,...)
             if self.container and self.container.replica.container then
                 local widget = self.container.replica.container:GetWidget()
-                if widget and widget.OnCloseFn then 
-                    widget.OnCloseFn(self,...)
+                if widget and widget.SoraOnCloseFn then 
+                    widget.SoraOnCloseFn(self,...)
                 end
             end
             oldClose(self,...)
@@ -97,8 +97,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             oldRefresh(self,...)
             if self.container and self.container.replica.container then
                 local widget = self.container.replica.container:GetWidget()
-                if widget and widget.OnRefreshFn then 
-                    widget.OnRefreshFn(self,...)
+                if widget and widget.SoraOnRefreshFn then 
+                    widget.SoraOnRefreshFn(self,...)
                 end
             end
         end

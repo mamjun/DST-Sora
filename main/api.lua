@@ -414,6 +414,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     s.OnControl = function(self, control, down)
         if self.focus and control == CONTROL_SECONDARY then
             m.OnClick(self, down)
+            return false
         end
         return m.OnControl(self, control, down)
     end
@@ -422,6 +423,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         if s.focus and key == KEY_SPACE and not down and not m.cd() then
             s:SetPosition(m.dpos:Get())
             TheSim:SetPersistentString(m.name, string.format("return Vector3(%d,%d,%d)", m.dpos:Get()), false)
+            return false
         end
         return m.OnRawKey(self, key, down, ...)
     end

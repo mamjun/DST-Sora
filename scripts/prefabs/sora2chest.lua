@@ -102,8 +102,9 @@ local function updatesign(inst)
 local function onhit(inst, worker)
     inst.sorasign = nil
     updatesign(inst)
-    if inst.hitcount and inst.hitcount > 1 then
-    inst.components.container:DropEverything()
+    if inst.hitcount and inst.hitcount > 0 then
+        inst.components.container:DropEverything()
+        TheWorld.components.sorachestmanager:OnClose(inst, worker)
     end
     --inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()

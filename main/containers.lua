@@ -37,6 +37,61 @@ if not params then
     params = {}
     needhelp = true
 end
+local ImageButton = require "widgets/imagebutton"
+local function AddButton(config,name,pos,fn,postfn)
+    local btn
+    local data  = {tokill = {}}
+    local SoraOnOpenFn = config.SoraOnOpenFn 
+    config.SoraOnOpenFn = function(self,inst,doer,...)
+        if btn and btn.inst and btn.inst.widget then btn:Kill() btn = nil end
+        btn = self:AddChild(ImageButton("images/ui.xml", "button_small.tex", "button_small_over.tex", "button_small_disabled.tex", nil, nil, {1,1}, {0,0}))
+        btn.image:SetScale(1.07)
+        btn.text:SetPosition(2,-2)
+        btn:SetPosition(pos:Get())
+        btn:SetText(name)
+
+        btn:SetFont(BUTTONFONT)
+        btn:SetDisabledFont(BUTTONFONT)
+        btn:SetTextSize(33)
+        btn.text:SetVAlign(ANCHOR_MIDDLE)
+        btn.text:SetColour(0, 0, 0, 1)
+
+        if fn then
+            btn:SetOnClick(function()
+                if doer ~= nil then
+                    if doer:HasTag("busy") then
+                        --Ignore button click when doer is busy
+                        return
+                    elseif doer.components.playercontroller ~= nil then
+                        local iscontrolsenabled, ishudblocking = doer.components.playercontroller:IsEnabled()
+                        if not (iscontrolsenabled or ishudblocking) then
+                            --Ignore button click when controls are disabled
+                            --but not just because of the HUD blocking input
+                            return
+                        end
+                    end
+                end
+                fn(inst, doer,btn,self,data)
+            end)
+        end
+        if postfn then
+            postfn(btn,inst,name,self,data,...)
+        end
+        if SoraOnOpenFn then
+            return SoraOnOpenFn(self,inst, doer,...)
+        end
+    end
+    local SoraOnCloseFn = config.SoraOnCloseFn
+    config.SoraOnCloseFn = function(self,inst,doer,...)
+        if btn and btn.inst and btn.inst.widget  then btn:Kill() btn = nil end
+        for k,v in pairs (data.tokill) do
+            if v and v.inst and v.inst.widget then 
+                v:Kill()
+            end
+        end
+    end
+
+end
 params.sorapack_container = {
     widget = {
         slotpos = {},
@@ -136,20 +191,6 @@ for y = 4, 0, -1 do
         table.insert(params.sorafire.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
-local function OnQiangBoClose(player, inst)
-    if inst and type(inst) == "table" and inst.GUID and inst.components.container ~= nil then
-        if not player then
-            return
-        end
-        if not player.sora2chestcd then
-            player.sora2chestcd = SoraCD(1)
-        end
-        if player.sora2chestcd() then
-            TheWorld.components.sorachestmanager:OnClose(inst, player)
-        end
-    end
-end
-AddModRPCHandler("sora", "sora2chestclose", OnQiangBoClose)
 
 local gemblack = {
     greemgem = 1
@@ -186,7 +227,7 @@ for y = 4, -1, -1 do
     end
 end
 local sora2chestpopup = require "widgets/sora2chestpopup"
-function params.sora2chest.widget:OnOpenFn(inst)
+function params.sora2chest.widget:SoraOnOpenFn(inst)
     if TUNING.SORACHESTUI then
         self.text = self:AddChild(sora2chestpopup())
     end
@@ -210,11 +251,7 @@ function params.sora2chest.itemtestfn(container, item, slot)
     return (slot > 25 and item:HasTag("gem")) or slot <= 25
 end
 function params.sora2chest.widget.buttoninfo.fn(inst)
-    if inst.components.container ~= nil and ThePlayer then
-        OnQiangBoClose(ThePlayer, inst)
-    elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
-        SendModRPCToServer(MOD_RPC["sora"]["sora2chestclose"], inst)
-    end
+    r_event(nil,"Sora2ChestControl",{cmd="Collect"},inst)
 end
 
 params.sorabase = {
@@ -233,7 +270,7 @@ for y = 4, 0, -1 do
     end
 end
 local soratreepopup = require "widgets/soratreepopup"
-function params.sorabase.widget:OnOpenFn(inst)
+function params.sorabase.widget:SoraOnOpenFn(inst)
     self.text = self:AddChild(soratreepopup())
 end
 
@@ -247,7 +284,7 @@ params.sora_light = {
         side_align_tip = 100,
         buttoninfo = {
             text = "收集",
-            position = GLOBAL.Vector3(530, 40, 0)
+            position = GLOBAL.Vector3(530, 50, 0)
         }
     },
     acceptsstacks = true,
@@ -304,7 +341,7 @@ function params.sora_light.itemtestfn(container, item, slot)
                sora_light_slot
 end
 params.sora_light.widget.buttoninfo.fn = params.sora2chest.widget.buttoninfo.fn
-function params.sora_light.widget:OnOpenFn(inst)
+function params.sora_light.widget:SoraOnOpenFn(inst)
     self.candrag = true
     if rawget(GLOBAL, "MakeMedalDragableUI") then
         MakeMedalDragableUI(self, self.bgimage,"sora_light", {
@@ -388,7 +425,41 @@ params.sora_lightflier_cat = {
     acceptsstacks = true,
     type = "chest"
 }
-
+sora2chestcontrol = require "widgets/sora2chestcontrol"
+AddButton(params.sora2chest.widget,"控制",Vector3(120, -220, 0),function (inst,doer,ui,s,data)
+    if ui.sora2chestcontrol and ui.sora2chestcontrol.inst and not ui.sora2chestcontrol.inst.widget then
+        ui.sora2chestcontrol = nil
+    end
+    if not ui.sora2chestcontrol then
+        ui.sora2chestcontrol=s:AddChild(sora2chestcontrol())
+        ui.sora2chestcontrol:SetPosition(120,-400,0)
+        table.insert(data.tokill,ui.sora2chestcontrol)
+        return 
+    end
+    if ui.sora2chestcontrol.shown then
+        ui.sora2chestcontrol:Hide()
+    else
+        ui.sora2chestcontrol:Show()
+        ui.sora2chestcontrol:ShowTime()
+    end
+end)
+AddButton(params.sora_light.widget,"控制",Vector3(530, 10, 0),function (inst,doer,ui,s,data)
+    if ui.sora2chestcontrol and ui.sora2chestcontrol.inst and not ui.sora2chestcontrol.inst.widget then
+        ui.sora2chestcontrol = nil
+    end
+    if not ui.sora2chestcontrol then
+        ui.sora2chestcontrol=s:AddChild(sora2chestcontrol())
+        ui.sora2chestcontrol:SetPosition(680,10,0)
+        table.insert(data.tokill,ui.sora2chestcontrol)
+        return 
+    end
+    if ui.sora2chestcontrol.shown then
+        ui.sora2chestcontrol:Hide()
+    else
+        ui.sora2chestcontrol:Show()
+        ui.sora2chestcontrol:ShowTime()
+    end
+end)
 if needhelp then
     print("????")
     local old_widgetsetup = containers.widgetsetup

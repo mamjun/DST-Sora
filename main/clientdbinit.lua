@@ -101,6 +101,44 @@ temp.serverfn = function(ns, db, userid)
             ent.components.soracontainlock:TryPass(doer, data.pass or "000000")
         end
     end)
+
+
+    db:ListenForEvent("Sora2ChestControl", function(id, data,event,ent)
+        --print(id, data, event, ent)
+        if not (data and type(data) == "table" and data.cmd) then
+            return
+        end
+        local cmd = data.cmd    
+        local doer = UserToPlayer(id)
+        --print(doer.userid,cmd,data.pass or "0")
+        if not (doer) then
+            return
+        end    
+        if cmd == "Collect" and ent and type(ent) == "table" and ent.components and ent.components.container  then
+            if not doer.sora2chestcd then
+                doer.sora2chestcd = SoraCD(1)
+            end
+            if not doer.sora2chestcd() then return end
+
+            if TheWorld.components.sorachestmanager:IsStop() then
+                TheWorld.components.sorachestmanager:GetStopTime(doer)
+                return
+            end
+            TheWorld.components.sorachestmanager:OnClose(ent, doer)
+            return 
+        end
+        if cmd == "UnPause" then
+            TheWorld.components.sorachestmanager:Pause(false)
+        elseif cmd == "Pause" then
+            TheWorld.components.sorachestmanager:Pause(true)
+        elseif cmd == "PauseDay" then
+            TheWorld.components.sorachestmanager:SetStopTime(TUNING.TOTAL_DAY_TIME)
+        elseif cmd == "PauseTenDays" then
+            TheWorld.components.sorachestmanager:SetStopTime(TUNING.TOTAL_DAY_TIME * 10)
+        end
+        TheWorld.components.sorachestmanager:GetStopTime(doer)
+    end)
+
     db.inst = TheWorld
 
 end
