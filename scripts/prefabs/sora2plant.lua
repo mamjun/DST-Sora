@@ -92,7 +92,7 @@ end
 
 local function cd(inst, time)
     if inst and inst.components.rechargeable then
-        inst.components.rechargeable:Discharge(time or 5)
+        inst.components.rechargeable:Discharge(time or 2)
     end
 end
 
@@ -868,6 +868,11 @@ local SPELLS = {{
         inst.components.spellbook:SetSpellName("改变范围")
         if TheWorld.ismastersim then
             inst.components.aoespell:SetSpellFn(OnRangeFn)
+            inst.seeds = nil
+            local doer = inst.components.inventoryitem:GetGrandOwner()
+            if doer then
+                Say(doer,  "种子模板已清空\n请选择功能")
+            end
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",
@@ -933,6 +938,7 @@ local function fn()
     inst.isbig = net_bool(inst.GUID, "sora2plant.isbig", "sora2plant.isbig")
     inst.MiniMapEntity:SetIcon("sora2plant.tex")
     inst:ListenForEvent("sora2plant.isbig", Setreticule)
+    inst:AddTag("soraveryquickcast")
     inst:AddComponent("spellbook")
     inst.components.spellbook:SetRadius(SPELLBOOK_RADIUS)
     inst.components.spellbook:SetFocusRadius(SPELLBOOK_FOCUS_RADIUS)

@@ -56,6 +56,22 @@ map['cutstone'] = 'rocks'
 map['papyrus'] = 'cutreeds'
 map['myth_coin_box'] = 'myth_coin'
 map['thulecite_pieces'] = 'thulecite'
+
+map['feather_crow'] = "feather"
+map['feather_robin'] = "feather"
+map['feather_robin_winter'] = "feather"
+map['feather_canary'] = "feather"
+
+map['killerbee'] = "bee"
+map['trunk_summer'] = "trunk_winter"
+
+
+map['blue_cap'] = "cap"
+map['moon_cap'] = "cap"
+map['red_cap'] = "cap"
+map['green_cap'] = "cap"
+
+
 for i=1,31 do
     map['trinket_'..tostring(i)] = 'trinket'
 end

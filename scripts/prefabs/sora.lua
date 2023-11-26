@@ -845,6 +845,8 @@ local master_postinit = function(inst)
     end
     inst:DoTaskInTime(0, applyupgrades)
     inst.ReFreshExpTask = inst:DoTaskInTime(5, ReFreshExp)
+    inst.components.combat.attackrange = 3
+    inst.components.combat.hitrange = 4
     inst.OnLoad = onload
     inst.OnNewSpawn = OnSoraSpawn
     local PushEvent = inst.PushEvent

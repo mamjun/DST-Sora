@@ -426,7 +426,45 @@ end)
 -- end
 -- end)
 -- end)
+local function  Fixsoraveryquick(inst,action,sg)
+    local sg = sg or "doshortaction" 
+    if inst and inst.actionhandlers and inst.actionhandlers[action] then
+        local old = inst.actionhandlers[action].deststate
+        inst.actionhandlers[action].deststate = function(inst, action,...)
+            if action and action.doer and action.doer:HasTag("sora") then
+                return sg 
+            end
+            if type(old) =="string" then
+                return old
+            end
+            return old(inst,action,...)
+        end
+    end
+end
 
+local function  Fixsoraveryquickcast(inst,action)
+    if inst and inst.actionhandlers and inst.actionhandlers[action] then
+        local old = inst.actionhandlers[action].deststate
+        inst.actionhandlers[action].deststate = function(inst, action,...)
+            if action and action.invobject and action.invobject:HasTag("soraveryquickcast") then
+                return "veryquickcastspell"
+            end
+            if type(old) =="string" then
+                return old
+            end
+            return old(inst,action,...)
+        end
+    end
+end
+
+local function FixSora(self)
+    Fixsoraveryquickcast(self,ACTIONS.CASTAOE)
+    Fixsoraveryquick(self,ACTIONS.BUILD)
+    Fixsoraveryquick(self,ACTIONS.HARVEST)
+    Fixsoraveryquick(self,ACTIONS.MURDER)
+    Fixsoraveryquick(self,ACTIONS.FEED)
+    Fixsoraveryquick(self,ACTIONS.EAT,"quickeat")
+end
 AddStategraphPostInit("wilson", function(self)
     if self.states.chop then
         ehook(self.states.chop, "onenter", function(inst)
@@ -443,6 +481,7 @@ AddStategraphPostInit("wilson", function(self)
             end
         end)
     end
+    FixSora(self)
 end)
 
 AddStategraphPostInit("wilson_client", function(self)
@@ -453,6 +492,7 @@ AddStategraphPostInit("wilson_client", function(self)
             end
         end)
     end
+    FixSora(self)
 end)
 
 local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol", function(inst, symbol, build, newsymbol)
