@@ -685,7 +685,7 @@ local function ResetChestData(inst, doer)
     end
 end
 local function OnOpen(inst, event)
-    SoraAPI.CheckChestValid(inst)
+    --SoraAPI.CheckChestValid(inst)
 end
 local function OnClose(inst, event)
     local doer = event and event.doer
@@ -700,7 +700,7 @@ local function OnClose(inst, event)
     if not inst.components.container then
         return
     end
-    SoraAPI.CheckChestValid(inst)
+    --SoraAPI.CheckChestValid(inst)
     local data = inst.sorachestdata
     GetItem(inst, data)
     if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") then

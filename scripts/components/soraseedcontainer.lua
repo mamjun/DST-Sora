@@ -163,6 +163,7 @@ function c:HandleGetSeeds(player, name)
             local getnum = 1
             if inst.components.stackable then
                 getnum = math.min(inst.components.stackable.maxsize, num)
+                getnum = math.min(40, num)
                 inst.components.stackable:SetStackSize(getnum)
             end
             db:Set("seeds", name, num - getnum)

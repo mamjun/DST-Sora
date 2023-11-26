@@ -60,7 +60,7 @@ local function SetSkin(inst, x, y)
 end
 
 local function Onisfullmoon(inst, var)
-    SoraAPI.CheckChestValid(inst)
+    --SoraAPI.CheckChestValid(inst)
     if var and inst and inst.components.container then
         local item = inst.components.container:GetItemInSlot(1)
         if not (item and item:IsValid()) then

@@ -52,16 +52,24 @@ AddSimPostInit(TryToFixAllRecipes)
 --         return Close(ss,...)
 --     end
 -- end)
-local function onowner(self, owner)
-    -- body
-    if not self.inst.replica.inventoryitem then
-        return
-    end
-    self.inst.replica.inventoryitem:SetOwner(owner)
-end
+-- local function onowner(self, owner)
+--     -- body
+--     if not self.inst.replica.inventoryitem then
+--         return
+--     end
+--     self.inst.replica.inventoryitem:SetOwner(owner)
+-- end
 
 AddComponentPostInit("inventoryitem", function(self, inst)
-    addsetter(self, "owner", onowner)
+    --addsetter(self, "owner", onowner)
+    inst:ListenForEvent("onremove",function (i)
+        if i.components.inventoryitem and i.components.inventoryitem.owner then
+            local owner = i.components.inventoryitem.owner
+            if owner.components.container and owner.components.container:GetItemSlot(i) then
+                owner.components.container:RemoveItem(owner,true)
+            end
+        end
+    end)
 end)
 
 if getsora("fixyzhou") then

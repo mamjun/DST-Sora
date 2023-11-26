@@ -463,6 +463,8 @@ local function FixSora(self)
     Fixsoraveryquick(self,ACTIONS.HARVEST)
     Fixsoraveryquick(self,ACTIONS.MURDER)
     Fixsoraveryquick(self,ACTIONS.FEED)
+    Fixsoraveryquick(self,ACTIONS.COOK)
+    Fixsoraveryquick(self,ACTIONS.PLANTSOIL)
     Fixsoraveryquick(self,ACTIONS.EAT,"quickeat")
 end
 AddStategraphPostInit("wilson", function(self)
