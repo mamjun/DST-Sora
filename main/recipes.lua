@@ -79,6 +79,7 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
         ings = ings[recmode]
     end
     for k, v in pairs(ings) do
+        local ing =( k == "san" and san) or k 
         table.insert(recings, Ingredient(k, v))
     end
     
@@ -353,6 +354,14 @@ Rec("sora2plant", "扶光", "又要迫害X了对吧", equip2, "sorabook", {{
     mole = 5,
     mandrake = 2
 }})
+
+AddInvImg("sora_pickhat", "inventoryimages/sora_pickhat", "sora_pickhat")
+Rec("sora_pickhat", "咸鱼咸鱼咸", "一群咸鱼罢了", equip2, "sora", {
+    strawhat = 1,
+    seeds = 5,
+    [san] = 50,
+})
+
 
 Rec("sora2sword", "奇妙法杖", "一个奇妙法杖！", equip2, "soraother", {{
     goldenshovel = 2,

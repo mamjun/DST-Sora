@@ -460,6 +460,28 @@ AddButton(params.sora_light.widget,"控制",Vector3(530, 10, 0),function (inst,d
         ui.sora2chestcontrol:ShowTime()
     end
 end)
+
+
+params.sora_pickhat = {
+    widget = {
+        slotpos = {},
+        bgatlas = "images/quagmire_recipebook.xml",
+        bgimage = "quagmire_recipe_menu_bg.tex",
+        pos = Vector3(100, 80, 0),
+
+    },
+    acceptsstacks = true,
+    type = "hand_inv"
+}
+for y = 2, 0, -1 do
+    for x = 0, 2 do
+        table.insert(params.sora_pickhat.widget.slotpos, Vector3(70 * x - 70 , 70 * y - 70, 0))
+    end
+end
+function params.sora_pickhat.widget:SoraOnOpenFn(inst)
+    self.bgimage:ScaleToSize(240, 240)
+end
+
 if needhelp then
     print("????")
     local old_widgetsetup = containers.widgetsetup

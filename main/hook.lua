@@ -441,6 +441,25 @@ local function  Fixsoraveryquick(inst,action,sg)
         end
     end
 end
+local function  Fixsoraquickeat(inst,action,sg)
+    local sg = sg or "doshortaction" 
+    if inst and inst.actionhandlers and inst.actionhandlers[action] then
+        local old = inst.actionhandlers[action].deststate
+        inst.actionhandlers[action].deststate = function(inst, action,...)
+            if action and action.doer and action.doer:HasTag("sora") then
+                if type(old) =="string" then
+                    return sg 
+                end
+                local oldsg = old(inst, action,...)
+                return (oldsg =="eat" and  sg ) or oldsg
+            end
+            if type(old) =="string" then
+                return old
+            end
+            return old(inst,action,...)
+        end
+    end
+end
 
 local function  Fixsoraveryquickcast(inst,action)
     if inst and inst.actionhandlers and inst.actionhandlers[action] then
@@ -465,7 +484,7 @@ local function FixSora(self)
     Fixsoraveryquick(self,ACTIONS.FEED)
     Fixsoraveryquick(self,ACTIONS.COOK)
     Fixsoraveryquick(self,ACTIONS.PLANTSOIL)
-    Fixsoraveryquick(self,ACTIONS.EAT,"quickeat")
+    Fixsoraquickeat(self,ACTIONS.EAT,"quickeat")
 end
 AddStategraphPostInit("wilson", function(self)
     if self.states.chop then

@@ -80,6 +80,7 @@ local function fn()
 
     inst:AddTag("plant")
     inst:AddTag("ghost")
+    inst:AddTag("sora_fl")
     inst.MiniMapEntity:SetIcon("sora_fl.tex")
 
     inst.AnimState:SetBank("sora_fl")

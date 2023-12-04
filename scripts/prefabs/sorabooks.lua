@@ -210,7 +210,8 @@ local changelist = {
     houndstooth = "stinger",
     -- 牛毛蜘蛛丝
     silk = "beefalowool",
-    beefalowool = "silk",
+    beefalowool = "beardhair",
+    beardhair = "silk",
     -- 蜘蛛腺 蚊子血囊
     spidergland = "mosquitosack",
     mosquitosack = "spidergland",

@@ -179,6 +179,7 @@ local function onequip(inst, owner)
             if owner.components.inventory  then owner.components.inventory :GiveItem(inst) end
             if  owner.components.talker then owner.components.talker:Say("这是Sora的背包") end
 			end)
+			return 
 	end
     owner.AnimState:OverrideSymbol("swap_body_backback", "sorabag", "swap_body")
 	--turnon(inst)

@@ -92,6 +92,7 @@ local function onequip(inst, owner)
             if owner.components.inventory  then owner.components.inventory :GiveItem(inst) end
             if  owner.components.talker then owner.components.talker:Say("这是Sora的蝴蝶结") end
 			end)
+            return 
 	end
     --owner.AnimState:OverrideSymbol("swap_body", "sorabowknot", "swap_body")
     --owner.AnimState:OverrideSymbol("swap_body", "sorabowknot", "swap_sorabowknot")
