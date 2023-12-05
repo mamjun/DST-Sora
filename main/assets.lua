@@ -118,3 +118,4 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     AddMinimapAtlas("images/inventoryimages/sora_wq.xml")
     --声音
     RemapSoundEvent( "dontstarve/characters/sora/hurt", "sora/characters/hurt" )
+

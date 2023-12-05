@@ -38,6 +38,7 @@ local com = Class(function(self, inst)
     self.dq = self.range * self.range
     self.birds = {} -- 这儿存放召唤出来的鸟
     self.nameuse = {0, 0, 0, 0, 0} -- 已经用掉的名字
+    self.picking = {}
 end)
 
 function com:HasWork()
@@ -49,11 +50,19 @@ local whitelist = {
     sapling = 1,
     spider = 1,
     butterfly = 1,
+    fireflies = 1,
     moonbutterfly = 1,
+    mole=1,
     bee = 1,
     killerbee = 1
 }
+local blacklist = {sora_pickhat =1}
 local function cancatch(inst)
+    
+    if blacklist[inst.prefab] then
+        return false
+    end
+
     if inst.components.inventoryitem then
         if inst.components.inventoryitem.cangoincontainer and inst.components.inventoryitem.canbepickedup then
             return true
@@ -67,9 +76,9 @@ local function cancatch(inst)
     end
 end
 function com:DoTask()
-    if (GetTime() - self.starttime) < 10 then
+    if (GetTime() - self.starttime) < 5 then
         return
-    end -- 开局10秒不捡
+    end -- 开局5秒不捡
     local pos = self.inst:GetPosition()
     local ents = TheSim:FindEntities(pos.x, 0, pos.z, self.range, nil,
         {"decorationitem", "FX", "player", "INLIMBO", "sora_fl"},
@@ -82,7 +91,7 @@ function com:DoTask()
         end
         for k, v in pairs(ents) do
             if v and not v.sorapickhatskip then
-                if v:IsValid() and cancatch(v) then
+                if not self.picking[v] and v:IsValid() and cancatch(v) then
                     if not self:TryToPick(v) then
                         break
                     end
@@ -101,6 +110,7 @@ function com:GetBirdCount() -- 获取鸟数量
     return i
 end
 local pickfn = {}
+local map = {grass = "cutgrass",sapling="twigs"}
 function com:TryToPick(item)
     if not item then
         return true
@@ -113,12 +123,13 @@ function com:TryToPick(item)
     end -- 你怎么进来的 滚
     if self.inst.components.container:IsFull() then
         local is = self.inst.components.container:FindItems(function(i)
-            return i.prefab == item.prefab and i.components.stackable and not i.components.stackable:IsFull()
+            return (i.prefab == item.prefab or i.prefab == map[item.prefab])and i.components.stackable and not i.components.stackable:IsFull()
         end)
         if not next(is) then
             return true
         end -- 箱子满了 别捡了
     end
+    self.picking[item] = 1
     self.inst.fx:PushEvent("soratowork")
     local bird = SpawnPrefab("sora_fx_bird")
     bird:pick(item, self.inst)
@@ -126,7 +137,7 @@ function com:TryToPick(item)
     local ind = math.random(5)
     local count = 0
     while true do -- 避免名字重复出现
-        if self.nameuse[ind] < 1 or count < 50 then
+        if self.nameuse[ind] < 0.5 or count > 50 then
             break
         end
         ind = math.random(5)
@@ -144,6 +155,7 @@ function com:TryToPick(item)
     bird.unbind = function()
         self.birds[bird] = nil
         self.nameuse[ind] = self.nameuse[ind] - 1
+        self.picking[item] = nil
     end
 
     bird.pickitem = function(bird, hat, item)

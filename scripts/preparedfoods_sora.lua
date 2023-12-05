@@ -282,7 +282,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         test = function(cooker, names, tags)
             return names.honey and names.honey > 1 and tags.veggie and tags.veggie > 1 and not tags.fruit and
                        not tags.inedible and not tags.frozen and not tags.egg and
-                       (names.pimpkin or names.pimpkin_cooked)
+                       (names.pumpkin or names.pumpkin_cooked)
         end,
         priority = 900,
         foodtype = FOODTYPE.VEGGIE,
@@ -373,7 +373,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         perishtime = 6,
         sanity = 30,
         cooktime = 2,
-        temperature = 30,
+        temperature = 50,
         temperatureduration = 480,
         nochill = true,
         tags = {},

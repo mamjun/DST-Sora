@@ -481,7 +481,9 @@ end
 function params.sora_pickhat.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(240, 240)
 end
-
+params.sora_pickhat.itemtestfn = function()
+    return not SoraAPI.IsTradeIteming
+end
 if needhelp then
     print("????")
     local old_widgetsetup = containers.widgetsetup

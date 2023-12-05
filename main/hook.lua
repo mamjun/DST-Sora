@@ -1127,3 +1127,14 @@ ModManager.RegisterPrefabs = function(self)
     TheSim:LoadPrefabs({"MOD_SORASIGNOTHER"})
 	table.insert(self.loadedprefabs,"MOD_SORASIGNOTHER")
 end
+
+IsTradeIteming = false
+AddClassPostConstruct("widgets/invslot",function (self)
+    local old =  self.TradeItem
+    self.TradeItem = function(...)
+        IsTradeIteming = true
+        local x,y,z = old(...)
+        IsTradeIteming = false
+        return x,y,z
+    end
+end)
