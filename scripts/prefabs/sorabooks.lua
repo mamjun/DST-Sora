@@ -164,7 +164,8 @@ local changelist = {
     -- 采下的蘑菇
     red_cap = "green_cap",
     green_cap = "blue_cap",
-    blue_cap = "red_cap",
+    blue_cap = "moon_cap",
+    moon_cap="red_cap",
     -- 烤蘑菇
     red_cap_cooked = "green_cap_cooked",
     green_cap_cooked = "blue_cap_cooked",

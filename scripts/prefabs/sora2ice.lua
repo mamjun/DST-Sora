@@ -27,41 +27,42 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-require "prefabutil"
+]] require "prefabutil"
 
-local assets =
-{
-    Asset("ANIM", "anim/sora2ice.zip"),
-    Asset("ANIM", "anim/sorachest.zip"),
-	Asset("ATLAS", "images/inventoryimages/sora2ice.xml"),
-	Asset("IMAGE", "images/inventoryimages/sora2ice.tex"),
-	Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice.xml", 256),
-}
+local assets = {Asset("ANIM", "anim/sora2ice.zip"), Asset("ANIM", "anim/sorachest.zip"),
+                Asset("ATLAS", "images/inventoryimages/sora2ice.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2ice.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice.xml", 256),
+                Asset("ANIM", "anim/sora2ice_seed.zip"),
+                Asset("ATLAS", "images/inventoryimages/sora2ice_seed.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2ice_seed.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_seed.xml", 256),
+                Asset("ANIM", "anim/sora2ice_flower.zip"),
+                Asset("ATLAS", "images/inventoryimages/sora2ice_flower.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2ice_flower.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_flower.xml", 256)
+            }
 
-local prefabs =
-{
-    "collapse_small",
-}
+local prefabs = {"collapse_small"}
 -- local function onrefresh(inst)
-	-- if inst.components.container then
-			-- for i,j in pairs(inst.components.container.slots) do
-                -- if j and j.components.perishable then
-				-- j.components.perishable:SetPercent(1)
-                -- end
-            -- end
-	-- end
+-- if inst.components.container then
+-- for i,j in pairs(inst.components.container.slots) do
+-- if j and j.components.perishable then
+-- j.components.perishable:SetPercent(1)
+-- end
+-- end
+-- end
 -- end
 
 local function onopen(inst)
-    --inst.AnimState:PlayAnimation("open")
+    -- inst.AnimState:PlayAnimation("open")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
 
 local function onclose(inst)
-	--onrefresh(inst)
-    --inst.AnimState:PlayAnimation("close")
-	--inst.AnimState:PlayAnimation("closed")
+    -- onrefresh(inst)
+    -- inst.AnimState:PlayAnimation("close")
+    -- inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
 end
 
@@ -75,15 +76,15 @@ local function onhammered(inst, worker)
 end
 
 local function onhit(inst, worker)
-    --inst.AnimState:PlayAnimation("hit")
+    -- inst.AnimState:PlayAnimation("hit")
     inst.components.container:DropEverything()
-    --inst.AnimState:PushAnimation("closed", false)
+    -- inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()
 end
 
 local function onbuilt(inst)
-    --inst.AnimState:PlayAnimation("place")
-    --inst.AnimState:PlayAnimation("closed")
+    -- inst.AnimState:PlayAnimation("place")
+    -- inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_craft")
 end
 
@@ -97,7 +98,7 @@ local function fn()
     inst.entity:AddNetwork()
 
     inst.MiniMapEntity:SetIcon("sora2ice.tex")
-	--MakeObstaclePhysics(inst, .4)
+    -- MakeObstaclePhysics(inst, .4)
     inst:AddTag("fridge")
     inst:AddTag("structure")
     inst:AddTag("nosteal")
@@ -106,7 +107,7 @@ local function fn()
     inst.AnimState:PlayAnimation("idle")
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
-    --MakeSnowCoveredPristine(inst)
+    -- MakeSnowCoveredPristine(inst)
 
     inst.entity:SetPristine()
 
@@ -118,32 +119,49 @@ local function fn()
     end
 
     inst:AddComponent("inspectable")
-	inst.components.inspectable:SetDescription("它可以保护我们的食物")
+    inst.components.inspectable:SetDescription("它可以保护我们的食物")
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sorafire")
     inst.components.container.onopenfn = onopen
     inst.components.container.onclosefn = onclose
     inst:AddComponent("preserver")
     inst.components.preserver:SetPerishRateMultiplier(-500000)
-	--inst:DoPeriodicTask(30,onrefresh)
-	
+    -- inst:DoPeriodicTask(30,onrefresh)
+
     inst:AddComponent("lootdropper")
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(2)
     inst.components.workable:SetOnFinishCallback(onhammered)
-    inst.components.workable:SetOnWorkCallback(onhit) 
+    inst.components.workable:SetOnWorkCallback(onhit)
 
     inst:ListenForEvent("onbuilt", onbuilt)
     MakeSnowCovered(inst)
 
     AddHauntableDropItemOrWork(inst)
-	-- if TUNING.SMART_SIGN_DRAW_ENABLE then
-	-- 	SMART_SIGN_DRAW(inst)
-	-- end
-	
+    -- if TUNING.SMART_SIGN_DRAW_ENABLE then
+    -- 	SMART_SIGN_DRAW(inst)
+    -- end
+
     return inst
 end
+for k, v in pairs({"flower", "seed"}) do
+    local tname = "sora2ice_".. v
+    SoraAPI.MakeItemSkin("sora2ice",tname, {
+        
+        name = "妙蛙".. (v=="seed" and "种子" or "花"),
+        atlas = "images/inventoryimages/" .. tname .. ".xml",
+        image = tname,
+        build = tname,
+        bank = tname,
+        basebuild = "sora2ice",
+        basebank =  "sora2ice",
+        init_fn = function(inst)
+        end,
 
-return Prefab("sora2ice", fn, assets, prefabs),
-    MakePlacer("sora2ice_placer", "sora2ice", "sora2ice", "idle")
+        checkfn = SoraAPI.SoraSkinCheckFn,
+        checkclientfn = SoraAPI.SoraSkinCheckClientFn
+    })
+end
+
+return Prefab("sora2ice", fn, assets, prefabs), MakePlacer("sora2ice_placer", "sora2ice", "sora2ice", "idle")

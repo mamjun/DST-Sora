@@ -31,6 +31,12 @@ WeGame平台: 穹の空 模组ID：workshop-1199017653598519351
                    Asset("IMAGE", "images/inventoryimages/sora_pickhat.tex"), Asset("ANIM", "anim/crow.zip"),
                    Asset("ANIM", "anim/kitcoon_basic.zip"), Asset("ANIM", "anim/kitcoon_emotes.zip"),
                    Asset("ANIM", "anim/kitcoon_traits.zip"), Asset("ANIM", "anim/kitcoon_jump.zip")}
+local function OnOpen(inst)
+    inst.components.fueled:StartConsuming()
+end
+local function OnClose(inst)
+    inst.components.fueled:StopConsuming()
+end
 local function turnoff(inst, owner)
     if inst.components.container ~= nil and not inst.notdrop then
         inst.components.container:Close(owner)
@@ -44,7 +50,7 @@ local function turnoff(inst, owner)
         end
     end
     inst.components.container.canbeopened = false
-    inst.components.fueled:StopConsuming()
+    -- inst.components.fueled:StopConsuming()
     inst.components.sorapickhat:TurnOff()
 end
 local function turnon(inst, owner)
@@ -52,7 +58,7 @@ local function turnon(inst, owner)
         turnoff(inst, owner)
         return
     end
-    inst.components.fueled:StartConsuming()
+    -- inst.components.fueled:StartConsuming()
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
     end
@@ -81,7 +87,7 @@ local function ReFx(inst, owner, build)
         inst.fx:bind(owner, inst)
     end
 end
-local function onplayerdespawn(inst)    --玩家移除
+local function onplayerdespawn(inst) -- 玩家移除
     local hat = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
     if hat and hat.prefab == "sora_pickhat" then
         hat.notdrop = true
@@ -95,7 +101,7 @@ local function onequip(inst, owner)
     end
     turnon(inst, owner)
     ReFx(inst, owner, true)
-    inst:ListenForEvent("player_despawn",onplayerdespawn,owner)
+    inst:ListenForEvent("player_despawn", onplayerdespawn, owner)
     -- owner.AnimState:OverrideSymbol("swap_hat", GetInventoryItemAtlas("fish.tex"),"fish.tex")
     owner.AnimState:Show("HAT")
     owner.AnimState:Show("HAIR_HAT")
@@ -110,7 +116,7 @@ local function onunequip(inst, owner)
     end
     turnoff(inst, owner)
     ReFx(inst, owner, false)
-    inst:RemoveEventCallback("player_despawn",onplayerdespawn,owner)
+    inst:RemoveEventCallback("player_despawn", onplayerdespawn, owner)
     owner.AnimState:ClearOverrideSymbol("swap_hat")
     owner.AnimState:Hide("HAT")
     owner.AnimState:Hide("HAIR_HAT")
@@ -167,6 +173,8 @@ local function fn()
     inst:AddComponent('container')
     inst.components.container.canbeopened = false
     inst.components.container:WidgetSetup("sora_pickhat")
+    inst.components.container.onclosefn = OnClose
+    inst.components.container.onopenfn = OnOpen
     inst:AddComponent("sorapickhat")
     -- inst.components.container.onopenfn = onopen
     -- inst.components.container.onclosefn = onclose
@@ -203,7 +211,7 @@ local function fn()
     inst.fxprefab = allfxi[math.random(1, 9)]
     -- inst.AnimState:SetBuild(allfx[inst.fxprefab] .. "_build")
     inst:DoTaskInTime(0, function()
-       inst.AnimState:SetBuild(allfx[inst.fxprefab] .. "_build")
+        inst.AnimState:SetBuild(allfx[inst.fxprefab] .. "_build")
     end)
     return inst
 end
@@ -264,17 +272,17 @@ for k, v in pairs({
 end
 local function pick(inst, item, hat)
     -- body
-    
-    inst:ListenForEvent("onremove",function ()
+
+    inst:ListenForEvent("onremove", function()
         if inst.unbind then
-            inst:unbind(hat) 
+            inst:unbind(hat)
             inst.unbind = nil
         end
-    end) 
+    end)
     local pos = item:GetPosition()
     inst.Physics:Teleport(pos.x, 25, pos.z)
     local speed = math.random() * 10 - 20
-    inst.Physics:SetMotorVel(0,speed , 0)
+    inst.Physics:SetMotorVel(0, speed, 0)
     inst:StartThread(function()
         while true do
             local p = inst:GetPosition()
@@ -285,7 +293,7 @@ local function pick(inst, item, hat)
                 inst.AnimState:PushAnimation("peck")
                 Sleep(1.2)
                 if inst.pickitem and hat then
-                    if item:IsValid() and not item:IsInLimbo()  then
+                    if item:IsValid() and not item:IsInLimbo() then
                         inst:pickitem(hat, item)
                     end
                 end
@@ -302,7 +310,7 @@ local function pick(inst, item, hat)
                 break
             elseif item:IsValid() and not item:IsInLimbo() then
                 local ip = item:GetPosition()
-                inst.Physics:SetMotorVel((ip.x-p.x)*10,speed , (ip.z-p.z)*10)
+                inst.Physics:SetMotorVel((ip.x - p.x) * 10, speed, (ip.z - p.z) * 10)
             end
             Sleep(0.01)
         end
@@ -336,7 +344,7 @@ local function MakeBirds()
         inst.AnimState:SetBank("crow")
         inst.AnimState:SetBuild("crow_build")
         inst.AnimState:PlayAnimation("glide", true)
-        
+
         inst.entity:AddPhysics()
         inst.Physics:SetCollisionGroup(COLLISION.CHARACTERS)
         inst.Physics:ClearCollisionMask()

@@ -1138,3 +1138,9 @@ AddClassPostConstruct("widgets/invslot",function (self)
         return x,y,z
     end
 end)
+local function onpick(inst,data)
+    inst.sorapickhatskip = GetTime()
+end 
+AddComponentPostInit("inventoryitem", function(self)
+    self.inst:ListenForEvent("ondropped",onpick)
+end)

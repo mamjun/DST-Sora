@@ -43,7 +43,7 @@ end)
 
 function com:HasWork()
     local t = GetTime()
-    return (t - self.lastwork > 30)
+    return (t - self.lastwork < 30)
 end
 local whitelist = {
     grass = 1,
@@ -79,6 +79,10 @@ function com:DoTask()
     if (GetTime() - self.starttime) < 5 then
         return
     end -- 开局5秒不捡
+    if not (self.inst.components.container and self.inst.components.container:IsOpen()) then
+        return 
+    end
+    local t = GetTime()
     local pos = self.inst:GetPosition()
     local ents = TheSim:FindEntities(pos.x, 0, pos.z, self.range, nil,
         {"decorationitem", "FX", "player", "INLIMBO", "sora_fl"},
@@ -90,7 +94,7 @@ function com:DoTask()
             return -- 睡着了 等会吧 
         end
         for k, v in pairs(ents) do
-            if v and not v.sorapickhatskip then
+            if v and not (v.sorapickhatskip and (t-v.sorapickhatskip ) < 120 ) then
                 if not self.picking[v] and v:IsValid() and cancatch(v) then
                     if not self:TryToPick(v) then
                         break
@@ -118,7 +122,8 @@ function com:TryToPick(item)
     if self:GetBirdCount() >= self.maxbird then
         return true
     end -- 没鸟了！
-    if item.sorapickhatskip then
+    local t = GetTime()
+    if item.sorapickhatskip and (t-item.sorapickhatskip ) < 120 then
         return true
     end -- 你怎么进来的 滚
     if self.inst.components.container:IsFull() then
@@ -147,7 +152,7 @@ function com:TryToPick(item)
     bird.ind = ind
     self.nameuse[ind] = self.nameuse[ind] + 1
     if item.components.inventoryitem then
-        item.sorapickhatskip = true
+        item.sorapickhatskip = t
         item:DoTaskInTime(120, function()
             item.sorapickhatskip = nil
         end)
