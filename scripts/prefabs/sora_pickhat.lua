@@ -344,7 +344,7 @@ local function MakeBirds()
         inst.AnimState:SetBank("crow")
         inst.AnimState:SetBuild("crow_build")
         inst.AnimState:PlayAnimation("glide", true)
-
+        inst.entity:AddNetwork()
         inst.entity:AddPhysics()
         inst.Physics:SetCollisionGroup(COLLISION.CHARACTERS)
         inst.Physics:ClearCollisionMask()
