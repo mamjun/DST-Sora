@@ -286,7 +286,7 @@ local function pick(inst, item, hat)
     inst:StartThread(function()
         while true do
             local p = inst:GetPosition()
-            if p.y < 0.1 then
+            if p.y < 0.1  or inst:IsAsleep() then
                 inst.Physics:Stop()
                 inst.Physics:Teleport(p.x, 0, p.z)
                 inst.AnimState:PlayAnimation("peck")
@@ -317,7 +317,7 @@ local function pick(inst, item, hat)
         while true do
             local p = inst:GetPosition()
             inst.components.inventory:DropEverything()
-            if p.y > 25 then
+            if p.y > 25   or inst:IsAsleep() then
                 if inst.unbind and hat then
                     inst:unbind(hat)
                     inst.unbind = nil

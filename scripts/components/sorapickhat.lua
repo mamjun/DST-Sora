@@ -32,6 +32,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local com = Class(function(self, inst)
     self.inst = inst
     self.lastwork = -300
+    self.lasteat = -300
     self.starttime = 0
     self.maxbird = 3 -- 最大三只鸟同时工作
     self.range = 15 -- 捡取半径
@@ -52,13 +53,15 @@ local whitelist = {
     butterfly = 1,
     fireflies = 1,
     moonbutterfly = 1,
-    mole=1,
+    mole = 1,
     bee = 1,
     killerbee = 1
 }
-local blacklist = {sora_pickhat =1}
+local blacklist = {
+    sora_pickhat = 1
+}
 local function cancatch(inst)
-    
+
     if blacklist[inst.prefab] then
         return false
     end
@@ -75,26 +78,64 @@ local function cancatch(inst)
         return true
     end
 end
+local fishes = {
+    oceanfish_small_8_inv = 1,
+    oceanfish_medium_8_inv = 1,
+    oceanfish_medium_6_inv = 1,
+    oceanfish_medium_7_inv = 1,
+    oceanfish_small_7_inv = 1,
+    oceanfish_small_6_inv = 1
+}
 function com:DoTask()
-    if (GetTime() - self.starttime) < 5 then
+    local t = GetTime()
+    if (t - self.starttime) < 5 then
         return
     end -- 开局5秒不捡
     if not (self.inst.components.container and self.inst.components.container:IsOpen()) then
-        return 
+        return
     end
-    local t = GetTime()
+
+    if math.random() < 0.02 and (t - self.lasteat) > 180 and self.inst.components.fueled:GetPercent() < 0.5 then
+        if not (self.inst.fx and self.inst.fx.sg and not self.inst.fx.sg:HasStateTag("busy") and
+            self.inst.fx.components.sleeper and not self.inst.fx.components.sleeper.isasleep) then
+            return -- 睡着了 等会吧 
+        end
+        if self.inst.owner then
+            local item = self.inst.owner.components.inventory:FindItem(function(inst)
+                return inst:HasTag("catfood")
+            end)
+            if item then
+                local per = 0.2
+                if fishes[item.prefab] then
+                    per = 1
+                end
+                per = per + self.inst.components.fueled:GetPercent()
+                per = math.min(per, 1)
+                local it = self.inst.owner.components.inventory:RemoveItem(item, false,true)
+                if it then
+                    self.inst.components.fueled:SetPercent(per)
+                    self.inst.fx:PushEvent("soratoeat")
+                    self.lasteat = t
+                    self.starttime = t - 2
+                    return
+                end
+            end
+        end
+    end
+
     local pos = self.inst:GetPosition()
     local ents = TheSim:FindEntities(pos.x, 0, pos.z, self.range, nil,
-        {"decorationitem", "FX", "player", "INLIMBO", "sora_fl"},
-        {"_inventoryitem", "pickable", "oceanfishable"})
+        {"decorationitem", "FX", "player", "INLIMBO", "sora_fl"}, {"_inventoryitem", "pickable", "oceanfishable"})
+
     if next(ents) then
         self.lastwork = GetTime() -- 来活了 别睡了
         if not (self.inst.fx and self.inst.fx.sg and not self.inst.fx.sg:HasStateTag("busy") and
             self.inst.fx.components.sleeper and not self.inst.fx.components.sleeper.isasleep) then
             return -- 睡着了 等会吧 
         end
+
         for k, v in pairs(ents) do
-            if v and not (v.sorapickhatskip and (t-v.sorapickhatskip ) < 120 ) then
+            if v and not (v.sorapickhatskip and (t - v.sorapickhatskip) < 120) then
                 if not self.picking[v] and v:IsValid() and cancatch(v) then
                     if not self:TryToPick(v) then
                         break
@@ -114,7 +155,10 @@ function com:GetBirdCount() -- 获取鸟数量
     return i
 end
 local pickfn = {}
-local map = {grass = "cutgrass",sapling="twigs"}
+local map = {
+    grass = "cutgrass",
+    sapling = "twigs"
+}
 function com:TryToPick(item)
     if not item then
         return true
@@ -123,12 +167,13 @@ function com:TryToPick(item)
         return true
     end -- 没鸟了！
     local t = GetTime()
-    if item.sorapickhatskip and (t-item.sorapickhatskip ) < 120 then
+    if item.sorapickhatskip and (t - item.sorapickhatskip) < 120 then
         return true
     end -- 你怎么进来的 滚
     if self.inst.components.container:IsFull() then
         local is = self.inst.components.container:FindItems(function(i)
-            return (i.prefab == item.prefab or i.prefab == map[item.prefab])and i.components.stackable and not i.components.stackable:IsFull()
+            return (i.prefab == item.prefab or i.prefab == map[item.prefab]) and i.components.stackable and
+                       not i.components.stackable:IsFull()
         end)
         if not next(is) then
             return true
@@ -170,7 +215,7 @@ function com:TryToPick(item)
 
             elseif item.components.pickable then
                 item.components.pickable:Pick(bird)
-            elseif item.components.oceanfishable and Prefabs[item.prefab.."_inv"] then
+            elseif item.components.oceanfishable and Prefabs[item.prefab .. "_inv"] then
                 if item.components.weighable then
                     item.components.weighable:SetPlayerAsOwner(hat.owner)
                 end
@@ -178,7 +223,25 @@ function com:TryToPick(item)
                 local fish = SpawnPrefab(item.prefab .. "_inv")
                 local pos = hat:GetPosition()
                 fish.Transform:SetPosition(pos.x, pos.y, pos.z)
-                fish.components.inventoryitem:SetLanded(true, false)
+                -- fish.components.inventoryitem:SetLanded(true, false)
+                if fish.flop_task then
+                    fish.flop_task:Cancel()
+                end
+                if item.components.oceanfishable ~= nil and fish.components.weighable ~= nil then
+                    fish.components.weighable:CopyWeighable(item.components.weighable)
+                    item.components.weighable:SetPlayerAsOwner(nil)
+                end
+                item:Remove()
+                bird.components.inventory:GiveItem(fish, nil, item:GetPosition())
+            elseif item.components.oceanfishable and Prefabs[item.prefab .. "_land"] then
+                if item.components.weighable then
+                    item.components.weighable:SetPlayerAsOwner(hat.owner)
+                end
+
+                local fish = SpawnPrefab(item.prefab .. "_land")
+                local pos = hat:GetPosition()
+                fish.Transform:SetPosition(pos.x, pos.y, pos.z)
+                -- fish.components.inventoryitem:SetLanded(true, false)
                 if fish.flop_task then
                     fish.flop_task:Cancel()
                 end

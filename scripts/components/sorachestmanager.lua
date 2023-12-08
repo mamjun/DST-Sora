@@ -50,26 +50,26 @@ local allchest = {}
 
 local map = {}
 map['antliontrinket'] = 'trinket'
-map['boards'] = 'log'
-map['rope'] = 'cutgrass'
-map['cutstone'] = 'rocks'
-map['papyrus'] = 'cutreeds'
+-- map['boards'] = 'log'
+-- map['rope'] = 'cutgrass'
+-- map['cutstone'] = 'rocks'
+-- map['papyrus'] = 'cutreeds'
 map['myth_coin_box'] = 'myth_coin'
 map['thulecite_pieces'] = 'thulecite'
 
-map['feather_crow'] = "feather"
-map['feather_robin'] = "feather"
-map['feather_robin_winter'] = "feather"
-map['feather_canary'] = "feather"
+-- map['feather_crow'] = "feather"
+-- map['feather_robin'] = "feather"
+-- map['feather_robin_winter'] = "feather"
+-- map['feather_canary'] = "feather"
 
 map['killerbee'] = "bee"
 map['trunk_summer'] = "trunk_winter"
 
 
-map['blue_cap'] = "cap"
-map['moon_cap'] = "cap"
-map['red_cap'] = "cap"
-map['green_cap'] = "cap"
+-- map['blue_cap'] = "cap"
+-- map['moon_cap'] = "cap"
+-- map['red_cap'] = "cap"
+-- map['green_cap'] = "cap"
 
 
 for i=1,31 do
@@ -777,6 +777,19 @@ function com:GetStopTime(doer)
     end
     return tosay
 end
+
+function com:GetBuilderChest(doer)
+    local chests = {}
+    for type,v in pairs(allchest) do
+        for chest,v in pairs(allchest[type]) do
+            if chest and chest:IsValid() and  (TUNING.SORACHESTRANGE >2000 or chest:GetDistanceSqToInst(doer)  <(TUNING.SORACHESTRANGE *TUNING.SORACHESTRANGE ) ) then
+                table.insert(chests,chest)
+            end
+        end
+    end
+    return chests
+end
+
 function com:RegType(type, data)
     data.controls = data.controls or {}
     data.containers = data.containers or {}
@@ -808,6 +821,7 @@ function com:RegByType(chest, type)
         chest:ListenForEvent("onclose", OnClose)
         chest:ListenForEvent("onremove", OnChestRemove)
         chest:ListenForEvent("worked", HitProtect)
+        chest:AddTag("sorasmartchest")
     end
 end
 function com:UnReg(chest)
@@ -818,6 +832,7 @@ function com:UnReg(chest)
         updatechests[chest] = nil
         chest.sorachestdata = nil
         allchest[chest.sorachesttype][chest] = nil
+        chest:RemoveTag("sorasmartchest")
     end
 end
 

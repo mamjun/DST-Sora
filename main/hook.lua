@@ -312,12 +312,14 @@ end)
 
 AddLaterFn(function()
     local old = up.Get(EntityScript.CollectActions, 'COMPONENT_ACTIONS', "componentactions.lua")
-    if not old then return end
+    if not old then
+        return
+    end
     if old.SCENE and old.INVENTORY then
         local oldSCENEfn = old.SCENE.prototyper
         if oldSCENEfn then
             old.SCENE.prototyper = function(inst, doer, ...)
-             if inst and inst:HasTag("sora_light") then
+                if inst and inst:HasTag("sora_light") then
                     return
                 end
                 return oldSCENEfn(inst, doer, ...)
@@ -360,7 +362,6 @@ GLOBAL.SoraTags = {"fastbuilder", -- 修理工快速制作
 "masterchef", -- 大厨
 "professionalchef", -- 调味
 "expertchef", -- 做饭动作快点
-"swampwhisperer", -- 未知标签 但是不会吓跑颤栗花
 "soraflyer" -- 白云飞行术
 }
 
@@ -426,65 +427,85 @@ end)
 -- end
 -- end)
 -- end)
-local function  Fixsoraveryquick(inst,action,sg)
-    local sg = sg or "doshortaction" 
+local function Fixsoraveryquick(inst, action, sg)
+    local sg = sg or "doshortaction"
     if inst and inst.actionhandlers and inst.actionhandlers[action] then
         local old = inst.actionhandlers[action].deststate
-        inst.actionhandlers[action].deststate = function(inst, action,...)
+        inst.actionhandlers[action].deststate = function(inst, action, ...)
             if action and action.doer and action.doer:HasTag("sora") then
-                return sg 
+                return sg
             end
-            if type(old) =="string" then
+            if type(old) == "string" then
                 return old
             end
-            return old(inst,action,...)
+            return old(inst, action, ...)
         end
     end
 end
-local function  Fixsoraquickeat(inst,action,sg)
-    local sg = sg or "doshortaction" 
+local function Fixsoraquickeat(inst, action, sg)
+    local sg = sg or "doshortaction"
     if inst and inst.actionhandlers and inst.actionhandlers[action] then
         local old = inst.actionhandlers[action].deststate
-        inst.actionhandlers[action].deststate = function(inst, action,...)
+        inst.actionhandlers[action].deststate = function(inst, action, ...)
             if action and action.doer and action.doer:HasTag("sora") then
-                if type(old) =="string" then
-                    return sg 
+                if type(old) == "string" then
+                    return sg
                 end
-                local oldsg = old(inst, action,...)
-                return (oldsg =="eat" and  sg ) or oldsg
+                local oldsg = old(inst, action, ...)
+                return (oldsg == "eat" and sg) or oldsg
             end
-            if type(old) =="string" then
+            if type(old) == "string" then
                 return old
             end
-            return old(inst,action,...)
+            return old(inst, action, ...)
         end
     end
 end
 
-local function  Fixsoraveryquickcast(inst,action)
+local function Fixsoraveryquickcast(inst, action)
     if inst and inst.actionhandlers and inst.actionhandlers[action] then
         local old = inst.actionhandlers[action].deststate
-        inst.actionhandlers[action].deststate = function(inst, action,...)
+        inst.actionhandlers[action].deststate = function(inst, action, ...)
             if action and action.invobject and action.invobject:HasTag("soraveryquickcast") then
                 return "veryquickcastspell"
             end
-            if type(old) =="string" then
+            if type(old) == "string" then
                 return old
             end
-            return old(inst,action,...)
+            return old(inst, action, ...)
         end
     end
 end
-
+local function Fixsoraveryquickbuild(inst, action, sg)
+    local sg = sg or "doshortaction"
+    if inst and inst.actionhandlers and inst.actionhandlers[action] then
+        local old = inst.actionhandlers[action].deststate
+        inst.actionhandlers[action].deststate = function(inst, action, ...)
+            if action and action.doer and action.doer:HasTag("sora") then
+                if action.recipe and action.recipe == "myth_flyskill_sora_build_sora" then
+                    if type(old) == "string" then
+                        return old
+                    end
+                    return old(inst, action, ...)
+                end
+                return sg
+            end
+            if type(old) == "string" then
+                return old
+            end
+            return old(inst, action, ...)
+        end
+    end
+end
 local function FixSora(self)
-    Fixsoraveryquickcast(self,ACTIONS.CASTAOE)
-    Fixsoraveryquick(self,ACTIONS.BUILD)
-    Fixsoraveryquick(self,ACTIONS.HARVEST)
-    Fixsoraveryquick(self,ACTIONS.MURDER)
-    Fixsoraveryquick(self,ACTIONS.FEED)
-    Fixsoraveryquick(self,ACTIONS.COOK)
-    Fixsoraveryquick(self,ACTIONS.PLANTSOIL)
-    Fixsoraquickeat(self,ACTIONS.EAT,"quickeat")
+    Fixsoraveryquickcast(self, ACTIONS.CASTAOE)
+    Fixsoraveryquickbuild(self, ACTIONS.BUILD)
+    Fixsoraveryquick(self, ACTIONS.HARVEST)
+    Fixsoraveryquick(self, ACTIONS.MURDER)
+    Fixsoraveryquick(self, ACTIONS.FEED)
+    Fixsoraveryquick(self, ACTIONS.COOK)
+    Fixsoraveryquick(self, ACTIONS.PLANTSOIL)
+    Fixsoraquickeat(self, ACTIONS.EAT, "quickeat")
 end
 AddStategraphPostInit("wilson", function(self)
     if self.states.chop then
@@ -979,168 +1000,414 @@ end
 --     end
 -- end)
 
-
-AddComponentPostInit("freezable",function (self)
-    for k,v in pairs({"AddColdness","Freeze"}) do
+AddComponentPostInit("freezable", function(self)
+    for k, v in pairs({"AddColdness", "Freeze"}) do
         local old = self[v]
-        self[v] = function (s,...)
-            local inst = s.inst 
-            if inst and inst:HasTag("player") and inst.components.inventory and inst.components.inventory:HasItemWithTag("sora_unfreeze",1) then
-                return 
+        self[v] = function(s, ...)
+            local inst = s.inst
+            if inst and inst:HasTag("player") and inst.components.inventory and
+                inst.components.inventory:HasItemWithTag("sora_unfreeze", 1) then
+                return
             end
-            return old(s,...)
+            return old(s, ...)
         end
     end
 end)
 
-AddComponentPostInit("grogginess",function (self)
-    for k,v in pairs({"AddGrogginess","GoToSleep"}) do
+AddComponentPostInit("grogginess", function(self)
+    for k, v in pairs({"AddGrogginess", "GoToSleep"}) do
         local old = self[v]
-        self[v] = function (s,...)
-            local inst = s.inst 
-            if inst and inst:HasTag("player") and inst.components.inventory and inst.components.inventory:HasItemWithTag("sora_unsleep",1) then
-                return 
+        self[v] = function(s, ...)
+            local inst = s.inst
+            if inst and inst:HasTag("player") and inst.components.inventory and
+                inst.components.inventory:HasItemWithTag("sora_unsleep", 1) then
+                return
             end
-            return old(s,...)
+            return old(s, ...)
         end
     end
 end)
 
-AddStategraphPostInit("wilson",function (sg)
+AddStategraphPostInit("wilson", function(sg)
     if sg.events and sg.events['yawn'] then
-        local old = sg.events['yawn'].fn 
-        sg.events['yawn'].fn = function(inst,...)
-            if inst and inst:HasTag("player") and inst.components.inventory and inst.components.inventory:HasItemWithTag("sora_unsleep",1) then
+        local old = sg.events['yawn'].fn
+        sg.events['yawn'].fn = function(inst, ...)
+            if inst and inst:HasTag("player") and inst.components.inventory and
+                inst.components.inventory:HasItemWithTag("sora_unsleep", 1) then
                 return true
             end
-            return old(inst,...)
+            return old(inst, ...)
         end
     end
 end)
 
-AddComponentPostInit("playercontroller",function (self)
+AddComponentPostInit("playercontroller", function(self)
     self.remote_authority = false
 end)
---开扶光不关箱子！
-AddClassPostConstruct("screens/playerhud",function (self)
-    local oldOpenSpellWheel  = self.OpenSpellWheel 
-    if not oldOpenSpellWheel then return end
-    local oldCloseAllChestContainerWidgets = up.Get(oldOpenSpellWheel,"CloseAllChestContainerWidgets","playerhud")
-    if not oldCloseAllChestContainerWidgets then return end
-    local function CloseAllChestContainerWidgets(self,...)
-        if self.soraspellbook then return end
-        return oldCloseAllChestContainerWidgets(self,...)
+-- 开扶光不关箱子！
+AddClassPostConstruct("screens/playerhud", function(self)
+    local oldOpenSpellWheel = self.OpenSpellWheel
+    if not oldOpenSpellWheel then
+        return
     end
-    up.Set(oldOpenSpellWheel,"CloseAllChestContainerWidgets",CloseAllChestContainerWidgets,"playerhud")
-    self.OpenSpellWheel  = function(s,item,...)
+    local oldCloseAllChestContainerWidgets = up.Get(oldOpenSpellWheel, "CloseAllChestContainerWidgets", "playerhud")
+    if not oldCloseAllChestContainerWidgets then
+        return
+    end
+    local function CloseAllChestContainerWidgets(self, ...)
+        if self.soraspellbook then
+            return
+        end
+        return oldCloseAllChestContainerWidgets(self, ...)
+    end
+    up.Set(oldOpenSpellWheel, "CloseAllChestContainerWidgets", CloseAllChestContainerWidgets, "playerhud")
+    self.OpenSpellWheel = function(s, item, ...)
         if item and item:HasTag("soraspellbook") then
             s.soraspellbook = true
         else
             s.soraspellbook = nil
         end
-        return oldOpenSpellWheel(s,item,...)
+        return oldOpenSpellWheel(s, item, ...)
     end
 end)
 
-AddComponentPostInit("inventory",function(self) 
+AddComponentPostInit("inventory", function(self)
     local CloseAllChestContainers = self.CloseAllChestContainers
-    function self.CloseAllChestContainers(s,...)
-        if s:EquipHasTag("soraspellbook") then return end
-        return CloseAllChestContainers(s,...)
+    function self.CloseAllChestContainers(s, ...)
+        if s:EquipHasTag("soraspellbook") then
+            return
+        end
+        return CloseAllChestContainers(s, ...)
     end
 end)
 
-local oldRegisterPrefabs = ModManager.RegisterPrefabs 
+local oldRegisterPrefabs = ModManager.RegisterPrefabs
 
 ModManager.RegisterPrefabs = function(self)
-	oldRegisterPrefabs(self)
-	if TUNING.SMART_SIGN_DRAW_ENABLE then return end  --小木牌兼容
+    oldRegisterPrefabs(self)
+    if TUNING.SMART_SIGN_DRAW_ENABLE then
+        return
+    end -- 小木牌兼容
     enabledmods = ModManager.enabledmods
     local Assets = {}
-	for i,modname in ipairs(enabledmods) do
-		local mod = ModManager:GetMod(modname)
-		--检索 modmain里注册的资源
-		if mod.Assets then 
-			local modatlas = {}
-			local modatlas_build = {}
-			--检索所有的贴图
-			for k,v in ipairs (mod.Assets) do
-				if v.type == "ATLAS" then 
-					table.insert(modatlas,v.file)
-				elseif v.type == "ATLAS_BUILD" then 
-					table.insert(modatlas_build,v.file)
-				end
-			end
-			--判断是否有对应的ATLAS_BUILD
-			for k,v in ipairs(modatlas) do
-				local notfind = true
-				for x,y in ipairs(modatlas_build) do
-					if v == y then
-						notfind = false
-						break
-					end
-				end
-				if notfind then
-				--没有就插入
-				--因为注册的时候会自动搜索路径，所以自己注册的时候要还原回原来的路径
-				v = string.gsub(v,"%.%./mods/[^/]+/","",1)
-				table.insert(Assets,Asset("ATLAS_BUILD",v,256))
-				end
-			end
-		end
-		
-		--检索 prefabs 里注册的资源
-		if mod.Prefabs then
-			for n,prefab in pairs(mod.Prefabs) do
-				local modatlas = {}
-				local modatlas_build = {}
-				--检索所有的贴图
-				if prefab.assets then
-					for k,v in pairs (prefab.assets) do
-						if v.type == "ATLAS" then 
-							table.insert(modatlas,v.file)
-						elseif v.type == "ATLAS_BUILD" then 
-							table.insert(modatlas_build,v.file)
-						end
-					end
-				end
-				--判断是否有对应的ATLAS_BUILD
-				for k,v in ipairs(modatlas) do
-					local notfind = true
-					for x,y in ipairs(modatlas_build) do
-						if v == y then
-							notfind = false
-							break
-						end
-					end
-					if notfind then
-					--没有就插入
-					v = string.gsub(v,"%.%./mods/[^/]+/","",1)
-					table.insert(Assets,Asset("ATLAS_BUILD",v,256))
-					end
-				end
-			end
-		end
-	end
-	--注册资源
-	RegisterPrefabs(Prefab("MOD_SORASIGNOTHER",nil,Assets,nil,true))
+    for i, modname in ipairs(enabledmods) do
+        local mod = ModManager:GetMod(modname)
+        -- 检索 modmain里注册的资源
+        if mod.Assets then
+            local modatlas = {}
+            local modatlas_build = {}
+            -- 检索所有的贴图
+            for k, v in ipairs(mod.Assets) do
+                if v.type == "ATLAS" then
+                    table.insert(modatlas, v.file)
+                elseif v.type == "ATLAS_BUILD" then
+                    table.insert(modatlas_build, v.file)
+                end
+            end
+            -- 判断是否有对应的ATLAS_BUILD
+            for k, v in ipairs(modatlas) do
+                local notfind = true
+                for x, y in ipairs(modatlas_build) do
+                    if v == y then
+                        notfind = false
+                        break
+                    end
+                end
+                if notfind then
+                    -- 没有就插入
+                    -- 因为注册的时候会自动搜索路径，所以自己注册的时候要还原回原来的路径
+                    v = string.gsub(v, "%.%./mods/[^/]+/", "", 1)
+                    table.insert(Assets, Asset("ATLAS_BUILD", v, 256))
+                end
+            end
+        end
+
+        -- 检索 prefabs 里注册的资源
+        if mod.Prefabs then
+            for n, prefab in pairs(mod.Prefabs) do
+                local modatlas = {}
+                local modatlas_build = {}
+                -- 检索所有的贴图
+                if prefab.assets then
+                    for k, v in pairs(prefab.assets) do
+                        if v.type == "ATLAS" then
+                            table.insert(modatlas, v.file)
+                        elseif v.type == "ATLAS_BUILD" then
+                            table.insert(modatlas_build, v.file)
+                        end
+                    end
+                end
+                -- 判断是否有对应的ATLAS_BUILD
+                for k, v in ipairs(modatlas) do
+                    local notfind = true
+                    for x, y in ipairs(modatlas_build) do
+                        if v == y then
+                            notfind = false
+                            break
+                        end
+                    end
+                    if notfind then
+                        -- 没有就插入
+                        v = string.gsub(v, "%.%./mods/[^/]+/", "", 1)
+                        table.insert(Assets, Asset("ATLAS_BUILD", v, 256))
+                    end
+                end
+            end
+        end
+    end
+    -- 注册资源
+    RegisterPrefabs(Prefab("MOD_SORASIGNOTHER", nil, Assets, nil, true))
     TheSim:LoadPrefabs({"MOD_SORASIGNOTHER"})
-	table.insert(self.loadedprefabs,"MOD_SORASIGNOTHER")
+    table.insert(self.loadedprefabs, "MOD_SORASIGNOTHER")
 end
 
 IsTradeIteming = false
-AddClassPostConstruct("widgets/invslot",function (self)
-    local old =  self.TradeItem
+AddClassPostConstruct("widgets/invslot", function(self)
+    local old = self.TradeItem
     self.TradeItem = function(...)
         IsTradeIteming = true
-        local x,y,z = old(...)
+        local x, y, z = old(...)
         IsTradeIteming = false
-        return x,y,z
+        return x, y, z
     end
 end)
-local function onpick(inst,data)
+local function onpick(inst, data)
     inst.sorapickhatskip = GetTime()
-end 
+end
 AddComponentPostInit("inventoryitem", function(self)
-    self.inst:ListenForEvent("ondropped",onpick)
+    self.inst:ListenForEvent("ondropped", onpick)
+end)
+
+AddPrefabPostInit("player_classified", function(inst)
+    inst.soraglobalbuild = net_bool(inst.GUID, "soraglobalbuild", "ingredientmoddirty")
+    inst:DoPeriodicTask(0.5, function()
+        inst:PushEvent("ingredientmoddirty")
+    end)
+end)
+
+-- AddPlayerPostInit(function(inst)
+--     inst:DoTaskInTime(0, function(i)
+--         if i.replica and i.replica.builder then
+--             local oldIsFreeBuildMode = i.replica.builder.IsFreeBuildMode
+--             i.replica.builder.IsFreeBuildMode = function(self, ...)
+--                 if self.classified ~= nil then
+--                     return self.classified.soraglobalbuild:value()
+--                 end
+--                 return oldIsFreeBuildMode(self, ...)
+--             end
+--         end
+--     end)
+-- end)
+local function FindChest(doer, range)
+    return FindEntity(doer, range or 10, nil, {"sorasmartchest"})
+end
+local function invetoryhashook(self, fnname)
+    local old = self[fnname]
+    if old then
+        self[fnname] = function(s, ...)
+            local owner = s.owner
+            if owner and owner.replica and owner.replica.inventory and owner.replica.builder and owner.player_classified and
+                owner.player_classified.soraglobalbuild and owner.player_classified.soraglobalbuild:value() and
+                FindChest(owner) then
+                local oldhas = owner.replica.inventory.Has
+                owner.replica.inventory.Has = function(ss, ...)
+                    local a, b, c = oldhas(ss, ...)
+                    return true, b, c
+                end
+                local oldHasIngredients = owner.replica.builder.HasIngredients
+                owner.replica.builder.HasIngredients = function()
+                    return true
+                end
+                local x, y, z = old(s, ...)
+                owner.replica.inventory.Has = oldhas
+                owner.replica.builder.HasIngredients = oldHasIngredients
+                return x, y, z
+            else
+                return old(s, ...)
+            end
+
+        end
+    end
+end
+AddSimPostInit(function()
+    local oldDoRecipeClick = _G.DoRecipeClick
+    _G.DoRecipeClick = function(owner, recipe, skin, ...)
+        if owner and owner.replica and owner.replica.inventory and owner.replica.builder and owner.player_classified and
+            owner.player_classified.soraglobalbuild and owner.player_classified.soraglobalbuild:value() and
+            FindChest(owner) then
+            local oldhas = owner.replica.inventory.Has
+            owner.replica.inventory.Has = function(ss, ...)
+                local a, b, c = oldhas(ss, ...)
+                return true, b, c
+            end
+            local oldHasIngredients = owner.replica.builder.HasIngredients
+            owner.replica.builder.HasIngredients = function()
+                return true
+            end
+            local x, y, z = oldDoRecipeClick(owner, recipe, skin, ...)
+            owner.replica.inventory.Has = oldhas
+            owner.replica.builder.HasIngredients = oldHasIngredients
+            return x, y, z
+        else
+            return oldDoRecipeClick(owner, recipe, skin, ...)
+        end
+    end
+end)
+for k, v in pairs({
+    ["widgets/redux/craftingmenu_hud"] = "RebuildRecipes",
+    ["widgets/redux/craftingmenu_ingredients"] = "SetRecipe",
+    ["widgets/redux/craftingmenu_widget"] = "UpdateFilterButtons"
+}) do
+    AddClassPostConstruct(k, function(s)
+        invetoryhashook(s, v)
+    end)
+end
+AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(s)
+    s.owner:DoTaskInTime(0.1,function ()
+        local CanBuild = s.owner.replica.builder.CanBuild
+        local owner = s.owner
+        s.owner.replica.builder.CanBuild = function(sss, ...)
+            if owner and owner.replica and owner.replica.inventory and owner.replica.builder and owner.player_classified and
+                owner.player_classified.soraglobalbuild and owner.player_classified.soraglobalbuild:value() and
+                FindChest(owner) then
+                return true
+            end
+            return CanBuild(sss, ...)
+        end
+    end)
+end)
+AddComponentPostInit("builder", function(s)
+    local oldHasIngredients = s.HasIngredients
+    -- local oldRemoveIngredients = s.RemoveIngredients
+    s.HasIngredients = function(ss, rec, ...)
+        local inst = ss.inst
+        if inst:HasTag("player") and inst.player_classified and inst.player_classified.soraglobalbuild:value() and
+            FindChest(inst, 12) then
+            local oldhas = inst.components.inventory.Has
+            local chest = TheWorld.components.sorachestmanager:GetBuilderChest(inst)
+            inst.components.inventory.Has = function(sss, item, num, ...)
+                local x, y, z = oldhas(sss, item, num, ...)
+                if x then
+                    return x, y, z
+                end
+                local numneed = num - y
+                for k, v in pairs(chest) do
+                    local ss, yy, zz = v.components.container:Has(item, numneed, true)
+                    y = y + yy
+                    numneed = numneed - yy
+                    if ss then
+                        return true, y
+                    end
+                end
+                return false, y
+            end
+            local x, y, z = oldHasIngredients(ss, rec, ...)
+            inst.components.inventory.Has = oldhas
+            return x, y, z
+        else
+            return oldHasIngredients(ss, rec, ...)
+        end
+    end
+    local oldGetIngredients = s.GetIngredients
+    s.GetIngredients = function(ss, rec, ...)
+        local inst = ss.inst
+        if inst:HasTag("player") and inst.player_classified and inst.player_classified.soraglobalbuild:value() then
+            local oldGetCraftingIngredient = inst.components.inventory.GetCraftingIngredient
+            local chest = TheWorld.components.sorachestmanager:GetBuilderChest(inst)
+            inst.components.inventory.GetCraftingIngredient = function(sss, item, num, ...)
+                local finds = oldGetCraftingIngredient(sss, item, num, ...)
+                local need = num
+                for k, v in pairs(finds) do
+                    need = need - v
+                end
+                if need < 1 then
+                    return finds
+                end
+                for k, v in pairs(chest) do
+                    local findss = v.components.container:GetCraftingIngredient(item, need)
+                    for ik, iv in pairs(findss) do
+                        need = need - iv
+                        finds[ik] = iv
+                        if need < 1 then
+                            return finds
+                        end
+                    end
+                end
+                return finds
+            end
+            local x, y, z = oldGetIngredients(ss, rec, ...)
+            inst.components.inventory.GetCraftingIngredient = oldGetCraftingIngredient
+            return x, y, z
+        else
+            return oldGetIngredients(ss, rec, ...)
+        end
+    end
+    local oldMakeRecipe = s.MakeRecipe
+    s.MakeRecipe = function(ss, ...)
+        ss.soramakerecipe = true
+        return oldMakeRecipe(ss, ...)
+    end
+
+    local oldMakeRecipeFromMenu = s.MakeRecipeFromMenu
+    s.MakeRecipeFromMenu = function(ss, ...)
+        ss.soramakerecipe = false
+        local x, y, z = oldMakeRecipeFromMenu(ss, ...)
+        if not ss.soramakerecipe then
+            ss.inst.components.locomotor:Stop()
+            local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(), "sora_cantbuild",
+                0, nil, 0)
+            ss.inst.components.locomotor:PushAction(buffaction, true)
+            return true
+        end
+        return x, y, z
+    end
+
+    local oldBufferBuild = s.BufferBuild
+    s.BufferBuild = function(ss,rec,...)
+        local x,y,z = oldBufferBuild(ss,rec,...)
+        if not  ss.buffered_builds[rec]  then
+            ss.inst.components.locomotor:Stop()
+            local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(), "sora_cantbuild",
+                0, nil, 0)
+            ss.inst.components.locomotor:PushAction(buffaction, true)
+            return true
+        end
+        return   x,y,z
+    end
+    local oldMakeRecipeAtPoint = s.MakeRecipeAtPoint
+    s.MakeRecipeAtPoint = function(ss,rec,...)
+        ss.soramakerecipe = false
+        local x,y,z = oldMakeRecipeAtPoint(ss,rec,...)
+        if not ss:IsBuildBuffered(rec.name) and not ss.soramakerecipe then
+            ss.inst.components.locomotor:Stop()
+            local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(), "sora_cantbuild",
+                0, nil, 0)
+            ss.inst.components.locomotor:PushAction(buffaction, true)
+            return true
+        end
+        return x,y,z
+    end
+
+    -- s.RemoveIngredients = function(ss,rec,...)
+    --     local inst = ss.inst 
+    --     if inst:HasTag("player") and inst.player_classified and inst.player_classified.soraglobalbuild:value() then
+    --         local oldRemoveItem = inst.components.inventory.RemoveItem
+    --         local chest = TheWorld.components.sorachestmanager:GetBuilderChest(inst)
+    --         inst.components.inventory.RemoveItem  = function(sss,item,num,...)
+    --             local x,y,z = oldRemoveItem(sss,item,num,...)
+    --             if x then return x,y,z end
+
+    --             for k,v in pairs(chest)  do
+    --                 local ss,yy,zz = v.components.container:RemoveItem(item,numneed,true)
+    --                 if ss then return ss,yy,zz end
+    --             end
+    --             return 
+    --         end
+    --         local x,y,z = oldRemoveIngredients(ss,rec,...)
+    --         inst.components.inventory.RemoveItem = oldRemoveItem
+    --         return x,y,z
+    --     else
+    --         return  oldRemoveIngredients(ss,rec,...)
+    --     end
+    -- end
 end)

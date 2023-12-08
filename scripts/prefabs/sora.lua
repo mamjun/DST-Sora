@@ -277,6 +277,7 @@ local function applyupgrades(inst, nosay)
     if not inst.components.reader then
         inst:AddComponent("reader")
     end
+    inst:RemoveTag("scarytoprey")
 end
 local function ReFreshExp(inst)
     local per = soraconfig.level.expper(inst.soraexp:value())
@@ -654,6 +655,7 @@ local common_postinit = function(inst)
     inst:AddTag("sora")
     inst:AddTag("sorabuilder")
     inst:AddTag("cryo")
+    inst:RemoveTag("scarytoprey")
     if TheNet:GetServerGameMode() == "quagmire" then
         inst:AddTag("quagmire_cheapskate")
     end
@@ -765,8 +767,8 @@ local master_postinit = function(inst)
     inst.components.health.DoDelta = function(...)
         local oldclamp = math.clamp
         local args = {...}
-        if args[2] and args[2] >200 then    --致死伤害
-            args[2] = args[2] >20000 and  0  or 10 
+        if args[2] and args[2] <-200 then    --致死伤害
+            args[2] = args[2] <-20000 and  0  or -10 
         end
         math.clamp = function(v, min, max, ...)
             if v > 1 and min == 0 and max == 1 then

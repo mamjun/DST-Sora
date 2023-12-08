@@ -135,6 +135,13 @@ temp.serverfn = function(ns, db, userid)
             TheWorld.components.sorachestmanager:SetStopTime(TUNING.TOTAL_DAY_TIME)
         elseif cmd == "PauseTenDays" then
             TheWorld.components.sorachestmanager:SetStopTime(TUNING.TOTAL_DAY_TIME * 10)
+        elseif cmd == "GlobalBuild" then
+            if doer and doer.player_classified and doer.player_classified.soraglobalbuild then
+                local b = not doer.player_classified.soraglobalbuild:value()
+                doer.player_classified.soraglobalbuild:set(b)
+                Say(doer,b and "开启全局制作模式" or "关闭全局制作模式")
+            end
+            return
         end
         TheWorld.components.sorachestmanager:GetStopTime(doer)
     end)
