@@ -435,3 +435,65 @@ end)
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
 
+
+
+
+
+local SORATELEITEM = GLOBAL.Action({
+    priority = 999
+})
+SORATELEITEM.id = "SORATELEITEM"
+SORATELEITEM.str = "传送"
+SORATELEITEM.fn = function(act)
+    local invobject = act.invobject
+    if act.target ~= nil and act.doer ~= nil  and invobject then
+        invobject.components.sorateleitem:TryTele(act.doer,act.target)
+    end
+    return true
+end
+
+AddAction(SORATELEITEM)
+AddComponentAction("USEITEM", "sorateleitem", function(inst, doer, target, actions, right)
+    if right and inst and doer then
+        table.insert(actions, ACTIONS.SORATELEITEM)
+    end
+end)
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORATELEITEM, "doshortaction"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORATELEITEM, "doshortaction"))
+
+
+
+local SORA2POKEBALL = GLOBAL.Action({
+    priority = 999
+})
+SORA2POKEBALL.id = "SORA2POKEBALL"
+SORA2POKEBALL.stroverridefn = function(act)
+    return act.invobject:HasTag("sora2pokeball") and "你才到球里去" or "快到球里来"
+end
+SORA2POKEBALL.fn = function(act)
+    local invobject = act.invobject
+    local doer = act.doer
+    if doer and invobject then
+        if not invobject.components.sora2pokeball.userid  then 
+            invobject.components.sora2pokeball:Bind(doer.userid,doer.name)
+            Say(doer,"你才到球里去")
+            return true
+        end
+        local x,t = invobject.components.sora2pokeball:Tele(doer)
+        if not x then Say(doer,t) end
+    end
+    return true
+end
+
+AddAction(SORA2POKEBALL)
+AddComponentAction("INVENTORY", "sora2pokeball", function(inst, doer, actions, right)
+    if inst and doer and inst:HasTag("sorarecharge") then 
+        table.insert(actions, ACTIONS.SORA2POKEBALL)
+    end
+end)
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORA2POKEBALL, "doshortaction"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORA2POKEBALL, "doshortaction"))
+
+

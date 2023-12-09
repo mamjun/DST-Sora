@@ -65,10 +65,10 @@ map['thulecite_pieces'] = 'thulecite'
 map['killerbee'] = "bee"
 map['trunk_summer'] = "trunk_winter"
 
--- map['blue_cap'] = "cap"
--- map['moon_cap'] = "cap"
--- map['red_cap'] = "cap"
--- map['green_cap'] = "cap"
+map['blue_cap'] = "cap"
+map['moon_cap'] = "cap"
+map['red_cap'] = "cap"
+map['green_cap'] = "cap"
 
 for i = 1, 31 do
     map['trinket_' .. tostring(i)] = 'trinket'
@@ -868,9 +868,11 @@ function com:HasItem(doer, item, need)
         local items = self:GetItems(data[1], data[2])
         if (TUNING.SORACHESTRANGE > 2000 or
             (data[1]:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
+            local keepone = 1
             for _, it in pairs(items) do
                 if it.prefab == item and not it:HasTag("nocrafting") then
-                    find = find + (it.components.stackable and it.components.stackable.stacksize or 1)
+                    find = find + (it.components.stackable and it.components.stackable.stacksize or 1) - keepone
+                    keepone = 0
                     if find >= need then
                         return find >= need, find
                     end
@@ -889,17 +891,22 @@ function com:GetIngredients(doer, item, need)
         local items = self:GetItems(data[1], data[2])
         if (TUNING.SORACHESTRANGE > 2000 or
             (data[1]:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
+            local keepone = 1
             for _, it in pairs(items) do
                 if it.prefab == item and not it:HasTag("nocrafting") then
                     if it.components.stackable then 
                         local get = need - find
-                        get = math.min(it.components.stackable.stacksize,get)
+                        get = math.min(it.components.stackable.stacksize-keepone,get)
                         itemsfind[it] = get
                         find = find + get 
                     else
-                        itemsfind[it] = 1
-                        find = find +1 
+                        if keepone > 0  then 
+                        else
+                            itemsfind[it] = 1
+                            find = find +1
+                        end
                     end
+                    keepone = 0
                     if find >= need then
                         return itemsfind
                     end

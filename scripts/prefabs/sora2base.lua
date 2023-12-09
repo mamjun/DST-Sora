@@ -635,6 +635,7 @@ local function stonefn()
 	inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
 	inst:AddComponent("sorauseable")
 	inst.components.sorauseable:SetOnUseFn(onuse)
+	inst:AddComponent("sorateleitem")
     --inst.components.instrument:SetOnHeardFn(HearHorn)
     return inst
 end

@@ -1,3 +1,4 @@
+
 --[[
 授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
@@ -27,17 +28,66 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] GLOBAL.setmetatable(env, {
-    __index = function(t, k)
-        return GLOBAL.rawget(GLOBAL, k)
-    end
-})
+]] --[[专属交互
+]] --
+local com = Class(function(self, inst)
+    self.inst = inst
+    self.userid = nil
+    self.name = nil
+end)
 
-modimport("main/init")
--- prefab文件列表
-PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "sorahat", "sora2hat", "sora2bag",
-               "sora2sword", "sora3sword", "sora2ice", "sora2fire", "sora2plant", "soramagic", "sorapick",
-               "sorahealing", "soratele", "sorabowknot", "sorabooks", "sorahealingstar", "soraprojectile", "sorameteor",
-               "sora2buffer", "sora2prop", "sora2amulet", "sora2base", "sora2chest", "sora2tree", "sorafoods",
-               "sorahair", "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
-               "sora_nizao","sora_lock","sora_pickhat","sora2pokeball"}
+function com:Bind(userid,name)
+    self.userid = userid 
+    self.name = name 
+    self.inst:AddTag("sora2pokeball")
+    self.inst.components.named:SetName((name or "").."的精灵球")
+end
+function com:Tele(doer)
+   
+    if not self.userid  then 
+        return false,"这个精灵球还未绑定"
+    end
+    
+    local player = UserToPlayer(self.userid)
+    if not player then 
+        return false,"这个精灵球里的宝可梦不在家"
+    end
+    if player == doer then 
+        return false,"这是你自己的精灵球"
+    end
+    if not self.inst.components.rechargeable:IsCharged() then 
+        local t = math.floor(self.inst.components.rechargeable:GetTimeToCharge())
+        return false,"冷却中" .. t .. "S"
+    end
+    local pos = player:GetPosition()
+    if not TheWorld.Map:IsAboveGroundAtPoint(pos.x, 0, pos.z, false) then
+        return false, "目标地点不是陆地\n不支持传送"
+    end
+
+    doer.components.locomotor:Stop()
+    local pp = doer:GetPosition()
+    doer.Physics:Teleport(pos.x, pp.y, pos.z)
+    self.inst.components.rechargeable:Discharge(10)
+end
+
+
+function com:OnSave()
+    return {
+        {userid=self.userid,name=self.name}
+    }
+end
+
+function com:OnLoad(data)
+    if not data then
+        return
+    end
+    if data.userid then 
+        self:Bind(data.userid,data.name)
+    end
+end
+
+function com:GetDebugString()
+    return ""
+end
+
+return com

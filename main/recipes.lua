@@ -190,7 +190,11 @@ Rec("sorarepairer", "穹の缝纫包", "缝缝补补又三年", item, "sora", {{
     spider = 3,
     goldnugget = 3
 }}).numtogive = 4
-
+Rec("sora2pokeball", "穹の精灵球", "你才到球里去", item, "sora", {
+    goldnugget = 10,
+    telestaff = 1,
+    sora_flh = 1
+})
 Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
     goose_feather = 5,
     beefalowool = 6,
