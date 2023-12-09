@@ -764,11 +764,10 @@ local master_postinit = function(inst)
         return "cryo"
     end
     local oldhealthdodelta = inst.components.health.DoDelta
-    inst.components.health.DoDelta = function(...)
+    inst.components.health.DoDelta = function(self,num,...)
         local oldclamp = math.clamp
-        local args = {...}
-        if args[2] and args[2] <-200 then    --致死伤害
-            args[2] = args[2] <-20000 and  0  or -10 
+        if num and num <-200 then    --致死伤害
+            num = num <-20000 and  0  or -10 
         end
         math.clamp = function(v, min, max, ...)
             if v > 1 and min == 0 and max == 1 then
@@ -776,7 +775,7 @@ local master_postinit = function(inst)
             end
             return oldclamp(v, min, max, ...)
         end
-        oldhealthdodelta(...)
+        oldhealthdodelta(self,num,...)
         math.clamp = oldclamp
     end
     -- 走路速度

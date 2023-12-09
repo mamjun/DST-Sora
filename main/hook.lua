@@ -1177,38 +1177,27 @@ end
 AddComponentPostInit("inventoryitem", function(self)
     self.inst:ListenForEvent("ondropped", onpick)
 end)
-
-AddPrefabPostInit("player_classified", function(inst)
-    inst.soraglobalbuild = net_bool(inst.GUID, "soraglobalbuild", "ingredientmoddirty")
-    inst:DoPeriodicTask(0.5, function()
-        inst:PushEvent("ingredientmoddirty")
-    end)
-end)
-
--- AddPlayerPostInit(function(inst)
---     inst:DoTaskInTime(0, function(i)
---         if i.replica and i.replica.builder then
---             local oldIsFreeBuildMode = i.replica.builder.IsFreeBuildMode
---             i.replica.builder.IsFreeBuildMode = function(self, ...)
---                 if self.classified ~= nil then
---                     return self.classified.soraglobalbuild:value()
---                 end
---                 return oldIsFreeBuildMode(self, ...)
---             end
---         end
---     end)
--- end)
 local function FindChest(doer, range)
     return FindEntity(doer, range or 10, nil, {"sorasmartchest"})
 end
+AddPrefabPostInit("player_classified", function(inst)
+    inst.soraglobalbuild = net_bool(inst.GUID, "soraglobalbuild", "ingredientmoddirty")
+    inst.soraglobalbuildenable =  false
+    inst:DoPeriodicTask(1, function()
+        local chest =  inst.soraglobalbuild:value()  and FindEntity(inst, 10, nil, {"sorasmartchest"})  and true or false
+        if chest ~= inst.soraglobalbuildenable then 
+            inst.soraglobalbuildenable = chest 
+            inst:PushEvent("ingredientmoddirty")
+        end
+    end)
+end)
+
 local function invetoryhashook(self, fnname)
     local old = self[fnname]
     if old then
         self[fnname] = function(s, ...)
             local owner = s.owner
-            if owner and owner.replica and owner.replica.inventory and owner.replica.builder and owner.player_classified and
-                owner.player_classified.soraglobalbuild and owner.player_classified.soraglobalbuild:value() and
-                FindChest(owner) then
+            if owner and  owner.player_classified and owner.player_classified.soraglobalbuildenable then
                 local oldhas = owner.replica.inventory.Has
                 owner.replica.inventory.Has = function(ss, ...)
                     local a, b, c = oldhas(ss, ...)
@@ -1232,9 +1221,7 @@ end
 AddSimPostInit(function()
     local oldDoRecipeClick = _G.DoRecipeClick
     _G.DoRecipeClick = function(owner, recipe, skin, ...)
-        if owner and owner.replica and owner.replica.inventory and owner.replica.builder and owner.player_classified and
-            owner.player_classified.soraglobalbuild and owner.player_classified.soraglobalbuild:value() and
-            FindChest(owner) then
+        if owner and  owner.player_classified and owner.player_classified.soraglobalbuildenable then
             local oldhas = owner.replica.inventory.Has
             owner.replica.inventory.Has = function(ss, ...)
                 local a, b, c = oldhas(ss, ...)
@@ -1267,9 +1254,7 @@ AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(s)
         local CanBuild = s.owner.replica.builder.CanBuild
         local owner = s.owner
         s.owner.replica.builder.CanBuild = function(sss, ...)
-            if owner and owner.replica and owner.replica.inventory and owner.replica.builder and owner.player_classified and
-                owner.player_classified.soraglobalbuild and owner.player_classified.soraglobalbuild:value() and
-                FindChest(owner) then
+            if owner and  owner.player_classified and owner.player_classified.soraglobalbuildenable then
                 return true
             end
             return CanBuild(sss, ...)
@@ -1281,25 +1266,14 @@ AddComponentPostInit("builder", function(s)
     -- local oldRemoveIngredients = s.RemoveIngredients
     s.HasIngredients = function(ss, rec, ...)
         local inst = ss.inst
-        if inst:HasTag("player") and inst.player_classified and inst.player_classified.soraglobalbuild:value() and
-            FindChest(inst, 12) then
+        if inst and  inst.player_classified and inst.player_classified.soraglobalbuildenable then
             local oldhas = inst.components.inventory.Has
-            local chest = TheWorld.components.sorachestmanager:GetBuilderChest(inst)
             inst.components.inventory.Has = function(sss, item, num, ...)
                 local x, y, z = oldhas(sss, item, num, ...)
                 if x then
                     return x, y, z
                 end
-                local numneed = num - y
-                for k, v in pairs(chest) do
-                    local ss, yy, zz = v.components.container:Has(item, numneed, true)
-                    y = y + yy
-                    numneed = numneed - yy
-                    if ss then
-                        return true, y
-                    end
-                end
-                return false, y
+                return TheWorld.components.sorachestmanager:HasItem(inst,item,num - y)
             end
             local x, y, z = oldHasIngredients(ss, rec, ...)
             inst.components.inventory.Has = oldhas
@@ -1311,9 +1285,8 @@ AddComponentPostInit("builder", function(s)
     local oldGetIngredients = s.GetIngredients
     s.GetIngredients = function(ss, rec, ...)
         local inst = ss.inst
-        if inst:HasTag("player") and inst.player_classified and inst.player_classified.soraglobalbuild:value() then
+        if inst and  inst.player_classified and inst.player_classified.soraglobalbuildenable then 
             local oldGetCraftingIngredient = inst.components.inventory.GetCraftingIngredient
-            local chest = TheWorld.components.sorachestmanager:GetBuilderChest(inst)
             inst.components.inventory.GetCraftingIngredient = function(sss, item, num, ...)
                 local finds = oldGetCraftingIngredient(sss, item, num, ...)
                 local need = num
@@ -1323,8 +1296,7 @@ AddComponentPostInit("builder", function(s)
                 if need < 1 then
                     return finds
                 end
-                for k, v in pairs(chest) do
-                    local findss = v.components.container:GetCraftingIngredient(item, need)
+                    local findss = TheWorld.components.sorachestmanager:GetIngredients(inst,item,need)
                     for ik, iv in pairs(findss) do
                         need = need - iv
                         finds[ik] = iv
@@ -1332,7 +1304,6 @@ AddComponentPostInit("builder", function(s)
                             return finds
                         end
                     end
-                end
                 return finds
             end
             local x, y, z = oldGetIngredients(ss, rec, ...)
@@ -1387,27 +1358,4 @@ AddComponentPostInit("builder", function(s)
         end
         return x,y,z
     end
-
-    -- s.RemoveIngredients = function(ss,rec,...)
-    --     local inst = ss.inst 
-    --     if inst:HasTag("player") and inst.player_classified and inst.player_classified.soraglobalbuild:value() then
-    --         local oldRemoveItem = inst.components.inventory.RemoveItem
-    --         local chest = TheWorld.components.sorachestmanager:GetBuilderChest(inst)
-    --         inst.components.inventory.RemoveItem  = function(sss,item,num,...)
-    --             local x,y,z = oldRemoveItem(sss,item,num,...)
-    --             if x then return x,y,z end
-
-    --             for k,v in pairs(chest)  do
-    --                 local ss,yy,zz = v.components.container:RemoveItem(item,numneed,true)
-    --                 if ss then return ss,yy,zz end
-    --             end
-    --             return 
-    --         end
-    --         local x,y,z = oldRemoveIngredients(ss,rec,...)
-    --         inst.components.inventory.RemoveItem = oldRemoveItem
-    --         return x,y,z
-    --     else
-    --         return  oldRemoveIngredients(ss,rec,...)
-    --     end
-    -- end
 end)

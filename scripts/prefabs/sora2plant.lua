@@ -96,7 +96,7 @@ local function cd(inst, time)
     end
 end
 
-local function incd(inst, doer)
+local function incd(inst, doer,time)
     if not inst and doer then
         return false
     end
@@ -105,7 +105,7 @@ local function incd(inst, doer)
         Say(doer, "冷却中" .. t .. "S")
         return true
     end
-    cd(inst)
+    cd(inst,time)
     return false
 end
 local names = require "utils/soragjrnames"
@@ -170,7 +170,7 @@ local function FarmFn(inst, doer, pos, poss)
     if not TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) then
         return false, "只能在农田里使用"
     end
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"soil"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3,nil,nil, {"soil","sora2plant_fx"})
     for k, v in pairs(ents) do
         if isNear(v, pos) then
             v:Remove()
@@ -515,6 +515,7 @@ local function SeedFn(inst, doer, pos)
             table.insert(newents, v)
         end
     end
+
     if #newents ~= #inst.seeds then
         return false, "农田数量与模板不匹配"
     end
@@ -568,6 +569,10 @@ local function SeedFn(inst, doer, pos)
             local seedpos = Point(pos.x + v[1], 0, pos.z + v[2])
             one.components.deployable.CanDeploy = CanDeployAnyWhere
             one.components.deployable.spacing = DEPLOYSPACING.NONE
+            local oldondeploy = one.components.deployable.ondeploy
+            one.components.deployable.ondeploy = function(s,pos,doer,...)
+                return oldondeploy(s,seedpos,doer,...)
+            end
             one.components.deployable:Deploy(seedpos, doer or inst)
         end
     end
@@ -1045,6 +1050,9 @@ local function Bind(inst, name, isload, des)
         name = name
     })
     inst.des = des or GetDes(name) or nil
+    if isload then 
+        inst:RemoveTag("sora2plant_fx")
+    end
 end
 local function fxfn(Sim)
     local inst = CreateEntity()
@@ -1067,6 +1075,7 @@ local function fxfn(Sim)
     inst.AnimState:SetRayTestOnBB(true)
     -- inst:AddTag("FX")
     inst:AddTag("NOBLOCK")
+    inst:AddTag("sora2plant_fx")
     inst.entity:SetPristine()
     inst.wet_prefix = ""
     if not TheWorld.ismastersim then
@@ -1118,8 +1127,8 @@ local function fxfn(Sim)
     inst.components.sorasavecmp:AddLoad("name", function(i, data)
         if data and data.name and type(data.name) == "string" then
             inst:DoTaskInTime(0, function()
-
                 inst:Bind(data.name, true, data.des)
+                
             end)
         end
         return data

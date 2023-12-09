@@ -73,7 +73,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         perishtime = 3,
         sanity = 40,
         cooktime = 0.5,
-        temperature = -30,
+        temperature = -50,
         temperatureduration = 480,
         floater = {"med", nil, 0.65},
         oneat_desc = "恰花花,学仙术",

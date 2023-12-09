@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] --[[专属交互
 ]] --
 SoraAPI.ChestData = {}
-local cmp 
+local cmp
 local orderData = {}
 local allchest = {}
 --[[prefab = {
@@ -65,18 +65,16 @@ map['thulecite_pieces'] = 'thulecite'
 map['killerbee'] = "bee"
 map['trunk_summer'] = "trunk_winter"
 
-
 -- map['blue_cap'] = "cap"
 -- map['moon_cap'] = "cap"
 -- map['red_cap'] = "cap"
 -- map['green_cap'] = "cap"
 
-
-for i=1,31 do
-    map['trinket_'..tostring(i)] = 'trinket'
+for i = 1, 31 do
+    map['trinket_' .. tostring(i)] = 'trinket'
 end
-for i=32,46 do
-    map['trinket_'..tostring(i)] = 'hallow_trinket'
+for i = 32, 46 do
+    map['trinket_' .. tostring(i)] = 'hallow_trinket'
 end
 local function FindPrefab() -- tools_1 tools_2 这样的自动合并
     for k, v in pairs(Prefabs) do
@@ -134,7 +132,8 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
     local x, y, z = inst.Transform:GetWorldPosition()
     -- x, y, z = TheWorld.Map:GetTileCenterPoint(x+4, 0, z)
     x = x + 4
-    local ents = TheSim:FindEntities(x, y, z, 1.5, nil, {"FX", "NOBLOCK", "NOCLICK", "player", "INLIMBO","_inventoryitem"})
+    local ents = TheSim:FindEntities(x, y, z, 1.5, nil,
+        {"FX", "NOBLOCK", "NOCLICK", "player", "INLIMBO", "_inventoryitem"})
     local num = #ents
     local pos = Vector3(x, y, z)
     for k, n in pairs(container) do
@@ -169,8 +168,9 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
 end
 
 local function catch(inst)
-    if not inst:IsInLimbo() and not inst:HasTag("decorationitem") and inst.components.inventoryitem and not inst.components.inventoryitem.owner and
-        not (inst.components.health and inst.components.health:IsDead()) and inst:IsValid() then
+    if not inst:IsInLimbo() and not inst:HasTag("decorationitem") and inst.components.inventoryitem and
+        not inst.components.inventoryitem.owner and not (inst.components.health and inst.components.health:IsDead()) and
+        inst:IsValid() then
         return true
     end
     return false
@@ -231,7 +231,9 @@ local TryPut
 local GetOneItem
 if TUNING.SORACHESTRANGE > 2000 then
     function DayUpdate() -- 只负责收东西
-        if cmp:IsStop() then return end
+        if cmp:IsStop() then
+            return
+        end
         UpdateEnts()
         local topick = {}
         for ent, v in pairs(cacheents) do
@@ -286,7 +288,9 @@ if TUNING.SORACHESTRANGE > 2000 then
 else
     local maxrange = TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE
     function DayUpdate(inst, chest, container)
-        if cmp:IsStop() then return end
+        if cmp:IsStop() then
+            return
+        end
         UpdateEnts()
         local topick = {}
         for ent, v in pairs(cacheents) do
@@ -342,7 +346,9 @@ else
     end
 end
 local function GetItem(inst, data) -- 箱子收东西
-    if cmp:IsStop() then return end
+    if cmp:IsStop() then
+        return
+    end
     UpdateEnts()
     for k, v in pairs(data.c) do
         if v then
@@ -353,7 +359,8 @@ local function GetItem(inst, data) -- 箱子收东西
 end
 
 local function GetData(inst)
-    return allchest[inst.sorachesttype] and allchest[inst.sorachesttype][inst] and allchest[inst.sorachesttype][inst].data
+    return allchest[inst.sorachesttype] and allchest[inst.sorachesttype][inst] and
+               allchest[inst.sorachesttype][inst].data
 end
 local function OnChestRemove(chest)
     TheWorld.components.sorachestmanager:UnReg(chest)
@@ -433,7 +440,7 @@ local GemTask = {
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
                 if it then
-                    
+
                 else
                     full = false
                 end
@@ -534,9 +541,9 @@ local function TryCacheEnt(inst, all) -- 尝试缓存下来
         inst.SoraChestSkip = true
         return
     end
-    if inst.components.projectile and (inst.components.projectile.target or inst.components.projectile.dest) then  --投射物
+    if inst.components.projectile and (inst.components.projectile.target or inst.components.projectile.dest) then -- 投射物
         inst.SoraChestSkip = true
-        return 
+        return
     end
     if inst:IsInLimbo() then -- 不可见实体
         return true
@@ -666,6 +673,7 @@ local function ResetChestData(inst, doer)
                 end
             end
             data.c[k] = first or drop_first -- 选定拾取的
+            TheWorld.components.sorachestmanager:ResetCache()
             if not data.c[k] and inst.sorasign then
                 data.c[k] = toprefab(inst.sorasign.name)
             end
@@ -685,7 +693,7 @@ local function ResetChestData(inst, doer)
     end
 end
 local function OnOpen(inst, event)
-    --SoraAPI.CheckChestValid(inst)
+    -- SoraAPI.CheckChestValid(inst)
 end
 local function OnClose(inst, event)
     local doer = event and event.doer
@@ -700,7 +708,7 @@ local function OnClose(inst, event)
     if not inst.components.container then
         return
     end
-    --SoraAPI.CheckChestValid(inst)
+    -- SoraAPI.CheckChestValid(inst)
     local data = inst.sorachestdata
     GetItem(inst, data)
     if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") then
@@ -711,16 +719,16 @@ local function OnClose(inst, event)
 end
 FindPrefab()
 
-local function HitProtect(inst,data)
+local function HitProtect(inst, data)
     if not inst.components.workable then
-        return 
+        return
     end
-    if not inst.hitcount  then
-        inst.hitcount =  0 
+    if not inst.hitcount then
+        inst.hitcount = 0
         inst.hitcd = SoraCD(30)
     end
     if inst.hitcd() then
-        inst.hitcount =  0 
+        inst.hitcount = 0
         inst.components.workable.workleft = 10
     else
         inst.hitcount = inst.hitcount + 1
@@ -731,12 +739,28 @@ local function HitProtect(inst,data)
         end
     end
 end
-
+local function OnItemGet(inst,data)
+    local controls = inst.sorachestdata.controls
+    if data and data.item and data.slot then 
+        if table.contains(controls,data.slot) and data.item:HasTag("gem") then 
+            data.item:AddTag("nocrafting")
+        end
+    end
+end
+local function OnItemLose(inst,data)
+    local controls = inst.sorachestdata.controls
+    if data and data.prev_item and data.slot then 
+        if table.contains(controls,data.slot) and data.prev_item:HasTag("gem") then 
+            data.prev_item:RemoveTag("nocrafting")
+        end
+    end
+end
 local ChestData = SoraAPI.ChestData
 local com = Class(function(self, inst)
     self.inst = inst
     cmp = self
     self.stoptime = 0
+    self.chestcache = {}
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
     self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
@@ -759,35 +783,131 @@ function com:IsStop()
         return true
     elseif self.stoptime == 0 then
         return false
-    else 
+    else
         return self.stoptime > GetTime()
     end
 end
 function com:GetStopTime(doer)
     local tosay = ""
-    if  self.stoptime == 0 then
+    if self.stoptime == 0 then
         tosay = "正常收集中"
     elseif self.stoptime < 0 then
         tosay = "暂停收集中"
     else
-        tosay = tostring(math.floor(self.stoptime - GetTime())) ..  "s后恢复收集"
+        tosay = tostring(math.floor(self.stoptime - GetTime())) .. "s后恢复收集"
     end
-    if doer then 
-        SoraAPI.Say(doer,tosay)
+    if doer then
+        SoraAPI.Say(doer, tosay)
     end
     return tosay
 end
 
 function com:GetBuilderChest(doer)
     local chests = {}
-    for type,v in pairs(allchest) do
-        for chest,v in pairs(allchest[type]) do
-            if chest and chest:IsValid() and  (TUNING.SORACHESTRANGE >2000 or chest:GetDistanceSqToInst(doer)  <(TUNING.SORACHESTRANGE *TUNING.SORACHESTRANGE ) ) then
-                table.insert(chests,chest)
+    for type, v in pairs(allchest) do
+        for chest, v in pairs(allchest[type]) do
+            if chest and chest:IsValid() and
+                (TUNING.SORACHESTRANGE > 2000 or chest:GetDistanceSqToInst(doer) <
+                    (TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
+                table.insert(chests, chest)
             end
         end
     end
     return chests
+end
+function com:ResetCache(item)
+    local chestcache = self.chestcache
+    if item then
+        self.chestcache[item] = nil
+    else
+        self.chestcache = {}
+    end
+end
+function com:GetCacheChest(item)
+    local chestcache = self.chestcache
+    local needprefab = toprefab(item)
+    local t = GetTime()
+    if chestcache[item] and (t - chestcache[item].time) < 10 then
+        return chestcache[item].chest
+    else
+        chestcache[item] = {
+            time = t,
+            chest = {}
+        }
+        for type, v in pairs(allchest) do
+            for chest, data in pairs(allchest[type]) do
+                for k, v in pairs(data.c) do
+                    if v == needprefab then
+                        table.insert(chestcache[item].chest, {chest, k})
+                    end
+                end
+            end
+        end
+        return chestcache[item].chest
+    end
+end
+
+function com:GetItems(chest, k)
+    local items = {}
+    local toget = chest.sorachestdata.containers[k]
+    if toget then
+        for k, v in pairs(toget) do
+            local item = chest.components.container:GetItemInSlot(v)
+            if item then
+                table.insert(items, item)
+            end
+        end
+    end
+    return items
+end
+function com:HasItem(doer, item, need)
+    local chests = self:GetCacheChest(item)
+    local needprefab = toprefab(item)
+    local find = 0
+    for k, data in pairs(chests) do
+        local items = self:GetItems(data[1], data[2])
+        if (TUNING.SORACHESTRANGE > 2000 or
+            (data[1]:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
+            for _, it in pairs(items) do
+                if it.prefab == item and not it:HasTag("nocrafting") then
+                    find = find + (it.components.stackable and it.components.stackable.stacksize or 1)
+                    if find >= need then
+                        return find >= need, find
+                    end
+                end
+            end
+        end
+    end
+    return find >= need, find
+end
+function com:GetIngredients(doer, item, need)
+    local chests = self:GetCacheChest(item)
+    local needprefab = toprefab(item)
+    local find = 0
+    local itemsfind = {}
+    for k, data in pairs(chests) do
+        local items = self:GetItems(data[1], data[2])
+        if (TUNING.SORACHESTRANGE > 2000 or
+            (data[1]:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
+            for _, it in pairs(items) do
+                if it.prefab == item and not it:HasTag("nocrafting") then
+                    if it.components.stackable then 
+                        local get = need - find
+                        get = math.min(it.components.stackable.stacksize,get)
+                        itemsfind[it] = get
+                        find = find + get 
+                    else
+                        itemsfind[it] = 1
+                        find = find +1 
+                    end
+                    if find >= need then
+                        return itemsfind
+                    end
+                end
+            end
+        end
+    end
+    return itemsfind
 end
 
 function com:RegType(type, data)
@@ -821,6 +941,8 @@ function com:RegByType(chest, type)
         chest:ListenForEvent("onclose", OnClose)
         chest:ListenForEvent("onremove", OnChestRemove)
         chest:ListenForEvent("worked", HitProtect)
+        chest:ListenForEvent("itemget", OnItemGet)
+        chest:ListenForEvent("itemlose", OnItemLose)
         chest:AddTag("sorasmartchest")
     end
 end
@@ -829,6 +951,8 @@ function com:UnReg(chest)
         chest:RemoveEventCallback("onopen", OnOpen)
         chest:RemoveEventCallback("onclose", OnClose)
         chest:RemoveEventCallback("worked", HitProtect)
+        chest:RemoveEventCallback("itemget", OnItemGet)
+        chest:RemoveEventCallback("itemlose", OnItemLose)
         updatechests[chest] = nil
         chest.sorachestdata = nil
         allchest[chest.sorachesttype][chest] = nil
@@ -854,7 +978,7 @@ end
 
 function com:GetDebugString()
     local str = {"\nSoraChest"}
-    table.insert(str, "collect:" ..self:GetStopTime())
+    table.insert(str, "collect:" .. self:GetStopTime())
     table.insert(str, "-----allchest-------")
     local trace = true
     for k, v in pairs(allchest) do
