@@ -73,13 +73,16 @@ end
 
 function com:OnSave()
     return {
-        {userid=self.userid,name=self.name}
+        userid=self.userid,name=self.name
     }
 end
 
 function com:OnLoad(data)
     if not data then
         return
+    end
+    if data and data[1] then
+        data = data[1]
     end
     if data.userid then 
         self:Bind(data.userid,data.name)
