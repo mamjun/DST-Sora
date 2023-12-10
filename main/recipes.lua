@@ -812,6 +812,10 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
     Rec("cutstone", nil, "石石石石", maker, "sora", {
         siving_rocks = 40
     }).numtogive = 10
+
+    Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother", {
+        siving_rocks = 40
+    }).numtogive = 20
 end
 
 -- Rec("sora_butter", "拟造-黄油", "一份黄油蟹蟹!", DST, "sora", {
