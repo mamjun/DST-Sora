@@ -18,7 +18,7 @@ local states = {State {
             local r = math.random()
             local emote_idle_chance = 0.3
             if r < emote_idle_chance then
-                inst.sg:GoToState("playful" .. math.random(inst.hat and 6 or 87))
+                inst.sg:GoToState("playful" .. math.random(inst.hat and 6 or 7))
             else
                 inst.sg:GoToState("idle")
             end

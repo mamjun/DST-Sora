@@ -60,6 +60,7 @@ function com:Tele(doer)
         return false,"冷却中" .. t .. "S"
     end
     local pos = player:GetPosition()
+    
     if not TheWorld.Map:IsAboveGroundAtPoint(pos.x, 0, pos.z, false) then
         return false, "目标地点不是陆地\n不支持传送"
     end

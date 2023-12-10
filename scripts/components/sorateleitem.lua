@@ -83,7 +83,7 @@ local itemfn = {
         if target and target.components.mapspotrevealer then
             local pos, reason = target.components.mapspotrevealer.gettargetfn(target, doer)
             if pos then
-                inst.components.mapspotrevealer.postreveal(target)
+                target.components.mapspotrevealer.postreveal(target)
                 return true, pos
             end
         end
@@ -131,9 +131,12 @@ function com:TryTele(doer, target)
                 return Say(doer, "暂时找不到新的目标\n请稍后再试")
             end
             doer.components.locomotor:Stop()
+            if doer:GetDistanceSqToInst(item) > 4 then 
+                self.inst.components.stackable:Get():Remove()
+            end
             local pp = doer:GetPosition()
             doer.Physics:Teleport(pos.x, pp.y, pos.z)
-            self.inst.components.stackable:Get():Remove()
+            
         end
     end
 end
