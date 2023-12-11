@@ -121,22 +121,40 @@ function com:TryTele(doer, target)
             Say(doer, pos)
         end
     else
-        local item = c_findnext(prefabmap[target.prefab] or target.prefab)
-        if item then
-            local pos = item:GetPosition()
-            if not TheWorld.Map:IsAboveGroundAtPoint(pos.x, 0, pos.z, false) then
-                return Say(doer, "目标地点不是陆地\n不支持传送")
+        local tofind = prefabmap[target.prefab] or target.prefab
+        local allitems = {}
+        local pos
+        for k, v in pairs(Ents) do
+            if v ~= target and v.prefab == tofind then
+                local dpos = v:GetPosition()
+                if TheWorld.Map:IsAboveGroundAtPoint(dpos.x, 0, dpos.z, false) then
+                    table.insert(allitems, v)
+                end
             end
-            if item == target then 
-                return Say(doer, "暂时找不到新的目标\n请稍后再试")
+        end
+        if next(allitems) then
+            local item
+            doer.sorateleindex = ((doer.sorateleindex or 0) + 1) 
+            local index = doer.sorateleindex
+            for i = 1, 100 do
+                index = index  % #allitems + 1
+                if not FindEntity(allitems[index], 4, nil, {"player"}) then
+                    item = allitems[index]
+                end
             end
-            doer.components.locomotor:Stop()
-            if doer:GetDistanceSqToInst(item) > 4 then 
-                self.inst.components.stackable:Get():Remove()
+            if item then
+                local pos = item:GetPosition()
+                doer.components.locomotor:Stop()
+                if doer:GetDistanceSqToInst(item) > 4 then
+                    self.inst.components.stackable:Get():Remove()
+                end
+                local pp = doer:GetPosition()
+                doer.Physics:Teleport(pos.x, pp.y, pos.z)
+            else
+                return Say(doer, "没有找到目标地点\n请稍后传送")
             end
-            local pp = doer:GetPosition()
-            doer.Physics:Teleport(pos.x, pp.y, pos.z)
-            
+        else
+            return Say(doer, "没有找到目标地点\n请稍后传送")
         end
     end
 end

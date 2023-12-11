@@ -667,7 +667,7 @@ local function FeiFn(inst, doer, pos)
             if isNear(v, pos) then
                 if doer:HasTag("sora") and doer.soralevel:value() > 14 then -- 需要施肥的变野生！
                     local fix = nil
-                    if v.components.pickable and v.components.pickable.transplanted then
+                    if v.components.pickable and( v.components.pickable.transplanted or v.components.pickable:IsBarren() )then
                         v.components.pickable.transplanted = false
                         if v.components.pickable:IsBarren() then
                             v.components.pickable:MakeEmpty()

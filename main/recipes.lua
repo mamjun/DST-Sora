@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] -- 添加物品栏
 local TechTree = require("techtree")
 local InvImg = {}
-local NoRec 
+local NoRec
 rec_back = "_build_sora"
 local AllSoraRec = {}
 local recmode = GetModConfigData("recmode") > 0 and GetModConfigData("recmode") or mode
@@ -72,17 +72,19 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     STRINGS.NAMES[BUILD] = STRINGS.NAMES[BUILD] or STRINGS.NAMES[PREFAB] or name
     STRINGS.CHARACTERS.GENERIC.DESCRIBE[PREFAB] = STRINGS.CHARACTERS.GENERIC.DESCRIBE[PREFAB] or des
     STRINGS.RECIPE_DESC[PREFAB] = STRINGS.RECIPE_DESC[PREFAB] or des
-    if not tab then return end
-    
+    if not tab then
+        return
+    end
+
     local recings = {}
     if #ings > 0 then -- 是数组 则区分难度
         ings = ings[recmode]
     end
     for k, v in pairs(ings) do
-        local ing =( k == "san" and san) or k 
+        local ing = (k == "san" and san) or k
         table.insert(recings, Ingredient(k, v))
     end
-    
+
     local config = {}
     config.min_spacing = 1
     config.product = prefab
@@ -96,8 +98,6 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
         rec.image = prefab .. ".tex"
         rec.atlas = softresolvefilepath("images/inventoryimages/" .. prefab .. ".xml")
     end
-
-    
 
     -- rec.description = des or STRINGS.RECIPE_DESC[PREFAB]
     AllSoraRec[prefab] = rec
@@ -146,7 +146,6 @@ if IsMythEnable() then
     Rec("myth_flyskill", nil, nil, {CRAFTING_FILTERS.CHARACTER.name}, "soraflyer", {
         [san] = 15
     }).level = TechTree.Create(TECH.LOST)
-
 
     AddInvImg("myth_coin_box", "inventoryimages/myth_coin_box", "myth_coin_box")
     local rec = Rec("myth_coin_box", "铜钱串", "怎么想都是花花的错", maker, "sora", {
@@ -363,9 +362,8 @@ AddInvImg("sora_pickhat", "inventoryimages/sora_pickhat", "sora_pickhat")
 Rec("sora_pickhat", "咸鱼咸鱼咸", "一群咸鱼罢了", equip2, "sora", {
     strawhat = 1,
     seeds = 5,
-    [san] = 50,
+    [san] = 50
 })
-
 
 Rec("sora2sword", "奇妙法杖", "一个奇妙法杖！", equip2, "soraother", {{
     goldenshovel = 2,
@@ -620,17 +618,19 @@ for k, v in pairs({"red", "blue", "violet", "silvery", "orange", "yellow", "gree
     })
 end
 Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother", {{
-    goldnugget = 2
+    goldnugget = 10,
+    townportaltalisman = 5
 }, {
-    goldnugget = 2,
-    townportaltalisman = 1
+    goldnugget = 10,
+    townportaltalisman = 5,
+    purplegem = 1
 }, {
-    goldnugget = 2,
-    townportaltalisman = 1,
-    moonrocknugget = 2
-}})
+    goldnugget = 10,
+    townportaltalisman = 5,
+    purplegem = 2
+}}).numtogive = 5
 
---AddInvImg("sora_lock", "inventoryimages/sora2stone", "sora2stone")
+-- AddInvImg("sora_lock", "inventoryimages/sora2stone", "sora2stone")
 Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraother", {{
     [san] = 20,
     coontail = 1,
@@ -788,13 +788,13 @@ Rec("sora_sign", "拟造-木牌", "为什么看了就像打他?", NoRec)
 Rec("sora_sign_item", "拟造-木牌", "为什么看了就像打他?", DST, "sora", {
     boards = 20,
     livinglog = 10,
-    nightmarefuel=20,
-    [san]=100
+    nightmarefuel = 20,
+    [san] = 100
 }).placer = "no"
 AddInvImg2("sora_pearl", GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl.tex")
 Rec("sora_pearl", "拟造-珍珠", "咦,好温暖,还有一种清醒的感觉", DST, "sora", {
     opalpreciousgem = 3,
-    heatrock=10,
+    heatrock = 10
 })
 
 if IsModEnable("Legion") or IsModEnable("棱镜") then
@@ -814,8 +814,9 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
     }).numtogive = 10
 
     Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother", {
-        siving_rocks = 40
-    }).numtogive = 20
+        siving_rocks = 40,
+        purplegem = 1
+    }).numtogive = 5
 end
 
 -- Rec("sora_butter", "拟造-黄油", "一份黄油蟹蟹!", DST, "sora", {
@@ -826,20 +827,20 @@ end
 
 TUNING.SORAUNLOCKRECIPES = {}
 TUNING.SORAUNLOCKRECIPESKEYMAP = {}
-function UnlonkRecipesMap(key,map)
-    if not  table.contains(TUNING.SORAUNLOCKRECIPES,key) then
-        table.insert(TUNING.SORAUNLOCKRECIPES,key)
+function UnlonkRecipesMap(key, map)
+    if not table.contains(TUNING.SORAUNLOCKRECIPES, key) then
+        table.insert(TUNING.SORAUNLOCKRECIPES, key)
     end
     if not TUNING.SORAUNLOCKRECIPESKEYMAP[key] then
         TUNING.SORAUNLOCKRECIPESKEYMAP[key] = {}
     end
-    table.insert(TUNING.SORAUNLOCKRECIPESKEYMAP[key],map .. rec_back)
+    table.insert(TUNING.SORAUNLOCKRECIPESKEYMAP[key], map .. rec_back)
 end
 function UnlonkRecipes(name, ings, des)
     local recname = name .. rec_back
     local map = false
-    for k,v in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP) do
-        if table.contains(v,recname) then
+    for k, v in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP) do
+        if table.contains(v, recname) then
             map = true
         end
     end
@@ -927,9 +928,9 @@ UnlonkRecipes("hermit_pearl", {
 }, "比珍珠还珍")
 
 -- 鱼池
-UnlonkRecipesMap("ponds","pond")
-UnlonkRecipesMap("ponds","pond_cave")
-UnlonkRecipesMap("ponds","lava_pond")
+UnlonkRecipesMap("ponds", "pond")
+UnlonkRecipesMap("ponds", "pond_cave")
+UnlonkRecipesMap("ponds", "lava_pond")
 AddInvImg2("pond", "minimap/minimap_data.xml", "pond.png")
 UnlonkRecipes("pond", {
     shovel = 1,
@@ -951,20 +952,20 @@ UnlonkRecipes("lava_pond", {
     chum = 50
 }, "挖?这玩意真是挖出来的?")
 -- 远古配方
-UnlonkRecipesMap("gemruins","orangeamulet")
-UnlonkRecipesMap("gemruins","greenamulet")
-UnlonkRecipesMap("gemruins","orangestaff")
-UnlonkRecipesMap("gemruins","yellowstaff")
-UnlonkRecipesMap("gemruins","greenstaff")
+UnlonkRecipesMap("gemruins", "orangeamulet")
+UnlonkRecipesMap("gemruins", "greenamulet")
+UnlonkRecipesMap("gemruins", "orangestaff")
+UnlonkRecipesMap("gemruins", "yellowstaff")
+UnlonkRecipesMap("gemruins", "greenstaff")
 
 UnlonkRecipes("orangeamulet")
 UnlonkRecipes("greenamulet")
 UnlonkRecipes("orangestaff")
 UnlonkRecipes("yellowstaff")
 UnlonkRecipes("greenstaff")
-UnlonkRecipesMap("ruins","nutrientsgoggleshat")
-UnlonkRecipesMap("ruins","ruinshat")
-UnlonkRecipesMap("ruins","armorruins")
+UnlonkRecipesMap("ruins", "nutrientsgoggleshat")
+UnlonkRecipesMap("ruins", "ruinshat")
+UnlonkRecipesMap("ruins", "armorruins")
 UnlonkRecipes("nutrientsgoggleshat")
 UnlonkRecipes("ruinshat")
 UnlonkRecipes("armorruins")
@@ -1048,7 +1049,7 @@ for k, v in pairs({"marble", "stone", "moonglass"}) do
         local rname = "chesspiece_" .. iv
         STRINGS.NAMES[name:upper()] = STRINGS.NAMES[rname:upper() .. "_BUILDER"]
         STRINGS.RECIPE_DESC[name:upper()] = STRINGS.RECIPE_DESC[rname:upper() .. "_BUILDER"]
-        UnlonkRecipesMap(rname,name)
+        UnlonkRecipesMap(rname, name)
         local r = UnlonkRecipes(name, {
             [ing] = 3
         })
@@ -1062,7 +1063,7 @@ STRINGS.NAMES["GLASSSPIKE_TALL"] = STRINGS.NAMES.GLASSSPIKE .. "_高"
 for k, v in pairs({"short", "med", "tall"}) do
     local name = "glassspike_" .. v
     AddInvImg(name, "inventoryimages1", "glassspike")
-    UnlonkRecipesMap("glassspike",name)
+    UnlonkRecipesMap("glassspike", name)
     UnlonkRecipes(name, {
         cutstone = 3
     }, "你想被刺穿吗")
@@ -1118,19 +1119,20 @@ UnlonkRecipes("wormhole_help", {
     goldenshovel = 40,
     purplegem = 5
 }, "一对虫洞")
-local nfsmodname = IsModEnable("2916137510") and "workshop-2916137510" or IsModEnable("2199027653598541321") and "workshop-2199027653598541321"
-if  nfsmodname then
-    --GetModConfigData()
+local nfsmodname = IsModEnable("2916137510") and "workshop-2916137510" or IsModEnable("2199027653598541321") and
+                       "workshop-2199027653598541321"
+if nfsmodname then
+    -- GetModConfigData()
     local food = require "preparedfoods_sora"
-    --if tab and food then
-        for k, v in pairs(food) do
-            local name = v.basename or v.name
-            local nfsname = "mi_nfs_" .. name
-            local des = "绝对吃不完的" .. (STRINGS.NAMES[name:upper()] or "")
-            AddInvImg2(nfsname, "images/inventoryimages/" .. name .. ".xml", name..".tex")
-            Rec(nfsname, des, des,item, "sora", {
-                [name] = 300
-            })
-        end
-    --end
+    -- if tab and food then
+    for k, v in pairs(food) do
+        local name = v.basename or v.name
+        local nfsname = "mi_nfs_" .. name
+        local des = "绝对吃不完的" .. (STRINGS.NAMES[name:upper()] or "")
+        AddInvImg2(nfsname, "images/inventoryimages/" .. name .. ".xml", name .. ".tex")
+        Rec(nfsname, des, des, item, "sora", {
+            [name] = 300
+        })
+    end
+    -- end
 end

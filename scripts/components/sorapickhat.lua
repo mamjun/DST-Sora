@@ -117,6 +117,7 @@ function com:DoTask()
                     self.inst.fx:PushEvent("soratoeat")
                     self.lasteat = t
                     self.starttime = t - 2
+                    it:Remove()
                     return
                 end
             end

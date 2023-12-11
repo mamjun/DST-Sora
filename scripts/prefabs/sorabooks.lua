@@ -358,7 +358,7 @@ local function trychange(inst)
         inst:Remove()
     end
     -- 需要施肥的变成不需要施肥
-    if inst.components.pickable and inst.components.pickable.transplanted then
+    if inst.components.pickable and (inst.components.pickable.transplanted or inst.components.pickable:IsBarren())then
         inst.components.pickable.transplanted = false
         if inst.components.pickable:IsBarren() then
             inst.components.pickable:MakeEmpty()
