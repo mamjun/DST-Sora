@@ -1177,27 +1177,51 @@ end
 AddComponentPostInit("inventoryitem", function(self)
     self.inst:ListenForEvent("ondropped", onpick)
 end)
-local function FindChest(doer, range)
-    return FindEntity(doer, range or 10, nil, {"sorasmartchest"})
-end
-AddPrefabPostInit("player_classified", function(inst)
-    inst.soraglobalbuild = net_bool(inst.GUID, "soraglobalbuild", "ingredientmoddirty")
-    inst.soraglobalbuildenable =  false
-    inst:DoPeriodicTask(1, function()
-        local chest =  inst.soraglobalbuild:value()  and FindEntity(inst, 10, nil, {"sorasmartchest"})  and true or false
-        if chest ~= inst.soraglobalbuildenable then 
-            inst.soraglobalbuildenable = chest 
-            inst:PushEvent("ingredientmoddirty")
-        end
-    end)
-end)
 
-local function invetoryhashook(self, fnname)
-    local old = self[fnname]
-    if old then
-        self[fnname] = function(s, ...)
-            local owner = s.owner
-            if owner and  owner.player_classified and owner.player_classified.soraglobalbuildenable then
+if not TUNING.SORADISABLEGLOBAL then
+    AddPrefabPostInit("player_classified", function(inst)
+        inst.soraglobalbuild = net_bool(inst.GUID, "soraglobalbuild", "ingredientmoddirty")
+        inst.soraglobalbuildenable = false
+        inst:DoPeriodicTask(1, function()
+            local chest = inst.soraglobalbuild:value() and FindEntity(inst, 10, nil, {"sorasmartchest"}) and true or
+                              false
+            if chest ~= inst.soraglobalbuildenable then
+                inst.soraglobalbuildenable = chest
+                inst:PushEvent("ingredientmoddirty")
+            end
+        end)
+    end)
+
+    local function invetoryhashook(self, fnname)
+        local old = self[fnname]
+        if old then
+            self[fnname] = function(s, ...)
+                local owner = s.owner
+                if owner and owner.player_classified and owner.player_classified.soraglobalbuildenable then
+                    local oldhas = owner.replica.inventory.Has
+                    owner.replica.inventory.Has = function(ss, ...)
+                        local a, b, c = oldhas(ss, ...)
+                        return true, b, c
+                    end
+                    local oldHasIngredients = owner.replica.builder.HasIngredients
+                    owner.replica.builder.HasIngredients = function()
+                        return true
+                    end
+                    local x, y, z = old(s, ...)
+                    owner.replica.inventory.Has = oldhas
+                    owner.replica.builder.HasIngredients = oldHasIngredients
+                    return x, y, z
+                else
+                    return old(s, ...)
+                end
+
+            end
+        end
+    end
+    AddSimPostInit(function()
+        local oldDoRecipeClick = _G.DoRecipeClick
+        _G.DoRecipeClick = function(owner, recipe, skin, ...)
+            if owner and owner.player_classified and owner.player_classified.soraglobalbuildenable then
                 local oldhas = owner.replica.inventory.Has
                 owner.replica.inventory.Has = function(ss, ...)
                     local a, b, c = oldhas(ss, ...)
@@ -1207,96 +1231,72 @@ local function invetoryhashook(self, fnname)
                 owner.replica.builder.HasIngredients = function()
                     return true
                 end
-                local x, y, z = old(s, ...)
+                local x, y, z = oldDoRecipeClick(owner, recipe, skin, ...)
                 owner.replica.inventory.Has = oldhas
                 owner.replica.builder.HasIngredients = oldHasIngredients
                 return x, y, z
             else
-                return old(s, ...)
+                return oldDoRecipeClick(owner, recipe, skin, ...)
             end
-
-        end
-    end
-end
-AddSimPostInit(function()
-    local oldDoRecipeClick = _G.DoRecipeClick
-    _G.DoRecipeClick = function(owner, recipe, skin, ...)
-        if owner and  owner.player_classified and owner.player_classified.soraglobalbuildenable then
-            local oldhas = owner.replica.inventory.Has
-            owner.replica.inventory.Has = function(ss, ...)
-                local a, b, c = oldhas(ss, ...)
-                return true, b, c
-            end
-            local oldHasIngredients = owner.replica.builder.HasIngredients
-            owner.replica.builder.HasIngredients = function()
-                return true
-            end
-            local x, y, z = oldDoRecipeClick(owner, recipe, skin, ...)
-            owner.replica.inventory.Has = oldhas
-            owner.replica.builder.HasIngredients = oldHasIngredients
-            return x, y, z
-        else
-            return oldDoRecipeClick(owner, recipe, skin, ...)
-        end
-    end
-end)
-for k, v in pairs({
-    ["widgets/redux/craftingmenu_hud"] = "RebuildRecipes",
-    ["widgets/redux/craftingmenu_ingredients"] = "SetRecipe",
-    ["widgets/redux/craftingmenu_widget"] = "UpdateFilterButtons"
-}) do
-    AddClassPostConstruct(k, function(s)
-        invetoryhashook(s, v)
-    end)
-end
-AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(s)
-    s.owner:DoTaskInTime(0.1,function ()
-        local CanBuild = s.owner.replica.builder.CanBuild
-        local owner = s.owner
-        s.owner.replica.builder.CanBuild = function(sss, ...)
-            if owner and  owner.player_classified and owner.player_classified.soraglobalbuildenable then
-                return true
-            end
-            return CanBuild(sss, ...)
         end
     end)
-end)
-AddComponentPostInit("builder", function(s)
-    local oldHasIngredients = s.HasIngredients
-    -- local oldRemoveIngredients = s.RemoveIngredients
-    s.HasIngredients = function(ss, rec, ...)
-        local inst = ss.inst
-        if inst and  inst.player_classified and inst.player_classified.soraglobalbuildenable then
-            local oldhas = inst.components.inventory.Has
-            inst.components.inventory.Has = function(sss, item, num, ...)
-                local x, y, z = oldhas(sss, item, num, ...)
-                if x then
-                    return x, y, z
-                end
-                return TheWorld.components.sorachestmanager:HasItem(inst,item,num - y)
-            end
-            local x, y, z = oldHasIngredients(ss, rec, ...)
-            inst.components.inventory.Has = oldhas
-            return x, y, z
-        else
-            return oldHasIngredients(ss, rec, ...)
-        end
+    for k, v in pairs({
+        ["widgets/redux/craftingmenu_hud"] = "RebuildRecipes",
+        ["widgets/redux/craftingmenu_ingredients"] = "SetRecipe",
+        ["widgets/redux/craftingmenu_widget"] = "UpdateFilterButtons"
+    }) do
+        AddClassPostConstruct(k, function(s)
+            invetoryhashook(s, v)
+        end)
     end
-    local oldGetIngredients = s.GetIngredients
-    s.GetIngredients = function(ss, rec, ...)
-        local inst = ss.inst
-        if inst and  inst.player_classified and inst.player_classified.soraglobalbuildenable then 
-            local oldGetCraftingIngredient = inst.components.inventory.GetCraftingIngredient
-            inst.components.inventory.GetCraftingIngredient = function(sss, item, num, ...)
-                local finds = oldGetCraftingIngredient(sss, item, num, ...)
-                local need = num
-                for k, v in pairs(finds) do
-                    need = need - v
+    AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(s)
+        s.owner:DoTaskInTime(0.1, function()
+            local CanBuild = s.owner.replica.builder.CanBuild
+            local owner = s.owner
+            s.owner.replica.builder.CanBuild = function(sss, ...)
+                if owner and owner.player_classified and owner.player_classified.soraglobalbuildenable then
+                    return true
                 end
-                if need < 1 then
-                    return finds
+                return CanBuild(sss, ...)
+            end
+        end)
+    end)
+    AddComponentPostInit("builder", function(s)
+        local oldHasIngredients = s.HasIngredients
+        -- local oldRemoveIngredients = s.RemoveIngredients
+        s.HasIngredients = function(ss, rec, ...)
+            local inst = ss.inst
+            if inst and inst.player_classified and inst.player_classified.soraglobalbuildenable then
+                local oldhas = inst.components.inventory.Has
+                inst.components.inventory.Has = function(sss, item, num, ...)
+                    local x, y, z = oldhas(sss, item, num, ...)
+                    if x then
+                        return x, y, z
+                    end
+                    return TheWorld.components.sorachestmanager:HasItem(inst, item, num - y)
                 end
-                    local findss = TheWorld.components.sorachestmanager:GetIngredients(inst,item,need)
+                local x, y, z = oldHasIngredients(ss, rec, ...)
+                inst.components.inventory.Has = oldhas
+                return x, y, z
+            else
+                return oldHasIngredients(ss, rec, ...)
+            end
+        end
+        local oldGetIngredients = s.GetIngredients
+        s.GetIngredients = function(ss, rec, ...)
+            local inst = ss.inst
+            if inst and inst.player_classified and inst.player_classified.soraglobalbuildenable then
+                local oldGetCraftingIngredient = inst.components.inventory.GetCraftingIngredient
+                inst.components.inventory.GetCraftingIngredient = function(sss, item, num, ...)
+                    local finds = oldGetCraftingIngredient(sss, item, num, ...)
+                    local need = num
+                    for k, v in pairs(finds) do
+                        need = need - v
+                    end
+                    if need < 1 then
+                        return finds
+                    end
+                    local findss = TheWorld.components.sorachestmanager:GetIngredients(inst, item, need)
                     for ik, iv in pairs(findss) do
                         need = need - iv
                         finds[ik] = iv
@@ -1304,59 +1304,60 @@ AddComponentPostInit("builder", function(s)
                             return finds
                         end
                     end
-                return finds
+                    return finds
+                end
+                local x, y, z = oldGetIngredients(ss, rec, ...)
+                inst.components.inventory.GetCraftingIngredient = oldGetCraftingIngredient
+                return x, y, z
+            else
+                return oldGetIngredients(ss, rec, ...)
             end
-            local x, y, z = oldGetIngredients(ss, rec, ...)
-            inst.components.inventory.GetCraftingIngredient = oldGetCraftingIngredient
+        end
+        local oldMakeRecipe = s.MakeRecipe
+        s.MakeRecipe = function(ss, ...)
+            ss.soramakerecipe = true
+            return oldMakeRecipe(ss, ...)
+        end
+
+        local oldMakeRecipeFromMenu = s.MakeRecipeFromMenu
+        s.MakeRecipeFromMenu = function(ss, ...)
+            ss.soramakerecipe = false
+            local x, y, z = oldMakeRecipeFromMenu(ss, ...)
+            if not ss.soramakerecipe then
+                ss.inst.components.locomotor:Stop()
+                local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(),
+                    "sora_cantbuild", 0, nil, 0)
+                ss.inst.components.locomotor:PushAction(buffaction, true)
+                return true
+            end
             return x, y, z
-        else
-            return oldGetIngredients(ss, rec, ...)
         end
-    end
-    local oldMakeRecipe = s.MakeRecipe
-    s.MakeRecipe = function(ss, ...)
-        ss.soramakerecipe = true
-        return oldMakeRecipe(ss, ...)
-    end
 
-    local oldMakeRecipeFromMenu = s.MakeRecipeFromMenu
-    s.MakeRecipeFromMenu = function(ss, ...)
-        ss.soramakerecipe = false
-        local x, y, z = oldMakeRecipeFromMenu(ss, ...)
-        if not ss.soramakerecipe then
-            ss.inst.components.locomotor:Stop()
-            local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(), "sora_cantbuild",
-                0, nil, 0)
-            ss.inst.components.locomotor:PushAction(buffaction, true)
-            return true
+        local oldBufferBuild = s.BufferBuild
+        s.BufferBuild = function(ss, rec, ...)
+            local x, y, z = oldBufferBuild(ss, rec, ...)
+            if not ss.buffered_builds[rec] then
+                ss.inst.components.locomotor:Stop()
+                local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(),
+                    "sora_cantbuild", 0, nil, 0)
+                ss.inst.components.locomotor:PushAction(buffaction, true)
+                return true
+            end
+            return x, y, z
         end
-        return x, y, z
-    end
+        local oldMakeRecipeAtPoint = s.MakeRecipeAtPoint
+        s.MakeRecipeAtPoint = function(ss, rec, ...)
+            ss.soramakerecipe = false
+            local x, y, z = oldMakeRecipeAtPoint(ss, rec, ...)
+            if not ss:IsBuildBuffered(rec.name) and not ss.soramakerecipe then
+                ss.inst.components.locomotor:Stop()
+                local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(),
+                    "sora_cantbuild", 0, nil, 0)
+                ss.inst.components.locomotor:PushAction(buffaction, true)
+                return true
+            end
+            return x, y, z
+        end
+    end)
 
-    local oldBufferBuild = s.BufferBuild
-    s.BufferBuild = function(ss,rec,...)
-        local x,y,z = oldBufferBuild(ss,rec,...)
-        if not  ss.buffered_builds[rec]  then
-            ss.inst.components.locomotor:Stop()
-            local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(), "sora_cantbuild",
-                0, nil, 0)
-            ss.inst.components.locomotor:PushAction(buffaction, true)
-            return true
-        end
-        return   x,y,z
-    end
-    local oldMakeRecipeAtPoint = s.MakeRecipeAtPoint
-    s.MakeRecipeAtPoint = function(ss,rec,...)
-        ss.soramakerecipe = false
-        local x,y,z = oldMakeRecipeAtPoint(ss,rec,...)
-        if not ss:IsBuildBuffered(rec.name) and not ss.soramakerecipe then
-            ss.inst.components.locomotor:Stop()
-            local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(), "sora_cantbuild",
-                0, nil, 0)
-            ss.inst.components.locomotor:PushAction(buffaction, true)
-            return true
-        end
-        return x,y,z
-    end
-end)
-
+end

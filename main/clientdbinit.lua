@@ -136,6 +136,10 @@ temp.serverfn = function(ns, db, userid)
         elseif cmd == "PauseTenDays" then
             TheWorld.components.sorachestmanager:SetStopTime(TUNING.TOTAL_DAY_TIME * 10)
         elseif cmd == "GlobalBuild" then
+            if TUNING.SORADISABLEGLOBAL then 
+                Say(doer,IsGemEnable and "全局制作不兼容GemCore,已自动禁用" or "设置里已禁止全局制作")
+                return 
+            end
             if doer and doer.player_classified and doer.player_classified.soraglobalbuild then
                 local b = not doer.player_classified.soraglobalbuild:value()
                 doer.player_classified.soraglobalbuild:set(b)

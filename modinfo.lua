@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
  author = "FL"
-version = "11.30.32" -- 版本
+version = "11.30.34" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -214,6 +214,19 @@ configuration_options = {maketitle("jichu", "基础设置"), {
         description = "禁用,不物品栏相关扩展",
         data = true,
         hover = "禁用,不物品栏相关扩展"
+    }},
+    default = false
+}, {
+    name = "disableui_globalbuild",
+    label = "禁用全局制作",
+    options = {{
+        description = "不禁用",
+        data = false,
+        hover = "不禁用,允许使用全局制作"
+    }, {
+        description = "禁用,禁止使用全局制作",
+        data = true,
+        hover = "禁用,禁止使用全局制作"
     }},
     default = false
 }, {

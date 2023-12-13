@@ -51,6 +51,12 @@ GLOBAL.TUNING.SORATOCHEST = GetModConfigData("tochest")
 GLOBAL.TUNING.SORALOCK1 = GetModConfigData("lock1")
 GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
 GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
+
+GLOBAL.TUNING.SORADISABLEGLOBAL = GetModConfigData("disableui_globalbuild")
+IsGemEnable = rawget(_G,"gemrun") and true or false
+if IsGemEnable then 
+    GLOBAL.TUNING.SORADISABLEGLOBAL = true
+end
 -- 加载模块
 function mi(str)
     modimport("main/" .. str)

@@ -115,7 +115,7 @@ end
 local function FuckGemCore()
     if rawget(_G,"gemrun") and not TheNet:IsDedicated() then
         (ThePlayer or TheWorld):DoTaskInTime(1,function()
-         SoraPushPopupDialog("小穹的温馨提示","本MOD与GemCore/宝石核心存在已知严重冲突\n请关闭GemCore/宝石核心后再次游玩\n如果你是开启了全局暂停模组\n请更换成同名的另一模组,另一模组不依赖GemCore","退出游戏",function() DoRestart(true) end)
+         SoraPushPopupDialog("小穹的温馨提示","本MOD与GemCore/宝石核心存在已知严重冲突\n请关闭GemCore/宝石核心后再次游玩\n如果你是开启了全局暂停模组\n现在已经不需要了","退出游戏",function() DoRestart(true) end)
          end)
     end
 end
