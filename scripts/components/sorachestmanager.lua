@@ -126,7 +126,10 @@ end
 local function CanDeployAnyWhere()
     return true
 end
+local blackmizhi = {
+dock_kit=1
 
+}
 local function HeLiMiZhi(inst, doer, maxplant, container)
 
     local x, y, z = inst.Transform:GetWorldPosition()
@@ -138,7 +141,7 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
     local pos = Vector3(x, y, z)
     for k, n in pairs(container) do
         local item = inst.components.container:GetItemInSlot(n)
-        if item and item.components.deployable and not item.prefab:match("^turf_") and
+        if item and not blackmizhi[item.prefab] and item.components.deployable and not item.prefab:match("^turf_") and
             not (item.components.deployable.mode == DEPLOYMODE.TURF) then
             if num >= maxplant then
                 return
@@ -205,6 +208,7 @@ local function TryPutToContainer(chest, ents, container, fn)
                     i[k.prefab] = i[k.prefab] - 1
                 end
             elseif not item then
+                k.components.inventoryitem:RemoveFromOwner(true)
                 con:GiveItem(k, container[i[k.prefab]], nil, true)
                 if k.components.knownlocations then -- 有家就忘了 
                     k.components.knownlocations:ForgetLocation("home")
@@ -212,6 +216,7 @@ local function TryPutToContainer(chest, ents, container, fn)
                 if k.components.inventoryitem then
                     k.components.inventoryitem:OnPickup(chest)
                 end
+
                 puted[k] = 1
                 over = true
                 i[k.prefab] = i[k.prefab] - 1
@@ -710,11 +715,17 @@ local function OnClose(inst, event)
     end
     -- SoraAPI.CheckChestValid(inst)
     local data = inst.sorachestdata
-    GetItem(inst, data)
+    inst:DoTaskInTime(0,
+        function() -- 因为直接往箱子里放东西的时候 会先释放物品 然后打开容器 放入   打开容器触发旧容器的onclose 这时候会尝试收取 
+            GetItem(inst, data)
+        end)
+
     if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") then
-        for k, container in pairs(data.containers) do
-            HeLiMiZhi(inst, doer, data.gem.greengem * data.gem.greengem * 2, container)
-        end
+        inst:DoTaskInTime(0.1, function()
+            for k, container in pairs(data.containers) do
+                HeLiMiZhi(inst, doer, data.gem.greengem * data.gem.greengem * 2, container)
+            end
+        end)
     end
 end
 FindPrefab()
@@ -739,18 +750,18 @@ local function HitProtect(inst, data)
         end
     end
 end
-local function OnItemGet(inst,data)
+local function OnItemGet(inst, data)
     local controls = inst.sorachestdata.controls
-    if data and data.item and data.slot then 
-        if table.contains(controls,data.slot) and data.item:HasTag("gem") then 
+    if data and data.item and data.slot then
+        if table.contains(controls, data.slot) and data.item:HasTag("gem") then
             data.item:AddTag("nocrafting")
         end
     end
 end
-local function OnItemLose(inst,data)
+local function OnItemLose(inst, data)
     local controls = inst.sorachestdata.controls
-    if data and data.prev_item and data.slot then 
-        if table.contains(controls,data.slot) and data.prev_item:HasTag("gem") then 
+    if data and data.prev_item and data.slot then
+        if table.contains(controls, data.slot) and data.prev_item:HasTag("gem") then
             data.prev_item:RemoveTag("nocrafting")
         end
     end
@@ -894,16 +905,16 @@ function com:GetIngredients(doer, item, need)
             local keepone = 1
             for _, it in pairs(items) do
                 if it.prefab == item and not it:HasTag("nocrafting") then
-                    if it.components.stackable then 
+                    if it.components.stackable then
                         local get = need - find
-                        get = math.min(it.components.stackable.stacksize-keepone,get)
+                        get = math.min(it.components.stackable.stacksize - keepone, get)
                         itemsfind[it] = get
-                        find = find + get 
+                        find = find + get
                     else
-                        if keepone > 0  then 
+                        if keepone > 0 then
                         else
                             itemsfind[it] = 1
-                            find = find +1
+                            find = find + 1
                         end
                     end
                     keepone = 0

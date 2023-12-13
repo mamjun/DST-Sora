@@ -221,7 +221,7 @@ local function fn()
     TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
 
     inst:AddComponent("preserver")
-    inst.components.preserver:SetPerishRateMultiplier(1)
+    inst.components.preserver:SetPerishRateMultiplier(0)
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(4)

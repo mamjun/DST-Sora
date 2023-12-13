@@ -193,6 +193,7 @@ function makelightflier()
         inst.AnimState:PlayAnimation("sleep_loop", true)
 
         inst.entity:SetPristine()
+        MakeInventoryPhysics(inst)
         if not TheWorld.ismastersim then
             return inst
         end

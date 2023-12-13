@@ -38,7 +38,22 @@ local prefabmap = {
     deer_antler2 = "klaus_sack", -- 鹿角
     deer_antler3 = "klaus_sack", -- 鹿角
     klaussackkey = "klaus_sack" -- 麋鹿茸
+
 }
+local prefabmaps = {
+    kitcoon_forest = "kitcoon",
+    kitcoon_savanna = "kitcoon",
+    kitcoon_deciduou = "kitcoon",
+    kitcoon_marsh = "kitcoon",
+    kitcoon_grass = "kitcoon",
+    kitcoon_rocky = "kitcoon",
+    kitcoon_desert = "kitcoon",
+    kitcoon_moon = "kitcoon",
+    kitcoon_yot = "kitcoon"
+}
+local function toprefab(prefab)
+    return prefabmaps[prefab] or prefab or "unprefab"
+end
 local itemfn = {
     medal_treasure_map = function(inst, doer, target)
         if target.getTreasurePoint then
@@ -121,11 +136,11 @@ function com:TryTele(doer, target)
             Say(doer, pos)
         end
     else
-        local tofind = prefabmap[target.prefab] or target.prefab
+        local tofind = prefabmap[target.prefab] or prefabmaps[target.prefab] or target.prefab
         local allitems = {}
         local pos
         for k, v in pairs(Ents) do
-            if v ~= target and v.prefab == tofind then
+            if toprefab(v.prefab) == tofind then
                 local dpos = v:GetPosition()
                 if TheWorld.Map:IsAboveGroundAtPoint(dpos.x, 0, dpos.z, false) then
                     table.insert(allitems, v)
@@ -134,13 +149,15 @@ function com:TryTele(doer, target)
         end
         if next(allitems) then
             local item
-            doer.sorateleindex = ((doer.sorateleindex or 0) + 1) 
-            local index = doer.sorateleindex
+            doer.sorateleindex = (doer.sorateleindex or 0)
+            local index = doer.sorateleindex % #allitems  +1 
+            doer.sorateleindex = doer.sorateleindex + 1
             for i = 1, 100 do
-                index = index  % #allitems + 1
-                if not FindEntity(allitems[index], 4, nil, {"player"}) then
+                if allitems[index] and allitems[index] ~= target and not FindEntity(allitems[index], 4, nil, {"player"}) then
                     item = allitems[index]
+                    break
                 end
+                index = index % #allitems + 1
             end
             if item then
                 local pos = item:GetPosition()

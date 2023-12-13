@@ -879,6 +879,9 @@ local master_postinit = function(inst)
         end
         return PushEvent(i, name, data, ...)
     end
+    if inst.components.spooked then
+        inst:RemoveComponent("spooked")
+     end
 end
 -- 乱动皮肤的后果自负！！！
 
