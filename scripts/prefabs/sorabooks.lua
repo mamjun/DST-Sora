@@ -611,6 +611,7 @@ local Magic_defs = {{
                     tentacle.Transform:SetPosition(x, 0, z)
                     tentacle.sg:GoToState("attack_pre")
                     tentacle.persists = false -- 触手不保存
+                    tentacle:AddTag("companion")
                     tentacle.components.combat.externaldamagemultipliers:SetModifier("sora", 3)
                     tentacle.components.combat.externaldamagetakenmultipliers:SetModifier("sora", 0.33)
                     tentacle.components.combat:SetRange(TUNING.TENTACLE_ATTACK_DIST * 1.5,

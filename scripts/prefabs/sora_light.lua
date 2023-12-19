@@ -343,7 +343,7 @@ local function fn()
     -- inst.components.workable:SetOnFinishCallback(onhammered)
     -- inst.components.workable:SetOnWorkCallback(onhit)
     inst:AddComponent("preserver")
-    inst.components.preserver:SetPerishRateMultiplier(1)
+    inst.components.preserver:SetPerishRateMultiplier(0)
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sora_light")
     inst.components.container.onopenfn = onopen

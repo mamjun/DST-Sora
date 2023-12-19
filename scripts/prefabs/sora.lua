@@ -511,7 +511,7 @@ end
 
 local function emoteplants(inst)
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, 15, nil, nil, {"tendable_farmplant"})
+    local ents = TheSim:FindEntities(x, y, z, 25, nil, nil, {"tendable_farmplant"})
     for k, v in pairs(ents) do
         if v.components.farmplanttendable ~= nil then
             v.components.farmplanttendable:TendTo(inst)
@@ -607,7 +607,7 @@ local function onemote(inst, data)
             inst.emotefn = nil
         end
 
-        inst.emotefn = inst:DoTaskInTime(3, emoteplants)
+        inst.emotefn = inst:DoPeriodicTask(3, emoteplants)
         SoraSound(inst, sound, nil, "sorabgm")
     else
         SoraSound(inst, sound, nil)

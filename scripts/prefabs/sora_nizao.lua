@@ -365,9 +365,9 @@ local cantarget = {
     --蝙蝠
     bat=1,
     --触手
-    --tentacle_pillar=1,
-    --tentacle=1,
-    --tentacle_pillar_arm=1,
+    tentacle_pillar=1,
+    tentacle=1,
+    tentacle_pillar_arm=1,
     --树精
     leif=1,
     leif_sparse=1,

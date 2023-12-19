@@ -83,10 +83,9 @@ local function FindPrefab() -- tools_1 tools_2 这样的自动合并
             if p then
                 map[k] = p
             end
-            if k:match("winter_ornament") then
-                map[k] = "winter_ornament"
-            end
-            if k:match("^medal_fruit_tree_.+_scion$") then
+            if k:match("winter_ornament_boss") then
+                map[k] = "winter_ornament_boss"
+            elseif k:match("^medal_fruit_tree_.+_scion$") then
                 map[k] = "medal_fruit_tree_scion"
             end
 
@@ -127,7 +126,7 @@ local function CanDeployAnyWhere()
     return true
 end
 local blackmizhi = {
-dock_kit=1
+    dock_kit = 1
 
 }
 local function HeLiMiZhi(inst, doer, maxplant, container)
@@ -209,14 +208,13 @@ local function TryPutToContainer(chest, ents, container, fn)
                 end
             elseif not item then
                 k.components.inventoryitem:RemoveFromOwner(true)
-                con:GiveItem(k, container[i[k.prefab]], nil, true)
                 if k.components.knownlocations then -- 有家就忘了 
                     k.components.knownlocations:ForgetLocation("home")
                 end
                 if k.components.inventoryitem then
                     k.components.inventoryitem:OnPickup(chest)
                 end
-
+                con:GiveItem(k, container[i[k.prefab]], nil, true)
                 puted[k] = 1
                 over = true
                 i[k.prefab] = i[k.prefab] - 1
@@ -234,11 +232,30 @@ end
 local DayUpdate
 local TryPut
 local GetOneItem
+local function AllChestDrop()
+    for _, d in pairs(orderData) do
+        for chest, data in pairs(allchest[d[1]] or {}) do
+            for index, c in pairs(data.c) do
+                for k, v in pairs(data.containers[index]) do
+                    local item = chest.components.container:GetItemInSlot(v)
+                    if item then
+                        local p = toprefab(item.prefab)
+                        if p ~= c and not notdrop[p] then
+                            chest.components.container:DropItemBySlot(v)
+                            item.SoraChestSkip = nil
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
 if TUNING.SORACHESTRANGE > 2000 then
     function DayUpdate() -- 只负责收东西
         if cmp:IsStop() then
             return
         end
+        AllChestDrop()
         UpdateEnts()
         local topick = {}
         for ent, v in pairs(cacheents) do
@@ -296,6 +313,7 @@ else
         if cmp:IsStop() then
             return
         end
+        AllChestDrop()
         UpdateEnts()
         local topick = {}
         for ent, v in pairs(cacheents) do
@@ -616,18 +634,8 @@ local function ResetChestData(inst, doer)
                 end
             end
         elseif item then
-            local itemdrop = container:RemoveItem(item, true)
-            if itemdrop then
-                itemdrop.Transform:SetPosition(pos:Get())
-                if itemdrop.components.inventoryitem then
-                    itemdrop.components.inventoryitem:OnDropped(true)
-                end
-                itemdrop.prevcontainer = nil
-                itemdrop.prevslot = nil
-                inst:PushEvent("dropitem", {
-                    item = itemdrop
-                })
-            end
+            container:DropItemBySlot(v)
+            item.SoraChestSkip = nil
         end
     end
     if inst.components.preserver then
@@ -662,18 +670,8 @@ local function ResetChestData(inst, doer)
                         first = first or p
                     end
                     if first ~= p and not notdrop[p] then -- 丢弃多余的 
-                        local itemdrop = container:RemoveItem(item, true)
-                        if itemdrop then
-                            itemdrop.Transform:SetPosition(pos:Get())
-                            if itemdrop.components.inventoryitem then
-                                itemdrop.components.inventoryitem:OnDropped(true)
-                            end
-                            itemdrop.prevcontainer = nil
-                            itemdrop.prevslot = nil
-                            inst:PushEvent("dropitem", {
-                                item = itemdrop
-                            })
-                        end
+                        container:DropItemBySlot(slot)
+                        item.SoraChestSkip = nil
                     end
                 end
             end
