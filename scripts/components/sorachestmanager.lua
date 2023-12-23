@@ -250,6 +250,24 @@ local function AllChestDrop()
         end
     end
 end
+
+local function  ChestDrop(chest)
+    if chest and chest.sorachestdata then 
+        local data = chest.sorachestdata
+        for index, c in pairs(data.c) do
+            for k, v in pairs(data.containers[index]) do
+                local item = chest.components.container:GetItemInSlot(v)
+                if item then
+                    local p = toprefab(item.prefab)
+                    if p ~= c and not notdrop[p] then
+                        chest.components.container:DropItemBySlot(v)
+                        item.SoraChestSkip = nil
+                    end
+                end
+            end
+        end
+    end
+end
 if TUNING.SORACHESTRANGE > 2000 then
     function DayUpdate() -- 只负责收东西
         if cmp:IsStop() then
@@ -429,6 +447,7 @@ local GemTask = {
     end,
     orangegem = function(inst, data, v)
         GetItem(inst, data)
+        ChestDrop()
     end,
     yellowgem = function(inst, data, v)
         local pos = inst:GetPosition()
@@ -973,6 +992,7 @@ function com:UnReg(chest)
         chest.sorachestdata = nil
         allchest[chest.sorachesttype][chest] = nil
         chest:RemoveTag("sorasmartchest")
+        self:ResetCache(nil)
     end
 end
 

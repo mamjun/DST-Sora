@@ -287,7 +287,7 @@ local function ReFreshExp(inst)
 end
 
 local function GetExp(inst, num, code, dmaxexp, once)
-    -- 获得经验
+    -- 获得经验  请勿公布
     if once then
         if not inst.soraonceexp[code] then
             inst.soraonceexp[code] = num
@@ -295,7 +295,7 @@ local function GetExp(inst, num, code, dmaxexp, once)
             num = 0
         end
     else
-        local maxexp = dmaxexp or 120
+        local maxexp = dmaxexp or 80
         local t = TheWorld.state.cycles
         if (t ~= inst.soraday) then
             local olddayexp = inst.soradayexp -- getexppatch
@@ -314,11 +314,16 @@ local function GetExp(inst, num, code, dmaxexp, once)
                 inst.soradayexp[code] = 0
             end
             if (inst.soradayexp[code] + num > maxexp) then
-                num = math.min(math.max(0, maxexp - inst.soradayexp[code]), num)
+                if (inst.soradayexp[code] + num > (maxexp*5)) then 
+                    num = 0
+                elseif (inst.soradayexp[code]> maxexp) then 
+                    num = 1
+                else
+                    num = math.min(math.max(0, maxexp - inst.soradayexp[code]), num)
+                end
             end
             inst.soradayexp[code] = inst.soradayexp[code] + num
         end
-
     end
     if num == 0 then
         return

@@ -1273,7 +1273,16 @@ if not TUNING.SORADISABLEGLOBAL then
                     if x then
                         return x, y, z
                     end
-                    return TheWorld.components.sorachestmanager:HasItem(inst, item, num - y)
+                    local x1,y1,z1 =  TheWorld.components.sorachestmanager:HasItem(inst, item, num - y)
+                    if not x1 then 
+                        if ss.soramakerecipecount then 
+                            ss.soramakerecipecount[item] = num -y - y1
+                        end
+                    end
+                    if ss.sorajusttest then 
+                        x1 = true
+                    end
+                    return x1,y1,z1
                 end
                 local x, y, z = oldHasIngredients(ss, rec, ...)
                 inst.components.inventory.Has = oldhas
@@ -1320,10 +1329,11 @@ if not TUNING.SORADISABLEGLOBAL then
         end
 
         local oldMakeRecipeFromMenu = s.MakeRecipeFromMenu
-        s.MakeRecipeFromMenu = function(ss, ...)
+        s.MakeRecipeFromMenu = function(ss, rec,...)
             ss.soramakerecipe = false
-            local x, y, z = oldMakeRecipeFromMenu(ss, ...)
+            local x, y, z = oldMakeRecipeFromMenu(ss,rec, ...)
             if not ss.soramakerecipe then
+                ss.soralastrecipe = rec.name
                 ss.inst.components.locomotor:Stop()
                 local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(),
                     "sora_cantbuild", 0, nil, 0)
@@ -1337,6 +1347,7 @@ if not TUNING.SORADISABLEGLOBAL then
         s.BufferBuild = function(ss, rec, ...)
             local x, y, z = oldBufferBuild(ss, rec, ...)
             if not ss.buffered_builds[rec] then
+                ss.soralastrecipe = rec
                 ss.inst.components.locomotor:Stop()
                 local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(),
                     "sora_cantbuild", 0, nil, 0)
@@ -1351,6 +1362,7 @@ if not TUNING.SORADISABLEGLOBAL then
             local x, y, z = oldMakeRecipeAtPoint(ss, rec, ...)
             if not ss:IsBuildBuffered(rec.name) and not ss.soramakerecipe then
                 ss.inst.components.locomotor:Stop()
+                ss.soralastrecipe = rec.name
                 local buffaction = BufferedAction(ss.inst, nil, ACTIONS.BUILD, nil, s.inst:GetPosition(),
                     "sora_cantbuild", 0, nil, 0)
                 ss.inst.components.locomotor:PushAction(buffaction, true)
@@ -1359,5 +1371,24 @@ if not TUNING.SORADISABLEGLOBAL then
             return x, y, z
         end
     end)
-
+    local oldfn = ACTIONS.BUILD.fn 
+    ACTIONS.BUILD.fn = function(act,...)
+        if act.doer.components.builder ~= nil and act.recipe == "sora_cantbuild" then
+            local builder = act.doer.components.builder
+            if builder.soralastrecipe  then 
+                builder.sorajusttest = true
+                local tosay = "制作失败,至少还缺:\n"
+                builder.soramakerecipecount = {}
+                builder:HasIngredients(builder.soralastrecipe)
+                for k,v in pairs(builder.soramakerecipecount) do 
+                    tosay = tosay  .. (STRINGS.NAMES[k:upper()] or k ) .. " * " .. tostring(v) .."\n"
+                end
+                builder.sorajusttest = nil
+                builder.soramakerecipecount = nil
+                Say(act.doer,tosay)
+            end
+            return true
+        end
+        return  oldfn(act,...)
+    end
 end
