@@ -273,6 +273,7 @@ if TUNING.SORACHESTRANGE > 2000 then
         if cmp:IsStop() then
             return
         end
+        TheWorld.components.sorachestmanager:UpdateAllChest()
         AllChestDrop()
         UpdateEnts()
         local topick = {}
@@ -331,6 +332,7 @@ else
         if cmp:IsStop() then
             return
         end
+        TheWorld.components.sorachestmanager:UpdateAllChest()
         AllChestDrop()
         UpdateEnts()
         local topick = {}
@@ -475,6 +477,7 @@ local GemTask = {
     end,
 
     purplegem = function(inst, data, v)
+        if TUNING.SORATOCHESTGEM then return end
         local pos = inst:GetPosition()
         local con = inst.components.container
         for k, container in pairs(data.containers) do
@@ -551,7 +554,7 @@ local function UpdateAllChest()
     local UnReg = {}
     for type, chests in pairs(allchest) do -- 统计失效箱子
         for k, v in pairs(chests) do
-            if not k:IsValid() then
+            if not (k:IsValid() and k.components.container )then
                 if not UnReg[type] then
                     UnReg[type] = {}
                 end

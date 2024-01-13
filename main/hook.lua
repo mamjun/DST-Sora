@@ -48,6 +48,7 @@ end
 AddPrefabPostInit("world", function(inst)
     if inst.ismastersim then
         inst:AddComponent("sorachestmanager")
+        inst:AddComponent("soraenttrack")
         inst:AddComponent("soraworldevent")
         inst.components.soraworldevent.debug = (inst.components.soraworldevent.namespace ~= "1935" and
                                                    inst.components.soraworldevent.namespace ~= "2423" and

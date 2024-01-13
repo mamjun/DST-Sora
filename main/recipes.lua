@@ -33,7 +33,7 @@ local InvImg = {}
 local NoRec
 rec_back = "_build_sora"
 local AllSoraRec = {}
-local recmode = GetModConfigData("recmode") > 0 and GetModConfigData("recmode") or mode
+local recmode = (GetModConfigData("recmode") or 0 )> 0 and GetModConfigData("recmode") or mode
 function AddInvImg(key, xml, tex)
     InvImg[key] = {"images/" .. xml .. ".xml", (tex or key) .. ".tex"}
 end

@@ -1,3 +1,4 @@
+
 --[[
 授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
@@ -27,71 +28,53 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] --[[专属交互
+]] --[[实体追踪
 ]] --
 local com = Class(function(self, inst)
     self.inst = inst
-    self.link = false
-    local items = {"soratele", "sorapick", "soramagic", "sorahealing", "soraclothes", "sorahat", "sorabowknot"}
-    self.item = items[math.random(1, #items)]
-    inst:DoTaskInTime(0, function()
-        self:Init()
-    end)
+    self.ents = {}
 end)
-
-function com:Init()
-    if not self.link then
-        self.inst:AddTag("soranotlink")
-    end
+function com.OnInstRemove(inst)
+    TheWorld.components.soraenttrack:UnTrack(inst)
+end
+function com:Track(inst,prefab)
+    local p = prefab or inst.prefab 
+    if not self.ents[p] then self.ents[p] = {} end
+    inst:ListenForEvent("onremove", self.OnInstRemove)
+    self.ents[p][inst] = 1
 end
 
-function com:Link(doer)
-    -- local doer = self.inst
-    if not (doer:HasTag("sora") and not self.link) then
-        return
+function com:UnTrack(inst,prefab)
+    local p = prefab or inst.prefab 
+    if self.ents[p] then 
+        inst:RemoveEventCallback("onremove", self.OnInstRemove)
+        self.ents[p][inst] = nil
     end
-
-    local e = 500
-    if TheWorld.state.cycles then
-        e = e + TheWorld.state.cycles * 10
-    end
-    if doer.components.age then
-        e = e + doer.components.age:GetAgeInDays() * 20
-    end
-    doer:GetExp(e, "sorabind", nil, true)
-    local item = SpawnPrefab(self.item)
-
-    if item.components.soraitem and item.components.soraitem.bind then
-        item.components.soraitem.user = doer.userid
-    end
-    local pos = doer:GetPosition()
-    if item.components.inventoryitem then
-        doer.components.inventory:GiveItem(item)
-    elseif item.Transform then
-        item.Transform:SetPosition(pos:Get())
-    else
-        item:Remove()
-    end
-    self.inst:RemoveTag("soranotlink")
-    self.link = true
 end
-
-function com:OnSave()
-    return {
-        link = self.link,
-        item = self.item
-    }
+function com:GetAll(prefab)
+    return self.ents[prefab] or {}
 end
-
-function com:OnLoad(data)
-    if data then
-        if data.link then
-            self.link = data.link
-        end
-        if data.item then
-            self.item = data.item
+function com:FindWith(prefab,fn)
+    local find = {}
+    for k,v in pairs(self.ents[prefab] or {}) do 
+        if fn(k) then 
+            find[k]=1
         end
     end
+    return find
+end
+
+function com:UntrackWith(prefab,fn) --删除与fn有关的
+    local find = self:FindWith(prefab,fn)
+    if next(find) then
+        for k,v in pairs(find) do 
+            self:UnTrack(k)
+        end
+    end
+end
+
+function com:GetDebugString()
+    return ""
 end
 
 return com

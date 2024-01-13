@@ -92,7 +92,7 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
-
+    TheWorld.components.soraenttrack:Track(inst,"sora_fl")
     inst:AddComponent("pickable")
     inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries"
     inst.components.pickable.onpickedfn = onpickedfn

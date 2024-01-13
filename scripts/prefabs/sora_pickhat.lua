@@ -152,6 +152,7 @@ local function fn()
     inst.Transform:SetSixFaced()
     inst:AddTag("NOBLOCK")
     inst:AddTag("cantpack")
+    inst:AddTag("nonpackable")
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
             inst.replica.container:WidgetSetup("sora_pickhat")

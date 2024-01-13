@@ -414,7 +414,6 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     s.OnControl = function(self, control, down)
         if self.focus and control == CONTROL_SECONDARY then
             m.OnClick(self, down)
-            return false
         end
         return m.OnControl(self, control, down)
     end

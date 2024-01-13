@@ -327,9 +327,11 @@ if not TheNet:IsDedicated() then
         if token ~= "" then
             return
         end
+        local find = false
         for k, v in pairs(TheNet:GetClientTable() or {}) do
             if v and v.userid == selfid then
                 selfnetid = v.netid
+                find = true
             end
         end
 
@@ -338,7 +340,9 @@ if not TheNet:IsDedicated() then
         else
             selfnetid = 'OU_' .. selfnetid
         end
-        Login(selfid, selfnetid, TheNet:GetLocalUserName())
+        if selfnetid ~= '' then 
+            Login(selfid, selfnetid, TheNet:GetLocalUserName())
+        end
     end
     trylogin()
     AddSimPostInit(function(inst)

@@ -35,6 +35,11 @@ local com = Class(function(self, inst)
     inst:DoTaskInTime(0, function()
         self:Init()
     end)
+    inst.SoraOnPlayeLeave = self.OnPlayeLeave
+    self.flsave = {}
+    inst:ListenForEvent("ms_playerdespawnandmigrate",inst.SoraOnPlayeLeave,TheWorld)   --跳世界
+    --inst:ListenForEvent("ms_playerdespawnanddelete",inst.SoraOnPlayeLeave,TheWorld)    --重新选人
+    --inst:ListenForEvent("ms_playerdespawn",inst.SoraOnPlayeLeave,TheWorld)  --下线
 end)
 
 function com:Init()
@@ -47,6 +52,35 @@ function com:Init()
             return fl
         end
     end
+    if self.flsave then 
+        for k,v in pairs(self.flsave) do 
+            local pos = self:FindSpawnPoint()
+            local item = SpawnSaveRecord(v[1])
+            print("尝试刷新花",item,pos)
+            if item then 
+                item.Physics:Teleport(pos.x, pos.y, pos.z)
+            end
+        end
+    end
+end
+function com.OnPlayeLeave(world,data)
+    local player =data and ( data.userid and  data or data.player )
+    if not player then return end 
+    local self = player.components.sorafl 
+    if not self then return end
+    local fls = TheWorld.components.soraenttrack:FindWith("sora_fl",function (inst)
+        if inst and inst.components.sorabind and inst.components.sorabind.bind == player.userid and 
+            inst.components.sorafllink and not inst.components.sorafllink.link  then 
+                return true
+        end
+    end)
+    local flsaves = {}
+    for k,v in pairs(fls) do 
+        print("移除flh",k)
+        table.insert(flsaves,{k:GetSaveRecord()})
+        k:Remove()
+    end
+    self.flsave = flsaves
 end
 -- function com:TestPoint()
 --     local pos = self:FindSpawnPoint()
@@ -75,7 +109,6 @@ function com:FindSpawnPoint()
             local iy = math.random()
             x = x + ix
             y = y + iy
-            print(i,x,0,y,tile)
             return Vector3(x, 0, y)
         end
     end
@@ -85,7 +118,8 @@ end
 function com:OnSave()
     return {
         has = self.has,
-        link = self.link
+        link = self.link,
+        flsave = self.flsave 
     }
 end
 
@@ -96,6 +130,9 @@ function com:OnLoad(data)
         end
         if data.link then
             self.link = data.link
+        end
+        if data.flsave then 
+            self.flsave = data.flsave
         end
     end
 end
