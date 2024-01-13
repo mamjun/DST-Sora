@@ -1011,7 +1011,7 @@ function com:UpdateChest(chest)
     UpdateChest(chest)
 end
 
-function com:UpdataAllChest()
+function com:UpdateAllChest()
     UpdateAllChest()
 end
 
