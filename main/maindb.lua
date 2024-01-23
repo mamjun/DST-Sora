@@ -347,7 +347,7 @@ local MainDB = Class(function(self)
     self.Asyns = {}
     -- RPC！
     self.RPCHandles = {}
-
+    self.OnNoticeHandles = {}
     self.Bigs = {} -- 大数据传输
 
     self.Syn = { -- 记录同步顺序和同步状态
@@ -418,7 +418,43 @@ function MainDB:Notice(event, data)
     if self.inst and self.inst:IsValid() then
         self.inst:PushEvent(event, data)
     end
+    if self.OnNoticeHandles  and self.OnNoticeHandles[event] then 
+        for k,v in pairs(self.OnNoticeHandles[event]) do 
+            if v.cb and (not v.fn or v.fn(self,event,data)) then 
+                v.cb(self,event,data)
+            end
+        end
+    end
 end
+function MainDB:OnNotice(event, key,fn,call)
+    if not (key and call) then return end
+    if not self.OnNoticeHandles[event] then 
+        self.OnNoticeHandles[event] = {}
+    end 
+    self.OnNoticeHandles[event][key] = {fn=fn,cb=call}
+end
+function MainDB:RemoveOnNotice(event, key)
+    if not (key ) then return end
+    if not self.OnNoticeHandles[event] then 
+        return 
+    end 
+    self.OnNoticeHandles[event][key] = nil
+end
+function MainDB:OnNoticeSet(noticekey, root,key,call)
+    if not call then return end
+    self:OnNotice("MainDBSet",noticekey, function (s,event,data)
+        if data.root == root then 
+            if key and data.key ~= key then 
+                return false
+            end
+            return true
+        end
+    end,call)
+end
+function MainDB:RemoveOnNoticeSet(noticekey)
+    self:RemoveOnNotice("Set", noticekey)
+end
+
 
 function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
     if cmd == "event" then -- 推送事件
@@ -481,6 +517,24 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
                             value = v
                         })
                     end
+                end
+            end
+        elseif type(d) == "nil" then
+            if data then 
+                self.data[data] = {} 
+                self:Notice("MainDBRootSync", {
+                    namespace = self.namespace,
+                    root = data,
+                    value = nil
+                })
+            else 
+                for k,v in pairs() do 
+                    self.data[k] = {} 
+                    self:Notice("MainDBRootSync", {
+                        namespace = self.namespace,
+                        root = k,
+                        value = nil
+                    })
                 end
             end
         end
@@ -631,7 +685,7 @@ function MainDB:GetRootHash(root, needhash) -- 获取hash值 用于对比同步
     local str = ""
     if not root then
         for k, v in pairs(self.data) do
-            for ik, iv in pairs(v) do
+            for ik, iv in pairs(v or {}) do
                 keys = keys + 1
             end
         end
@@ -639,7 +693,7 @@ function MainDB:GetRootHash(root, needhash) -- 获取hash值 用于对比同步
             hashs = self:GetTableHash(self.data)
         end
     elseif self.data[root] then
-        for k, v in pairs(self.data[root]) do
+        for k, v in pairs(self.data[root] or {}) do
             keys = keys + 1
         end
         if needhash then

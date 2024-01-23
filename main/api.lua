@@ -608,6 +608,34 @@ function TryLoadUI(str, ...) -- MakePcallFn
     return uiinst
 end
 
+local lastscr = nil
+global("TheSCR")
+function TryLoadSCR(str, ...) -- MakePcallFn
+    if lastscr then
+        TheFrontEnd:PopScreen(lastscr)
+        lastscr = nil
+    end
+    package.loaded["screens/" .. str] = nil
+    local ui = require("screens/" .. str)
+    local old = ui._ctor
+    local uiinst
+    ui._ctor = function(obj, ...)
+        uiinst = obj
+        return old(obj, ...)
+    end
+    local t, r = pcall(ui, ...)
+    if t then
+        uiinst = r
+    else
+        print("scrload", t, r)
+    end
+    GLOBAL.TheSCR = uiinst
+    lastscr = uiinst
+    TheFrontEnd:PushScreen(uiinst)
+    return uiinst
+end
+
+
 function CheckChestValid(inst)
     if inst and inst:IsValid() and inst.components.container then
         local container = inst.components.container

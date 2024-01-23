@@ -29,19 +29,38 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] --[[专属交互
 ]] --
+local allfl = {}
+SoraAPI.AllFL = allfl
 local com = Class(function(self, inst)
     self.inst = inst
+    allfl[inst]=1
     self.link = false
+    self.name = nil 
     local items = {"soratele", "sorapick", "soramagic", "sorahealing", "soraclothes", "sorahat", "sorabowknot"}
     self.item = items[math.random(1, #items)]
     inst:DoTaskInTime(0, function()
         self:Init()
     end)
 end)
-
+function com:OnRemoveEntity()
+    allfl[self.inst]=nil
+end
 function com:Init()
     if not self.link then
         self.inst:AddTag("soranotlink")
+    end
+    if not self.name then 
+        self.name = self.inst.components.sorabind.bind .. "|" .. tostring(math.random(100*100,100*100*10-1))
+        allfl[self.inst]=self.name
+    else
+        for k,v in pairs(allfl) do 
+            if v == self.name then  --重复的花 移除！
+                print("移除重复花",self.inst,self.name)
+                self.inst:DoTaskInTime(0,self.inst.Remove)  
+                return 
+            end
+        end
+        allfl[self.inst]=self.name
     end
 end
 
@@ -79,7 +98,8 @@ end
 function com:OnSave()
     return {
         link = self.link,
-        item = self.item
+        item = self.item,
+        name = self.name 
     }
 end
 
@@ -90,6 +110,9 @@ function com:OnLoad(data)
         end
         if data.item then
             self.item = data.item
+        end
+        if  data.name then 
+            self.name = data.name 
         end
     end
 end

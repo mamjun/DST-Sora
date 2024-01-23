@@ -29,13 +29,13 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]]
 local u = soraupdate    --内部接口
-u.SoraRecipes = {}
-for i=1,10 do
-    local name = "update_sora_"..i
-    STRINGS.NAMES[name:upper()] = ""
-    STRINGS.NAMES[name:upper()..'_BUILD'] = STRINGS.NAMES[name:upper()]
-	STRINGS.CHARACTERS.GENERIC.DESCRIBE[name:upper()] = [[]]
-    STRINGS.RECIPE_DESC[name:upper()] = [[]]
-    u.SoraRecipes[name]=AddRecipe(name,{},newtab,TECH.LOST,nil,nil,nil,nil,"soraupdate")
-    AllRecipes[name] = nil
-end
+-- u.SoraRecipes = {}
+-- for i=1,10 do
+--     local name = "update_sora_"..i
+--     STRINGS.NAMES[name:upper()] = ""
+--     STRINGS.NAMES[name:upper()..'_BUILD'] = STRINGS.NAMES[name:upper()]
+-- 	STRINGS.CHARACTERS.GENERIC.DESCRIBE[name:upper()] = [[]]
+--     STRINGS.RECIPE_DESC[name:upper()] = [[]]
+--     u.SoraRecipes[name]=AddRecipe(name,{},newtab,TECH.LOST,nil,nil,nil,nil,"soraupdate")
+--     AllRecipes[name] = nil
+-- end

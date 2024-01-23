@@ -37,8 +37,12 @@ end)
 function com:Init(doer, pass, name, id)
 
 end
-
-
+function com:OnRemoveEntity()
+    
+end
+function com:OnRemoveFromEntity()
+    
+end
 function com:OnSave()
     return {
         --add_component_if_missing_sora = (self.pass ~= "") and 1 or nil

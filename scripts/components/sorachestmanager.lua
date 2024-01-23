@@ -967,6 +967,9 @@ function com:RegType(type, data)
 end
 
 function com:RegByType(chest, type)
+    if not chest.components.container then 
+        return 
+    end
     if ChestData[type] then
         if not allchest[type] then
             allchest[type] = {}
@@ -982,6 +985,10 @@ function com:RegByType(chest, type)
         chest:ListenForEvent("itemget", OnItemGet)
         chest:ListenForEvent("itemlose", OnItemLose)
         chest:AddTag("sorasmartchest")
+        local oldfn = chest.components.container.OnRemoveFromEntity 
+        chest.components.container.OnRemoveFromEntity = function(...)
+            self:UnReg(chest)
+        end
     end
 end
 function com:UnReg(chest)

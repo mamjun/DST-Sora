@@ -316,6 +316,9 @@ if not TheNet:IsDedicated() then
     local get = GetTime
     local last = get()
     local function IsPlaying()
+        if ThePlayer and ThePlayer.soraisplayer  and not ThePlayer.soraisplayer:value() then 
+            return false
+        end
         local ct = get()
         return (ct-last) < 180
     end

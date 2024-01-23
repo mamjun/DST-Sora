@@ -682,6 +682,7 @@ local common_postinit = function(inst)
     }
     inst.soraexpmax = net_int(inst.GUID, "sora_expmax", "soraexpdirty")
     inst.soraexpper = net_int(inst.GUID, "sora_expper", "soraexpdirty")
+    inst.soraisplayer = net_bool(inst.GUID, "sora_isplayer", "soraplayerdirty")
     inst.AnimState:SetBuild("sora_uniforms")
     inst.AnimState:AddOverrideBuild("player_idles_wendy")
 end
@@ -745,6 +746,17 @@ local master_postinit = function(inst)
                 end
             end
         end
+    end)
+    local count = 0
+    inst:DoPeriodicTask(1,function ()
+        if inst.components.health and  (not inst.components.health:IsDead() and not inst.components.health.invincible ) then
+            count = count - 1 
+            count = math.max(count,0)
+        else 
+            count = count + 1 
+            count = math.min(count,10)
+        end
+        inst.soraisplayer:set(count<5)
     end)
     inst:AddComponent("reader")
     inst:DoTaskInTime(0.1, function()

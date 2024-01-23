@@ -56,11 +56,11 @@ function com:Init()
         for k,v in pairs(self.flsave) do 
             local pos = self:FindSpawnPoint()
             local item = SpawnSaveRecord(v[1])
-            print("尝试刷新花",item,pos)
             if item then 
                 item.Physics:Teleport(pos.x, pos.y, pos.z)
             end
         end
+        self.flsave = {}
     end
 end
 function com.OnPlayeLeave(world,data)
@@ -76,7 +76,6 @@ function com.OnPlayeLeave(world,data)
     end)
     local flsaves = {}
     for k,v in pairs(fls) do 
-        print("移除flh",k)
         table.insert(flsaves,{k:GetSaveRecord()})
         k:Remove()
     end
