@@ -43,19 +43,22 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2chest.zip"),
                 Asset("ATLAS", "images/inventoryimages/sora2chest.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2chest.tex"),
-                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest.xml", 256)}
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest.xml", 256),
+                Asset("ANIM", "anim/sora2chest_pkq.zip"), Asset("ATLAS", "images/inventoryimages/sora2chest_pkq.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2chest_pkq.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest_pkq.xml", 256)}
 
 local prefabs = {"collapse_small"}
 
 local function onopen(inst)
-    --inst.AnimState:PlayAnimation("open")
+    -- inst.AnimState:PlayAnimation("open")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
 
 local function onclose(inst, doer)
-    --TheWorld.components.sorachestmanager:OnClose(inst, doer)
-    --inst.AnimState:PlayAnimation("close")
-    --inst.AnimState:PlayAnimation("closed")
+    -- TheWorld.components.sorachestmanager:OnClose(inst, doer)
+    -- inst.AnimState:PlayAnimation("close")
+    -- inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
 end
 
@@ -68,12 +71,14 @@ local function onhammered(inst, worker)
 end
 local function updatesign(inst)
     local sign = nil
-    for k=1,25 do
-        local v  = inst.components.container:GetItemInSlot(k)
+    for k = 1, 25 do
+        local v = inst.components.container:GetItemInSlot(k)
         if v and v.prefab and v.components.inventoryitem then
-            sign = {name=v.prefab}
-            sign.image = v.replica.inventoryitem:GetImage() --v.components.inventoryitem.imagename and (v.components.inventoryitem.imagename ..".tex") or 
-            sign.atlas = v.replica.inventoryitem:GetAtlas() --v.components.inventoryitem.atlasname or 
+            sign = {
+                name = v.prefab
+            }
+            sign.image = v.replica.inventoryitem:GetImage() -- v.components.inventoryitem.imagename and (v.components.inventoryitem.imagename ..".tex") or 
+            sign.atlas = v.replica.inventoryitem:GetAtlas() -- v.components.inventoryitem.atlasname or 
             if v.inv_image_bg and v.inv_image_bg.image then
                 sign.bgimage = v.inv_image_bg.image
                 sign.bgatlas = v.inv_image_bg.atlas
@@ -85,20 +90,26 @@ local function updatesign(inst)
     if sign then
         inst.AnimState:Show("chestitem_bg")
         inst.AnimState:Show("swap_item")
-        inst.AnimState:OverrideSymbol("swap_item",sign.atlas,sign.image)
+        inst.AnimState:OverrideSymbol("swap_item", sign.atlas, sign.image)
         if sign.bgimage then
             inst.AnimState:Show("swap_item_bg")
-            inst.AnimState:OverrideSymbol("swap_item_bg",sign.bgatlas,sign.bgimage)
+            inst.AnimState:OverrideSymbol("swap_item_bg", sign.bgatlas, sign.bgimage)
         else
             inst.AnimState:Hide("swap_item_bg")
         end
     else
-        inst.AnimState:Hide("chestitem_bg")
-        inst.AnimState:Hide("swap_item_bg")
-        inst.AnimState:Hide("swap_item")
+        if not inst.skinname then
+            inst.AnimState:Hide("chestitem_bg")
+            inst.AnimState:Hide("swap_item_bg")
+            inst.AnimState:Hide("swap_item")
+        else
+            inst.AnimState:Show("chestitem_bg")
+            inst.AnimState:Hide("swap_item_bg")
+            inst.AnimState:Hide("swap_item")
+        end
     end
     inst.sorasign = sign
- end
+end
 local function onhit(inst, worker)
     inst.sorasign = nil
     updatesign(inst)
@@ -106,19 +117,19 @@ local function onhit(inst, worker)
         inst.components.container:DropEverything()
         TheWorld.components.sorachestmanager:OnClose(inst, worker)
     end
-    --inst.AnimState:PushAnimation("closed", false)
+    -- inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()
 end
 
 local function onbuilt(inst)
-    --inst.AnimState:PlayAnimation("place")
-    --inst.AnimState:PlayAnimation("closed")
+    -- inst.AnimState:PlayAnimation("place")
+    -- inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_craft")
 end
 local cmp = require "components/sorachestmanager"
 local data = {
-    containers = {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,21, 22, 23, 24, 25}},
-    controls = {26,27,28,29,30},
+    containers = {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}},
+    controls = {26, 27, 28, 29, 30},
     pri = 50,
     overfull = 1
 }
@@ -156,7 +167,9 @@ local data2 = {
             end
             inst.sora2chest:set_local(false)
             inst.sora2chest:set(true)
-            if not inst.prefab then inst.prefab = "treasurechest" end
+            if not inst.prefab then
+                inst.prefab = "treasurechest"
+            end
             TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
             inst:AddTag("sora2chest")
         end
@@ -166,9 +179,9 @@ local data2 = {
         -- 不给卸载 老子没写 嚣张
     end
 }
- if not TUNING.SORATOCHEST then
+if not TUNING.SORATOCHEST then
     cmp2:RegPatch("sora2chest", data2)
- end
+end
 
 local function fn()
     local inst = CreateEntity()
@@ -206,17 +219,19 @@ local function fn()
     inst.components.container.onclosefn = onclose
     inst:ListenForEvent("onclose", updatesign)
     inst:AddComponent("sorasavecmp")
-    inst.components.sorasavecmp:AddSave("sign",function (inst)
-        return inst.sorasign and {sign = inst.sorasign}
+    inst.components.sorasavecmp:AddSave("sign", function(inst)
+        return inst.sorasign and {
+            sign = inst.sorasign
+        }
     end)
-    inst.components.sorasavecmp:AddLoad("sign",function (inst,data)
+    inst.components.sorasavecmp:AddLoad("sign", function(inst, data)
         if data and data.sign then
-            if Prefabs[data.sign.name] then 
+            if Prefabs[data.sign.name] then
                 inst.sorasign = data.sign
             end
         end
     end)
-    inst:DoTaskInTime(0,updatesign)
+    inst:DoTaskInTime(0, updatesign)
     inst.prefab = "sora2chest"
     TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
 
@@ -268,5 +283,22 @@ local function placer_help(inst)
     inst.AnimState:Hide("swap_item")
     -- body
 end
+
+local tname = "sora2chest_pkq"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "皮卡丘",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sora2chest",
+    basebank = "sora2chest",
+    init_fn = function(inst)
+    end,
+
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
 return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle"),
     Prefab("sora_tochest", tochestfn, assets, prefabs)

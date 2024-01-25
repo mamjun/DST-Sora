@@ -50,12 +50,15 @@ function com:Init()
         self.inst:AddTag("soranotlink")
     end
     if not self.name then 
+        if not self.inst.components.sorabind.bind then 
+            self.inst:DoTaskInTime(0,self.inst.Remove)  
+            return 
+        end
         self.name = self.inst.components.sorabind.bind .. "|" .. tostring(math.random(100*100,100*100*10-1))
         allfl[self.inst]=self.name
     else
         for k,v in pairs(allfl) do 
             if v == self.name then  --重复的花 移除！
-                print("移除重复花",self.inst,self.name)
                 self.inst:DoTaskInTime(0,self.inst.Remove)  
                 return 
             end
