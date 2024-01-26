@@ -103,7 +103,7 @@ local function updatesign(inst)
             inst.AnimState:Hide("swap_item_bg")
             inst.AnimState:Hide("swap_item")
         else
-            inst.AnimState:Show("chestitem_bg")
+            inst.AnimState:Hide("chestitem_bg")
             inst.AnimState:Hide("swap_item_bg")
             inst.AnimState:Hide("swap_item")
         end
