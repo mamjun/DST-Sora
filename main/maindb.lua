@@ -371,6 +371,9 @@ local MainDB = Class(function(self)
     }
 end)
 -- 基础模块
+function MainDB:GetMiD()
+    return mid
+end
 function MainDB:Init(namespace, syntime, roottime) -- 初始化
     if self.Inited then
         return
@@ -915,7 +918,9 @@ function CreateMainDB(namespace, syntime, roottime)
     db:Init(namespace, syntime, roottime)
     return db
 end
-
+function GetMID()
+    return mid
+end
 -- GLOBAL.DB = CreateMainDB("test",300,1)
 -- AddPrefabPostInit("forest",function(inst)
 --     inst.components.TestDB = DB

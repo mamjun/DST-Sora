@@ -33,7 +33,18 @@ MODKEY = "sora"
 SORADEBUG = modname:find("dev") and true or false
 DebugPrint = function(...)
     if SORADEBUG  then
-        print(...)
+        local args = {...}
+        for k,v in pairs(args or {}) do 
+            if type(v) == "string" and v:utf8len() > 200 then 
+                local t = {}
+                TheSim:LuaPrint("----more "..tostring(t):sub(-8).."---")
+                TheSim:LuaPrint(v)
+
+                args[k] = v:sub(1,20) .. " ...| " .. tostring(t):sub(-8)
+                
+            end
+        end
+        print(unpack(args))
     end
 end
 
