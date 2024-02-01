@@ -304,6 +304,8 @@ local function hash(str)
 end
 --坑爹玩意  klei的hash函数 在linux下和windows下对中文处理不一致
 --重新抄了个  https://blog.csdn.net/weixin_36298476/article/details/113055407
+
+local json = SoraAPI.json
 if not TheNet:GetIsServer() then
     env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
     end)

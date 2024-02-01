@@ -15,6 +15,7 @@ local rpcprint = env.DEBUGPRINT or env.DebugPrint or print -- 可以在外面定
     选人界面可以收发event 但是不会无法触发RPC 因为选人界面无法触发task  Get Set的只会同步一次 
 
 ]]
+local json = SoraAPI.json
 local intmax = 2 ^ 32 
 local function hash(str)
     local n = 5381

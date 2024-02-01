@@ -48,6 +48,7 @@ function com:Init()
         if pos then
             local fl = SpawnAt("sora_fl", pos)
             fl.components.sorabind:Bind(self.inst.userid, self.inst.name)
+            print("生成风铃草",self.inst.userid,self.inst.name,pos)
             self.has = true
             return fl
         end
@@ -56,6 +57,7 @@ function com:Init()
         for k,v in pairs(self.flsave) do 
             local pos = self:FindSpawnPoint()
             local item = SpawnSaveRecord(v[1])
+            print("重新生成风铃草",self.inst.userid,self.inst.name,pos)
             if item then 
                 item.Physics:Teleport(pos.x, pos.y, pos.z)
             end
@@ -77,6 +79,7 @@ function com.OnPlayeLeave(world,data)
     local flsaves = {}
     for k,v in pairs(fls) do 
         table.insert(flsaves,{k:GetSaveRecord()})
+        print("带走风铃草",player.userid,player.name,k:GetPosition())
         k:Remove()
     end
     self.flsave = flsaves

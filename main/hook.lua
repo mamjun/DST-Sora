@@ -37,10 +37,10 @@ local function Onplayerdespawnanddelete(world, data)
         if TheWorld.ismastershard then
             Onsoradespawn(player.userid, player.soraexp:value())
         else
-            TheWorld.components.soraworldevent:PushEvent("soradespawn", {
+            GLOBALDB:PushEvent("soradespawn", {
                 userid = player.userid,
                 soraexp = player.soraexp:value()
-            }, 0, true)
+            }, GetMID())
         end
     end
 end
@@ -49,19 +49,19 @@ AddPrefabPostInit("world", function(inst)
     if inst.ismastersim then
         inst:AddComponent("sorachestmanager")
         inst:AddComponent("soraenttrack")
-        inst:AddComponent("soraworldevent")
-        inst.components.soraworldevent.debug = (inst.components.soraworldevent.namespace ~= "1935" and
-                                                   inst.components.soraworldevent.namespace ~= "2423" and
-                                                   inst.components.soraworldevent.namespace ~= "4507" and
-                                                   inst.components.soraworldevent.namespace ~= "a-de")
+        -- inst:AddComponent("soraworldevent")
+        -- inst.components.soraworldevent.debug = (inst.components.soraworldevent.namespace ~= "1935" and
+        --                                            inst.components.soraworldevent.namespace ~= "2423" and
+        --                                            inst.components.soraworldevent.namespace ~= "4507" and
+        --                                            inst.components.soraworldevent.namespace ~= "a-de")
         inst:AddComponent("soraexpsave")
-        inst.components.soraworldevent:SetNameSpace("sora")
-        inst.components.soraworldevent:SetTimer(5)
+        --inst.components.soraworldevent:SetNameSpace("sora")
+        --inst.components.soraworldevent:SetTimer(5)
         inst:ListenForEvent("ms_playerdespawn", Onplayerdespawnanddelete)
         inst:ListenForEvent("ms_playerdespawnandmigrate", Onplayerdespawnanddelete)
         inst:ListenForEvent("ms_playerdespawnanddelete", Onplayerdespawnanddelete)
         if inst.ismastershard then
-            inst.components.soraworldevent:ListenForEvent("soradespawn", function(inst, data)
+            GLOBALDB:ListenForEvent("soradespawn", function(inst, data)
                 Onsoradespawn(data.userid, data.soraexp)
             end)
         end

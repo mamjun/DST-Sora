@@ -81,7 +81,7 @@ function event:push(event,data)        --内部方法
 end
 
 function event:GetJson()            --内部方法  组装json
-    local r,ret = pcall(json.encode,self.t) --组装json
+    local r,ret = pcall(SoraAPI.json.encode,self.t) --组装json
     return ret 
 end
 local function protect(x,y)
@@ -94,7 +94,7 @@ function event:SysEvent()        --接受和发送事件
     if rf then 
         local r = rf:read('*a')
         rf:close()
-        local _,rjs = pcall(json.decode,r)  --解析文件
+        local _,rjs = pcall(SoraAPI.json.decode,r)  --解析文件
         if rjs then 
         --清除对方已确认接收的
             if rjs.recive then 

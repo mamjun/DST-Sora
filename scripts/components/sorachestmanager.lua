@@ -31,6 +31,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] --
 SoraAPI.ChestData = {}
 local cmp
+local json = SoraAPI.json
 local orderData = {}
 local allchest = {}
 --[[prefab = {

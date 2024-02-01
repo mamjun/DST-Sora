@@ -37,6 +37,7 @@ setmetatable(env, {
     end
 }) -- 注册全局表
 local U
+local json = SoraAPI.json
 local u = soraupdate -- 内部接口
 local com = Class(function(self) -- 自动更新组件
     env.self = self -- 注册到env里面

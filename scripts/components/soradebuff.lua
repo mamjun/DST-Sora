@@ -147,7 +147,7 @@ function com:OnLoad(data)
 end
 
 function com:GetDebugString()
-    return "buffs: " .. json.encode(self.buffs)
+    return "buffs: " .. SoraAPI.json.encode(self.buffs)
 end
 
 return com

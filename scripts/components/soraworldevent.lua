@@ -31,7 +31,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local basepath = "../mods/"..TUNING.SORAMODNAME..'/log/'     
 --缓存文件路径 需要提前创建 temp目录 
 --在 modmain里定义SORAMODNAME 或者直接写死
-local json  = require("json")
+local json = SoraAPI.json
 
 local workmode = {          --同一命名空间的工作模式要求相同 否则结果未知
     MasterSlave = 1,        --主从模式 主世界支持发送到指定世界 从世界只支持发送到主世界 

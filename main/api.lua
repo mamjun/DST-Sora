@@ -33,6 +33,7 @@ GLOBAL.SoraUp = up
 -- 注册全局API
 GLOBAL.SoraAPI = env
 GLOBAL.SORAAPI = env
+json = require("utils/jsonfl")
 
 userdata = require("utils/sorauserdatahook")
 GLOBAL.SoraUserData = userdata

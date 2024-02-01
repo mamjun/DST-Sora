@@ -32,7 +32,7 @@ local skinowner = {} -- 服务器所有人拥有的皮肤
 local selfowner = {} -- 自己拥有的皮肤
 local skinowner_tmp = {} -- 自己拥有的皮肤_限时皮肤
 local selfowner_tmp = {} -- 自己拥有的皮肤_限时皮肤
-
+local json = SoraAPI.json
 local islogin = {} -- 已经登录过的玩家
 local autologin = {} -- 服务器自动获取一次皮肤
 local selfid = TheNet:GetUserID()

@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 --require "config/debug"
 require "prefabutil"
-
+local json = SoraAPI.json
 local sorapacker = Class(function(self, inst)
 	self.inst = inst
 	self.placerstring = net_string(inst.GUID,"sorapacker.placerstring","placerstringdirty")
