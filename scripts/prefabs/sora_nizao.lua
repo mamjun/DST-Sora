@@ -215,8 +215,8 @@ function makelightflier()
                 return {
                     init = (inst.cat and inst.cat:IsValid() and 1 or 0),
                     data = d,
-                    refs = r
-                }
+                },r
+                
             end
             return data
         end)

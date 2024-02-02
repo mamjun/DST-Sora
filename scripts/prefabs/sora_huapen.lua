@@ -244,7 +244,7 @@ local function fn()
             if item and item.prefab == "opalpreciousgem" then
                 return
             end
-            if item and item.components.stackable and not item.components.stackable:IsFull() then
+            if item and item.replica.stackable and item.components.stackable and not item.components.stackable:IsFull() then
                 item.components.stackable.stacksize = item.components.stackable.stacksize + 1
                 i.SoundEmitter:PlaySound("dontstarve/creatures/together/deer/chain")
             end

@@ -636,7 +636,6 @@ function TryLoadSCR(str, ...) -- MakePcallFn
     return uiinst
 end
 
-
 function CheckChestValid(inst)
     if inst and inst:IsValid() and inst.components.container then
         local container = inst.components.container
@@ -734,9 +733,9 @@ function Gift(gifts, data, doer)
             end
         end
     end
-    if data.itemfn then 
+    if data.itemfn then
         for k, v in pairs(items) do
-            data.itemfn(v,data,doer)
+            data.itemfn(v, data, doer)
         end
     end
     if #items > 0 then
@@ -752,10 +751,64 @@ function Gift(gifts, data, doer)
         for i, v in ipairs(items) do
             v:Remove()
         end
-        if data.giftfn then 
-            packer.giftfn(packer,data,doer)
+        if data.giftfn then
+            packer.giftfn(packer, data, doer)
         end
         return packer
     end
     return
 end
+
+function CreateTaskList()
+    local UpdateList = {
+        top = nil,
+        last = nil
+    }
+    -- local ListMax = 600 --最大600 多了就不调度了
+    local function PushTask(fn, ...)
+        local this = {
+            fn = fn,
+            args = {...},
+            next = nil
+        }
+        if not UpdateList.top then
+            UpdateList.top = this
+        end
+        if UpdateList.last then
+            UpdateList.last.next = this
+        end
+        UpdateList.last = this
+    end
+    local function PopTask()
+        -- 调度一个任务
+        local this = UpdateList.top
+        if this then
+            this.fn(unpack(this.args))
+            if this.next then -- 下一个往前调度
+                UpdateList.top = this.next
+                this.next = nil
+            else
+                UpdateList.top = nil
+            end
+        end
+    end
+    local function GetTask()
+        local i = 0
+        if not UpdateList.top then
+            return 0
+        end
+        local this = UpdateList.top
+        i = i + 1
+        while this.next do
+            i = i + 1
+            this = this.next
+        end
+        return i
+    end
+    return {
+        PushTask = PushTask,
+        PopTask = PopTask,
+        GetTask = GetTask
+    }
+end
+

@@ -186,10 +186,14 @@ local ThankYouPopup = require "screens/thankyoupopup"
 local function PushThankYouPopup(item)
     local map = GetSkinMapByBase(item)
     local data = {}
-    for k,v in pairs(map) do 
-        table.insert(data,{item=k,item_id=1,gifttype = "SORASSKIN"})
+    for k, v in pairs(map) do
+        table.insert(data, {
+            item = k,
+            item_id = 1,
+            gifttype = "SORASSKIN"
+        })
     end
-   TheFrontEnd:PushScreen(ThankYouPopup(data))
+    TheFrontEnd:PushScreen(ThankYouPopup(data))
 
 end
 local apiurl = "http://skin.fl.lovetly.top/api/Dst"
@@ -316,13 +320,13 @@ if not TheNet:IsDedicated() then
     local get = GetTime
     local last = get()
     local function IsPlaying()
-        if ThePlayer and ThePlayer.soraisplayer  and not ThePlayer.soraisplayer:value() then 
+        if ThePlayer and ThePlayer.soraisplayer and not ThePlayer.soraisplayer:value() then
             return false
         end
         local ct = get()
-        return (ct-last) < 180
+        return (ct - last) < 180
     end
-    local function  ReSetPlay(...)
+    local function ReSetPlay(...)
         last = get()
     end
     GetSkins(selfid)
@@ -343,7 +347,7 @@ if not TheNet:IsDedicated() then
         else
             selfnetid = 'OU_' .. selfnetid
         end
-        if selfnetid ~= '' then 
+        if selfnetid ~= '' then
             Login(selfid, selfnetid, TheNet:GetLocalUserName())
         end
     end
@@ -367,11 +371,13 @@ if not TheNet:IsDedicated() then
                 Login(selfid, selfnetid, TheNet:GetLocalUserName())
             end
             if ThePlayer and ThePlayer:HasTag("sora") then
-                if IsPlaying() then  OnLine() end
+                if IsPlaying() then
+                    OnLine()
+                end
             end
         end)
         TheInput:AddMoveHandler(ReSetPlay)
-        --TheInput:AddControlHandler(ReSetPlay)
+        -- TheInput:AddControlHandler(ReSetPlay)
     end)
 end
 
@@ -381,11 +387,53 @@ if TheNet:GetIsServer() then
             GetSkins(inst.userid)
         end)
     end)
+    local UpdateList = {
+        top = nil,
+        last = nil
+    }
+    -- local ListMax = 600 --最大600 多了就不调度了
+    local function AddToList(fn, ...)
+        local this = {
+            fn = fn,
+            args = {...},
+            next = nil
+        }
+        if not UpdateList.top then
+            UpdateList.top = this
+        end
+        if UpdateList.last then
+            UpdateList.last.next = this
+        end
+        UpdateList.last = this
+    end
+    local function PopTask()
+        -- 调度一个任务
+        local this = UpdateList.top 
+        if this then 
+            this.fn(unpack(this.args))
+            if this.next then   --下一个往前调度
+                UpdateList.top  = this.next
+                this.next = nil
+            else
+                UpdateList.top = nil
+            end
+        end
+    end
     AddSimPostInit(function(inst)
+        TheWorld:DoPeriodicTask(1, PopTask)
         TheWorld:DoPeriodicTask(600, function()
             local t = TheNet:GetClientTable()
-            for k, v in pairs(t) do
-                GetSkins(v.userid)
+            if #t > 10 then
+                -- 人太多 只更新本世界的 
+                for k, v in pairs(AllPlayers) do
+                    if v.userid then
+                        AddToList(GetSkins, v.userid)
+                    end
+                end
+            else
+                for k, v in pairs(t) do
+                    AddToList(GetSkins, v.userid)
+                end
             end
         end)
     end)
@@ -471,7 +519,8 @@ local skinhandle = {
                             config.open = gifts.open
                             gifts.open = nil
                             config.name = "礼包:" .. (data.name or "未知")
-                            config.des  = "礼包:" .. (data.name or "未知") .. "\r\n内含:" .. (data.item or "未知")
+                            config.des = "礼包:" .. (data.name or "未知") .. "\r\n内含:" ..
+                                             (data.item or "未知")
                             config.cdk = cdk
                             local packer = SoraAPI.Gift(gifts, config, inst)
                             inst.components.inventory:GiveItem(packer, nil, inst:GetPosition())
