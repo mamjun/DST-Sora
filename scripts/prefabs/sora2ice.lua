@@ -40,7 +40,8 @@ local assets = {Asset("ANIM", "anim/sora2ice.zip"), Asset("ANIM", "anim/soraches
                 Asset("ANIM", "anim/sora2ice_flower.zip"),
                 Asset("ATLAS", "images/inventoryimages/sora2ice_flower.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2ice_flower.tex"),
-                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_flower.xml", 256)
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_flower.xml", 256),
+
             }
 
 local prefabs = {"collapse_small"}

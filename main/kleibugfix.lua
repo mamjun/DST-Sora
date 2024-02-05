@@ -92,3 +92,15 @@ AddComponentPostInit("workable",function (self)
      end
 end)
 
+
+AddComponentPostInit("moonbeastspawner",function (self)
+    self.OnEntitySleep = self.Stop
+    local oldStart = self.Start
+    self.Start = function(s,...)
+        if self.inst:IsAsleep() then 
+            self:Stop()
+            return 
+        end
+        return oldStart(s,...)
+    end
+end)

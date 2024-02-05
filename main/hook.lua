@@ -47,6 +47,7 @@ end
 
 AddPrefabPostInit("world", function(inst)
     if inst.ismastersim then
+        inst.soraismastersim = true
         inst:AddComponent("sorachestmanager")
         inst:AddComponent("soraenttrack")
         -- inst:AddComponent("soraworldevent")

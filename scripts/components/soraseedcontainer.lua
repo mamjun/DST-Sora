@@ -106,7 +106,7 @@ local c = Class(function(self, inst)
     self.inst = inst
 end)
 function c:GetDB()
-    if TheWorld.ismastersim then
+    if TheWorld.soraismastersim then
         local db = nil
         if self.inst and self.inst.owner and self.inst.owner.userid then
             db = SoraAPI.GetClientDB("seeds", self.inst.owner.userid, true)
@@ -136,7 +136,7 @@ function c:GetAllSeeds()
     return seedinfo
 end
 function c:CollectAllSeeds()
-    if TheWorld.ismastersim then
+    if TheWorld.soraismastersim then
         self:HandleCollectAllSeeds(ThePlayer)
     else
         local db = self:GetDB()
@@ -144,7 +144,7 @@ function c:CollectAllSeeds()
     end
 end
 function c:GetSeeds(name)
-    if TheWorld.ismastersim then
+    if TheWorld.soraismastersim then
         self:HandleGetSeeds(ThePlayer, name)
     else
         local db = self:GetDB()

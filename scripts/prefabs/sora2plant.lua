@@ -984,7 +984,7 @@ local function fn()
     if not allseeds then
         allseeds = inst.components.soraseedcontainer:GetAllName()
     end
-    if not TheWorld.ismastersim then
+    if not TheWorld.soraismastersim then
         inst.components.spellbook:SelectSpell(7)
         return inst
     end

@@ -58,7 +58,7 @@ function com:Init()
     if self.inst.components.pickable then
         local old = self.inst.components.pickable.Pick 
         self.inst.components.pickable.Pick = function(s,doer,...)
-            if not (doer and (doer:HasTag("sora") and doer.userid == self.bind  or  TUNING.ENABLESORABINDPICK and doer and doer.Network:IsServerAdmin())) then
+            if not (doer and (doer:HasTag("sora") and doer.userid == self.bind  or  TUNING.ENABLESORABINDPICK and doer and doer.Network and doer.Network:IsServerAdmin())) then
                 return true
             end
             return old(s,doer,...)

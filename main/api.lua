@@ -805,10 +805,14 @@ function CreateTaskList()
         end
         return i
     end
+    local function GetAll()
+        return UpdateList
+    end
     return {
         PushTask = PushTask,
         PopTask = PopTask,
-        GetTask = GetTask
+        GetTask = GetTask,
+        GetAll = GetAll,
     }
 end
 

@@ -37,6 +37,11 @@ local assets =
 	Asset("ATLAS", "images/inventoryimages/sora2fire.xml"),
 	Asset("IMAGE", "images/inventoryimages/sora2fire.tex"),
 	Asset("ATLAS_BUILD", "images/inventoryimages/sora2fire.xml", 256),
+
+    Asset("ANIM", "anim/sora2fire_xhl.zip"),
+	Asset("ATLAS", "images/inventoryimages/sora2fire_xhl.xml"),
+	Asset("IMAGE", "images/inventoryimages/sora2fire_xhl.tex"),
+	Asset("ATLAS_BUILD", "images/inventoryimages/sora2fire_xhl.xml", 256),
 }
 
 local prefabs =
@@ -174,6 +179,21 @@ local function fn()
 
     return inst
 end
+local tname = "sora2fire_xhl"
+    SoraAPI.MakeItemSkin("sora2fire",tname, {
+        
+        name = "小火龙",
+        atlas = "images/inventoryimages/" .. tname .. ".xml",
+        image = tname,
+        build = tname,
+        bank = tname,
+        basebuild = "sora2fire",
+        basebank =  "sora2fire",
+        init_fn = function(inst)
+        end,
 
+        checkfn = SoraAPI.SoraSkinCheckFn,
+        checkclientfn = SoraAPI.SoraSkinCheckClientFn
+    })
 return Prefab("sora2fire", fn, assets, prefabs),
     MakePlacer("sora2fire_placer", "sora2fire", "sora2fire", "idle")

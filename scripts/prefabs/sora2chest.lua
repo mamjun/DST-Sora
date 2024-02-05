@@ -46,7 +46,14 @@ local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2ch
                 Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest.xml", 256),
                 Asset("ANIM", "anim/sora2chest_pkq.zip"), Asset("ATLAS", "images/inventoryimages/sora2chest_pkq.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2chest_pkq.tex"),
-                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest_pkq.xml", 256)}
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest_pkq.xml", 256),
+                Asset("ANIM", "anim/sora2chest_sns.zip"), Asset("ATLAS", "images/inventoryimages/sora2chest_sns.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2chest_sns.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest_sns.xml", 256),
+
+                Asset("ANIM", "anim/sora2chest_jng.zip"), Asset("ATLAS", "images/inventoryimages/sora2chest_jng.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2chest_jng.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2chest_jng.xml", 256)}
 
 local prefabs = {"collapse_small"}
 
@@ -70,6 +77,10 @@ local function onhammered(inst, worker)
     inst:Remove()
 end
 local function updatesign(inst)
+    if not TheWorld.ismastersim then 
+        return
+    end
+    if not inst.components.container then return end
     local sign = nil
     for k = 1, 25 do
         local v = inst.components.container:GetItemInSlot(k)
@@ -97,12 +108,19 @@ local function updatesign(inst)
         else
             inst.AnimState:Hide("swap_item_bg")
         end
+        if inst.skinname == "sora2chest_sns" then
+            inst.AnimState:Hide("chest")
+        else
+            inst.AnimState:Show("chest")
+        end
     else
         if not inst.skinname then
+            inst.AnimState:Show("chest")
             inst.AnimState:Hide("chestitem_bg")
             inst.AnimState:Hide("swap_item_bg")
             inst.AnimState:Hide("swap_item")
         else
+            inst.AnimState:Show("chest")
             inst.AnimState:Hide("chestitem_bg")
             inst.AnimState:Hide("swap_item_bg")
             inst.AnimState:Hide("swap_item")
@@ -293,12 +311,45 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     bank = tname,
     basebuild = "sora2chest",
     basebank = "sora2chest",
-    init_fn = function(inst)
-    end,
-
+    init_fn = updatesign,
+    clear_fn =function (inst)
+        inst:DoTaskInTime(0,updatesign)
+    end ,
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
+local tname = "sora2chest_sns"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "水凝兽",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sora2chest",
+    basebank = "sora2chest",
+    init_fn = updatesign,
+    clear_fn =function (inst)
+        inst:DoTaskInTime(0,updatesign)
+    end ,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+local tname = "sora2chest_jng"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
 
+    name = "杰尼龟",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sora2chest",
+    basebank = "sora2chest",
+    init_fn = updatesign,
+    clear_fn =function (inst)
+        inst:DoTaskInTime(0,updatesign)
+    end ,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
 return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle"),
     Prefab("sora_tochest", tochestfn, assets, prefabs)
