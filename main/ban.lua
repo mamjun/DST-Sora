@@ -127,11 +127,23 @@ local function Fuckjhbj()
         end)
     end
 end
-
+local function CheckMoGu()
+    if IsModEnable("蘑菇慕斯")  then
+        TheSim:GetPersistentString("SoraCheckMogu", function(load_success, data) 
+            if not load_success or ((tonumber(data) or 0 )< (os.time()-24*3600*31))then
+                (ThePlayer or TheWorld):DoTaskInTime(1,function()
+                    SoraPushPopupDialog("小穹的温馨提示","你已经开启了<<蘑菇慕斯>>\n如发生崩溃或者bug\n请在关闭蘑菇慕斯后再试","我已了解",function() end)
+                    TheSim:SetPersistentString("SoraCheckMogu",(tostring(os.time())),false)
+               end)
+            end
+        end)
+    end
+end
 local function CheckNamePostInit(self)
     ThePlayer:DoTaskInTime(1,CheckName)
     ThePlayer:DoTaskInTime(1,CheckMod)
     ThePlayer:DoTaskInTime(2,Fuckjhbj)
+    ThePlayer:DoTaskInTime(4,CheckMoGu)
     --ThePlayer:DoTaskInTime(2,FuckGemCore)
 end
 AddClassPostConstruct("widgets/controls", CheckNamePostInit) 

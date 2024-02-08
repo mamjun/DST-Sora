@@ -58,14 +58,18 @@ local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2ch
 local prefabs = {"collapse_small"}
 
 local function onopen(inst)
-    -- inst.AnimState:PlayAnimation("open")
+    if inst.skinname == 'sora2chest_sns' then 
+        inst.AnimState:PlayAnimation("open")
+    else
+        inst.AnimState:PlayAnimation("idle")
+    end
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
 
 local function onclose(inst, doer)
     -- TheWorld.components.sorachestmanager:OnClose(inst, doer)
     -- inst.AnimState:PlayAnimation("close")
-    -- inst.AnimState:PlayAnimation("closed")
+    inst.AnimState:PlayAnimation("idle")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
 end
 
@@ -125,6 +129,11 @@ local function updatesign(inst)
             inst.AnimState:Hide("swap_item_bg")
             inst.AnimState:Hide("swap_item")
         end
+    end
+    if inst.skinname == "sora2chest_sns" and inst.components.container:IsOpen() then
+        inst.AnimState:PlayAnimation("open")
+    else
+        inst.AnimState:PlayAnimation("idle")
     end
     inst.sorasign = sign
 end

@@ -806,7 +806,7 @@ local SPELLS = {{
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("收农作物")
         Setreticule(inst)
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(OnPickFn)
         end
     end,
@@ -817,7 +817,7 @@ local SPELLS = {{
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("照料植物")
         Setreticule(inst)
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(OnPlantFn)
         end
     end,
@@ -828,7 +828,7 @@ local SPELLS = {{
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("田地施肥")
         Setreticule(inst)
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(OnFeiFn)
         end
     end,
@@ -839,7 +839,7 @@ local SPELLS = {{
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("刨地十格")
         Setreticule(inst)
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(On10Fn)
         end
     end,
@@ -850,7 +850,7 @@ local SPELLS = {{
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("刨坑4x4")
         Setreticule(inst)
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(On4x4Fn)
         end
     end,
@@ -861,7 +861,7 @@ local SPELLS = {{
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("刨地3x3")
         Setreticule(inst)
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(On3x3Fn)
         end
     end,
@@ -871,7 +871,7 @@ local SPELLS = {{
     label = "范", -- 扩大操作范围
     onselect = function(inst)
         inst.components.spellbook:SetSpellName("改变范围")
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(OnRangeFn)
             inst.seeds = nil
             local doer = inst.components.inventoryitem:GetGrandOwner()
@@ -892,7 +892,7 @@ local SPELLS = {{
             ThePlayer.HUD.controls.containerroot.soraseedui =
                 ThePlayer.HUD.controls.containerroot:AddChild(ui(ThePlayer))
         end
-        if TheWorld.ismastersim then
+        if TheWorld.soraismastersim then
             inst.components.aoespell:SetSpellFn(OnSeedFn)
         end
     end,
@@ -903,8 +903,8 @@ local SPELLS = {{
 for k, v in pairs(SPELLS) do
     local oldonselect = v.onselect
     v.onselect = function(inst, ...)
-        -- print("onselect", k, TheWorld.ismastersim, inst)
-        if not TheWorld.ismastersim then
+        -- print("onselect", k, TheWorld.soraismastersim, inst)
+        if not TheWorld.soraismastersim then
             SoraAPI.SoraRPC:PushEvent("SelectBook", {
                 id = k
             }, nil, inst)
@@ -1078,7 +1078,7 @@ local function fxfn(Sim)
     inst:AddTag("sora2plant_fx")
     inst.entity:SetPristine()
     inst.wet_prefix = ""
-    if not TheWorld.ismastersim then
+    if not TheWorld.soraismastersim then
         return inst
     end
     inst:AddComponent("named")
