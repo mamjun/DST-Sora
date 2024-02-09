@@ -112,7 +112,7 @@ local function updatesign(inst)
         else
             inst.AnimState:Hide("swap_item_bg")
         end
-        if inst.skinname == "sora2chest_sns" then
+        if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp" )then
             inst.AnimState:Hide("chest")
         else
             inst.AnimState:Show("chest")
@@ -130,7 +130,7 @@ local function updatesign(inst)
             inst.AnimState:Hide("swap_item")
         end
     end
-    if inst.skinname == "sora2chest_sns" and inst.components.container:IsOpen() then
+    if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp") and inst.components.container:IsOpen() then
         inst.AnimState:PlayAnimation("open")
     else
         inst.AnimState:PlayAnimation("idle")
@@ -340,6 +340,25 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     clear_fn =function (inst)
         inst:DoTaskInTime(0,updatesign)
     end ,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeItemSkin("sora2chest", tname.."_tmp", {
+    name = "水凝兽(限时)",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sora2chest",
+    basebank = "sora2chest",
+    init_fn = updatesign,
+    clear_fn =function (inst)
+        inst:DoTaskInTime(0,updatesign)
+    end ,
+    rarity = "限时体验",
+    rarityorder = 80,
+    raritycorlor = {0.957, 0.769, 0.188, 1},
+    FrameSymbol = "heirloom",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

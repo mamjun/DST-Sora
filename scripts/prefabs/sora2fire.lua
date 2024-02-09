@@ -195,5 +195,24 @@ local tname = "sora2fire_xhl"
         checkfn = SoraAPI.SoraSkinCheckFn,
         checkclientfn = SoraAPI.SoraSkinCheckClientFn
     })
+    SoraAPI.MakeItemSkin("sora2fire",tname.."_tmp", {
+        
+        name = "小火龙(限时)",
+        atlas = "images/inventoryimages/" .. tname .. ".xml",
+        image = tname,
+        build = tname,
+        bank = tname,
+        basebuild = "sora2fire",
+        basebank =  "sora2fire",
+        init_fn = function(inst)
+        end,
+
+        rarity = "限时体验",
+        rarityorder = 80,
+        raritycorlor = {0.957, 0.769, 0.188, 1},
+        FrameSymbol = "heirloom",
+        checkfn = SoraAPI.SoraSkinCheckFn,
+        checkclientfn = SoraAPI.SoraSkinCheckClientFn
+    })
 return Prefab("sora2fire", fn, assets, prefabs),
     MakePlacer("sora2fire_placer", "sora2fire", "sora2fire", "idle")
