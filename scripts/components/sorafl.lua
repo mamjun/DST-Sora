@@ -70,6 +70,11 @@ function com.OnPlayeLeave(world,data)
     if not player then return end 
     local self = player.components.sorafl 
     if not self then return end
+    if self.hassave then 
+        print("重复收到事件")
+        return 
+    end
+    self.hassave = 1 
     local fls = TheWorld.components.soraenttrack:FindWith("sora_fl",function (inst)
         if inst and inst.components.sorabind and inst.components.sorabind.bind == player.userid and 
             inst.components.sorafllink and not inst.components.sorafllink.link  then 
@@ -83,6 +88,7 @@ function com.OnPlayeLeave(world,data)
         k:Remove()
     end
     self.flsave = flsaves
+    print("保存风铃草",GetTableSize(self.flsave))
 end
 -- function com:TestPoint()
 --     local pos = self:FindSpawnPoint()
@@ -118,6 +124,7 @@ function com:FindSpawnPoint()
 end
 
 function com:OnSave()
+    print("sorafl_onsave",GetTableSize(self.flsave))
     return {
         has = self.has,
         link = self.link,

@@ -330,7 +330,7 @@ local function pick(inst, item, hat)
         end
     end)
 end
-local birdsname = {{"crow", "咸鱼"}, {"robin", "勤劳的羊姐"}, {"robin_winter", "大鼻子路猪"},
+local birdsname = {{"crow", "咸鱼"}, {"robin", "勤劳的羊姐"}, {"robin_winter", "欢猪"},
                    {"canary", "墨宝"}, {"quagmire_pigeon", "咕咕桃"}}
 for k, v in pairs(birdsname) do
     table.insert(assets, Asset("ANIM", "anim/" .. v[1] .. "_build.zip"))

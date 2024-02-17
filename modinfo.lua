@@ -27,9 +27,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
- author = "FL"
-version = "11.33" -- 版本
+]] author = "FL"
+version = "11.34" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -268,7 +267,7 @@ configuration_options = {maketitle("jichu", "基础设置"), {
         hover = "隐藏强迫症箱子介绍"
     }},
     default = true
-},{
+}, {
     name = "add",
     label = "扩展打包纸，允许打包落水洞等物品，\n但是请不要带这些东西跳世界，会出问题",
     options = {{
@@ -320,7 +319,7 @@ configuration_options = {maketitle("jichu", "基础设置"), {
         hover = "允许上强迫症"
     }},
     default = false
-},{
+}, {
     name = "tochestgem",
     label = "禁止强迫症紫宝石打包",
     options = {{
@@ -558,8 +557,8 @@ configuration_options = {maketitle("jichu", "基础设置"), {
                          makeconfig("san1", "基础回SAN", "%s", 0, -5, 0.5, 30),
                          makeconfig("san2", "升级回SAN", "%s", 0.2, 0, 0.1, 50),
                          makeconfig("san3", "特殊回SAN", "%s", 10, -5, 1, 55),
-                         makeconfig("foodd1", "基础反鲜(负的才是返鲜,正的是腐烂)", "%s", 0.25, -1, 0.05, 30),
-                         makeconfig("foodd2", "升级反鲜(负的才是返鲜,正的是腐烂)", "%s", -0.1, -0.5, 0.1, 20),
+                         makeconfig("foodd1", "基础反鲜(负的才是返鲜,正的是腐烂)", "%s", 0.25, -1, 0.05,
+    30), makeconfig("foodd2", "升级反鲜(负的才是返鲜,正的是腐烂)", "%s", -0.1, -0.5, 0.1, 20),
                          makeconfig("spe", "移速", "%s%%", 1.1, 0.7, 0.05, 16, 1),
                          makeconfig("water", "防水", "%s%%", 0, 0, 0.05, 20, 0),
                          maketitle("sorabowknot", "穹の蝴蝶结"),
