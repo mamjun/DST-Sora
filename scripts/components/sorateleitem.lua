@@ -55,6 +55,12 @@ local function toprefab(prefab)
     return prefabmaps[prefab] or prefab or "unprefab"
 end
 local itemfn = {
+    flxunbao = function(inst, doer, target)
+        if target.data and target.data.pos and target.data.worldid ~= "-1" then
+            return true,target.data.pos
+        end
+        return false, "预言失败\n无法传送"
+    end,
     medal_treasure_map = function(inst, doer, target)
         if target.getTreasurePoint then
             local data = target:getTreasurePoint()
@@ -150,7 +156,7 @@ function com:TryTele(doer, target)
         if next(allitems) then
             local item
             doer.sorateleindex = (doer.sorateleindex or 0)
-            local index = doer.sorateleindex % #allitems  +1 
+            local index = doer.sorateleindex % #allitems + 1
             doer.sorateleindex = doer.sorateleindex + 1
             for i = 1, 100 do
                 if allitems[index] and allitems[index] ~= target and not FindEntity(allitems[index], 4, nil, {"player"}) then

@@ -416,7 +416,7 @@ function isArray(t)
     local maxIndex = 0
     for k, v in pairs(t) do
         if (type(k) == 'number' and math.floor(k) == k and 1 <= k) then -- k,v is an indexed pair
-            if k > 100 then
+            if k > 1000 then
                 return false
             end
             if (not isEncodable(v)) then

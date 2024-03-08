@@ -183,17 +183,43 @@ end)
 
 -- 网络部分
 local ThankYouPopup = require "screens/thankyoupopup"
-local function PushThankYouPopup(item)
+local function PushThankYouPopup(item,skindata)
     local map = GetSkinMapByBase(item)
     local data = {}
     for k, v in pairs(map) do
         table.insert(data, {
             item = k,
+         
             item_id = 1,
-            gifttype = "SORASSKIN"
+            gifttype = "SORASKIN"
         })
     end
-    TheFrontEnd:PushScreen(ThankYouPopup(data))
+    local scr = ThankYouPopup(data)
+    if skindata then 
+
+        if skindata.skinname then 
+            local oldSetSkinName = scr.SetSkinName
+            scr.SetSkinName = function(s,...)
+                oldSetSkinName(s,...)
+                scr.item_name:SetString(skindata.skinname)
+            end
+        end
+        if item:match("^IOU_") then 
+            local oldChangeGift = scr.ChangeGift
+            scr.ChangeGift = function(s,...)
+                oldChangeGift(s,...)
+                scr.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON",GetInventoryItemAtlas("waxpaper.tex"),"waxpaper.tex")
+            end
+            local oldOpenGift = scr.OpenGift
+            scr.OpenGift = function(s,...)
+                oldOpenGift(s,...)
+                scr.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON",GetInventoryItemAtlas("waxpaper.tex"),"waxpaper.tex")
+            end
+            scr.title:SetString("欠条(到期自动兑换)")
+            --scr.bg:SetTexture()
+        end
+    end
+    TheFrontEnd:PushScreen(scr)
 
 end
 local apiurl = "http://skin.fl.lovetly.top/api/Dst"
@@ -635,7 +661,6 @@ end)
 -- 上线激活连衣长裙
 
 STRINGS.THANKS_POPUP.SORASKIN = '感谢游玩小穹'
-
 if not TheNet:IsDedicated() then
     AddPrefabPostInit("sora", function(inst)
         inst:DoTaskInTime(5, function()
@@ -678,6 +703,7 @@ end
 if not TheNet:IsDedicated() then
     local GameTimeUnLockScreen -- 提前定义
     local CdkUnLockScreen -- 提前定义
+    
     local SkinActive = {
         sora_gete = function(s, item)
             local scr = GameTimeUnLockScreen(item)
@@ -708,6 +734,12 @@ if not TheNet:IsDedicated() then
     local item_map = {
         sora_none = "sora_uniforms"
     }
+    PushCDKScr = function(str)
+        local scr = CdkUnLockScreen("sora_none")
+        scr.unlocktext:SetString(str or "仅用于解锁穹妹CDK")
+        TheFrontEnd:PushScreen(scr)
+        return scr
+    end
     AddClassPostConstruct("widgets/redux/itemexplorer", function(self)
         local old_ShowItemSetInfo = self._ShowItemSetInfo
         self._ShowItemSetInfo = function(s, ...)
@@ -724,7 +756,7 @@ if not TheNet:IsDedicated() then
         self._UpdateItemSelectedInfo = function(s, item, ...)
             -- print(item,...)
             local r = old_UpdateItemSelectedInfo(s, item, ...)
-            if SkinActive[item] and not selfowner[item] then
+            if SkinActive[item] and not selfowner[item] and s.set_info_btn then
                 s.set_info_btn:SetText("激活")
                 s.set_info_btn:Show()
                 s.set_item_type = item
@@ -1008,7 +1040,7 @@ if not TheNet:IsDedicated() then
                         SkinRPC('GetSkins', true)
                         GetSkins(selfid)
                         TheFrontEnd:PopScreen(self)
-                        PushThankYouPopup(data.skinprefab)
+                        PushThankYouPopup(data.skinprefab,{skinname=data.skinname})
                     elseif (code == 6231) then
                         SkinRPC('UseCDK', cdk, true)
                         -- SoraPushPopupDialog('小穹的温馨提示',
