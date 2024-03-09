@@ -379,5 +379,11 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle"),
+local function chestpt(inst)
+    --inst.AnimState:Hide("chestitem_bg")
+    inst.AnimState:Hide("swap_item_bg")
+    inst.AnimState:Hide("swap_item")
+    -- body
+end
+return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle",nil,nil,nil,nil,nil,nil,chestpt),
     Prefab("sora_tochest", tochestfn, assets, prefabs)
