@@ -183,40 +183,42 @@ end)
 
 -- 网络部分
 local ThankYouPopup = require "screens/thankyoupopup"
-local function PushThankYouPopup(item,skindata)
+local function PushThankYouPopup(item, skindata)
     local map = GetSkinMapByBase(item)
     local data = {}
     for k, v in pairs(map) do
         table.insert(data, {
             item = k,
-         
+
             item_id = 1,
             gifttype = "SORASKIN"
         })
     end
     local scr = ThankYouPopup(data)
-    if skindata then 
+    if skindata then
 
-        if skindata.skinname then 
+        if skindata.skinname then
             local oldSetSkinName = scr.SetSkinName
-            scr.SetSkinName = function(s,...)
-                oldSetSkinName(s,...)
+            scr.SetSkinName = function(s, ...)
+                oldSetSkinName(s, ...)
                 scr.item_name:SetString(skindata.skinname)
             end
         end
-        if item:match("^IOU_") then 
+        if item:match("^IOU_") then
             local oldChangeGift = scr.ChangeGift
-            scr.ChangeGift = function(s,...)
-                oldChangeGift(s,...)
-                scr.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON",GetInventoryItemAtlas("waxpaper.tex"),"waxpaper.tex")
+            scr.ChangeGift = function(s, ...)
+                oldChangeGift(s, ...)
+                scr.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", GetInventoryItemAtlas("waxpaper.tex"),
+                    "waxpaper.tex")
             end
             local oldOpenGift = scr.OpenGift
-            scr.OpenGift = function(s,...)
-                oldOpenGift(s,...)
-                scr.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON",GetInventoryItemAtlas("waxpaper.tex"),"waxpaper.tex")
+            scr.OpenGift = function(s, ...)
+                oldOpenGift(s, ...)
+                scr.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", GetInventoryItemAtlas("waxpaper.tex"),
+                    "waxpaper.tex")
             end
             scr.title:SetString("欠条(到期自动兑换)")
-            --scr.bg:SetTexture()
+            -- scr.bg:SetTexture()
         end
     end
     TheFrontEnd:PushScreen(scr)
@@ -301,6 +303,8 @@ local function GetSkins(userid)
     end)
 end
 local gametimes = 0
+local gametimesuse = 0
+local gametimesunuse = 0
 local function Login(userid, netid, nick)
     SkinApi('c/Login', {
         kid = userid,
@@ -312,6 +316,12 @@ local function Login(userid, netid, nick)
             tokentime = 3600
             if data.time then
                 gametimes = data.time
+                if data.use then
+                    gametimesuse = data.use
+                end
+                if data.unuse then
+                    gametimesunuse = data.unuse
+                end
             end
         else
             print("LoginFailed", msg, type(data) == "table" and fastdump(data) or data)
@@ -325,6 +335,12 @@ local function OnLine()
     SkinApi('c/online/', {}, function(code, msg, data)
         if code > 3000 and data and data.time then
             gametimes = data.time
+            if data.use then
+                gametimesuse = data.use
+            end
+            if data.unuse then
+                gametimesunuse = data.unuse
+            end
         else
             return false
         end
@@ -434,11 +450,11 @@ if TheNet:GetIsServer() then
     end
     local function PopTask()
         -- 调度一个任务
-        local this = UpdateList.top 
-        if this then 
+        local this = UpdateList.top
+        if this then
             this.fn(unpack(this.args))
-            if this.next then   --下一个往前调度
-                UpdateList.top  = this.next
+            if this.next then -- 下一个往前调度
+                UpdateList.top = this.next
                 this.next = nil
             else
                 UpdateList.top = nil
@@ -702,17 +718,28 @@ end
 -- 客户端UI
 if not TheNet:IsDedicated() then
     local GameTimeUnLockScreen -- 提前定义
+    local GameTimeUnLockScreen2 -- 提前定义
     local CdkUnLockScreen -- 提前定义
-    
+    local allskins, allitemskin -- 提前定义
     local SkinActive = {
         sora_gete = function(s, item)
-            local scr = GameTimeUnLockScreen(item)
+            local scr = GameTimeUnLockScreen(item, 300)
             scr.unlocktext:SetString("在线游玩50小时解锁")
             return scr
         end,
-        sora_amly = function(s, item)
+        sora_amly2 = function(s, item)
             local scr = CdkUnLockScreen(item)
             scr.unlocktext:SetString("不定期发放CDK")
+            return scr
+        end,
+        sora_amly = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 600)
+            scr.unlocktext:SetString("消耗600活跃度解锁/群里大量掉落")
+            return scr
+        end,
+        sora_sllh = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 600)
+            scr.unlocktext:SetString("消耗600活跃度解锁")
             return scr
         end,
         sora_none = function(s, item)
@@ -819,7 +846,13 @@ if not TheNet:IsDedicated() then
         self.anim_root:SetPosition(-150, -50)
         self.anim = self.anim_root:AddChild(UIAnim())
         self.animstate = self.anim:GetAnimState()
-        self.animstate:SetBuild(item_map[item] or item)
+        local swap = item_map[item] or item
+        local build = swap
+        local skin = GetSkin(swap)
+        if skin and skin.isitemskins then
+            build = "sora_uniforms"
+        end
+        self.animstate:SetBuild(build)
         self.animstate:SetBank("wilson")
         self.animstate:PlayAnimation("emoteXL_loop_dance0", true)
         self.animstate:AddOverrideBuild("player_emote_extra")
@@ -833,7 +866,18 @@ if not TheNet:IsDedicated() then
         self.icon:GetAnimState():SetBank("accountitem_frame")
         self.icon:GetAnimState():SetBuild("accountitem_frame")
         self.icon:GetAnimState():PlayAnimation("icon", true)
-        self.icon:GetAnimState():OverrideSkinSymbol("SWAP_ICON", item_map[item] or item, "SWAP_ICON")
+        if skin then
+            if skin.swap_icon then
+                self.icon:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.swap_icon.build, skin.swap_icon.image)
+            elseif skin.image then
+                self.icon:GetAnimState():OverrideSkinSymbol("SWAP_ICON", softresolvefilepath(skin.atlas),
+                    skin.image .. ".tex")
+            else
+                self.icon:GetAnimState():OverrideSkinSymbol("SWAP_ICON", swap, "SWAP_ICON")
+            end
+        else
+            self.icon:GetAnimState():OverrideSkinSymbol("SWAP_ICON", swap, "SWAP_ICON")
+        end
 
         self.icon:GetAnimState():Hide("TINT")
         self.icon:GetAnimState():Hide("LOCK")
@@ -919,18 +963,11 @@ if not TheNet:IsDedicated() then
     function UnLockScreen:Close()
         TheFrontEnd:PopScreen(self)
     end
-    GameTimeUnLockScreen = Class(UnLockScreen, function(self, item, cb)
-        UnLockScreen._ctor(self, item, cb)
-        local pro = gametimes / 300
-        -- self.progressbar = self.content_root:AddChild(UIAnim())
-        -- self.progressbar:GetAnimState():SetBank("skin_progressbar")
-        -- self.progressbar:GetAnimState():SetBuild("skin_progressbar")
-        -- self.progressbar:GetAnimState():PlayAnimation("fill_progress", false)
-        -- self.progressbar:GetAnimState():SetPercent("fill_progress", pro)
-        -- self.progressbar:GetAnimState():Show("platinum")
-        -- self.progressbar:GetAnimState():Show("gold")
-        -- self.progressbar:SetPosition(0, 0) 
-        -- self.progressbar:SetScale(2,2,1)
+
+    GameTimeUnLockScreen = Class(UnLockScreen, function(self, item, time)
+        UnLockScreen._ctor(self, item)
+        time = time or 300
+        local pro = gametimes / time
 
         self.characterprogress = self.content_root:AddChild(
             Text(HEADERFONT, 40, nil, {255 / 255, 215 / 255, 0 / 255, 1}))
@@ -939,23 +976,30 @@ if not TheNet:IsDedicated() then
         self.characterprogress:SetString(string.format("当前进度: %0.1f%%", pro * 100))
 
         self.cb = function(s, i)
-            if gametimes >= 300 then
+            if gametimes >= time then
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
                 SkinApi('c/ActiveSkin', {
-                    skin = 'sora_gete'
+                    skin = self.item
                 }, function(code, msg, data)
                     TheFrontEnd:PopScreen(a)
-                    if code == 5021 then
+                    if code == 5031 then
                         SkinRPC('GetSkins', true)
                         GetSkins(selfid)
-                        PushThankYouPopup("sora_gete")
-                    elseif code == 5020 then
-                        SoraPushPopupDialog('小穹的温馨提示',
-                            "你已经拥有了[穹妹-哥特萝莉],不需要重复激活")
-                        SkinRPC('GetSkins')
+                        PushThankYouPopup(data.skinprefab)
+                    elseif code == 5032 then
+                        SkinRPC('GetSkins', true)
                         GetSkins(selfid)
-                    elseif code == -5022 then
-                        SoraPushPopupDialog('小穹的温馨提示', "时间计算出错,请半小时后再试")
+                        if data.use then
+                            gametimesuse = data.use
+                        end
+                        if data.unuse then
+                            gametimesunuse = data.unuse
+                        end
+                        SoraPushPopupDialog('小穹的温馨提示', tostring(data.msg))
+                        PushThankYouPopup(data.skinprefab)
+
+                    elseif code < 0 then
+                        SoraPushPopupDialog('小穹的温馨提示', tostring(data))
                     else
                         SoraPushPopupDialog('小穹的温馨提示', "皮肤激活失败,错误代码:" .. code .. info)
                     end
@@ -964,10 +1008,57 @@ if not TheNet:IsDedicated() then
                 return
             else
                 SoraPushPopupDialog("小穹的温馨提示",
-                    "在线时长不足50小时\n激活失败\n如果时长不对 请过半小时再试")
+                    "在线时长不足\n激活失败\n如果时长不对 请过半小时再试")
             end
         end
     end)
+
+    GameTimeUnLockScreen2 = Class(UnLockScreen, function(self, item, time)
+        UnLockScreen._ctor(self, item)
+        time = time or 300
+
+        self.characterprogress = self.content_root:AddChild(
+            Text(HEADERFONT, 40, nil, {255 / 255, 215 / 255, 0 / 255, 1}))
+        self.characterprogress:SetPosition(-200, 10)
+        self.characterprogress:SetString(string.format("可用活跃度: %d ", gametimesunuse))
+        self.cb = function(s, i)
+            if gametimesunuse >= time then
+                local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
+                SkinApi('c/ActiveSkin', {
+                    skin = self.item
+                }, function(code, msg, data)
+                    TheFrontEnd:PopScreen(a)
+                    if code == 5031 then
+                        SkinRPC('GetSkins', true)
+                        GetSkins(selfid)
+                        PushThankYouPopup(data.skinprefab)
+                    elseif code == 5032 then
+                        SkinRPC('GetSkins', true)
+                        GetSkins(selfid)
+                        if data.use then
+                            gametimesuse = data.use
+                        end
+                        if data.unuse then
+                            gametimesunuse = data.unuse
+                        end
+                        SoraPushPopupDialog('小穹的温馨提示', tostring(data.msg))
+                        PushThankYouPopup(data.skinprefab)
+
+                    elseif code < 0 then
+                        SoraPushPopupDialog('小穹的温馨提示', tostring(data))
+                    else
+                        SoraPushPopupDialog('小穹的温馨提示', "皮肤激活失败,错误代码:" .. code .. info)
+                    end
+                end)
+
+                return
+            else
+                SoraPushPopupDialog("小穹的温馨提示",
+                    "在线时长不足\n激活失败\n如果时长不对 请过半小时再试")
+            end
+        end
+    end)
+
     CdkUnLockScreen = Class(UnLockScreen, function(self, item, cb)
         UnLockScreen._ctor(self, item, cb)
         self.cdkbox = self.content_root:AddChild(TEMPLATES.StandardSingleLineTextEntry(nil, 360, 40))
@@ -1040,7 +1131,9 @@ if not TheNet:IsDedicated() then
                         SkinRPC('GetSkins', true)
                         GetSkins(selfid)
                         TheFrontEnd:PopScreen(self)
-                        PushThankYouPopup(data.skinprefab,{skinname=data.skinname})
+                        PushThankYouPopup(data.skinprefab, {
+                            skinname = data.skinname
+                        })
                     elseif (code == 6231) then
                         SkinRPC('UseCDK', cdk, true)
                         -- SoraPushPopupDialog('小穹的温馨提示',

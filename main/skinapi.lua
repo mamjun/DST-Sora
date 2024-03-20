@@ -28,8 +28,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.08
--- v1.08 更新  增加物品皮肤对ThankYouPopup的兼容  需要自行注册 ATLAS_BUILD
+-- verion = 1.09
+-- v1.09 更新  增加GetAllSkin 方法 新增 isitemskins 和 ischaracterskins 属性
+-- v1.08 更新  增加物品皮肤对ThankYouPopup的兼容  需要自行注册 ATLAS_BUILD  
 -- v1.07 更新  增加 MakeSkinNameMap GetSkinMap GetSkinMapByBase 三个方法
 -- v1.06 更新 新增对 [API] Modded Skins 的捕获逃逸
 -- v1.05 更新 修复兼容性问题
@@ -115,6 +116,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         if not skincharacters[base] then skincharacters[base] = true end
         characterskins[skinname] = data
         data.base_prefab = base
+        data.ischaracterskins = true
         data.rarity = data.rarity or "Loyal" -- 默认珍惜度
         data.build_name_override = data.build_name_override or skinname
         -- 不存在的珍惜度 自动注册字符串
@@ -187,6 +189,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         data.type = nil
         itemskins[skinname] = data
         data.base_prefab = base
+        data.isitemskins = true
         data.rarity = data.rarity or "Loyal" -- 默认珍惜度
         data.build_name_override = data.build_name_override or skinname
         -- 不存在的珍惜度 自动注册字符串
@@ -515,6 +518,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     end
 
     function GetSkin(name) return characterskins[name] or itemskins[name] or nil end
+    function GetAllSkin() return characterskins,itemskins end
     
 
     if recipe_help then
