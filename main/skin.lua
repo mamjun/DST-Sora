@@ -42,6 +42,7 @@ local function IsDefaultCharacterSkin(item_key)
 end
 
 function SoraSkinCheckFn(inventory, name)
+    if inventory and not name then name = inventory end
     return IsDefaultCharacterSkin(name) or (selfowner[name] or selfowner_tmp[name]) and true or false
 end
 
@@ -54,16 +55,23 @@ function SoraSkinCheckClientFn(inventory, userid, name)
     end
     return IsDefaultCharacterSkin(name) or false
 end
-
+UseSkin = {}
+-- {    ClientFN  ServerFN}
 -- 破解很简单,逮到就完蛋
+function RegUseSkinFN(item, serverfn, clientfn)
+    UseSkin[item] = {
+        serverfn = serverfn,
+        clientfn = clientfn
+    }
+end
 
+RegUseSkinFN("sora2ice")
 -- 先读取缓存  尽力而为 读不到就算了
 local cache = "SoraSkinCache"
 local servercache = cache .. "_server"
 if TheNet:GetIsServer() then
     TheSim:GetPersistentString(servercache, function(load_success, str)
         if load_success then
-            -- print(servercache, str)
             local r, j = pcall(json.decode, str)
             if r and j.tmp and j.owner then
                 for k, v in pairs(j.owner) do
@@ -85,7 +93,7 @@ end
 if not TheNet:IsDedicated() then
     TheSim:GetPersistentString(cache, function(load_success, str)
         if load_success then
-            -- print(cache, str)
+            
             local r, j = pcall(json.decode, str)
             if r and j.tmp and j.owner then
                 for k, v in pairs(j.owner) do
@@ -272,7 +280,6 @@ local function GetSkins(userid)
     SkinApi("s/GetSkins", {
         kid = userid
     }, function(code, msg, data)
-
         if code == 2001 and data.items then
             skinowner[userid] = {}
             for k, v in pairs(data.items) do
@@ -721,6 +728,14 @@ if not TheNet:IsDedicated() then
     local GameTimeUnLockScreen2 -- 提前定义
     local CdkUnLockScreen -- 提前定义
     local allskins, allitemskin -- 提前定义
+    local ItemScreen
+    local AddLine = soraenv.AddLine
+    local AddText = soraenv.AddText
+    local AddButton = soraenv.AddButton
+    local AddImgButton = soraenv.AddImgButton
+    local ImageButton = soraenv.ImageButton
+    local ItemSkin = {}
+    
     local SkinActive = {
         sora_gete = function(s, item)
             local scr = GameTimeUnLockScreen(item, 300)
@@ -756,14 +771,84 @@ if not TheNet:IsDedicated() then
             local scr = CdkUnLockScreen(item)
             scr.unlocktext:SetString("QQ群(908132556)内绑定后,游戏时长+群聊天数>150可以获取 ")
             return scr
-        end
+        end,
+        sora2base_big = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 300)
+            scr.unlocktext:SetString("消耗300活跃度解锁")
+            return scr
+        end,
+        sora2base_small = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 300)
+            scr.unlocktext:SetString("消耗300活跃度解锁")
+            return scr
+        end,
+        sora2ice_seed = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 300)
+            scr.unlocktext:SetString("消耗300活跃度解锁")
+            return scr
+        end,
+        sora2ice_flower = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 300)
+            scr.unlocktext:SetString("消耗300活跃度解锁")
+            return scr
+        end,
+       sora2chest_pkq = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 300)
+            scr.unlocktext:SetString("消耗300活跃度解锁")
+            return scr
+        end,
+        sora2chest_jng = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 300)
+            scr.unlocktext:SetString("消耗300活跃度解锁")
+            return scr
+        end,
+
     }
+
+    function AddItemSkin(item,des,time)
+        table.insert(ItemSkin,{item,des,time or 300})
+    end
+    AddItemSkin("sora2chest_sns","情之所生，由心而起")
+    AddItemSkin("sora2chest_pkq","就决定是你了,皮卡丘!")
+    AddItemSkin("sora2chest_jng","杰尼杰尼杰尼杰尼杰！")
+    AddItemSkin("sora2fire_xhl","禁止用尾巴烤火")
+    AddItemSkin("sora2fire_hrh","而你,我的朋友\n你才是真正的帕鲁")
+    AddItemSkin("sora2fire_hhl","摸耳朵是禁止事项!")
+    AddItemSkin("sora2fire_hjl","人家才不是伊布呢")
+    AddItemSkin("sora2ice_flower","你已被移出群聊'花开富贵'")
+    AddItemSkin("sora2ice_seed","来点种子,蟹蟹")
+    AddItemSkin("sora_pearl_pd","人家不是胖\n只是叫胖丁")
+    AddItemSkin("sora2base_big","谁不喜欢大的呢\n对,我说的就是祭坛")
+    AddItemSkin("sora2base_small","谁不喜欢小的呢\n对,我说的就是祭坛")
     local item_map = {
         sora_none = "sora_uniforms"
     }
+    -- UI定义
+    local Screen = require "widgets/screen"
+    local Text = require "widgets/text"
+    local UIAnim = require "widgets/uianim"
+    local Image = require "widgets/image"
+    local Widget = require "widgets/widget"
+    local TEMPLATES = require "widgets/redux/templates"
+    local AccountItemFrame = require "widgets/redux/accountitemframe"
+    local MAX_ITEMS = 5
+    local LINE_HEIGHT = 44
+    local TEXT_WIDTH = 300
+    local TEXT_OFFSET = 40
+    local FONT = BUTTONFONT
+    local FONT_SIZE = 32
+    local ITEM_SCALE = 0.6
+    local IMAGE_X = -55
+    local OWNED_COLOUR = UICOLOURS.WHITE
+    local NEED_COLOUR = UICOLOURS.GREY
     PushCDKScr = function(str)
         local scr = CdkUnLockScreen("sora_none")
         scr.unlocktext:SetString(str or "仅用于解锁穹妹CDK")
+        TheFrontEnd:PushScreen(scr)
+        return scr
+    end
+    PushItemScr = function(str)
+        local scr = ItemScreen()
         TheFrontEnd:PushScreen(scr)
         return scr
     end
@@ -778,38 +863,58 @@ if not TheNet:IsDedicated() then
             end
             return old_ShowItemSetInfo(s, ...)
         end
+        self.soraitem_btn = self.interact_root:AddChild(TEMPLATES.StandardButton(function()
+            local scr = PushItemScr()
+        
+        end, "物品皮肤", {130, 45}))
+        self.soraitem_btn:SetPosition(150, 0)
+        self.soraitem_btn:Hide()
 
         local old_UpdateItemSelectedInfo = self._UpdateItemSelectedInfo
         self._UpdateItemSelectedInfo = function(s, item, ...)
-            -- print(item,...)
             local r = old_UpdateItemSelectedInfo(s, item, ...)
             if SkinActive[item] and not selfowner[item] and s.set_info_btn then
                 s.set_info_btn:SetText("激活")
                 s.set_info_btn:Show()
                 s.set_item_type = item
             end
+            if item == "sora_none" then
+                self.soraitem_btn:Show()
+            else
+                self.soraitem_btn:Hide()
+            end
             return r
         end
     end)
-    -- UI定义
-    local Screen = require "widgets/screen"
-    local Text = require "widgets/text"
-    local UIAnim = require "widgets/uianim"
-    local Image = require "widgets/image"
-    local Widget = require "widgets/widget"
-    local TEMPLATES = require "widgets/redux/templates"
+    AddClassPostConstruct("screens/playerinfopopupscreen", function(self)
 
-    local MAX_ITEMS = 5
-    local LINE_HEIGHT = 44
-    local TEXT_WIDTH = 300
-    local TEXT_OFFSET = 40
-    local FONT = BUTTONFONT
-    local FONT_SIZE = 32
-    local ITEM_SCALE = 0.6
-    local IMAGE_X = -55
-    local OWNED_COLOUR = UICOLOURS.WHITE
-    local NEED_COLOUR = UICOLOURS.GREY
+        self.sorabtnroot = self.root:AddChild(Widget("sorabtnroot"))
+        self.sorabtnroot:SetPosition(-155, -205)
+        self.soraitembtn = self.sorabtnroot:AddChild(TEMPLATES.StandardButton(function()
+            PushItemScr()
+        end, "物品皮肤", {60, 30}))
+        self.soraitembtn:SetPosition(35, 0)
+        self.soracdkbtn = self.sorabtnroot:AddChild(TEMPLATES.StandardButton(function()
+            PushCDKScr()
+        end, "激活CDK", {60, 30}))
+        self.soracdkbtn:SetPosition(-35, 0)
+        self.sorabtnroot:Hide()
+        local old = self.MakeBG
+        self.MakeBG = function(s, ...)
+            if self.currentcharacter == "sora" then
+                self.sorabtnroot:Show()
+            else
+                self.sorabtnroot:Hide()
+            end
+            return old(s, ...)
+        end
 
+        if self.currentcharacter == "sora" then
+            self.sorabtnroot:Show()
+        else
+            self.sorabtnroot:Hide()
+        end
+    end)
     local UnLockScreen = Class(Screen, function(self, item, cb)
         Screen._ctor(self, "UnLockScreen")
         self.item = item
@@ -961,6 +1066,9 @@ if not TheNet:IsDedicated() then
     end
 
     function UnLockScreen:Close()
+        if self.OnCloseCB then 
+            self.OnCloseCB.CloseCB(self.OnCloseCB,self)
+        end
         TheFrontEnd:PopScreen(self)
     end
 
@@ -1148,6 +1256,212 @@ if not TheNet:IsDedicated() then
             end
         end
     end)
+
+    ItemScreen = Class(Screen, function(self)
+        Screen._ctor(self, "ItemScreen")
+        self.root = self:AddChild(Widget("root"))
+        self.root:SetPosition(0, 0)
+        self.root:SetHAnchor(ANCHOR_MIDDLE)
+        self.root:SetVAnchor(ANCHOR_MIDDLE)
+        self.bgimage = self.root:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_menu_bg.tex"))
+        self.bgimage:ScaleToSize(850, 500)
+        AddLine(self.root, 4, 450, false, {
+            pos = {30, 0}
+        })
+        local base_size = 128
+        local cell_size = 73
+        local row_w = cell_size
+        local row_h = cell_size;
+        local row_spacing = 3
+        local function ScrollWidgetsCtor(context, index)
+            local w = Widget("skin-cell-" .. index)
+            w.cell_root = w:AddChild(ImageButton("images/quagmire_recipebook.xml", "cookbook_known.tex",
+                "cookbook_known_selected.tex"))
+            w.cell_root:SetFocusScale(cell_size / base_size + .05, cell_size / base_size + .05)
+            w.cell_root:SetNormalScale(cell_size / base_size, cell_size / base_size)
+            w.focus_forward = w.cell_root
+            w.cell_root.ongainfocusfn = function()
+            end
+
+            w.recipie_root = w.cell_root.image:AddChild(Widget("recipe_root"))
+
+            w.item_img2 = w.recipie_root:AddChild(AccountItemFrame()) -- this will be replaced with the food icon
+            w.item_img2_anim = w.item_img2:GetAnimState()
+            w.item_img2:MoveToBack()
+            w.item_img2_anim:SetRayTestOnBB(true);
+            w.item_img2:SetScale(1)
+            w.item_img2_anim:PlayAnimation("icon", false)
+            w.item_img2:HideFrame()
+            w.item_img2_anim:Hide("TINT")
+
+            w.item_img = w.recipie_root:AddChild(AccountItemFrame()) -- this will be replaced with the food icon
+            w.item_img_anim = w.item_img:GetAnimState()
+            w.item_img:MoveToBack()
+            w.item_img_anim:SetRayTestOnBB(true);
+            w.item_img:SetScale(0.8)
+            w.item_img_anim:PlayAnimation("icon", false)
+            w.item_img:HideFrame()
+            w.cell_root:SetOnClick(function()
+                self:SetItem(w.data)
+            end)
+            return w
+        end
+
+        local function ScrollWidgetSetData(context, widget, data, index)
+            widget.data = data
+            if data ~= nil then
+                widget.cell_root:Show()
+                widget.recipie_root:Show()
+                widget.cell_root:SetTextures("images/quagmire_recipebook.xml", "cookbook_known.tex",
+                    "cookbook_known_selected.tex")
+                local xml, tex = SoraGetImage(data.item)
+                if xml and tex then 
+                    widget.item_img_anim:OverrideSymbol("SWAP_ICON", softresolvefilepath(xml), tex)
+                else
+                    widget.item_img_anim:ClearOverrideSymbol("SWAP_ICON")
+                end
+                if data.unlock then
+                    widget.item_img2_anim:Hide("TINT")
+                    widget.item_img_anim:Hide("LOCK")
+                else
+                    widget.item_img2_anim:Show("TINT")
+                    widget.item_img_anim:Show("LOCK")
+                end
+                widget:Enable()
+                widget.item = data.prefab
+            else
+                widget:Disable()
+                widget.item = nil
+                widget.cell_root:Hide()
+            end
+        end
+
+        local grid = TEMPLATES.ScrollingGrid({}, {
+            context = {},
+            widget_width = row_w + row_spacing,
+            widget_height = row_h + row_spacing,
+            force_peek = true,
+            num_visible_rows = 5,
+            num_columns = 5,
+            item_ctor_fn = ScrollWidgetsCtor,
+            apply_fn = ScrollWidgetSetData,
+            scrollbar_offset = 20,
+            scrollbar_height_offset = -60
+        })
+        self.grid = self.root:AddChild(grid)
+        grid:SetPosition(-200, 0)
+        self:RefreshItems()
+
+        self.iteminforoot = self.root:AddChild(Widget("root"))
+        self.iteminforoot:SetPosition(210, 0)
+        local r = self.iteminforoot
+        r.namestr = AddText(r, "", {
+            size = 40,
+            pos = {0, 180}
+        })
+        r.img = r:AddChild(Image())
+        r.img:SetScale(2.5)
+        r.img:SetPosition(0,60)
+        AddLine(r, 4, 400, true, {
+            pos = {0, -40}
+        })
+
+        local des = AddText(r, "", {
+            size = 30,
+            pos = {0, -40}
+        })
+        des:SetHAlign(ANCHOR_LEFT)
+        des:SetVAlign(ANCHOR_TOP)
+        des:SetRegionSize(260, 200)
+        des:SetMultilineTruncatedString([[]], 50, 260, 20, false)
+        des:SetPosition(0,-150)
+        r.des = des
+        r.act = AddButton(r, "激活", function ()
+            if  r.item and SkinActive[r.item] then 
+                local scr = SkinActive[r.item](self,r.item)
+                if scr then 
+                    scr.OnCloseCB= self
+                end
+                TheFrontEnd:PushScreen(scr)
+            end
+        end, {
+            size = {80, 40},
+            pos = {0, -180}
+        })
+        r.use = AddButton(r, "使用", NilFn, {
+            size = {80, 40},
+            pos = {0, -180}
+        })
+        r:Hide()
+    end)
+    function ItemScreen:RefreshItems()
+        local data = {}
+        for k,v in ipairs(ItemSkin) do 
+            local des = v[2]
+            if SkinActive[v[1]] and v[3] then 
+                des = des .. "\n  --消耗"..tostring(v[3]).."活跃度可以解锁"
+            end
+            local info ={item=v[1],des=des,unlock=SoraSkinCheckFn(nil,v[1])} 
+            table.insert(data,info)
+        end
+        self.grid:SetItemsData(data)
+    end
+
+    function ItemScreen:SetItem(data)
+        local item = data and data.item
+        if item then
+            local xml,tex = SoraGetImage(item)
+            if xml and tex then 
+                self.iteminforoot.img:SetTexture(xml,tex)
+            else
+                self.iteminforoot.img:SetTexture(GetInventoryItemAtlas("log.tex"),"log.tex")
+            end
+            self.iteminforoot.des:SetString(data.des or "")
+            self.iteminforoot.item = item
+            self.iteminforoot.namestr:SetString((STRINGS.NAMES[GetSkinBase(item):upper()] or "") .."|".. (STRINGS.SKIN_NAMES[item] or ""))
+            self.iteminforoot:Show()
+            if SoraSkinCheckFn(nil,item) then
+                self.iteminforoot.act:Hide()
+                if UseSkin[item] then
+                    self.iteminforoot.use:Show()
+                else
+                    self.iteminforoot.use:Hide()
+                end
+            else
+                self.iteminforoot.use:Hide()
+                if SkinActive[item] then
+                    self.iteminforoot.act:Show()
+                else
+                    self.iteminforoot.act:Hide()
+                end
+            end
+        else
+            self.iteminforoot:Hide()
+            self.iteminforoot.item =  nil
+        end
+    end
+
+    function ItemScreen:OnControl(control, down)
+        if ItemScreen._base.OnControl(self, control, down) then
+            return true
+        end
+        if control == CONTROL_CANCEL and not down then
+            -- self.buttons[#self.buttons].cb()
+            self:Close()
+            TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_move")
+            return true
+        end
+    end
+    function ItemScreen:CloseCB()
+        self:RefreshItems()
+        self:SetItem()
+    end
+    function ItemScreen:Close()
+        if self.OnCloseCB then 
+            self.OnCloseCB.CloseCB(self.OnCloseCB,self)
+        end
+        TheFrontEnd:PopScreen(self)
+    end
 end
 
 -- 获取n秒后的时间

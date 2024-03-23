@@ -495,6 +495,15 @@ local function item_fn()
     inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.NONE)
     return inst
 end
+
+local pearlassets =
+{
+    Asset("ANIM", "anim/sora_pearl_pd.zip"),
+	Asset("ATLAS", "images/inventoryimages/sora_pearl_pd.xml"),
+	Asset("IMAGE", "images/inventoryimages/sora_pearl_pd.tex"),
+	Asset("ATLAS_BUILD", "images/inventoryimages/sora_pearl_pd.xml", 256)
+}
+
 local function pearlfn()
     local inst = CreateEntity()
     inst.entity:AddTransform()
@@ -503,7 +512,7 @@ local function pearlfn()
     MakeInventoryPhysics(inst)
     inst.AnimState:SetBank("hermit_pearl")
     inst.AnimState:SetBuild("hermit_pearl")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     MakeInventoryFloatable(inst, "med", .15, 0.7)
     inst:AddTag("heatrock")
     inst:AddTag("HASHEATER")
@@ -539,11 +548,46 @@ local function pearlfn()
     end)
     return inst
 end
+local tname = "sora_pearl_pd"
+SoraAPI.MakeItemSkin("sora_pearl",tname, {
+    
+    name = "胖丁",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "hermit_pearl",
+    basebank =  "hermit_pearl",
+    init_fn = function(inst)
+    end,
+
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeItemSkin("sora_pearl",tname.."_tmp", {
+    
+    name = "胖丁(限时)",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "hermit_pearl",
+    basebank =  "hermit_pearl",
+    init_fn = function(inst)
+    end,
+
+    rarity = "限时体验",
+    rarityorder = 80,
+    raritycorlor = {0.957, 0.769, 0.188, 1},
+    FrameSymbol = "heirloom",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
 
 
 table.insert(All, Prefab("sora_sign", fn, assets))
 table.insert(All, Prefab("sora_sign_item", item_fn, assets))
 table.insert(All, MakePlacer("sora_sign_placer", "sign_home", "sign_home", "idle"))
 table.insert(All, MakePlacer("sora_sign_item_placer", "sign_home", "sign_home", "idle"))
-table.insert(All, Prefab("sora_pearl", pearlfn, assets))
+table.insert(All, Prefab("sora_pearl", pearlfn, pearlassets))
 return unpack(All)

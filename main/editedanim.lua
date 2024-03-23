@@ -67,6 +67,7 @@ end
 --
 
 AddClassPostConstruct("widgets/controls",function()
+    if SORADEBUG then return end
     if GLOBAL.TUNING.EDITED_ANIM then -- 存在则不处理
         return
     end

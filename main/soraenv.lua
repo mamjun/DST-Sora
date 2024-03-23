@@ -44,9 +44,30 @@ function InitSoraEnv()
         if data.size then
             btn:ForceImageSize(data.size[1], data.size[2])
         end
+        return btn 
     end
-
-
+    function AddImgButton(inst,img,fn,data)
+        data = data or {}
+        data.pos = data.pos or {0,0}
+        local xml,tex = SoraGetImage(img)
+        local btn = ImageButton(xml,tex)
+        local root = inst.root or inst 
+        root:AddChild(btn)
+        btn:SetPosition(data.pos[1],data.pos[2])
+        btn:SetOnClick(fn)
+        btn:SetText("")
+        return btn 
+    end
+    function AddLine(inst,w,h,rot,data)
+        data = data or {}
+        data.pos = data.pos or {0,0}
+        local line = Image("images/quagmire_recipebook.xml", "quagmire_recipe_scroll_bar.tex")
+        line:SetRotation(rot and 90 or 0)
+        line:ScaleToSize(w or 4, h or 300)
+        inst:AddChild(line)
+        line:SetPosition(data.pos[1],data.pos[2])
+        return line
+    end
 
 end
 

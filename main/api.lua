@@ -121,6 +121,13 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
         return atlas, t
     else
         if GLOBAL.Prefabs[name] then
+            if GLOBAL.Prefabs[name].is_skin and GLOBAL.Prefabs[name].imagename and GLOBAL.Prefabs[name].atlas then 
+                imagecache[name] = {
+                    atlas = GLOBAL.Prefabs[name].atlas,
+                    image = GLOBAL.Prefabs[name].imagename
+                }
+                return  GLOBAL.Prefabs[name].atlas ,GLOBAL.Prefabs[name].imagename
+            end
             local assets = GLOBAL.Prefabs[name].assets or {}
             for ak, av in pairs(assets) do
                 if type(av) == "table" and av.type and av.file and av.type == "ATLAS" then
