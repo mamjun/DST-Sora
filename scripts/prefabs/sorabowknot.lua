@@ -32,7 +32,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
                    Asset("IMAGE", "images/inventoryimages/sorabowknot.tex"), Asset("ANIM", "anim/sorabowknot_sora.zip"),
                    Asset("ATLAS", "images/inventoryimages/sorabowknot_sora.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabowknot_sora.xml", 256),
-                   Asset("IMAGE", "images/inventoryimages/sorabowknot_sora.tex")}
+                   Asset("IMAGE", "images/inventoryimages/sorabowknot_sora.tex"), Asset("ANIM", "anim/sorabowknot_ld.zip"),
+                   Asset("ATLAS", "images/inventoryimages/sorabowknot_ld.xml"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sorabowknot_ld.xml", 256),
+                   Asset("IMAGE", "images/inventoryimages/sorabowknot_ld.tex")}
 
 local packassets = {Asset("ANIM", "anim/sora2pack.zip"), Asset("ATLAS", "images/inventoryimages/sora2pack.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora2pack.xml", 256),
@@ -77,6 +80,52 @@ local function turnoff(inst)
         inst._light:Remove()
     end
 end
+local skinfn = {
+    sorabowknot_ld = {
+        equip = function(inst,owner)
+            if inst.vfx_fx and inst.vfx_fx:IsValid() then 
+                inst.vfx_fx:Remove()
+                inst.vfx_fx = nil
+            end
+            if inst.sfx then 
+                inst.sfx:Cancel()
+                inst.sfx = nil
+            end
+            inst.vfx_fx = SpawnPrefab("cane_candy_fx")
+            inst.vfx_fx.entity:AddFollower()
+            inst.vfx_fx.entity:SetParent(owner.entity) 
+            inst.vfx_fx.Follower:FollowSymbol(owner.GUID, "hair", 0, 0, 0)
+
+            inst.sfx = inst:DoPeriodicTask(1,function (inst)
+                local find = false
+                for k,v in pairs(AllPlayers) do 
+                    if v~= owner and v:GetDistanceSqToInst(inst) < 400  then 
+                        find = true 
+                        break
+                    end
+                end
+                if find then 
+                    inst.foleysound = "dontstarve/creatures/together/deer/chain"
+                else
+                    inst.foleysound = nil
+                end
+            end)
+            
+
+        end,
+        unequip = function(inst,owner)
+            if inst.vfx_fx and inst.vfx_fx:IsValid() then 
+                inst.vfx_fx:Remove()
+                inst.vfx_fx = nil
+            end
+            if inst.sfx then 
+                inst.sfx:Cancel()
+                inst.sfx = nil
+            end
+        end,
+    },
+
+}
 
 local function onequip(inst, owner)
     if owner ~= nil and not owner:HasTag("sora") then
@@ -97,6 +146,9 @@ local function onequip(inst, owner)
     owner.components.combat.externaldamagetakenmultipliers:SetModifier("sora2amulet", 2 - getsora("sorabowknotarm"))
     turnoff(inst)
     turnon(inst)
+    if inst.skinname and skinfn[inst.skinname] and skinfn[inst.skinname].equip then 
+        skinfn[inst.skinname].equip(inst,owner)
+    end
 end
 
 local function onunequip(inst, owner)
@@ -106,6 +158,9 @@ local function onunequip(inst, owner)
     owner.components.combat.externaldamagemultipliers:SetModifier("sora2amulet")
     owner.components.combat.externaldamagetakenmultipliers:SetModifier("sora2amulet")
     -- inst:RemoveEventCallback("armorbroke",onbreak,owner)
+    if inst.skinname and skinfn[inst.skinname] and skinfn[inst.skinname].unequip then 
+        skinfn[inst.skinname].unequip(inst,owner)
+    end
 end
 
 local function upgrade(inst)
@@ -199,7 +254,7 @@ local function fn()
     inst.entity:AddAnimState()
     inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
-
+    inst.entity:AddSoundEmitter()
     MakeInventoryPhysics(inst)
 
     inst.MiniMapEntity:SetIcon("sorabowknot.tex")
@@ -598,6 +653,36 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_sora", {
     bank = "sorabowknot_sora",
     basebuild = "sorabowknot",
     basebank = "sorabowknot",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
+SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_ld", {
+    name = "叮叮当",
+    atlas = "images/inventoryimages/sorabowknot_ld.xml",
+    image = "sorabowknot_ld",
+    build = "sorabowknot_ld",
+    bank = "sorabowknot_ld",
+    basebuild = "sorabowknot",
+    basebank = "sorabowknot",
+    init_fn = function(inst)
+		if inst.vfx_fx then 
+            inst.vfx_fx:Remove()
+        end
+        if inst.sfx then 
+            inst.sfx:Cancel()
+            inst.sfx = nil
+        end
+	end,
+	clear_fn = function(inst)
+		if inst.vfx_fx then 
+            inst.vfx_fx:Remove()
+        end
+        if inst.sfx then 
+            inst.sfx:Cancel()
+            inst.sfx = nil
+        end
+	end,
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

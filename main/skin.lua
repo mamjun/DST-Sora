@@ -830,6 +830,9 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_pearl_pd","人家不是胖\n只是叫胖丁")
     AddItemSkin("sora2base_big","谁不喜欢大的呢\n对,我说的就是祭坛")
     AddItemSkin("sora2base_small","谁不喜欢小的呢\n对,我说的就是祭坛")
+    AddItemSkin("sorabowknot_sora","我也会是第一名吗")
+    AddItemSkin("sorabowknot_ld","叮叮当，叮叮当\n铃儿响叮当")
+    AddItemSkin("sorabag_sdl","嘘,圣诞老人要来了")
     local item_map = {
         sora_none = "sora_uniforms"
     }

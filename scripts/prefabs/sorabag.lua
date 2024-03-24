@@ -28,13 +28,16 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] local assets = {Asset("ANIM", "anim/sorabag.zip"), Asset("ANIM", "anim/sorabag_sd.zip"),
-                   Asset("ANIM", "anim/sora2bag.zip"), Asset("ANIM", "anim/ui_krampusbag_2x5.zip"),
-                   Asset("ATLAS", "images/inventoryimages/sorabag.xml"),
+                   Asset("ANIM", "anim/sorabag_sdl.zip"), Asset("ANIM", "anim/sora2bag.zip"),
+                   Asset("ANIM", "anim/ui_krampusbag_2x5.zip"), Asset("ATLAS", "images/inventoryimages/sorabag.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabag.xml", 256),
                    Asset("IMAGE", "images/inventoryimages/sorabag.tex"),
-				   Asset("ATLAS", "images/inventoryimages/sorabag_sd.xml"),
+                   Asset("ATLAS", "images/inventoryimages/sorabag_sd.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabag_sd.xml", 256),
-                   Asset("IMAGE", "images/inventoryimages/sorabag_sd.tex")}
+                   Asset("IMAGE", "images/inventoryimages/sorabag_sd.tex"),
+                   Asset("ATLAS", "images/inventoryimages/sorabag_sdl.xml"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sorabag_sdl.xml", 256),
+                   Asset("IMAGE", "images/inventoryimages/sorabag_sdl.tex")}
 local san1 = getsora("sorabagsan1")
 local san2 = getsora("sorabagsan2")
 local san3 = getsora("sorabagsan3")
@@ -154,10 +157,10 @@ local function onfind(inst, owner)
     if #ents == 0 then
         inst.sora2bag = true
         if inst.skinname then
-			owner.AnimState:OverrideSymbol("swap_body_backback", inst.skinname, "swap_body")
-		else
-			owner.AnimState:OverrideSymbol("swap_body_backback", "sorabag", "swap_body")
-		end
+            owner.AnimState:OverrideSymbol("swap_body_backback", inst.skinname, "swap_body")
+        else
+            owner.AnimState:OverrideSymbol("swap_body_backback", "sorabag", "swap_body")
+        end
         inst.components.equippable.dapperness = (san1 + san2 * inst.sanlevel) / 60
         return
     end
@@ -366,7 +369,17 @@ SoraAPI.MakeItemSkin("sorabag", "sorabag_sd", {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-
+SoraAPI.MakeItemSkin("sorabag", "sorabag_sdl", {
+    name = "圣诞小鹿",
+    atlas = "images/inventoryimages/sorabag_sdl.xml",
+    image = "sorabag_sdl",
+    build = "sorabag_sdl",
+    bank = "sorabag_sd",
+    basebuild = "sorabag",
+    basebank = "sorabag",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
 return Prefab("sorabag", fn, assets)
 -- ,Prefab("soralight", soralightfn)
 
