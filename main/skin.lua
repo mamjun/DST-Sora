@@ -43,10 +43,12 @@ end
 
 function SoraSkinCheckFn(inventory, name)
     if inventory and not name then name = inventory end
+    name = GetSkinMap(name)
     return IsDefaultCharacterSkin(name) or (selfowner[name] or selfowner_tmp[name]) and true or false
 end
 
 function SoraSkinCheckClientFn(inventory, userid, name)
+    name = GetSkinMap(name)
     if userid and name and (not islogin[userid] or skinowner[userid] and skinowner_tmp[userid]) then
         if not islogin[userid] then -- 没取到玩家记录 就当是有吧 
             return true
@@ -178,7 +180,8 @@ MakeSkin("sora_mysora_r", {
     name = "花嫁",
     des = "执子之手,与子偕老"
 })
-
+MakeSkinNameMap("sora_sdsz","sora_sdsz_r")
+MakeSkinNameMap("sora_sdsz","sorabag_sd")
 AddSimPostInit(function()
     local old = ShouldDisplayItemInCollection
     GLOBAL.ShouldDisplayItemInCollection = function(str, ...)
@@ -653,10 +656,12 @@ local function CheckBuild(inst, build)
         if not inst.userid or not islogin[inst.userid] then
             return false
         end
+        build = GetSkinMap(build)
         if not (skinowner[inst.userid][build] or skinowner[inst.userid][build .. "_tmp"]) then
             return true
         end
     else
+        build = GetSkinMap(build)
         if not (selfowner[build] or selfowner_tmp[build]) then
             return true
         end
@@ -770,6 +775,11 @@ if not TheNet:IsDedicated() then
         sora_hf = function(s, item)
             local scr = CdkUnLockScreen(item)
             scr.unlocktext:SetString("QQ群(908132556)内绑定后,游戏时长+群聊天数>150可以获取 ")
+            return scr
+        end,
+        sora_llan = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 600)
+            scr.unlocktext:SetString("消耗600活跃度解锁")
             return scr
         end,
         sora2base_big = function(s, item)

@@ -36,9 +36,11 @@ Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), A
                 Asset("ANIM", "anim/sora_zhizheng.zip"), Asset("ANIM", "anim/sora_hf.zip"),
                 Asset("ANIM", "anim/sora_amly.zip"), Asset("ANIM", "anim/sora_gete.zip"),
                 Asset("ANIM", "anim/sora_llan.zip"), Asset("ANIM", "anim/sora_mysora.zip"),
-                Asset("ANIM", "anim/sora_mysora_r.zip"), Asset("ANIM", "anim/sorahair.zip"),
-                Asset("ANIM", "anim/sorahair2.zip"), Asset("ANIM", "anim/sorahair3.zip"),
-                Asset("ANIM", "anim/sorahair4.zip"), Asset("ANIM", "anim/ghost_sora_build.zip")}
+                Asset("ANIM", "anim/sora_mysora_r.zip"), Asset("ANIM", "anim/sora_shmm.zip"),
+                Asset("ANIM", "anim/sora_sdsz.zip"), Asset("ANIM", "anim/sora_sdsz_r.zip"),
+                Asset("ANIM", "anim/sorahair.zip"), Asset("ANIM", "anim/sorahair2.zip"),
+                Asset("ANIM", "anim/sorahair3.zip"), Asset("ANIM", "anim/sorahair4.zip"),
+                Asset("ANIM", "anim/ghost_sora_build.zip")}
 -- 追加新版本选人提示
 if TUNING.GAMEMODE_STARTING_ITEMS then
     if TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT then
@@ -314,9 +316,9 @@ local function GetExp(inst, num, code, dmaxexp, once)
                 inst.soradayexp[code] = 0
             end
             if (inst.soradayexp[code] + num > maxexp) then
-                if (inst.soradayexp[code] + num > (maxexp*5)) then 
+                if (inst.soradayexp[code] + num > (maxexp * 5)) then
                     num = 0
-                elseif (inst.soradayexp[code]> maxexp) then 
+                elseif (inst.soradayexp[code] > maxexp) then
                     num = 1
                 else
                     num = math.min(math.max(0, maxexp - inst.soradayexp[code]), num)
@@ -748,15 +750,15 @@ local master_postinit = function(inst)
         end
     end)
     local count = 0
-    inst:DoPeriodicTask(1,function ()
-        if inst.components.health and  (not inst.components.health:IsDead() and not inst.components.health.invincible ) then
-            count = count - 1 
-            count = math.max(count,0)
-        else 
-            count = count + 1 
-            count = math.min(count,10)
+    inst:DoPeriodicTask(1, function()
+        if inst.components.health and (not inst.components.health:IsDead() and not inst.components.health.invincible) then
+            count = count - 1
+            count = math.max(count, 0)
+        else
+            count = count + 1
+            count = math.min(count, 10)
         end
-        inst.soraisplayer:set(count<5)
+        inst.soraisplayer:set(count < 5)
     end)
     inst:AddComponent("reader")
     inst:DoTaskInTime(0.1, function()
@@ -781,10 +783,10 @@ local master_postinit = function(inst)
         return "cryo"
     end
     local oldhealthdodelta = inst.components.health.DoDelta
-    inst.components.health.DoDelta = function(self,num,...)
+    inst.components.health.DoDelta = function(self, num, ...)
         local oldclamp = math.clamp
-        if num and num <-200 then    --致死伤害
-            num = num <-20000 and  0  or -10 
+        if num and num < -200 then -- 致死伤害
+            num = num < -20000 and 0 or -10
         end
         math.clamp = function(v, min, max, ...)
             if v > 1 and min == 0 and max == 1 then
@@ -792,7 +794,7 @@ local master_postinit = function(inst)
             end
             return oldclamp(v, min, max, ...)
         end
-        oldhealthdodelta(self,num,...)
+        oldhealthdodelta(self, num, ...)
         math.clamp = oldclamp
     end
     -- 走路速度
@@ -898,7 +900,7 @@ local master_postinit = function(inst)
     end
     if inst.components.spooked then
         inst:RemoveComponent("spooked")
-     end
+    end
 end
 -- 乱动皮肤的后果自负！！！
 
@@ -907,7 +909,7 @@ local function MakeSkin(name, data, notemp)
     d.rarity = "总之就是非常可爱"
     d.rarityorder = 90
     d.raritycorlor = {255 / 255, 215 / 255, 0 / 255, 1}
-    d.release_group = -1001
+    --d.release_group = -1001
     d.skin_tags = {"BASE", "sora", "CHARACTER"}
     d.skins = {
         normal_skin = name,
@@ -978,6 +980,21 @@ MakeSkin("sora_hf", {
     name = "关雎",
     des = '关关雎鸠，在河之洲。\n窈窕淑女，君子好逑。',
     quotes = '悠...我在等你...'
+})
+MakeSkin("sora_shmm", {
+    name = "圣火喵喵",
+    des = '圣火昭昭,圣火耀耀。\n凡我弟子，喵喵喵喵。',
+    quotes = '随我加入圣火喵喵教吧!'
+})
+MakeSkin("sora_sdsz", {
+    name = "圣诞双子-穹",
+    des = '人家才不是空呢。\n我是穹!叫我sora也行。',
+    quotes = '你好,我是sora'
+})
+MakeSkin("sora_sdsz_r", {
+    name = "圣诞双子-空",
+    des = '人家才不是穹呢。\n我是空!叫我sora也行。',
+    quotes = '你好,我是sora'
 })
 
 return MakePlayerCharacter("sora", prefabs, assets, common_postinit, master_postinit, start_inv)

@@ -31,6 +31,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 -- verion = 1.09
 -- v1.10 更新 atlas 和 image直接注册到Prefab 方便调用
 --       增加 GetSkinBase  获取皮肤对应的基础prefab
+--      增加了默认 release_group
 -- v1.09 更新  增加GetAllSkin 方法 新增 isitemskins 和 ischaracterskins 属性
 -- v1.08 更新  增加物品皮肤对ThankYouPopup的兼容  需要自行注册 ATLAS_BUILD  
 -- v1.07 更新  增加 MakeSkinNameMap GetSkinMap GetSkinMapByBase 三个方法
@@ -108,9 +109,13 @@ local characterskins = {}
 
 local FrameSymbol = {}
 local skincharacters = {}
+local default_release_group = -100
+local default_display_order = -1000
 -- 人物过滤
 local SKIN_AFFINITY_INFO = require("skin_affinity_info")
 function MakeCharacterSkin(base, skinname, data)
+    default_release_group = default_release_group - 1
+    default_display_order = default_display_order + 1
     -- 基于哪个人物的  皮肤名称 额外数据
     data.type = nil
 
@@ -122,12 +127,14 @@ function MakeCharacterSkin(base, skinname, data)
     data.base_prefab = base
     data.ischaracterskins = true
     data.rarity = data.rarity or "Loyal" -- 默认珍惜度
+    data.release_group = data.release_group or default_release_group
+    data.display_order = data.display_order or default_display_order
     data.build_name_override = data.build_name_override or skinname
     -- 不存在的珍惜度 自动注册字符串
     if not STRINGS.UI.RARITY[data.rarity] then
         STRINGS.UI.RARITY[data.rarity] = data.rarity
         SKIN_RARITY_COLORS[data.rarity] = data.raritycorlor or {0.635, 0.769, 0.435, 1}
-        RARITY_ORDER[data.rarity] = data.rarityorder or -1
+        RARITY_ORDER[data.rarity] = data.rarityorder or -default_release_group 
         if data.FrameSymbol then
             FrameSymbol[data.rarity] = data.FrameSymbol
         end
@@ -195,17 +202,21 @@ function MakeItemSkinDefaultImage(base, atlas, image)
     itembaseimage[base] = {atlas, (image or base) .. ".tex", "default.tex"}
 end
 function MakeItemSkin(base, skinname, data)
+    default_release_group = default_release_group - 1
+    default_display_order = default_display_order + 1
     data.type = nil
     itemskins[skinname] = data
     data.base_prefab = base
     data.isitemskins = true
     data.rarity = data.rarity or "Loyal" -- 默认珍惜度
     data.build_name_override = data.build_name_override or skinname
+    data.release_group = data.release_group or default_release_group
+    data.display_order = data.display_order or default_display_order
     -- 不存在的珍惜度 自动注册字符串
     if not STRINGS.UI.RARITY[data.rarity] then
         STRINGS.UI.RARITY[data.rarity] = data.rarity
         SKIN_RARITY_COLORS[data.rarity] = data.raritycorlor or {0.635, 0.769, 0.435, 1}
-        RARITY_ORDER[data.rarity] = data.rarityorder or -1
+        RARITY_ORDER[data.rarity] = data.rarityorder or -default_release_group
         if data.FrameSymbol then
             FrameSymbol[data.rarity] = data.FrameSymbol
         end
@@ -638,7 +649,8 @@ if fninfo and fninfo.source and not fninfo.source:match("scripts/prefabskin%.lua
         prefab_skin.is_restricted = info.is_restricted
         prefab_skin.granted_items = info.granted_items
         prefab_skin.marketable = info.marketable
-        prefab_skin.release_group = info.release_group
+        prefab_skin.release_group = info.release_group or default_release_group
+        
         prefab_skin.linked_beard = info.linked_beard
         prefab_skin.share_bigportrait_name = info.share_bigportrait_name
         if info.torso_tuck_builds ~= nil then
