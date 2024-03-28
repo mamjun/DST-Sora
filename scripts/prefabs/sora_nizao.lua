@@ -133,6 +133,7 @@ local function uninit(inst)
         end
         inst.cat.components.container.ignoreoverstacked = true
         inst.cat.components.container:DestroyContents()
+        inst.cat.components.container.ignoreoverstacked = false
         -- local items = inst.cat.components.container:RemoveAllItems()
         -- for k, v in pairs(items) do
         --     v:Remove()

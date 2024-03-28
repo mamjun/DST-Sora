@@ -41,8 +41,13 @@ end
 local function onbuilt(inst)
     inst.AnimState:PlayAnimation("plant")
     inst.AnimState:PushAnimation("idle", true)
+    if not inst.skinname then 
+        inst:randomskin()
+    end
 end
 local function onhit(inst, worker)
+    inst.components.container:DropEverything()
+    inst.components.container:Close()
     inst.AnimState:PlayAnimation("hit")
     inst.AnimState:PushAnimation("idle", true)
 end
@@ -70,11 +75,13 @@ local function Onisfullmoon(inst, var)
         local stacksize = item and item.components.stackable and item.components.stackable.stacksize or 1
         if item and (item.prefab == "butterfly" or item.prefab == "petals") then
             local prefab = item.prefab == "butterfly" and "moonrocknugget" or "moonglass"
-            if item and item.components.stackable:IsFull() and math.random(1, 10) < 4 then
+            if item and item.components.stackable:IsOverStacked() and math.random(1, 10) < 4 then
                 prefab = "opalpreciousgem"
                 stacksize = 1
             end
+            inst.components.container.ignoreoverstacked = true
             inst.components.container:RemoveItemBySlot(1)
+            inst.components.container.ignoreoverstacked = false
             item:Remove()
             local item = SpawnPrefab(prefab)
             if item then
@@ -269,7 +276,7 @@ local function fn()
                 "sora_huapen_" .. math.random(1, 2) .. "_" .. math.random(1, 10), nil, nil)
         end
     end
-    inst:DoTaskInTime(0,inst.randomskin)
+    --inst:DoTaskInTime(0,inst.randomskin)
     return inst
 end
 
@@ -291,11 +298,6 @@ for x = 1, 2 do
             basebank = "sora_huapen_1_1",
             init_fn = function(inst)
             end,
-            clear_fn = function(inst)
-                if TheWorld.ismastersim then 
-                    inst:DoTaskInTime(1,inst.randomskin)
-                end
-            end
         })
     end
 end
