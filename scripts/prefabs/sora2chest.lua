@@ -58,7 +58,7 @@ local assets = {Asset("ANIM", "anim/sorachest.zip"), Asset("ANIM", "anim/sora2ch
 local prefabs = {"collapse_small"}
 
 local function onopen(inst)
-    if inst.skinname == 'sora2chest_sns' then 
+    if inst.skinname == 'sora2chest_sns' then
         inst.AnimState:PlayAnimation("open")
     else
         inst.AnimState:PlayAnimation("idle")
@@ -81,10 +81,12 @@ local function onhammered(inst, worker)
     inst:Remove()
 end
 local function updatesign(inst)
-    if not TheWorld.ismastersim then 
+    if not TheWorld.ismastersim then
         return
     end
-    if not inst.components.container then return end
+    if not inst.components.container then
+        return
+    end
     local sign = nil
     for k = 1, 25 do
         local v = inst.components.container:GetItemInSlot(k)
@@ -112,7 +114,7 @@ local function updatesign(inst)
         else
             inst.AnimState:Hide("swap_item_bg")
         end
-        if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp" )then
+        if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp") then
             inst.AnimState:Hide("chest")
         else
             inst.AnimState:Show("chest")
@@ -130,7 +132,8 @@ local function updatesign(inst)
             inst.AnimState:Hide("swap_item")
         end
     end
-    if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp") and inst.components.container:IsOpen() then
+    if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp") and
+        inst.components.container:IsOpen() then
         inst.AnimState:PlayAnimation("open")
     else
         inst.AnimState:PlayAnimation("idle")
@@ -179,7 +182,6 @@ local data2 = {
             for k, v in pairs(tocopy) do
                 copy[k] = inst.components.container[k]
             end
-            local infinitestacksize = inst.components.container.infinitestacksize
             inst:RemoveComponent("container")
             inst:AddComponent("container")
             if not inst.components.preserver then
@@ -195,15 +197,13 @@ local data2 = {
             end
             inst.sora2chest:set_local(false)
             inst.sora2chest:set(true)
-            if infinitestacksize then 
-                inst.components.container:EnableInfiniteStackSize(true)
-            end
+            inst.components.container:EnableInfiniteStackSize(true)
             if not inst.prefab then
                 inst.prefab = "treasurechest"
             end
             TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
             inst:AddTag("sora2chest")
-            
+
         end
     end,
     data = {},
@@ -326,9 +326,9 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     basebuild = "sora2chest",
     basebank = "sora2chest",
     init_fn = updatesign,
-    clear_fn =function (inst)
-        inst:DoTaskInTime(0,updatesign)
-    end ,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -342,13 +342,13 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     basebuild = "sora2chest",
     basebank = "sora2chest",
     init_fn = updatesign,
-    clear_fn =function (inst)
-        inst:DoTaskInTime(0,updatesign)
-    end ,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeItemSkin("sora2chest", tname.."_tmp", {
+SoraAPI.MakeItemSkin("sora2chest", tname .. "_tmp", {
     name = "水凝兽(限时)",
     atlas = "images/inventoryimages/" .. tname .. ".xml",
     image = tname,
@@ -357,9 +357,9 @@ SoraAPI.MakeItemSkin("sora2chest", tname.."_tmp", {
     basebuild = "sora2chest",
     basebank = "sora2chest",
     init_fn = updatesign,
-    clear_fn =function (inst)
-        inst:DoTaskInTime(0,updatesign)
-    end ,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
     rarity = "限时体验",
     rarityorder = 80,
     raritycorlor = {0.957, 0.769, 0.188, 1},
@@ -378,17 +378,18 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     basebuild = "sora2chest",
     basebank = "sora2chest",
     init_fn = updatesign,
-    clear_fn =function (inst)
-        inst:DoTaskInTime(0,updatesign)
-    end ,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 local function chestpt(inst)
-    --inst.AnimState:Hide("chestitem_bg")
+    -- inst.AnimState:Hide("chestitem_bg")
     inst.AnimState:Hide("swap_item_bg")
     inst.AnimState:Hide("swap_item")
     -- body
 end
-return Prefab("sora2chest", fn, assets, prefabs), MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle",nil,nil,nil,nil,nil,nil,chestpt),
+return Prefab("sora2chest", fn, assets, prefabs),
+    MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle", nil, nil, nil, nil, nil, nil, chestpt),
     Prefab("sora_tochest", tochestfn, assets, prefabs)
