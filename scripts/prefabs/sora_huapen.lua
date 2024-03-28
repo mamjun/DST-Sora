@@ -263,12 +263,13 @@ local function fn()
     inst.components.preserver:SetPerishRateMultiplier(-5000)
 
     inst:ListenForEvent("onbuilt", onbuilt)
-    inst:DoTaskInTime(0, function()
+    inst.randomskin = function(inst)
         if not inst.skinname then
             TheSim:ReskinEntity(inst.GUID, inst.skinname,
                 "sora_huapen_" .. math.random(1, 2) .. "_" .. math.random(1, 10), nil, nil)
         end
-    end)
+    end
+    inst:DoTaskInTime(0,inst.randomskin)
     return inst
 end
 
@@ -289,6 +290,11 @@ for x = 1, 2 do
             basebuild = "sora_huapen",
             basebank = "sora_huapen_1_1",
             init_fn = function(inst)
+            end,
+            clear_fn = function(inst)
+                if TheWorld.ismastersim then 
+                    inst:DoTaskInTime(1,inst.randomskin)
+                end
             end
         })
     end

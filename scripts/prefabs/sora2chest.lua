@@ -179,6 +179,7 @@ local data2 = {
             for k, v in pairs(tocopy) do
                 copy[k] = inst.components.container[k]
             end
+            local infinitestacksize = inst.components.container.infinitestacksize
             inst:RemoveComponent("container")
             inst:AddComponent("container")
             if not inst.components.preserver then
@@ -194,11 +195,15 @@ local data2 = {
             end
             inst.sora2chest:set_local(false)
             inst.sora2chest:set(true)
+            if infinitestacksize then 
+                inst.components.container:EnableInfiniteStackSize(true)
+            end
             if not inst.prefab then
                 inst.prefab = "treasurechest"
             end
             TheWorld.components.sorachestmanager:RegByType(inst, "sora2chest")
             inst:AddTag("sora2chest")
+            
         end
     end,
     data = {},

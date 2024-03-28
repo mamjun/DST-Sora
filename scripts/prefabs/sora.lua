@@ -154,6 +154,10 @@ local function OnSoraSpawn(inst)
                 table.insert(gifts, SpawnPrefab("cane", "cane_harlequin", nil, inst.userid))
                 cane = cane + 1
             end
+            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_rose") then
+                table.insert(gifts, SpawnPrefab("cane", "cane_rose", nil, inst.userid))
+                cane = cane + 1
+            end
             if cane < 2 then
                 table.insert(gifts, SpawnPrefab("cane"))
             end

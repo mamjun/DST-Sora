@@ -42,7 +42,9 @@ local function IsDefaultCharacterSkin(item_key)
 end
 
 function SoraSkinCheckFn(inventory, name)
-    if inventory and not name then name = inventory end
+    if inventory and not name then
+        name = inventory
+    end
     name = GetSkinMap(name)
     return IsDefaultCharacterSkin(name) or (selfowner[name] or selfowner_tmp[name]) and true or false
 end
@@ -95,7 +97,7 @@ end
 if not TheNet:IsDedicated() then
     TheSim:GetPersistentString(cache, function(load_success, str)
         if load_success then
-            
+
             local r, j = pcall(json.decode, str)
             if r and j.tmp and j.owner then
                 for k, v in pairs(j.owner) do
@@ -180,8 +182,8 @@ MakeSkin("sora_mysora_r", {
     name = "花嫁",
     des = "执子之手,与子偕老"
 })
-MakeSkinNameMap("sora_sdsz","sora_sdsz_r")
-MakeSkinNameMap("sora_sdsz","sorabag_sd")
+MakeSkinNameMap("sora_sdsz", "sora_sdsz_r")
+MakeSkinNameMap("sora_sdsz", "sorabag_sd")
 AddSimPostInit(function()
     local old = ShouldDisplayItemInCollection
     GLOBAL.ShouldDisplayItemInCollection = function(str, ...)
@@ -740,7 +742,7 @@ if not TheNet:IsDedicated() then
     local AddImgButton = soraenv.AddImgButton
     local ImageButton = soraenv.ImageButton
     local ItemSkin = {}
-    
+
     local SkinActive = {
         sora_gete = function(s, item)
             local scr = GameTimeUnLockScreen(item, 300)
@@ -802,7 +804,7 @@ if not TheNet:IsDedicated() then
             scr.unlocktext:SetString("消耗300活跃度解锁")
             return scr
         end,
-       sora2chest_pkq = function(s, item)
+        sora2chest_pkq = function(s, item)
             local scr = GameTimeUnLockScreen2(item, 300)
             scr.unlocktext:SetString("消耗300活跃度解锁")
             return scr
@@ -811,28 +813,28 @@ if not TheNet:IsDedicated() then
             local scr = GameTimeUnLockScreen2(item, 300)
             scr.unlocktext:SetString("消耗300活跃度解锁")
             return scr
-        end,
+        end
 
     }
 
-    function AddItemSkin(item,des,time)
-        table.insert(ItemSkin,{item,des,time or 300})
+    function AddItemSkin(item, des, time)
+        table.insert(ItemSkin, {item, des, time or 300})
     end
-    AddItemSkin("sora2chest_sns","情之所生，由心而起")
-    AddItemSkin("sora2chest_pkq","就决定是你了,皮卡丘!")
-    AddItemSkin("sora2chest_jng","杰尼杰尼杰尼杰尼杰！")
-    AddItemSkin("sora2fire_xhl","禁止用尾巴烤火")
-    AddItemSkin("sora2fire_hrh","而你,我的朋友\n你才是真正的帕鲁")
-    AddItemSkin("sora2fire_hhl","摸耳朵是禁止事项!")
-    AddItemSkin("sora2fire_hjl","人家才不是伊布呢")
-    AddItemSkin("sora2ice_flower","你已被移出群聊'花开富贵'")
-    AddItemSkin("sora2ice_seed","来点种子,蟹蟹")
-    AddItemSkin("sora_pearl_pd","人家不是胖\n只是叫胖丁")
-    AddItemSkin("sora2base_big","谁不喜欢大的呢\n对,我说的就是祭坛")
-    AddItemSkin("sora2base_small","谁不喜欢小的呢\n对,我说的就是祭坛")
-    AddItemSkin("sorabowknot_sora","我也会是第一名吗")
-    AddItemSkin("sorabowknot_ld","叮叮当，叮叮当\n铃儿响叮当")
-    AddItemSkin("sorabag_sdl","嘘,圣诞老人要来了")
+    AddItemSkin("sora2chest_sns", "情之所生，由心而起")
+    AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
+    AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
+    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火")
+    AddItemSkin("sora2fire_hrh", "而你,我的朋友\n你才是真正的帕鲁")
+    AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!")
+    AddItemSkin("sora2fire_hjl", "人家才不是伊布呢")
+    AddItemSkin("sora2ice_flower", "你已被移出群聊'花开富贵'")
+    AddItemSkin("sora2ice_seed", "来点种子,蟹蟹")
+    AddItemSkin("sora_pearl_pd", "人家不是胖\n只是叫胖丁")
+    AddItemSkin("sora2base_big", "谁不喜欢大的呢\n对,我说的就是祭坛")
+    AddItemSkin("sora2base_small", "谁不喜欢小的呢\n对,我说的就是祭坛")
+    AddItemSkin("sorabowknot_sora", "我也会是第一名吗")
+    AddItemSkin("sorabowknot_ld", "叮叮当，叮叮当\n铃儿响叮当")
+    AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
     local item_map = {
         sora_none = "sora_uniforms"
     }
@@ -876,10 +878,12 @@ if not TheNet:IsDedicated() then
             end
             return old_ShowItemSetInfo(s, ...)
         end
-        self.soraitem_btn = self.interact_root:AddChild(TEMPLATES.StandardButton(function()
-            local scr = PushItemScr()
-        
-        end, "物品皮肤", {130, 45}))
+        if self.interact_root then
+            self.soraitem_btn = self.interact_root:AddChild(TEMPLATES.StandardButton(function()
+                local scr = PushItemScr()
+
+            end, "物品皮肤", {130, 45}))
+        end
         self.soraitem_btn:SetPosition(150, 0)
         self.soraitem_btn:Hide()
 
@@ -1079,8 +1083,8 @@ if not TheNet:IsDedicated() then
     end
 
     function UnLockScreen:Close()
-        if self.OnCloseCB then 
-            self.OnCloseCB.CloseCB(self.OnCloseCB,self)
+        if self.OnCloseCB then
+            self.OnCloseCB.CloseCB(self.OnCloseCB, self)
         end
         TheFrontEnd:PopScreen(self)
     end
@@ -1328,7 +1332,7 @@ if not TheNet:IsDedicated() then
                 widget.cell_root:SetTextures("images/quagmire_recipebook.xml", "cookbook_known.tex",
                     "cookbook_known_selected.tex")
                 local xml, tex = SoraGetImage(data.item)
-                if xml and tex then 
+                if xml and tex then
                     widget.item_img_anim:OverrideSymbol("SWAP_ICON", softresolvefilepath(xml), tex)
                 else
                     widget.item_img_anim:ClearOverrideSymbol("SWAP_ICON")
@@ -1374,7 +1378,7 @@ if not TheNet:IsDedicated() then
         })
         r.img = r:AddChild(Image())
         r.img:SetScale(2.5)
-        r.img:SetPosition(0,60)
+        r.img:SetPosition(0, 60)
         AddLine(r, 4, 400, true, {
             pos = {0, -40}
         })
@@ -1387,13 +1391,13 @@ if not TheNet:IsDedicated() then
         des:SetVAlign(ANCHOR_TOP)
         des:SetRegionSize(260, 200)
         des:SetMultilineTruncatedString([[]], 50, 260, 20, false)
-        des:SetPosition(0,-150)
+        des:SetPosition(0, -150)
         r.des = des
-        r.act = AddButton(r, "激活", function ()
-            if  r.item and SkinActive[r.item] then 
-                local scr = SkinActive[r.item](self,r.item)
-                if scr then 
-                    scr.OnCloseCB= self
+        r.act = AddButton(r, "激活", function()
+            if r.item and SkinActive[r.item] then
+                local scr = SkinActive[r.item](self, r.item)
+                if scr then
+                    scr.OnCloseCB = self
                 end
                 TheFrontEnd:PushScreen(scr)
             end
@@ -1409,13 +1413,17 @@ if not TheNet:IsDedicated() then
     end)
     function ItemScreen:RefreshItems()
         local data = {}
-        for k,v in ipairs(ItemSkin) do 
+        for k, v in ipairs(ItemSkin) do
             local des = v[2]
-            if SkinActive[v[1]] and v[3] then 
-                des = des .. "\n  --消耗"..tostring(v[3]).."活跃度可以解锁"
+            if SkinActive[v[1]] and v[3] then
+                des = des .. "\n  --消耗" .. tostring(v[3]) .. "活跃度可以解锁"
             end
-            local info ={item=v[1],des=des,unlock=SoraSkinCheckFn(nil,v[1])} 
-            table.insert(data,info)
+            local info = {
+                item = v[1],
+                des = des,
+                unlock = SoraSkinCheckFn(nil, v[1])
+            }
+            table.insert(data, info)
         end
         self.grid:SetItemsData(data)
     end
@@ -1423,17 +1431,18 @@ if not TheNet:IsDedicated() then
     function ItemScreen:SetItem(data)
         local item = data and data.item
         if item then
-            local xml,tex = SoraGetImage(item)
-            if xml and tex then 
-                self.iteminforoot.img:SetTexture(xml,tex)
+            local xml, tex = SoraGetImage(item)
+            if xml and tex then
+                self.iteminforoot.img:SetTexture(xml, tex)
             else
-                self.iteminforoot.img:SetTexture(GetInventoryItemAtlas("log.tex"),"log.tex")
+                self.iteminforoot.img:SetTexture(GetInventoryItemAtlas("log.tex"), "log.tex")
             end
             self.iteminforoot.des:SetString(data.des or "")
             self.iteminforoot.item = item
-            self.iteminforoot.namestr:SetString((STRINGS.NAMES[GetSkinBase(item):upper()] or "") .."|".. (STRINGS.SKIN_NAMES[item] or ""))
+            self.iteminforoot.namestr:SetString((STRINGS.NAMES[GetSkinBase(item):upper()] or "") .. "|" ..
+                                                    (STRINGS.SKIN_NAMES[item] or ""))
             self.iteminforoot:Show()
-            if SoraSkinCheckFn(nil,item) then
+            if SoraSkinCheckFn(nil, item) then
                 self.iteminforoot.act:Hide()
                 if UseSkin[item] then
                     self.iteminforoot.use:Show()
@@ -1450,7 +1459,7 @@ if not TheNet:IsDedicated() then
             end
         else
             self.iteminforoot:Hide()
-            self.iteminforoot.item =  nil
+            self.iteminforoot.item = nil
         end
     end
 
@@ -1470,8 +1479,8 @@ if not TheNet:IsDedicated() then
         self:SetItem()
     end
     function ItemScreen:Close()
-        if self.OnCloseCB then 
-            self.OnCloseCB.CloseCB(self.OnCloseCB,self)
+        if self.OnCloseCB then
+            self.OnCloseCB.CloseCB(self.OnCloseCB, self)
         end
         TheFrontEnd:PopScreen(self)
     end

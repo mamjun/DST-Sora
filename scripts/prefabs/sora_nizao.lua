@@ -124,18 +124,19 @@ local function uninit(inst)
         local data, refs = inst.cat:GetPersistData()
         inst.components.sorasavecmp:SetSave("cat", {
             init = 0,
-            data = data,
-            refs = refs
+            data = data
         })
         inst.cat:AddTag("FX")
         inst.cat:AddTag("NOCLICK")
         if inst.cat.components.container:IsOpen() then
             inst.cat.components.container:Close()
         end
-        local items = inst.cat.components.container:RemoveAllItems()
-        for k, v in pairs(items) do
-            v:Remove()
-        end
+        inst.cat.components.container.ignoreoverstacked = true
+        inst.cat.components.container:DestroyContents()
+        -- local items = inst.cat.components.container:RemoveAllItems()
+        -- for k, v in pairs(items) do
+        --     v:Remove()
+        -- end
         ErodeAway(inst.cat, 2)
         inst.components.rechargeable:Discharge(0)
     end

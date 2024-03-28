@@ -1394,3 +1394,43 @@ if not TUNING.SORADISABLEGLOBAL then
         return  oldfn(act,...)
     end
 end
+
+local function OnUpgrade(inst, performer, upgraded_from_item)
+    local numupgrades = inst.components.upgradeable.numupgrades
+    if numupgrades > 0  then
+        inst._chestupgrade_stacksize = true
+        if inst.components.container ~= nil then -- NOTES(JBK): The container component goes away in the burnt load but we still want to apply builds.
+            inst.components.container:Close()
+            inst.components.container:EnableInfiniteStackSize(true)
+        end
+        if upgraded_from_item and performer  then
+            Say(performer,"升级容量成功")
+        else
+
+        end
+    end
+    inst.components.upgradeable.upgradetype = nil
+
+    if inst.components.lootdropper ~= nil then
+        inst.components.lootdropper:SetLoot({ "alterguardianhatshard" })
+    end
+end
+for k,v in pairs({"sora2chest","sora2fire","sora2ice","sora_light","sorabag","sora2bag","sora_lightflier_cat","sora2base","sora_huapen","sora_pickhat"}) do 
+    AddPrefabPostInit(v,function (inst)
+        if not TheWorld.ismastersim then 
+            return 
+        end
+        local upgradeable = inst:AddComponent("upgradeable")
+        upgradeable.upgradetype = UPGRADETYPES.CHEST
+        upgradeable:SetOnUpgradeFn(OnUpgrade)
+        local old = inst.OnLoad
+        inst.OnLoad = function(...)
+            if inst.components.upgradeable and inst.components.upgradeable.numupgrades > 0 then 
+                OnUpgrade(inst)
+            end
+            if old then 
+                return old(...)
+            end
+        end
+    end)
+end

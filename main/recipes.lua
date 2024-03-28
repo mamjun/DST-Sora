@@ -753,6 +753,11 @@ for i = 1, 8 do
         transistor = 2
     })
 end
+Rec("chestupgrade_stacksize", nil, nil, DST, "sora", {
+    butterfly = 10,
+    moonbutterfly=10,
+    wagpunk_bits=1,
+})
 
 Rec("chum", nil, nil, DST, "sora", {
     spoiled_food = 10
