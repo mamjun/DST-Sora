@@ -184,6 +184,10 @@ MakeSkin("sora_mysora_r", {
 })
 MakeSkinNameMap("sora_sdsz", "sora_sdsz_r")
 MakeSkinNameMap("sora_sdsz", "sorabag_sd")
+
+MakeSkinNameMap("sora_sdsz_tmp", "sora_sdsz_r_tmp")
+MakeSkinNameMap("sora_sdsz_tmp", "sorabag_sd_tmp")
+
 AddSimPostInit(function()
     local old = ShouldDisplayItemInCollection
     GLOBAL.ShouldDisplayItemInCollection = function(str, ...)

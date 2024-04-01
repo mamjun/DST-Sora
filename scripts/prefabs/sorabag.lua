@@ -157,7 +157,9 @@ local function onfind(inst, owner)
     if #ents == 0 then
         inst.sora2bag = true
         if inst.skinname then
-            owner.AnimState:OverrideSymbol("swap_body_backback", inst.skinname, "swap_body")
+            local skin = SoraAPI.GetSkin(inst.skinname)
+            local build = skin and skin.build or inst.skinname
+            owner.AnimState:OverrideSymbol("swap_body_backback", build, "swap_body")
         else
             owner.AnimState:OverrideSymbol("swap_body_backback", "sorabag", "swap_body")
         end
@@ -374,6 +376,18 @@ SoraAPI.MakeItemSkin("sorabag", "sorabag_sdl", {
     atlas = "images/inventoryimages/sorabag_sdl.xml",
     image = "sorabag_sdl",
     build = "sorabag_sdl",
+    bank = "sorabag_sd",
+    basebuild = "sorabag",
+    basebank = "sorabag",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
+SoraAPI.MakeItemSkin("sorabag", "sorabag_sd_tmp", {
+    name = "圣诞双子(限时)",
+    atlas = "images/inventoryimages/sorabag_sd.xml",
+    image = "sorabag_sd",
+    build = "sorabag_sd",
     bank = "sorabag_sd",
     basebuild = "sorabag",
     basebank = "sorabag",

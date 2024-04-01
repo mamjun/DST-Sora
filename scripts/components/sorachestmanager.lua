@@ -146,7 +146,9 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
             if num >= maxplant then
                 return
             end
+            inst.components.container.ignoreoverstacked  = true
             item = inst.components.container:RemoveItem(item, true)
+            inst.components.container.ignoreoverstacked  = false
             if item.components.stackable then
                 for i = 1, item.components.stackable.stacksize do
                     if num >= maxplant then
@@ -464,7 +466,9 @@ local GemTask = {
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
                 if it and ik > 1 then
+                    con.ignoreoverstacked  = true
                     local item = con:RemoveItem(it, true)
+                    con.ignoreoverstacked  = false
                     ent.components.container:GiveItem(item)
                     if ent.components.container:IsFull() then
                         ent.components.soragift:GetItem()
@@ -498,7 +502,9 @@ local GemTask = {
                     local item = inst.components.container:GetItemInSlot(slot)
                     local level = SoraAPI.GetSoraPackLevel(item)
                     if item and ik > 1 and level < 30 then
+                        con.ignoreoverstacked  = true
                         local it = inst.components.container:RemoveItem(item, true)
+                        con.ignoreoverstacked  = false
                         table.insert(gifts, it)
                         maxlevel = math.max(maxlevel, level + 1)
                     end
