@@ -81,6 +81,11 @@ SORAPACK.fn = function(act)
     if target ~= nil then
         local targetpos = target:GetPosition()
         local skin = invobject and invobject.prefab == "sora2pack" and invobject.link_skin or nil
+        if invobject and invobject.prefab == "sorabowknot" then 
+            if invobject.skinname == "sorabowknot_ld" then 
+                skin = "sorapacker_ld"
+            end
+        end
         local pack = GLOBAL.SpawnPrefab("sorapacker", skin)
         if pack then
             if pack.components.sorapacker:Pack(target, doer) then

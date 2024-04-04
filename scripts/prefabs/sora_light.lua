@@ -250,6 +250,10 @@ local function UpdateLightState(inst)
             inst.AnimState:PushAnimation("idle", false)
             inst.SoundEmitter:PlaySound(sound.toggle)
         end
+        for i = 1, 4 do
+            inst.AnimState:ClearOverrideSymbol("flower" ..i )
+        end
+
     end
 end
 
@@ -294,10 +298,11 @@ local cmp = require "components/sorachestmanager"
 local data = {
     containers = {},
     controls = {155, 156, 157, 158, 159},
-    pri = 100
+    pri = 100,
+    bangreen = true
 }
-for i = 1, 30 do
-    table.insert(data.containers, {i * 5 - 4, i * 5 - 3, i * 5 - 2, i * 5 - 1, i * 5})
+for i = 1, 50 do
+    table.insert(data.containers, {i * 3 - 2, i * 3 - 1, i * 3})
 end
 cmp:RegType("sora_light", data)
 local function fn()

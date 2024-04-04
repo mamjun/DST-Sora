@@ -34,6 +34,11 @@ local assets =
 	Asset("ATLAS", "images/inventoryimages/sorahat.xml"),
 	Asset("IMAGE", "images/inventoryimages/sorahat.tex"),
 	Asset("ATLAS_BUILD", "images/inventoryimages/sorahat.xml", 256),
+
+	Asset("ANIM", "anim/sorahat_sd.zip"),
+	Asset("ATLAS", "images/inventoryimages/sorahat_sd.xml"),
+	Asset("IMAGE", "images/inventoryimages/sorahat_sd.tex"),
+	Asset("ATLAS_BUILD", "images/inventoryimages/sorahat_sd.xml", 256),
 }
 local arm1 = getsora("sorahatarmor1")/100
 local arm2 = getsora("sorahatarmor2")
@@ -159,7 +164,7 @@ local function onequip(inst, owner)
             if  owner.components.talker then owner.components.talker:Say("这是Sora的衣服") end
 			end)
 	end
-	 owner.AnimState:OverrideSymbol("swap_hat", "sorahat", "swap_hat")
+	 owner.AnimState:OverrideSymbol("swap_hat", inst.skinname or  "sorahat", "swap_hat")
 	 owner.AnimState:Show("HAT")
      owner.AnimState:Show("HAIR_HAT")
      owner.AnimState:Hide("HAIR_NOHAT")
@@ -267,5 +272,18 @@ local function fn()
 
     return inst
 end
+RegisterInventoryItemAtlas("images/inventoryimages/sorahat.xml","sorahat.tex")
+SoraAPI.MakeItemSkinDefaultImage("sorahat", "images/inventoryimages/sorahat.xml", "sorahat")
+SoraAPI.MakeItemSkin("sorahat", "sorahat_sd", {
+    name = "圣诞发卡",
+    atlas = "images/inventoryimages/sorahat_sd.xml",
+    image = "sorahat_sd",
+    build = "sorahat_sd",
+    bank = "sorahat_sd",
+    basebuild = "sorahat",
+    basebank = "sorahat",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
 
 return Prefab("sorahat", fn, assets)

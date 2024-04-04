@@ -292,9 +292,9 @@ params.sora_light = {
 }
 local sora_light_slot = 0
 for z = 1, 5 do
-    for y = 1, 3 do
-        for x = 1, 5 do
-            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 933 + 350 * y, z * -70 + 395, 0))
+    for y = 1, 5 do
+        for x = 1, 3 do
+            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 820 + 211 * y, z * -70 + 395, 0))
             table.insert(params.sora_light.widget.slotbg, {
                 atlas = "images/hud.xml",
                 image = "inv_slot.tex"
@@ -305,9 +305,9 @@ for z = 1, 5 do
 end
 
 for z = 1, 5 do
-    for y = 1, 3 do
-        for x = 1, 5 do
-            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 933 + 350 * y, z * -70 + 30, 0))
+    for y = 1, 5 do
+        for x = 1, 3 do
+            table.insert(params.sora_light.widget.slotpos, GLOBAL.Vector3(66 * x - 820 + 211 * y, z * -70 + 30, 0))
             table.insert(params.sora_light.widget.slotbg, {
                 atlas = "images/hud.xml",
                 image = "inv_slot.tex"

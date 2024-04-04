@@ -184,7 +184,8 @@ MakeSkin("sora_mysora_r", {
 })
 MakeSkinNameMap("sora_sdsz", "sora_sdsz_r")
 MakeSkinNameMap("sora_sdsz", "sorabag_sd")
-
+MakeSkinNameMap("sorabowknot_ld", "sorapacker_ld")
+MakeSkinNameMap("sorabowknot_ld", "sora3pack_ld")
 MakeSkinNameMap("sora_sdsz_tmp", "sora_sdsz_r_tmp")
 MakeSkinNameMap("sora_sdsz_tmp", "sorabag_sd_tmp")
 
@@ -241,7 +242,7 @@ local function PushThankYouPopup(item, skindata)
     TheFrontEnd:PushScreen(scr)
 
 end
-local apiurl = "http://skin.fl.lovetly.top/api/Dst"
+local apiurl = "http://skin.flapi.cn/api/Dst"
 local token = ""
 local tokentime = 0
 -- local apiurl = "http://127.0.0.1/api/Dst"
@@ -839,6 +840,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sorabowknot_sora", "我也会是第一名吗")
     AddItemSkin("sorabowknot_ld", "叮叮当，叮叮当\n铃儿响叮当")
     AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
+    AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
     local item_map = {
         sora_none = "sora_uniforms"
     }

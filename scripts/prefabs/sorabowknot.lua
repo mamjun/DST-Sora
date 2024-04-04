@@ -32,7 +32,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
                    Asset("IMAGE", "images/inventoryimages/sorabowknot.tex"), Asset("ANIM", "anim/sorabowknot_sora.zip"),
                    Asset("ATLAS", "images/inventoryimages/sorabowknot_sora.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabowknot_sora.xml", 256),
-                   Asset("IMAGE", "images/inventoryimages/sorabowknot_sora.tex"), Asset("ANIM", "anim/sorabowknot_ld.zip"),
+                   Asset("IMAGE", "images/inventoryimages/sorabowknot_sora.tex"),
+                   Asset("ANIM", "anim/sorabowknot_ld.zip"),
                    Asset("ATLAS", "images/inventoryimages/sorabowknot_ld.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabowknot_ld.xml", 256),
                    Asset("IMAGE", "images/inventoryimages/sorabowknot_ld.tex")}
@@ -46,12 +47,15 @@ local packassets = {Asset("ANIM", "anim/sora2pack.zip"), Asset("ATLAS", "images/
                     Asset("ATLAS", "images/inventoryimages/sora2pack_2.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora2pack_2.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora2pack_2.tex"), Asset("ANIM", "anim/sora3pack.zip"),
-                    Asset("ATLAS", "images/inventoryimages/sora3pack.xml"),
+                    Asset("ANIM", "anim/sora3pack_ld.zip"), Asset("ATLAS", "images/inventoryimages/sora3pack.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora3pack.tex"),
                     Asset("ATLAS", "images/inventoryimages/sora3pack_1.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack_1.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora3pack_1.tex"),
+                    Asset("ATLAS", "images/inventoryimages/sora3pack_ld.xml"),
+                    Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack_ld.xml", 256),
+                    Asset("IMAGE", "images/inventoryimages/sora3pack_ld.tex"),
                     Asset("ATLAS", "images/inventoryimages/sora3pack_2.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack_2.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora3pack_2.tex")}
@@ -82,48 +86,47 @@ local function turnoff(inst)
 end
 local skinfn = {
     sorabowknot_ld = {
-        equip = function(inst,owner)
-            if inst.vfx_fx and inst.vfx_fx:IsValid() then 
+        equip = function(inst, owner)
+            if inst.vfx_fx and inst.vfx_fx:IsValid() then
                 inst.vfx_fx:Remove()
                 inst.vfx_fx = nil
             end
-            if inst.sfx then 
+            if inst.sfx then
                 inst.sfx:Cancel()
                 inst.sfx = nil
             end
             inst.vfx_fx = SpawnPrefab("cane_candy_fx")
             inst.vfx_fx.entity:AddFollower()
-            inst.vfx_fx.entity:SetParent(owner.entity) 
+            inst.vfx_fx.entity:SetParent(owner.entity)
             inst.vfx_fx.Follower:FollowSymbol(owner.GUID, "hair", 0, 0, 0)
 
-            inst.sfx = inst:DoPeriodicTask(1,function (inst)
+            inst.sfx = inst:DoPeriodicTask(1, function(inst)
                 local find = false
-                for k,v in pairs(AllPlayers) do 
-                    if v~= owner and v:GetDistanceSqToInst(inst) < 400  then 
-                        find = true 
+                for k, v in pairs(AllPlayers) do
+                    if v ~= owner and v:GetDistanceSqToInst(inst) < 400 then
+                        find = true
                         break
                     end
                 end
-                if find then 
+                if find then
                     inst.foleysound = "dontstarve/creatures/together/deer/chain"
                 else
                     inst.foleysound = nil
                 end
             end)
-            
 
         end,
-        unequip = function(inst,owner)
-            if inst.vfx_fx and inst.vfx_fx:IsValid() then 
+        unequip = function(inst, owner)
+            if inst.vfx_fx and inst.vfx_fx:IsValid() then
                 inst.vfx_fx:Remove()
                 inst.vfx_fx = nil
             end
-            if inst.sfx then 
+            if inst.sfx then
                 inst.sfx:Cancel()
                 inst.sfx = nil
             end
-        end,
-    },
+        end
+    }
 
 }
 
@@ -146,8 +149,8 @@ local function onequip(inst, owner)
     owner.components.combat.externaldamagetakenmultipliers:SetModifier("sora2amulet", 2 - getsora("sorabowknotarm"))
     turnoff(inst)
     turnon(inst)
-    if inst.skinname and skinfn[inst.skinname] and skinfn[inst.skinname].equip then 
-        skinfn[inst.skinname].equip(inst,owner)
+    if inst.skinname and skinfn[inst.skinname] and skinfn[inst.skinname].equip then
+        skinfn[inst.skinname].equip(inst, owner)
     end
 end
 
@@ -158,8 +161,8 @@ local function onunequip(inst, owner)
     owner.components.combat.externaldamagemultipliers:SetModifier("sora2amulet")
     owner.components.combat.externaldamagetakenmultipliers:SetModifier("sora2amulet")
     -- inst:RemoveEventCallback("armorbroke",onbreak,owner)
-    if inst.skinname and skinfn[inst.skinname] and skinfn[inst.skinname].unequip then 
-        skinfn[inst.skinname].unequip(inst,owner)
+    if inst.skinname and skinfn[inst.skinname] and skinfn[inst.skinname].unequip then
+        skinfn[inst.skinname].unequip(inst, owner)
     end
 end
 
@@ -247,7 +250,7 @@ local function onsave(inst, data)
     data.exp = inst.exp
     data.lexp = inst.lexp
 end
-
+RegisterInventoryItemAtlas("images/inventoryimages/sorabowknot.xml","sorabowknot.tex")
 local function fn()
     local inst = CreateEntity()
     inst.entity:AddTransform()
@@ -261,7 +264,7 @@ local function fn()
 
     inst.AnimState:SetBank("sorabowknot")
     inst.AnimState:SetBuild("sorabowknot")
-    inst.AnimState:PlayAnimation("anim",true)
+    inst.AnimState:PlayAnimation("anim", true)
     inst:AddTag("aquatic")
     inst:AddTag("waterproofer")
     inst:AddTag("sorabowknot")
@@ -298,6 +301,11 @@ local function fn()
     inst.components.bundlemaker:SetOnStartBundlingFn(function(inst, doer)
         if doer and doer.components.bundler then
             doer.components.bundler.itemprefab = nil
+            if inst.skinname == "sorabowknot_ld" then 
+                doer.components.bundler.preskinname = "sorapacker_ld"
+            else
+                doer.components.bundler.preskinname = nil
+            end
         end
     end)
     inst:AddComponent("sorapacker")
@@ -334,6 +342,7 @@ local function onfullload(inst)
     inst.components.inspectable:SetDescription(inst.components.sorapacker.item.name)
 end
 -- 打包纸
+
 local function packfn()
     local inst = CreateEntity()
     inst.entity:AddTransform()
@@ -458,7 +467,19 @@ SoraAPI.MakeItemSkin("sorapacker", "sorapacker_2", {
     init_fn = function(inst)
     end
 })
-
+SoraAPI.MakeItemSkin("sorapacker", "sorapacker_ld", {
+    name = "叮叮当",
+    atlas = "images/inventoryimages/sora3pack_ld.xml",
+    image = "sora3pack_ld",
+    build = "sora3pack_ld",
+    bank = "sora3pack_ld",
+    basebuild = "sora3pack",
+    basebank = "sora3pack_1",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end
+})
 local function soralightfn()
     local inst = CreateEntity()
 
@@ -511,8 +532,13 @@ local function GetPackLevel(data)
 end
 
 local function OnWrapped(inst, num, doer)
+    if doer and doer.components.bundler and doer.components.bundler.preskinname then 
+        inst.preskinname = doer.components.bundler.preskinname
+    end
     inst.AnimState:PlayAnimation("anim")
-    if math.random() > 0.5 then
+    if inst.preskinname then 
+        TheSim:ReskinEntity(inst.GUID, inst.skinname, inst.preskinname, nil)
+    elseif math.random() > 0.5 then
         TheSim:ReskinEntity(inst.GUID, inst.skinname, "sora3packer_2", nil)
     end
     if doer ~= nil and doer.SoundEmitter ~= nil then
@@ -623,6 +649,20 @@ SoraAPI.MakeItemSkin("sora3packer", "sora3packer_2", {
     end
 })
 
+SoraAPI.MakeItemSkin("sora3packer", "sora3packer_ld", {
+    name = "叮叮当",
+    atlas = "images/inventoryimages/sora3pack_ld.xml",
+    image = "sora3pack_ld",
+    build = "sora3pack_ld",
+    bank = "sora3pack_ld",
+    basebuild = "sora3pack",
+    basebank = "sora3pack_1",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end
+})
+
 local function pack3fn()
     local inst = CreateEntity()
 
@@ -640,6 +680,7 @@ local function pack3fn()
 
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sorapack_container")
+    inst.components.container:EnableInfiniteStackSize(true)
     inst.persists = false
     return inst
 end
@@ -666,23 +707,23 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_ld", {
     basebuild = "sorabowknot",
     basebank = "sorabowknot",
     init_fn = function(inst)
-		if inst.vfx_fx then 
+        if inst.vfx_fx then
             inst.vfx_fx:Remove()
         end
-        if inst.sfx then 
+        if inst.sfx then
             inst.sfx:Cancel()
             inst.sfx = nil
         end
-	end,
-	clear_fn = function(inst)
-		if inst.vfx_fx then 
+    end,
+    clear_fn = function(inst)
+        if inst.vfx_fx then
             inst.vfx_fx:Remove()
         end
-        if inst.sfx then 
+        if inst.sfx then
             inst.sfx:Cancel()
             inst.sfx = nil
         end
-	end,
+    end,
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

@@ -51,17 +51,41 @@ local allchest = {}
 
 local map = {}
 map['antliontrinket'] = 'trinket'
--- map['boards'] = 'log'
--- map['rope'] = 'cutgrass'
--- map['cutstone'] = 'rocks'
--- map['papyrus'] = 'cutreeds'
+map['boards'] = 'log'
+map['charcoal'] = 'log'
+map['twigs'] = 'cutgrass'
+map['rope'] = 'cutgrass'
+map['cutstone'] = 'rocks'
+map['gears'] = 'rocks'
+map['nitre'] = 'goldnugget'
+map['flint'] = 'goldnugget'
+map['papyrus'] = 'cutreeds'
+map['waxpaper'] = 'cutreeds'
 map['myth_coin_box'] = 'myth_coin'
 map['thulecite_pieces'] = 'thulecite'
 
--- map['feather_crow'] = "feather"
--- map['feather_robin'] = "feather"
--- map['feather_robin_winter'] = "feather"
--- map['feather_canary'] = "feather"
+map['marblebean'] = 'marble'
+
+map['moonrocknugget'] = 'moonglass'
+
+
+map['bluegem'] = 'redgem'
+map['purplegem'] = 'redgem'
+
+map['yellowgem'] = 'orangegem'
+map['greengem'] = 'orangegem'
+
+map['guano'] = 'poop'
+map['spoiled_food'] = 'poop'
+map['rottenegg'] = 'poop'
+
+map['livinglog'] = 'nightmarefuel'
+
+
+map['feather_crow'] = "feather"
+map['feather_robin'] = "feather"
+map['feather_robin_winter'] = "feather"
+map['feather_canary'] = "feather"
 
 map['killerbee'] = "bee"
 map['trunk_summer'] = "trunk_winter"
@@ -747,7 +771,7 @@ local function OnClose(inst, event)
             GetItem(inst, data)
         end)
 
-    if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") then
+    if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") and not data.bangreen then
         inst:DoTaskInTime(0.1, function()
             for k, container in pairs(data.containers) do
                 HeLiMiZhi(inst, doer, data.gem.greengem * data.gem.greengem * 2, container)
