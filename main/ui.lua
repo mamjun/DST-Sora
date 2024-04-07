@@ -51,13 +51,13 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             SoraMakeWidgetMovable(self.SoraExp.expstr,"soraexp",Vector3(100,30,0))
             self.wikiroot = self:AddChild(widget("root"))
             self.SoraWiki = self.wikiroot:AddChild(uianimbutton("sorawiki","sorawiki","close","open","close","close","open")) 
-            self.SoraWiki:SetTooltip("长按拖动\n双击空格重置\n长按等级隐藏")
+            self.SoraWiki:SetTooltip("邮件拖动\n双击空格重置\n长按等级隐藏")
             self.SoraWiki:SetTooltipPos(70, 0, 0)
             self.SoraWiki:SetScale(0.4,0.4,0.4)
             self.SoraWiki.cd =SoraCD(0.5)
             self.SoraWiki:SetOnClick(function()
                 if not self.SoraWiki.cd() then
-                    VisitURL("http://wikil.fl.lovetly.top/url.php?id=sora",false)
+                    VisitURL("http://wiki.flapi.cn/url.php?id=sora",false)
                 end
             end)
             self.SoraWiki:SetOnDown(function() self.SoraWiki.cd()  end) --按下
