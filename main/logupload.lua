@@ -136,7 +136,7 @@ local function getextendtrace(start)
 
         local info = debug.getinfo(i)
         if info then
-            table.insert(get, string.format("Level: %d Function Info:", i))
+            table.insert(get, string.format("Level: %d Function Info:", i-9))
             for k, v in pairs(info) do
                 table.insert(get, string.format("\t%s : %s", tostring(k), tostring(v)))
             end

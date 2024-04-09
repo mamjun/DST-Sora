@@ -294,7 +294,7 @@ local tname = "sora2fire_xhl"
     local tname = "sora2fire_hjl"
     SoraAPI.MakeItemSkin("sora2fire",tname, {
         
-        name = "火精灵",
+        name = "火伊布",
         atlas = "images/inventoryimages/" .. tname .. ".xml",
         image = tname,
         build = tname,
@@ -309,7 +309,7 @@ local tname = "sora2fire_xhl"
     })
     SoraAPI.MakeItemSkin("sora2fire",tname.."_tmp", {
         
-        name = "火精灵(限时)",
+        name = "火伊布(限时)",
         atlas = "images/inventoryimages/" .. tname .. ".xml",
         image = tname,
         build = tname,
