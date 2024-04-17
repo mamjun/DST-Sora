@@ -127,7 +127,7 @@ function soragift:GiveGift(doer)
     end
     self.giftplayer[user] = user
     local ran = math.random()
-    if ran > 0.33 and (user ~= "KU_3NiPQMhy") then
+    if ran > 0.33 then
         self.giftexp = self.giftexp + math.random(100, 300)
         self.inst.components.talker:Say("今天没有礼物哦！明天再来吧!")
         return true

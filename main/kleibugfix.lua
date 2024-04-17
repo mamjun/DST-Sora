@@ -104,3 +104,20 @@ AddComponentPostInit("moonbeastspawner",function (self)
         return oldStart(s,...)
     end
 end)
+
+AddLaterFn(function ()
+    local t = up.Get(HandleClientRPC,"CLIENT_RPC_HANDLERS","networkclientrpc.lua")
+    if t then 
+        for k,v in pairs({"PostActivateHandshake","AddSkillXP","SetSkillActivatedState","LearnBuilderRecipe","TakeOversizedPicture","ShowPopup"}) do 
+            if t[v] then 
+                local old = t[v]
+                v[v] = function(...)
+                    if not ThePlayer then 
+                        return 
+                    end
+                    return old(...)
+                end
+            end
+        end
+    end
+end)

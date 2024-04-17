@@ -1425,10 +1425,20 @@ AddMulPrefabPostInit({sorabag=1,sora2bag=1},function (inst)
         inst:ListenForEvent("itemget", onitemchange)
         inst:ListenForEvent("itemlose", onitemchange)
         inst:DoTaskInTime(0,onitemchange)
-        inst:ListenForEvent("onequip", function ()
+        inst:ListenForEvent("equipped", function (inst,data)
+            local owner = data and data.owner 
+            if not owner then return end 
             inst.components.container.canbeopened = true
+            if inst.components.container ~= nil then
+                inst.components.container:Open(owner)
+            end
         end)
-        inst:ListenForEvent("onunequip", function ()
+        inst:ListenForEvent("unequipped", function (inst,data)
+            local owner = data and data.owner 
+            if not owner then return end 
+            if inst.components.container ~= nil then
+                inst.components.container:Close(owner)
+            end
             inst.components.container.canbeopened = false
         end)
         if inst.components.container then 
