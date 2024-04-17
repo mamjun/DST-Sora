@@ -841,6 +841,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sorabowknot_ld", "叮叮当，叮叮当\n铃儿响叮当")
     AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
     AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
+    AddItemSkin("sora_sign_myy", "羊腿好吃,所以值得!")
     local item_map = {
         sora_none = "sora_uniforms"
     }

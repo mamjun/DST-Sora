@@ -482,9 +482,11 @@ SoraAPI.MakeItemSkin("sora_sign", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
         inst.AnimState:SetMultColour(1, 1, 1, 1)
+        inst.AnimState:PlayAnimation("idle", true)
     end,
     clear_fn = function(inst)
         inst.AnimState:SetMultColour(0 / 255, 0 / 255, 0 / 255, 0.75)
+        inst.AnimState:PlayAnimation("idle", true)
     end
 })
 SoraAPI.MakeItemSkinDefaultImage("sora_sign_item", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item")
@@ -500,8 +502,10 @@ SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_myy", {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
+        inst.AnimState:PlayAnimation("item", true)
     end,
     clear_fn = function(inst)
+        inst.AnimState:PlayAnimation("item", true)
     end
 })
 SoraAPI.MakeSkinNameMap("sora_sign_myy","sora_sign_item_myy")
@@ -519,7 +523,7 @@ local function ondeploy(inst, pt, deployer)
         blender.Physics:SetCollides(false)
         blender.Physics:Teleport(pt.x, 0, pt.z)
         blender.Physics:SetCollides(true)
-        blender.AnimState:PlayAnimation("idle", false)
+        blender.AnimState:PlayAnimation("idle", true)
         inst.components.stackable:Get():Remove()
     end
 end
