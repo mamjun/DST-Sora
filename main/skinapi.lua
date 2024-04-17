@@ -29,6 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 请提前一键global 然后 modimport导入
 -- verion = 1.09
+-- v1.11 新增 animloop 和 baseanimloop
 -- v1.10 更新 atlas 和 image直接注册到Prefab 方便调用
 --       增加 GetSkinBase  获取皮肤对应的基础prefab
 --      增加了默认 release_group
@@ -522,7 +523,7 @@ function basic_skininit_fn(inst, skinname)
     end
     inst.AnimState:SetBuild(data.build or skinname)
     if data.anim then
-        inst.AnimState:PlayAnimation(data.anim)
+        inst.AnimState:PlayAnimation(data.anim,data.animloop or nil)
     end
     if inst.components.inventoryitem ~= nil then
         inst.components.inventoryitem.atlasname = data.atlas or ("images/inventoryimages/" .. skinname .. ".xml")
@@ -542,7 +543,7 @@ function basic_skinclear_fn(inst, skinname) -- 默认认为 build 和prefab同�
         inst.AnimState:SetBank(data.basebank)
     end
     if data.baseanim then
-        inst.AnimState:PlayAnimation(data.baseanim)
+        inst.AnimState:PlayAnimation(data.baseanim,data.baseanimloop or nil)
     end
     inst.AnimState:SetBuild(data.basebuild or prefab)
     if inst.components.inventoryitem ~= nil then

@@ -823,3 +823,9 @@ function CreateTaskList()
     }
 end
 
+
+function AddMulPrefabPostInit(t,fn)
+    for k,v in pairs(t) do 
+        AddPrefabPostInit( type(k) == "string" and k or v ,fn)
+    end
+end

@@ -1406,3 +1406,33 @@ for k,v in pairs({"sora2chest","sora2fire","sora2ice","sora_light","sorabag","so
         end
     end)
 end
+
+local function onitemchange(inst)
+    if not (inst.components.inventoryitem and inst.components.container ) then return end 
+    local IsEmpty  =  inst.components.container:IsEmpty() 
+    local cannotopen = (inst.components.container.openlimit or 1 ) < 0 
+    local cangotoinv = inst.components.inventoryitem.cangoincontainer == true 
+    if not cangotoinv and IsEmpty then  --不能进物品栏且为空 则改成可以进物品栏
+        inst.components.inventoryitem.cangoincontainer = true 
+    elseif cangotoinv and not IsEmpty then 
+        inst.components.inventoryitem.cangoincontainer = false
+    end
+end
+
+
+AddMulPrefabPostInit({sorabag=1,sora2bag=1},function (inst)
+    if TheWorld.ismastersim then 
+        inst:ListenForEvent("itemget", onitemchange)
+        inst:ListenForEvent("itemlose", onitemchange)
+        inst:DoTaskInTime(0,onitemchange)
+        inst:ListenForEvent("onequip", function ()
+            inst.components.container.canbeopened = true
+        end)
+        inst:ListenForEvent("onunequip", function ()
+            inst.components.container.canbeopened = false
+        end)
+        if inst.components.container then 
+            inst.components.container.canbeopened = false
+        end
+    end
+end)

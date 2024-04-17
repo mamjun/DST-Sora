@@ -224,7 +224,7 @@ local function onequip(inst, owner)
 end
 
 local function onunequip(inst, owner)
-    inst.components.inventoryitem.cangoincontainer = false
+    --inst.components.inventoryitem.cangoincontainer = false
     owner.AnimState:ClearOverrideSymbol("swap_body_backback")
     -- owner.AnimState:ClearOverrideSymbol("backpack")
     -- turnoff(inst)
@@ -302,7 +302,7 @@ local function fn()
     inst.components.inventoryitem.foleysound = "dontstarve/movement/foley/marblearmour"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/sorabag.xml"
     inst.components.inventoryitem.imagename = "sorabag"
-    inst.components.inventoryitem.cangoincontainer = false
+    --inst.components.inventoryitem.cangoincontainer = false
     -- inst.components.inventoryitem.cangoincontainer = false
     -- 隔热
     inst:AddComponent("insulator")
@@ -310,7 +310,7 @@ local function fn()
     inst.components.insulator:SetSummer()
     inst:AddComponent("planardefense")
     inst.components.planardefense:SetBaseDefense(5)
-
+    
     inst:AddComponent("sanityaura")
     inst.components.sanityaura.aurafn = CalcSanityAura
     inst:AddComponent("waterproofer")

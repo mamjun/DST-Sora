@@ -153,8 +153,6 @@ local function fn()
 	inst.components.inventoryitem.foleysound = "dontstarve/movement/foley/marblearmour"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2bag.xml"
 	inst.components.inventoryitem.imagename = "sora2bag"
-    inst.components.inventoryitem.cangoincontainer = false
-	--inst.components.inventoryitem.cangoincontainer = false
 	inst.sorabag = true
 	--背包
 	inst:AddComponent("container")

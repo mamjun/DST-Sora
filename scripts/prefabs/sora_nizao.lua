@@ -216,9 +216,9 @@ function makelightflier()
                 local d, r = inst.cat:GetPersistData()
                 return {
                     init = (inst.cat and inst.cat:IsValid() and 1 or 0),
-                    data = d,
-                },r
-                
+                    data = d
+                }, r
+
             end
             return data
         end)
@@ -311,13 +311,25 @@ function makelightflier_cat()
 end
 table.insert(All, makelightflier_cat())
 
-local assets = {Asset("ANIM", "anim/sign_home.zip"), Asset("ANIM", "anim/ui_board_5x3.zip"),
-                Asset("MINIMAP_IMAGE", "sign")}
+local assets = {Asset("ANIM", "anim/sign_home.zip"), Asset("ANIM", "anim/sora_sign_myy.zip"),
+                Asset("ANIM", "anim/ui_board_5x3.zip"), Asset("MINIMAP_IMAGE", "sign"),
+                Asset("ATLAS", "images/inventoryimages/sora_sign_myy.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora_sign_myy.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora_sign_myy.xml", 256)}
 local function OnDismantle(inst, doer)
     if not (doer and doer:HasTag("player")) then
         return
     end
-    local item = SpawnPrefab("sora_sign_item")
+    local skin = nil
+    local user = nil
+    if doer then 
+        if inst.skinname then 
+            skin = inst.skinname:gsub("sora_sign","sora_sign_item")
+            user = doer.userid
+        end
+    end
+
+    local item = SpawnPrefab("sora_sign_item",skin,nil,user)
     if item then
         doer.components.inventory:GiveItem(item, nil, doer:GetPosition())
         inst:Remove()
@@ -364,17 +376,17 @@ local cantarget = {
     spider_warrior = 1,
     spider_healer = 1,
     spider_water = 1,
-    --蝙蝠
-    bat=1,
-    --触手
-    tentacle_pillar=1,
-    tentacle=1,
-    tentacle_pillar_arm=1,
-    --树精
-    leif=1,
-    leif_sparse=1,
-    --桦栗果精
-    birchnutdrake=1,
+    -- 蝙蝠
+    bat = 1,
+    -- 触手
+    tentacle_pillar = 1,
+    tentacle = 1,
+    tentacle_pillar_arm = 1,
+    -- 树精
+    leif = 1,
+    leif_sparse = 1,
+    -- 桦栗果精
+    birchnutdrake = 1,
     monkey = 1,
     lavae = 1,
     fruitfly = 1,
@@ -383,12 +395,12 @@ local cantarget = {
     bird_mutant_spitter = 1,
     medal_bee = 1,
     medal_beeguard = 1,
-    --胡萝卜鼠
-    carrat=1,
+    -- 胡萝卜鼠
+    carrat = 1,
     powder_wonkey = 1,
-    smallbird=1,
-    teenbird=1,
-    tallbird=1,
+    smallbird = 1,
+    teenbird = 1,
+    tallbird = 1
 }
 local soracrazy = require "brains/soracrazybrain"
 local function fn()
@@ -400,7 +412,7 @@ local function fn()
     MakeObstaclePhysics(inst, .2)
     inst.AnimState:SetBank("sign_home")
     inst.AnimState:SetBuild("sign_home")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle", true)
     inst.AnimState:Show("WRITING")
     inst.AnimState:SetMultColour(0 / 255, 0 / 255, 0 / 255, 0.75)
     inst:AddTag("NOBLOCK")
@@ -456,8 +468,53 @@ local function fn()
     -- inst:AddComponent("container")
     return inst
 end
+SoraAPI.MakeItemSkinDefaultImage("sora_sign", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item")
+local tname = "sora_sign_myy"
+SoraAPI.MakeItemSkin("sora_sign", tname, {
+    name = "棉悠悠",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sign_home",
+    basebank = "sign_home",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+        inst.AnimState:SetMultColour(1, 1, 1, 1)
+    end,
+    clear_fn = function(inst)
+        inst.AnimState:SetMultColour(0 / 255, 0 / 255, 0 / 255, 0.75)
+    end
+})
+SoraAPI.MakeItemSkinDefaultImage("sora_sign_item", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item")
+local tname = "sora_sign_myy"
+SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_myy", {
+    name = "棉悠悠",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sign_mini",
+    basebank = "sign_mini",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end,
+    clear_fn = function(inst)
+    end
+})
+SoraAPI.MakeSkinNameMap("sora_sign_myy","sora_sign_item_myy")
 local function ondeploy(inst, pt, deployer)
-    local blender = SpawnPrefab("sora_sign")
+    local skin = nil
+    local user = nil
+    if deployer then 
+        if inst.skinname then 
+            skin = inst.skinname:gsub("_item","")
+            user = deployer.userid
+        end
+    end
+    local blender = SpawnPrefab("sora_sign",skin,nil,user)
     if blender ~= nil then
         blender.Physics:SetCollides(false)
         blender.Physics:Teleport(pt.x, 0, pt.z)
@@ -475,7 +532,7 @@ local function item_fn()
     MakeInventoryPhysics(inst)
     inst.AnimState:SetBank("sign_mini")
     inst.AnimState:SetBuild("sign_mini")
-    inst.AnimState:PlayAnimation("item")
+    inst.AnimState:PlayAnimation("item",true)
     inst:AddTag("portableitem")
     MakeInventoryFloatable(inst, nil, 0.05, 0.7)
 
@@ -498,13 +555,10 @@ local function item_fn()
     return inst
 end
 
-local pearlassets =
-{
-    Asset("ANIM", "anim/sora_pearl_pd.zip"),
-	Asset("ATLAS", "images/inventoryimages/sora_pearl_pd.xml"),
-	Asset("IMAGE", "images/inventoryimages/sora_pearl_pd.tex"),
-	Asset("ATLAS_BUILD", "images/inventoryimages/sora_pearl_pd.xml", 256)
-}
+local pearlassets = {Asset("ANIM", "anim/sora_pearl_pd.zip"),
+                     Asset("ATLAS", "images/inventoryimages/sora_pearl_pd.xml"),
+                     Asset("IMAGE", "images/inventoryimages/sora_pearl_pd.tex"),
+                     Asset("ATLAS_BUILD", "images/inventoryimages/sora_pearl_pd.xml", 256)}
 
 local function pearlfn()
     local inst = CreateEntity()
@@ -514,7 +568,7 @@ local function pearlfn()
     MakeInventoryPhysics(inst)
     inst.AnimState:SetBank("hermit_pearl")
     inst.AnimState:SetBuild("hermit_pearl")
-    inst.AnimState:PlayAnimation("idle",true)
+    inst.AnimState:PlayAnimation("idle", true)
     MakeInventoryFloatable(inst, "med", .15, 0.7)
     inst:AddTag("heatrock")
     inst:AddTag("HASHEATER")
@@ -532,49 +586,52 @@ local function pearlfn()
     inst.components.inventoryitem.atlasname = GetInventoryItemAtlas("hermit_pearl.tex")
     inst.components.inventoryitem.imagename = "hermit_pearl"
     inst:AddComponent("temperature")
-    inst.components.temperature.current = 30 
-    inst.components.temperature.maxtemp = 30 
-    inst.components.temperature.mintemp = 30 
-    inst.components.temperature.SetTemperature = function() return true end
+    inst.components.temperature.current = 30
+    inst.components.temperature.maxtemp = 30
+    inst.components.temperature.mintemp = 30
+    inst.components.temperature.SetTemperature = function()
+        return true
+    end
 
     inst:AddComponent("heater")
     inst.components.heater.carriedheat = 30
     inst.components.heater.carriedheatmultiplier = 10
     inst.components.heater:SetThermics(true, true)
-    inst:ListenForEvent("onpickup",function (inst,data)
+    inst:ListenForEvent("onpickup", function(inst, data)
         if data and data.owner and data.owner.components then
-            if  data.owner.components.freezable and data.owner.components.freezable:IsFrozen() then
+            if data.owner.components.freezable and data.owner.components.freezable:IsFrozen() then
                 data.owner.components.freezable:Unfreeze()
             end
         end
     end)
     return inst
 end
+
 local tname = "sora_pearl_pd"
-SoraAPI.MakeItemSkin("sora_pearl",tname, {
-    
+SoraAPI.MakeItemSkin("sora_pearl", tname, {
+
     name = "胖丁",
     atlas = "images/inventoryimages/" .. tname .. ".xml",
     image = tname,
     build = tname,
     bank = tname,
     basebuild = "hermit_pearl",
-    basebank =  "hermit_pearl",
+    basebank = "hermit_pearl",
     init_fn = function(inst)
     end,
 
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeItemSkin("sora_pearl",tname.."_tmp", {
-    
+SoraAPI.MakeItemSkin("sora_pearl", tname .. "_tmp", {
+
     name = "胖丁(限时)",
     atlas = "images/inventoryimages/" .. tname .. ".xml",
     image = tname,
     build = tname,
     bank = tname,
     basebuild = "hermit_pearl",
-    basebank =  "hermit_pearl",
+    basebank = "hermit_pearl",
     init_fn = function(inst)
     end,
 
@@ -585,7 +642,6 @@ SoraAPI.MakeItemSkin("sora_pearl",tname.."_tmp", {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-
 
 table.insert(All, Prefab("sora_sign", fn, assets))
 table.insert(All, Prefab("sora_sign_item", item_fn, assets))
