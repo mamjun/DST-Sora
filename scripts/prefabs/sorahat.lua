@@ -286,4 +286,19 @@ SoraAPI.MakeItemSkin("sorahat", "sorahat_sd", {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 
+
+local tname = "sorahat_sby"
+SoraAPI.MakeItemSkin("sorahat", tname, {
+    name = "永恒水兵月",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sorahat",
+    basebank = "sorahat",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
 return Prefab("sorahat", fn, assets)

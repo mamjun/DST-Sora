@@ -35,7 +35,7 @@ local assets = {Asset("SOUND", "sound/sora.fsb"), -- Asset( "ANIM", "anim/sora.z
 Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), Asset("ANIM", "anim/sora_sllh.zip"),
                 Asset("ANIM", "anim/sora_zhizheng.zip"), Asset("ANIM", "anim/sora_hf.zip"),
                 Asset("ANIM", "anim/sora_amly.zip"), Asset("ANIM", "anim/sora_gete.zip"),
-                Asset("ANIM", "anim/sora_llan.zip"), Asset("ANIM", "anim/sora_mysora.zip"),
+                Asset("ANIM", "anim/sora_llan.zip"),Asset("ANIM", "anim/sora_sby.zip"), Asset("ANIM", "anim/sora_mysora.zip"),
                 Asset("ANIM", "anim/sora_mysora_r.zip"), Asset("ANIM", "anim/sora_shmm.zip"),
                 Asset("ANIM", "anim/sora_sdsz.zip"), Asset("ANIM", "anim/sora_sdsz_r.zip"),
                 Asset("ANIM", "anim/sorahair.zip"), Asset("ANIM", "anim/sorahair2.zip"),

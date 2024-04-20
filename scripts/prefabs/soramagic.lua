@@ -34,6 +34,12 @@ local assets=
 	Asset("ATLAS", "images/inventoryimages/soramagic.xml"),
 	Asset("ATLAS_BUILD", "images/inventoryimages/soramagic.xml",256),
 	Asset("IMAGE", "images/inventoryimages/soramagic.tex"),
+
+	Asset("ANIM", "anim/soramagic_sby.zip"),
+	Asset("ATLAS", "images/inventoryimages/soramagic_sby.xml"),
+	Asset("ATLAS_BUILD", "images/inventoryimages/soramagic_sby.xml",256),
+	Asset("IMAGE", "images/inventoryimages/soramagic_sby.tex"),
+
 }
 
 local prefabs = {
@@ -150,7 +156,7 @@ local function onequip(inst, owner)
         end)
 	return
 	end
-    owner.AnimState:OverrideSymbol("swap_object", "soramagic", "swap_weapon")
+    owner.AnimState:OverrideSymbol("swap_object", inst.skinname ~= "" and inst.skinname or "soramagic", "swap_weapon")
     owner.AnimState:Show("ARM_carry") 
     owner.AnimState:Hide("ARM_normal")
 	if inst.magicfx ~= nil then
@@ -218,7 +224,7 @@ local function fn()
 	inst:AddTag("aquatic")
     anim:SetBank("soramagic")
     anim:SetBuild("soramagic")
-    anim:PlayAnimation("idle")
+    anim:PlayAnimation("idle",true)
 	inst:AddTag("soratrader")
 	inst:AddTag("waterproofer")
 	inst:AddTag("rechargeable")
@@ -282,4 +288,17 @@ local function fn()
     
     return inst
 end
+
+SoraAPI.MakeItemSkin("soramagic", "soramagic_sby", {
+    name = "永恒水兵月",
+    atlas = "images/inventoryimages/soramagic_sby.xml",
+    image = "soramagic_sby",
+    build = "soramagic_sby",
+    bank = "soramagic_sby",
+    basebuild = "soramagic",
+    basebank = "soramagic",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
 return	Prefab( "soramagic", fn, assets, prefabs)

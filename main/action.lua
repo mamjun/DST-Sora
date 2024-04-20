@@ -85,6 +85,9 @@ SORAPACK.fn = function(act)
             if invobject.skinname == "sorabowknot_ld" then 
                 skin = "sorapacker_ld"
             end
+            if invobject.skinname == "sorabowknot_sby" then 
+                skin = "sorapacker_sby"
+            end
         end
         local pack = GLOBAL.SpawnPrefab("sorapacker", skin)
         if pack then

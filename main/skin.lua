@@ -139,7 +139,8 @@ end
 local black = {
     sora_llan = 1,
     sora_mysora = 1,
-    sora_mysora_r = 1
+    sora_mysora_r = 1,
+    sora_sby = 1
 }
 
 local function MakeSkin(name, data, notemp)
@@ -182,10 +183,16 @@ MakeSkin("sora_mysora_r", {
     name = "花嫁",
     des = "执子之手,与子偕老"
 })
+MakeSkin("sora_sby", {
+    name = "永恒水兵月",
+    des = "只有一个人，\n我愿意为她付出生命"
+})
 MakeSkinNameMap("sora_sdsz", "sora_sdsz_r")
 MakeSkinNameMap("sora_sdsz", "sorabag_sd")
 MakeSkinNameMap("sorabowknot_ld", "sorapacker_ld")
-MakeSkinNameMap("sorabowknot_ld", "sora3pack_ld")
+MakeSkinNameMap("sorabowknot_ld", "sora3packer_ld")
+MakeSkinNameMap("sorabowknot_sby", "sorapacker_sby")
+MakeSkinNameMap("sorabowknot_sby", "sora3packer_sby")
 MakeSkinNameMap("sora_sdsz_tmp", "sora_sdsz_r_tmp")
 MakeSkinNameMap("sora_sdsz_tmp", "sorabag_sd_tmp")
 

@@ -829,3 +829,12 @@ function AddMulPrefabPostInit(t,fn)
         AddPrefabPostInit( type(k) == "string" and k or v ,fn)
     end
 end
+
+function MakeAssetTable(name,oldtabl)
+    local t = oldtabl or {}
+    table.insert(t ,Asset("ANIM", "anim/"..name..".zip"))
+    table.insert(t ,Asset("ATLAS", "images/inventoryimages/"..name..".xml"))
+    table.insert(t ,Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256))
+    table.insert(t ,Asset("IMAGE", "images/inventoryimages/"..name..".tex"))
+    return t 
+end

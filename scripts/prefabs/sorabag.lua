@@ -207,7 +207,10 @@ local function onequip(inst, owner)
         return
     end
     if inst.skinname then
-        owner.AnimState:OverrideSymbol("swap_body_backback", inst.skinname, "swap_body")
+            local skin = SoraAPI.GetSkin(inst.skinname)
+            local build = skin and skin.build or inst.skinname
+            owner.AnimState:OverrideSymbol("swap_body_backback", build, "swap_body")
+        --owner.AnimState:OverrideSymbol("swap_body_backback", inst.skinname, "swap_body")
     else
         owner.AnimState:OverrideSymbol("swap_body_backback", "sorabag", "swap_body")
     end
@@ -376,7 +379,7 @@ SoraAPI.MakeItemSkin("sorabag", "sorabag_sdl", {
     atlas = "images/inventoryimages/sorabag_sdl.xml",
     image = "sorabag_sdl",
     build = "sorabag_sdl",
-    bank = "sorabag_sd",
+    bank = "sorabag_sdl",
     basebuild = "sorabag",
     basebank = "sorabag",
     checkfn = SoraAPI.SoraSkinCheckFn,
@@ -394,6 +397,19 @@ SoraAPI.MakeItemSkin("sorabag", "sorabag_sd_tmp", {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
+local tname = "sorabag_sby"
+SoraAPI.MakeItemSkin("sorabag", tname, {
+    name = "永恒水兵月",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sorabag",
+    basebank = "sorabag",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
 return Prefab("sorabag", fn, assets)
 -- ,Prefab("soralight", soralightfn)
 
