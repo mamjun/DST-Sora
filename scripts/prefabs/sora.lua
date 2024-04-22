@@ -35,11 +35,12 @@ local assets = {Asset("SOUND", "sound/sora.fsb"), -- Asset( "ANIM", "anim/sora.z
 Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), Asset("ANIM", "anim/sora_sllh.zip"),
                 Asset("ANIM", "anim/sora_zhizheng.zip"), Asset("ANIM", "anim/sora_hf.zip"),
                 Asset("ANIM", "anim/sora_amly.zip"), Asset("ANIM", "anim/sora_gete.zip"),
-                Asset("ANIM", "anim/sora_llan.zip"),Asset("ANIM", "anim/sora_sby.zip"), Asset("ANIM", "anim/sora_mysora.zip"),
-                Asset("ANIM", "anim/sora_mysora_r.zip"), Asset("ANIM", "anim/sora_shmm.zip"),
-                Asset("ANIM", "anim/sora_sdsz.zip"), Asset("ANIM", "anim/sora_sdsz_r.zip"),
-                Asset("ANIM", "anim/sorahair.zip"), Asset("ANIM", "anim/sorahair2.zip"),
-                Asset("ANIM", "anim/sorahair3.zip"), Asset("ANIM", "anim/sorahair4.zip"),
+                Asset("ANIM", "anim/sora_llan.zip"), Asset("ANIM", "anim/sora_sby.zip"),
+                Asset("ANIM", "anim/sora_mysora.zip"), Asset("ANIM", "anim/sora_mysora_r.zip"),
+                Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"),
+                Asset("ANIM", "anim/sora_sdsz_r.zip"), Asset("ANIM", "anim/sorahair.zip"),
+                Asset("ANIM", "anim/sorahair2.zip"), Asset("ANIM", "anim/sorahair3.zip"),
+                Asset("ANIM", "anim/sorahair4.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
                 Asset("ANIM", "anim/ghost_sora_build.zip")}
 -- 追加新版本选人提示
 if TUNING.GAMEMODE_STARTING_ITEMS then
@@ -586,6 +587,10 @@ local function onnewstate(inst, data)
         inst.components.sanity.dapperness = inst.components.sanity.dapperness - inst.soraindancing * soradancingsanity /
                                                 60
         inst.soraindancing = 0
+        if inst.soradancefx then
+            inst.soradancefx:Remove()
+            inst.soradancefx = nil
+        end
         inst:RemoveEventCallback("newstate", onnewstate)
     end
 end
@@ -613,12 +618,21 @@ local function onemote(inst, data)
         end
         inst.components.sanityaura.aurafn = CalcSanityAura
         inst:ListenForEvent("newstate", onnewstate)
+        if inst.soradancefx then
+            inst.soradancefx:Remove()
+            inst.soradancefx = nil
+        end
+        if inst.soradancefxprefab then
+            inst.soradancefx = SpawnPrefab(inst.soradancefxprefab)
+            inst.soradancefx.entity:SetParent(inst.entity)
+        end
         if inst.emotefn then
             inst.emotefn:Cancel()
             inst.emotefn = nil
         end
 
         inst.emotefn = inst:DoPeriodicTask(3, emoteplants)
+
         SoraSound(inst, sound, nil, "sorabgm")
     else
         SoraSound(inst, sound, nil)
@@ -913,7 +927,7 @@ local function MakeSkin(name, data, notemp)
     d.rarity = "总之就是非常可爱"
     d.rarityorder = 90
     d.raritycorlor = {255 / 255, 215 / 255, 0 / 255, 1}
-    --d.release_group = -1001
+    -- d.release_group = -1001
     d.skin_tags = {"BASE", "sora", "CHARACTER"}
     d.skins = {
         normal_skin = name,

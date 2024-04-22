@@ -27,21 +27,16 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local assets_fireballhit =
-{
-    Asset("ANIM", "anim/fireball_2_fx.zip"),
-    Asset("ANIM", "anim/deer_fire_charge.zip"),
-}
+]] local assets_fireballhit = {Asset("ANIM", "anim/fireball_2_fx.zip"), Asset("ANIM", "anim/deer_fire_charge.zip")}
 
 --------------------------------------------------------------------------
 local function OnHit_Fire(inst, owner, target)
-	SpawnPrefab("sorafireball_hit_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
+    SpawnPrefab("sorafireball_hit_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
     inst:Remove()
 end
 --------------------------------------------------------------------------
 local function OnThrown(inst, owner, target)
-	SpawnPrefab("fireball_cast_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
+    SpawnPrefab("fireball_cast_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
 end
 
 --------------------------------------------------------------------------
@@ -97,7 +92,9 @@ local function OnUpdateProjectileTail(inst, bank, build, speed, lightoverride, a
         tail.Transform:SetPosition(x + math.sin(rot) * hoffset, y + voffset, z + math.cos(rot) * hoffset)
         tail.Physics:SetMotorVel(speed * (.2 + math.random() * .3), 0, 0)
         tails[tail] = true
-        inst:ListenForEvent("onremove", function(tail) tails[tail] = nil end, tail)
+        inst:ListenForEvent("onremove", function(tail)
+            tails[tail] = nil
+        end, tail)
         tail:ListenForEvent("onremove", function(inst)
             tail.Transform:SetRotation(tail.Transform:GetRotation() + math.random() * 30 - 15)
         end, inst)
@@ -105,12 +102,9 @@ local function OnUpdateProjectileTail(inst, bank, build, speed, lightoverride, a
 end
 
 local function MakeProjectile(name, bank, build, speed, lightoverride, addcolour, multcolour, hitfx)
-    local assets =
-    {
-        Asset("ANIM", "anim/"..build..".zip"),
-    }
+    local assets = {Asset("ANIM", "anim/" .. build .. ".zip")}
 
-    local prefabs = hitfx ~= nil and { hitfx } or nil
+    local prefabs = hitfx ~= nil and {hitfx} or nil
 
     local function fn()
         local inst = CreateEntity()
@@ -136,11 +130,12 @@ local function MakeProjectile(name, bank, build, speed, lightoverride, addcolour
         end
         inst.AnimState:SetFinalOffset(-1)
 
-        --projectile (from projectile component) added to pristine state for optimization
+        -- projectile (from projectile component) added to pristine state for optimization
         inst:AddTag("projectile")
 
         if not TheNet:IsDedicated() then
-            inst:DoPeriodicTask(0, OnUpdateProjectileTail, nil, bank, build, speed, lightoverride, addcolour, multcolour, hitfx, {})
+            inst:DoPeriodicTask(0, OnUpdateProjectileTail, nil, bank, build, speed, lightoverride, addcolour,
+                multcolour, hitfx, {})
         end
 
         inst.entity:SetPristine()
@@ -148,20 +143,20 @@ local function MakeProjectile(name, bank, build, speed, lightoverride, addcolour
         if not TheWorld.ismastersim then
             return inst
         end
-		
-		inst.persists = false
+
+        inst.persists = false
 
         inst:AddComponent("projectile")
-		inst.components.projectile:SetSpeed(speed)
-		inst.components.projectile:SetHoming(true)
-		inst.components.projectile:SetHitDist(0.5) --Leo: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-		inst.components.projectile.onhit = function(inst, owner, target)
-			SpawnPrefab(hitfx).Transform:SetPosition(inst.Transform:GetWorldPosition())
-			inst:Remove()
-		end
-		inst.components.projectile:SetOnMissFn(inst.Remove)
-		inst.components.projectile:SetStimuli("fire")
-		--inst.components.projectile:SetOnThrownFn(OnThrown)
+        inst.components.projectile:SetSpeed(speed)
+        inst.components.projectile:SetHoming(true)
+        inst.components.projectile:SetHitDist(0.5) -- Leo: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        inst.components.projectile.onhit = function(inst, owner, target)
+            SpawnPrefab(hitfx).Transform:SetPosition(inst.Transform:GetWorldPosition())
+            inst:Remove()
+        end
+        inst.components.projectile:SetOnMissFn(inst.Remove)
+        inst.components.projectile:SetStimuli("fire")
+        -- inst.components.projectile:SetOnThrownFn(OnThrown)
 
         return inst
     end
@@ -190,24 +185,30 @@ local function fireballhit_fn()
     inst:AddTag("NOCLICK")
 
     inst.entity:SetPristine()
-	
-	inst.persists = false
-	
-	inst:ListenForEvent("animover", inst.Remove)
+
+    inst.persists = false
+
+    inst:ListenForEvent("animover", inst.Remove)
 
     return inst
 end
 
-
 --------------------------------------------------------------------------
 
-return MakeProjectile("sorafireball_projectile", "fireball_fx", "fireball_2_fx", 30, 0,nil , nil, "sorafireball_hit_fx"),
-    MakeProjectile("sorahealing_projectile", "fireball_fx", "fireball_2_fx", 15, 0, { 0,  255/255, 0/255, 150/255}, nil, "sorahealing_hit_fx"),
-	MakeProjectile("sorapick_projectile", "fireball_fx", "fireball_2_fx", 7, 0, { 0, 0/255, 100/255, 0/255}, nil, "sorapick_hit_fx"),
-	MakeProjectile("soratele_projectile", "fireball_fx", "fireball_2_fx", 10, 0, { 0, 0/255, 255/255, 0/255 }, nil, "soratele_hit_fx"),
-	MakeProjectile("sora2sword_projectile", "fireball_fx", "fireball_2_fx", 15, 0, { 0, 120/255, 230/255, 0/255 }, nil, "sora2sword_hit_fx"),
-    Prefab("sorafireball_hit_fx", fireballhit_fn, assets_fireballhit),
+return
+    MakeProjectile("sorafireball_projectile", "fireball_fx", "fireball_2_fx", 30, 0, nil, nil, "sorafireball_hit_fx"),
+    MakeProjectile("sorafireball_sby_projectile", "fireball_fx", "fireball_2_fx", 30, 0,
+        {0, 0 / 255, 255 / 255, 0 / 255}, nil, "sorafireball_hit_fx"),
+    MakeProjectile("sorahealing_projectile", "fireball_fx", "fireball_2_fx", 15, 0, {0, 255 / 255, 0 / 255, 150 / 255},
+        nil, "sorahealing_hit_fx"),
+    MakeProjectile("sorapick_projectile", "fireball_fx", "fireball_2_fx", 7, 0, {0, 0 / 255, 100 / 255, 0 / 255}, nil,
+        "sorapick_hit_fx"),
+    MakeProjectile("soratele_projectile", "fireball_fx", "fireball_2_fx", 10, 0, {0, 0 / 255, 255 / 255, 0 / 255}, nil,
+        "soratele_hit_fx"),
+    MakeProjectile("sora2sword_projectile", "fireball_fx", "fireball_2_fx", 15, 0, {0, 120 / 255, 230 / 255, 0 / 255},
+        nil, "sora2sword_hit_fx"), Prefab("sorafireball_hit_fx", fireballhit_fn, assets_fireballhit),
     Prefab("sorahealing_hit_fx", fireballhit_fn, assets_fireballhit),
-	Prefab("sorapick_hit_fx", fireballhit_fn, assets_fireballhit),
-	Prefab("soratele_hit_fx", fireballhit_fn, assets_fireballhit),
-	Prefab("sora2sword_hit_fx", fireballhit_fn, assets_fireballhit)
+    Prefab("sorapick_hit_fx", fireballhit_fn, assets_fireballhit),
+    Prefab("soratele_hit_fx", fireballhit_fn, assets_fireballhit),
+    Prefab("sora2sword_hit_fx", fireballhit_fn, assets_fireballhit),
+    Prefab("sorafireball_sby_hit_fx", fireballhit_fn, assets_fireballhit)

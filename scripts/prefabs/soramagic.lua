@@ -288,7 +288,7 @@ local function fn()
     
     return inst
 end
-
+SoraAPI.MakeItemSkinDefaultImage("soramagic","images/inventoryimages/soramagic.xml","soramagic")
 SoraAPI.MakeItemSkin("soramagic", "soramagic_sby", {
     name = "永恒水兵月",
     atlas = "images/inventoryimages/soramagic_sby.xml",
@@ -298,7 +298,14 @@ SoraAPI.MakeItemSkin("soramagic", "soramagic_sby", {
     basebuild = "soramagic",
     basebank = "soramagic",
     checkfn = SoraAPI.SoraSkinCheckFn,
-    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+	init_fn = function(inst)
+		inst.components.weapon:SetProjectile("sorafireball_sby_projectile")
+	end,
+	clear_fn = function(inst)
+		inst.components.weapon:SetProjectile("sorafireball_projectile")
+	end,
+
 })
 
 return	Prefab( "soramagic", fn, assets, prefabs)

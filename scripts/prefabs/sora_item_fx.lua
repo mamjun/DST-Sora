@@ -83,7 +83,59 @@ local function tmpfn(Sim)
 	inst.persists = false
 	return inst
 end
+local function footsbycfn(Sim)
+	print("footsbyfncc0")
+	local inst = CreateEntity()
+	inst.entity:AddTransform()
+	inst.entity:AddAnimState()
+    --inst.entity:AddNetwork()
+	inst.AnimState:SetBank("sora_foot_fx_sby")
+	inst.AnimState:SetBuild("sora_foot_fx_sby")
+	inst.AnimState:PlayAnimation("idle")
+	local scale = math.random()*0.5 +0.65
+	inst.AnimState:SetScale(scale,scale,scale)
+	inst:AddTag("FX")
+    inst:AddTag("NOCLICK")
+	inst:AddTag("NOBLOCK")
+	inst.entity:SetPristine()
+	inst.persists = false
+	inst:ListenForEvent("animover",inst.Remove)
+	return inst
+end
+
+local function FootFX(inst)
+	local parent = inst.entity:GetParent()
+	if parent and not parent:HasTag("moving") then 
+		return 
+	end
+	local fx = SpawnPrefab("sora_foot_fx_sby_c")
+	local pos = inst:GetPosition()
+	pos.x = pos.x + math.random()*2 -1 
+	pos.z = pos.z + math.random()*2 -1 
+	fx.Transform:SetPosition(pos:Get())
+
+	-- local fx = SpawnPrefab("sora_foot_fx_sby_c")
+	-- local pos = inst:GetPosition()
+	-- pos.x = pos.x + math.random()*2 -1 
+	-- pos.z = pos.z + math.random()*2 -1 
+	-- fx.Transform:SetPosition(pos:Get())
 
 
+end
 
-return Prefab( "sora_item_fx", fn, Assets ),Prefab( "sora_tmp_fx", tmpfn, tmpAssets )
+local function footsbyfn(Sim)
+	local inst = CreateEntity()
+	inst.entity:AddTransform()
+    inst.entity:AddNetwork()
+	inst:AddTag("FX")
+    inst:AddTag("NOCLICK")
+	inst:AddTag("NOBLOCK")
+	inst.entity:SetPristine()
+	inst.persists = false
+	if not TheNet:IsDedicated() then 
+		inst:DoPeriodicTask(0.3,FootFX,math.random())
+	end
+	return inst
+end
+
+return Prefab( "sora_item_fx", fn, Assets ),Prefab( "sora_tmp_fx", tmpfn, tmpAssets ),Prefab( "sora_foot_fx_sby", footsbyfn ),Prefab( "sora_foot_fx_sby_c", footsbycfn )

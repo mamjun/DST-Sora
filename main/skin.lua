@@ -185,7 +185,22 @@ MakeSkin("sora_mysora_r", {
 })
 MakeSkin("sora_sby", {
     name = "永恒水兵月",
-    des = "只有一个人，\n我愿意为她付出生命"
+    des = "只有一个人，\n我愿意为她付出生命",
+    init_fn = function(inst)
+        if inst and TheWorld.ismastersim then 
+            inst.sorafoot_fx = SpawnPrefab("sora_foot_fx_sby")
+            inst.sorafoot_fx.entity:SetParent(inst.entity)
+            inst.sorafoot_fx.owner = inst
+            inst.soradancefxprefab = "sora_fx_feather"
+        end
+    end,
+    clear_fn = function(inst)
+        if inst and inst.sorafoot_fx and TheWorld.ismastersim then 
+            inst.sorafoot_fx:Remove()
+            inst.soradancefxprefab = nil
+        end
+    end,
+
 })
 MakeSkinNameMap("sora_sdsz", "sora_sdsz_r")
 MakeSkinNameMap("sora_sdsz", "sorabag_sd")
