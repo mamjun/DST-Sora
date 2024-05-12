@@ -343,7 +343,7 @@ local function InitLogUpload()
         if err then
             topost = err .. "\n" .. table.concat(ret, "\n")
         end
-        TheSim:QueryServer("http://jh.fl.lovetly.top/logupload.php?mod=" .. modkey .. "&id=" .. logid, function()
+        TheSim:QueryServer("http://jh.flapi.cn/logupload.php?mod=" .. modkey .. "&id=" .. logid, function()
         end, "POST", topost or "Error") -- packlog(ret))
         -- io.open()
         if logtopath and path then -- 输出本地日志

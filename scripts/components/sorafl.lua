@@ -43,6 +43,9 @@ local com = Class(function(self, inst)
 end)
 
 function com:Init()
+    if self.hassave then 
+        return 
+    end
     if not self.has then
         local pos = self:FindSpawnPoint()
         if pos then
@@ -66,12 +69,12 @@ function com:Init()
     end
 end
 function com.OnPlayeLeave(world,data)
+    print("收到事件OnPlayeLeave",data and data.userid ,data.player,world)
     local player =data and ( data.userid and  data or data.player )
-    if not player then return end 
+    if not player then print("don't has player ") return end 
     local self = player.components.sorafl 
-    if not self then return end
+    if not self then print("player don't has sorafl") return end
     if self.hassave then 
-        print("重复收到事件")
         return 
     end
     self.hassave = 1 

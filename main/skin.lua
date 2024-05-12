@@ -37,6 +37,7 @@ local islogin = {} -- 已经登录过的玩家
 local autologin = {} -- 服务器自动获取一次皮肤
 local selfid = TheNet:GetUserID()
 local selfnetid = ''
+local trylogin 
 local function IsDefaultCharacterSkin(item_key)
     return string.sub(item_key, -5) == "_none"
 end
@@ -270,11 +271,17 @@ local tokentime = 0
 -- local apiurl = "http://127.0.0.1/api/Dst"
 local function nofn()
 end
+local logincd = SoraCD(5,true)
 local function SkinApi(api, data, fn)
     if not api then
         return false
     end
     data = data or {}
+    data.mod = modname
+    data.ext = DATASKINEXT or {}
+    if DATASKINFN then 
+        DATASKINFN(data)
+    end
     fn = fn or nofn
     local r, js = pcall(json.encode, data)
     if r then
@@ -284,6 +291,9 @@ local function SkinApi(api, data, fn)
             if succ and code == 200 then
                 local re, jso = pcall(json.decode, str)
                 if re and type(jso) == "table" then
+                    if jso.code == 401 and trylogin and logincd() then 
+                        trylogin()
+                    end
                     fn(jso.code, jso.msg, jso.data)
                 else
                     fn(-3, 'err json', str)
@@ -344,6 +354,7 @@ end
 local gametimes = 0
 local gametimesuse = 0
 local gametimesunuse = 0
+local lastloginfaild = nil
 local function Login(userid, netid, nick)
     SkinApi('c/Login', {
         kid = userid,
@@ -362,7 +373,16 @@ local function Login(userid, netid, nick)
                     gametimesunuse = data.unuse
                 end
             end
+            lastloginfaild = nil
         else
+            token = ""
+            
+            if data and data.error then 
+                lastloginfaild = data.error
+            end
+            if code == -1004 then 
+                lastloginfaild = "登录错误代码:-1004"
+            end
             print("LoginFailed", msg, type(data) == "table" and fastdump(data) or data)
             return false
         end
@@ -411,9 +431,12 @@ if not TheNet:IsDedicated() then
         last = get()
     end
     GetSkins(selfid)
-    local function trylogin()
+    function trylogin()
         if token ~= "" then
             return
+        end
+        if lastloginfaild then 
+            SoraPushPopupDialog("小穹的温馨提示", lastloginfaild)
         end
         local find = false
         for k, v in pairs(TheNet:GetClientTable() or {}) do
@@ -436,14 +459,13 @@ if not TheNet:IsDedicated() then
     AddSimPostInit(function(inst)
         TheWorld:DoTaskInTime(0, trylogin)
         TheWorld.TryReLoginTimes = 0
-        TheWorld.TryReLogin = TheWorld:DoPeriodicTask(10, function()
+        TheWorld.TryReLogin = TheWorld:DoPeriodicTask(3, function()
             TheWorld.TryReLoginTimes = TheWorld.TryReLoginTimes + 1
             if TheWorld.TryReLoginTimes < 21 and token == "" then
                 trylogin()
             else
                 TheWorld.TryReLogin:Cancel()
             end
-
         end)
         TheWorld:DoPeriodicTask(300, function()
             GetSkins(selfid)
@@ -912,9 +934,10 @@ if not TheNet:IsDedicated() then
                 local scr = PushItemScr()
 
             end, "物品皮肤", {130, 45}))
+            self.soraitem_btn:SetPosition(150, 0)
+            self.soraitem_btn:Hide()
         end
-        self.soraitem_btn:SetPosition(150, 0)
-        self.soraitem_btn:Hide()
+
 
         local old_UpdateItemSelectedInfo = self._UpdateItemSelectedInfo
         self._UpdateItemSelectedInfo = function(s, item, ...)
@@ -1131,6 +1154,11 @@ if not TheNet:IsDedicated() then
 
         self.cb = function(s, i)
             if gametimes >= time then
+                if token == "" and trylogin and logincd() then 
+                    trylogin()
+                    SoraPushPopupDialog("小穹的温馨提示", "请稍后再试")
+                    return 
+                end
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
                 SkinApi('c/ActiveSkin', {
                     skin = self.item
@@ -1177,6 +1205,12 @@ if not TheNet:IsDedicated() then
         self.characterprogress:SetString(string.format("可用活跃度: %d ", gametimesunuse))
         self.cb = function(s, i)
             if gametimesunuse >= time then
+                if token == "" and trylogin and logincd() then 
+                    trylogin()
+                    SoraPushPopupDialog("小穹的温馨提示", "请稍后再试")
+                    return 
+                end
+
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
                 SkinApi('c/ActiveSkin', {
                     skin = self.item
@@ -1243,6 +1277,12 @@ if not TheNet:IsDedicated() then
                     SoraPushPopupDialog("小穹的温馨提示", "请输入正确的卡密")
                     return
                 end
+                if token == "" and trylogin and logincd() then 
+                    trylogin()
+                    SoraPushPopupDialog("小穹的温馨提示", "请稍后再试")
+                    return 
+                end
+                
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
                 UseSkinCDK(cdk, function(code, msg, data)
                     TheFrontEnd:PopScreen(a)

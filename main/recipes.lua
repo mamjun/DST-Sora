@@ -474,6 +474,21 @@ Rec("sora2ice", "寒冰の箱子", "嘎嘣脆，鸡肉味！", build, "soraother
     bluegem = 20
 }})
 
+Rec("sora2birdchest", "咯咯哒", "努力加班~老板就有美好的未来", build, "soraother", {{
+    goldnugget = 10,
+    seeds = 10,
+    canary = 1
+}, {
+    goldnugget = 20,
+    seeds = 20,
+    canary = 6
+}, {
+    goldnugget = 200,
+    seeds = 200,
+    canary = 20
+}})
+AddInvImg("sora2birdchest", "inventoryimages/sora2birdchest", "sora2birdchest")
+
 Rec("sora2fire", "烈焰の箱子", "外焦里嫩！", build, "soraother", {{
     boards = 10,
     cutstone = 10,
@@ -487,6 +502,7 @@ Rec("sora2fire", "烈焰の箱子", "外焦里嫩！", build, "soraother", {{
     cutstone = 40,
     redgem = 20
 }})
+
 AddInvImg("sora2chest", "inventoryimages/sora2chest", "sora2chest")
 Rec("sora2chest", "强迫の箱子", "一个有着强迫症的箱子", build, "soraother", {{
     boards = 2,

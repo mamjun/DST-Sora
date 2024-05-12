@@ -84,7 +84,7 @@ local function tmpfn(Sim)
 	return inst
 end
 local function footsbycfn(Sim)
-	print("footsbyfncc0")
+	--print("footsbyfncc0")
 	local inst = CreateEntity()
 	inst.entity:AddTransform()
 	inst.entity:AddAnimState()

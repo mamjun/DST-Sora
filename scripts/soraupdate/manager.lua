@@ -42,7 +42,7 @@ local u = soraupdate -- 内部接口
 local com = Class(function(self) -- 自动更新组件
     env.self = self -- 注册到env里面
     self.vf = u.path .. "version.info"
-    self.api = "http://jh.fl.lovetly.top/soraupdate/update.php?version=" .. (u.d and "dev" or "main") --
+    self.api = "http://jh.flapi.cn/soraupdate/update.php?version=" .. (u.d and "dev" or "main") --
     self.savepatch = {}
     self.ddata = {
         name = TUNING.SORAMODNAME,
@@ -59,7 +59,7 @@ local com = Class(function(self) -- 自动更新组件
     self.updatefn = scheduler:ExecutePeriodic(u.d and 5 or 60, function()
         self:TryToUpdate()
     end)
-    self:TryFixUrl()
+    --self:TryFixUrl()
     self:TryToUpdate()
 end)
 
