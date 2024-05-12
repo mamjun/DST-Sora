@@ -34,7 +34,9 @@ local com = Class(function(self, inst)
     self.san = 1000 -- 心情1000
     self.sanmax = 1000 -- 最大心情1000
     self.inst:WatchWorldState("phase", function()
-        if TheWorld.state.phase ~= "night" then return end 
+        if TheWorld.state.phase ~= "night" then
+            return
+        end
         if TheWorld.state.moonphase == "new" then
             self.inst.components.talker:Say("暗影在接近")
             self:SetSan(0)
@@ -45,15 +47,15 @@ local com = Class(function(self, inst)
         end
     end)
     self.inst:WatchWorldState("cycles", function()
-            self.inst.components.talker:Say("新的一天开始了~")
-            self:GetSan(100)
+        self.inst.components.talker:Say("新的一天开始了~")
+        self:GetSan(100)
     end)
 end)
 function com:SetSan(num)
     self.san = math.clamp(num, 0, self.sanmax)
     local scl = self:GetPerBySan()
-    self.inst.AnimState:SetMultColour(1,1,1,scl)
-    self.inst.AnimState:SetScale(scl,scl,scl)
+    self.inst.AnimState:SetMultColour(1, 1, 1, scl)
+    self.inst.AnimState:SetScale(scl, scl, scl)
 end
 
 function com:GetSan(num)
@@ -74,7 +76,9 @@ function com:GetPerBySan()
     end
 end
 
-local SanMap = {sora_yez=100}
+local SanMap = {
+    sora_yez = 100
+}
 function com:GetItemSan(item)
     -- 料理类大量补充san
     -- 食物类(肉/作物)少量降低san
@@ -90,10 +94,10 @@ function com:GetItemSan(item)
         base = 20
     elseif item.prefab:find("trinket") then
         base = 10
+    elseif item.components.tradable and item.components.tradable.goldvalue > 0 then
+        base = -(item.components.tradable.goldvalue or 0)
     elseif item.components.edible then
         base = -1
-    elseif item.components.tradable then
-        base = -(item.components.tradable.goldvalue or 0)
     else
         base = -2
     end
@@ -112,31 +116,25 @@ function com:GetItemPro(item)
         base = ItemMap[item.prefab]
     elseif item:HasTag("preparedfood") then
         base = {}
-    elseif item.components.edible then
-        if item.prefab == "bird_egg" then
-            base = TheWorld.state.isnight and {
-                townportaltalisman = 1
-            } or {
-                goldnugget = 1
-            }
-        elseif item.components.edible.foodtype == FOODTYPE.MEAT then
-            base = {
-                bird_egg = 1
-            }
-        elseif Prefabs[string.lower(item.prefab .. "_seeds")] then
-            base = {
-                [string.lower(item.prefab .. "_seeds")] = 1
-            }
-        else
-            base = nil
-        end
+    elseif item.prefab == "bird_egg" then
+        base = {
+            [TheWorld.state.isnight and "townportaltalisman" or "goldnugget"] = 1
+        }
+    elseif item.components.edible and item.components.edible.foodtype == FOODTYPE.MEAT then
+        base = {
+            bird_egg = 1
+        }
+    elseif item.components.edible and Prefabs[string.lower(item.prefab .. "_seeds")] then
+        base = {
+            [string.lower(item.prefab .. "_seeds")] = 1
+        }
     elseif item.components.tradable and item.components.tradable.goldvalue > 0 then
         base = {
             [TheWorld.state.isnight and "townportaltalisman" or "goldnugget"] = item.components.tradable.goldvalue
         }
     end
     if item.components.stackable and base then
-        for k,v in pairs(base) do 
+        for k, v in pairs(base) do
             base[k] = v * item.components.stackable.stacksize
         end
     end
@@ -148,14 +146,14 @@ function com:GetItem()
     local allitem = {}
     local container = self.inst.components.container
     local has = false
-	for i = 1, container:GetNumSlots() do
-	    local item = container:GetItemInSlot(i)
-        if item then 
+    for i = 1, container:GetNumSlots() do
+        local item = container:GetItemInSlot(i)
+        if item then
             local toget = self:GetItemPro(item)
-            if toget then 
+            if toget then
                 sancost = sancost + self:GetItemSan(item)
-                for k,v in pairs(toget) do 
-                    allitem[k] = (allitem[k] or 0) + v 
+                for k, v in pairs(toget) do
+                    allitem[k] = (allitem[k] or 0) + v
                 end
                 self.inst.components.container:RemoveItem(item, true)
                 item:Remove()
@@ -163,34 +161,36 @@ function com:GetItem()
             end
         end
     end
-    if not has then return end 
+    if not has then
+        return
+    end
     self.inst.components.container:Close()
     self.inst.components.container.canbeopened = false
-    self.inst:DoTaskInTime(3,function ()
+    self.inst:DoTaskInTime(3, function()
         self.inst.components.container.canbeopened = true
     end)
-    self.inst.components.talker:Say(sancost > 0 and "感谢投喂~~" or  '哦买噶,又要工作了')
+    self.inst.components.talker:Say(sancost > 0 and "感谢投喂~~" or '哦买噶,又要工作了')
     self.inst.AnimState:PlayAnimation("eat")
-    self.inst.AnimState:PushAnimation("idle",true)
+    self.inst.AnimState:PushAnimation("idle", true)
     self:GetSan(sancost)
     local p = self:GetPerBySan()
-    for k,v in pairs(allitem) do 
+    for k, v in pairs(allitem) do
         allitem[k] = math.floor(v * p)
     end
     local pos = self.inst:GetPosition()
-    for k,v in pairs(allitem) do 
+    for k, v in pairs(allitem) do
         local item = SpawnPrefab(k)
-        if item then 
-            if item.components.stackable then 
+        if item then
+            if item.components.stackable then
                 item.components.stackable:SetStackSize(v)
             else
                 local n = v - 1
-                for i=1,n do 
-                    local it =  SpawnPrefab(k)
-                    self.inst.components.container:GiveItem(it,nil,pos)
+                for i = 1, n do
+                    local it = SpawnPrefab(k)
+                    self.inst.components.container:GiveItem(it, nil, pos)
                 end
             end
-            self.inst.components.container:GiveItem(item,nil,pos)
+            self.inst.components.container:GiveItem(item, nil, pos)
         end
     end
 end
@@ -205,12 +205,12 @@ function com:OnLoad(data)
     if not data then
         return
     end
-    self:SetSan(data.san or 0) 
-    --self.mode = data.mode == 1 and 1 or 0
+    self:SetSan(data.san or 0)
+    -- self.mode = data.mode == 1 and 1 or 0
 end
 
 function com:GetDebugString()
-    return string.format("%d / %d",self.san,self.sanmax)
+    return string.format("%d / %d", self.san, self.sanmax)
 end
 
 return com
