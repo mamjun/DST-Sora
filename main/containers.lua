@@ -239,7 +239,8 @@ function params.sora2chest.widget:SoraOnOpenFn(inst)
         })
     else
         SoraMakeWidgetMovable(self, "sora2chest", Vector3(-300, 100, 0), {
-            drag_offset = 0.6
+            drag_offset = 0.6,
+            ValidPos={minx=-700,miny=-320,maxx=700,maxy=320}
         })
     end
 end
@@ -349,7 +350,8 @@ function params.sora_light.widget:SoraOnOpenFn(inst)
         })
     else
         SoraMakeWidgetMovable(self, "sora_light", Vector3(200, 000, 0), {
-            drag_offset = 0.6
+            drag_offset = 0.6,
+            ValidPos={minx=-460,miny=-240,maxx=480,maxy=240}
         })
     end
 end
@@ -480,10 +482,61 @@ for y = 2, 0, -1 do
 end
 function params.sora_pickhat.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(240, 240)
+   
 end
 params.sora_pickhat.itemtestfn = function()
     return not SoraAPI.IsTradeIteming
 end
+
+
+params.sora3chest = {
+    widget = {
+        slotpos = {},
+        bgatlas = "images/quagmire_recipebook.xml",
+        bgimage = "quagmire_recipe_menu_bg.tex",
+        pos = Vector3(100, 80, 0),
+        buttoninfo = {
+            text = "收集",
+            position = GLOBAL.Vector3(-50, -120, 0)
+        }
+    },
+    acceptsstacks = true,
+    type = "hand_inv"
+}
+for y = 2, 0, -1 do
+    for x = 0, 2 do
+        table.insert(params.sora3chest.widget.slotpos, Vector3(70 * x - 70 , 70 * y - 50, 0))
+    end
+end
+function params.sora3chest.widget:SoraOnOpenFn(inst)
+    self.bgimage:ScaleToSize(240, 300)
+ 
+    SoraMakeWidgetMovable(self, "sora3chest", Vector3(-100,80, 0), {
+        drag_offset = 0.6,
+        ValidPos={minx=-1200,miny=0,maxx=520,maxy=920}
+    })
+end
+function params.sora3chest.widget.buttoninfo.fn(inst)
+    r_event(nil,"Sora2ChestControl",{cmd="Collect"},inst)
+end
+AddButton(params.sora3chest.widget,"控制",Vector3(60, -120, 0),function (inst,doer,ui,s,data)
+    if ui.sora2chestcontrol and ui.sora2chestcontrol.inst and not ui.sora2chestcontrol.inst.widget then
+        ui.sora2chestcontrol = nil
+    end
+    if not ui.sora2chestcontrol then
+        ui.sora2chestcontrol=s:AddChild(sora2chestcontrol())
+        ui.sora2chestcontrol:SetPosition(200,-50,0)
+        table.insert(data.tokill,ui.sora2chestcontrol)
+        return 
+    end
+    if ui.sora2chestcontrol.shown then
+        ui.sora2chestcontrol:Hide()
+    else
+        ui.sora2chestcontrol:Show()
+        ui.sora2chestcontrol:ShowTime()
+    end
+end)
+
 if needhelp then
     print("????")
     local old_widgetsetup = containers.widgetsetup

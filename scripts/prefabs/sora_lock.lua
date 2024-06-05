@@ -41,7 +41,7 @@ local function fn()
     inst.entity:AddNetwork()
     anim:SetBank("sora_lock")
     anim:SetBuild("sora_lock")
-    anim:PlayAnimation("idle")
+    anim:PlayAnimation("idle",true)
     inst:AddTag("soracontainlock")
 
     if not TheWorld.ismastersim then
@@ -53,7 +53,13 @@ local function fn()
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.atlasname = "images/inventoryimages/sora_lock.xml"
     inst.components.inventoryitem.imagename = "sora_lock"
-
+    inst:ListenForEvent("ondropped",function (i)
+        --i.AnimState:PlayAnimation("drop")
+        i.AnimState:PlayAnimation("idle",true)
+    end)
+    inst:DoTaskInTime(math.random()*0.5,function (i)
+        i.AnimState:PlayAnimation("idle",true)
+    end)
     inst:AddComponent("soracontainlock")
 
     inst:AddComponent("stackable")

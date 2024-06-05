@@ -33,7 +33,18 @@ local key = modname .. "fixtag" -- 默认用modname 做key 防止冲突
 function RegTag(tag) -- 必须先注册 主客机一起注册 注册后的tag会被截留
     Tags[tag] = string.lower(tag)
 end
-
+function PrintTags(inst)
+    if inst and inst[key] then 
+        print("MoreTags")
+        for k,v in pairs(inst[key].Tags) do 
+            print(k,v:value())
+        end
+        print("NOMoreTags")
+        for k,v in pairs(inst[key].TagsD) do 
+            print(k,v)
+        end
+    end
+end
 local function AddTag(inst, stag, ...)
     if not inst or not stag then return end
     tag = string.lower(stag)
@@ -43,6 +54,15 @@ local function AddTag(inst, stag, ...)
             inst[key].Tags[tag]:set(true)
         end
     else
+        if TAGSDEBUG then 
+            RemoveByValue(inst[key].TagsD,stag)
+            table.insert(inst[key].TagsD,stag)
+            if #inst[key].TagsD > 63 then 
+                print("ERRTAG",inst,fastdump(inst[key].TagsD))
+                print("ERRTAG","toadd",stag)
+                print(DoStackTrace("ERRTAG", 5))
+            end
+        end
         return inst[key].AddTag(inst, stag, ...)
     end
 end
@@ -56,6 +76,9 @@ local function RemoveTag(inst, stag, ...)
             inst[key].Tags[tag]:set(false)
         end
     else
+        if TAGSDEBUG then 
+            RemoveByValue(inst[key].TagsD,stag)
+        end
         return inst[key].RemoveTag(inst, stag, ...)
     end
 end
@@ -96,7 +119,8 @@ function FixTag(inst) -- 传入实体 主客机一起调用
         RemoveTag = inst.RemoveTag,
         HasTags = inst.HasTags,
         HasOneOfTags = inst.HasOneOfTags,
-        Tags = {}
+        Tags = {},
+        TagsD = {}
     }
     inst.AddTag = AddTag
     inst.HasTag = HasTag

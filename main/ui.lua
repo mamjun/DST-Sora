@@ -51,7 +51,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             SoraMakeWidgetMovable(self.SoraExp.expstr,"soraexp",Vector3(100,30,0))
             self.wikiroot = self:AddChild(widget("root"))
             self.SoraWiki = self.wikiroot:AddChild(uianimbutton("sorawiki","sorawiki","close","open","close","close","open")) 
-            self.SoraWiki:SetTooltip("邮件拖动\n双击空格重置\n长按等级隐藏")
+            self.SoraWiki:SetTooltip("右键拖动\n双击空格重置\n长按等级隐藏")
             self.SoraWiki:SetTooltipPos(70, 0, 0)
             self.SoraWiki:SetScale(0.4,0.4,0.4)
             self.SoraWiki.cd =SoraCD(0.5)

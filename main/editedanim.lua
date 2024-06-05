@@ -38,8 +38,9 @@ local mod_name = IsRail() and 'workshop-2199027653598529357' or
                      'workshop-2384660166'
 local function PushSubscribeDialog()
     TheSim:SubscribeToMod(mod_name)
+    local screen
     local function doclose() TheFrontEnd:PopScreen(screen) end
-    local screen = PopupDialogScreen(modinfo.name .. ":提示",
+    screen = PopupDialogScreen(modinfo.name .. ":提示",
                                      '已尝试自动订阅 :EditedAnims \n请稍后到mods列表里查看并勾选\n请订阅mod后,不要忘记开启mod!!!\n如果是服务器请联系服主开启mod\n如果订阅失败可到工坊手动订阅',
                                      {
         {text = '确定并退出', cb = function() GLOBAL.DoRestart(true) end}
@@ -47,8 +48,9 @@ local function PushSubscribeDialog()
     TheFrontEnd:PushScreen(screen)
 end
 local function PushPopupDialog()
+    local screen
     local function doclose() TheFrontEnd:PopScreen(screen) end
-    local screen = PopupDialogScreen(modinfo.name .. ":提示",
+    screen = PopupDialogScreen(modinfo.name .. ":提示",
                                      '本模组需要依赖mods :EditedAnims \n请订阅mod并到mod界面开启后再试\n请订阅mod后,不要忘记开启mod!!!',
                                      {
         {

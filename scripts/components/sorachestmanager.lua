@@ -68,7 +68,6 @@ map['marblebean'] = 'marble'
 
 map['moonrocknugget'] = 'moonglass'
 
-
 map['bluegem'] = 'redgem'
 map['purplegem'] = 'redgem'
 
@@ -80,7 +79,6 @@ map['spoiled_food'] = 'poop'
 map['rottenegg'] = 'poop'
 
 map['livinglog'] = 'nightmarefuel'
-
 
 map['feather_crow'] = "feather"
 map['feather_robin'] = "feather"
@@ -170,9 +168,9 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
             if num >= maxplant then
                 return
             end
-            inst.components.container.ignoreoverstacked  = true
+            inst.components.container.ignoreoverstacked = true
             item = inst.components.container:RemoveItem(item, true)
-            inst.components.container.ignoreoverstacked  = false
+            inst.components.container.ignoreoverstacked = false
             if item.components.stackable then
                 for i = 1, item.components.stackable.stacksize do
                     if num >= maxplant then
@@ -278,8 +276,8 @@ local function AllChestDrop()
     end
 end
 
-local function  ChestDrop(chest)
-    if chest and chest.sorachestdata then 
+local function ChestDrop(chest)
+    if chest and chest.sorachestdata then
         local data = chest.sorachestdata
         for index, c in pairs(data.c) do
             for k, v in pairs(data.containers[index]) do
@@ -313,9 +311,11 @@ if TUNING.SORACHESTRANGE > 2000 then
         end
         for _, d in pairs(orderData) do
             for chest, data in pairs(allchest[d[1]] or {}) do
-                for index, c in pairs(data.c) do
-                    if topick[c] then
-                        TryPutToContainer(chest, topick[c], data.containers[index])
+                if not data.notdayupdate then
+                    for index, c in pairs(data.c) do
+                        if topick[c] then
+                            TryPutToContainer(chest, topick[c], data.containers[index])
+                        end
                     end
                 end
             end
@@ -372,11 +372,13 @@ else
         end
         for _, d in pairs(orderData) do
             for chest, data in pairs(allchest[d[1]] or {}) do
-                for index, c in pairs(data.c) do
-                    if topick[c] then
-                        TryPutToContainer(chest, topick[c], data.containers[index], function(a, b)
-                            return a:GetDistanceSqToInst(b) < maxrange
-                        end)
+                if not data.notdayupdate then
+                    for index, c in pairs(data.c) do
+                        if topick[c] then
+                            TryPutToContainer(chest, topick[c], data.containers[index], function(a, b)
+                                return a:GetDistanceSqToInst(b) < maxrange
+                            end)
+                        end
                     end
                 end
             end
@@ -490,9 +492,9 @@ local GemTask = {
             for ik, slot in pairs(container) do
                 local it = con:GetItemInSlot(slot)
                 if it and ik > 1 then
-                    con.ignoreoverstacked  = true
+                    con.ignoreoverstacked = true
                     local item = con:RemoveItem(it, true)
-                    con.ignoreoverstacked  = false
+                    con.ignoreoverstacked = false
                     ent.components.container:GiveItem(item)
                     if ent.components.container:IsFull() then
                         ent.components.soragift:GetItem()
@@ -506,7 +508,9 @@ local GemTask = {
     end,
 
     purplegem = function(inst, data, v)
-        if TUNING.SORATOCHESTGEM then return end
+        if TUNING.SORATOCHESTGEM then
+            return
+        end
         local pos = inst:GetPosition()
         local con = inst.components.container
         for k, container in pairs(data.containers) do
@@ -526,9 +530,9 @@ local GemTask = {
                     local item = inst.components.container:GetItemInSlot(slot)
                     local level = SoraAPI.GetSoraPackLevel(item)
                     if item and ik > 1 and level < 30 then
-                        con.ignoreoverstacked  = true
+                        con.ignoreoverstacked = true
                         local it = inst.components.container:RemoveItem(item, true)
-                        con.ignoreoverstacked  = false
+                        con.ignoreoverstacked = false
                         table.insert(gifts, it)
                         maxlevel = math.max(maxlevel, level + 1)
                     end
@@ -585,7 +589,7 @@ local function UpdateAllChest()
     local UnReg = {}
     for type, chests in pairs(allchest) do -- 统计失效箱子
         for k, v in pairs(chests) do
-            if not (k:IsValid() and k.components.container )then
+            if not (k:IsValid() and k.components.container) then
                 if not UnReg[type] then
                     UnReg[type] = {}
                 end
@@ -771,7 +775,8 @@ local function OnClose(inst, event)
             GetItem(inst, data)
         end)
 
-    if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") and not data.bangreen then
+    if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") and
+        not data.bangreen then
         inst:DoTaskInTime(0.1, function()
             for k, container in pairs(data.containers) do
                 HeLiMiZhi(inst, doer, data.gem.greengem * data.gem.greengem * 2, container)
@@ -898,9 +903,11 @@ function com:GetCacheChest(item)
         }
         for type, v in pairs(allchest) do
             for chest, data in pairs(allchest[type]) do
-                for k, v in pairs(data.c) do
-                    if v == needprefab then
-                        table.insert(chestcache[item].chest, {chest, k})
+                if not data.selfcontainer then
+                    for k, v in pairs(data.c) do
+                        if v == needprefab then
+                            table.insert(chestcache[item].chest, {chest, k})
+                        end
                     end
                 end
             end
@@ -998,8 +1005,8 @@ function com:RegType(type, data)
 end
 
 function com:RegByType(chest, type)
-    if not chest.components.container then 
-        return 
+    if not chest.components.container then
+        return
     end
     if ChestData[type] then
         if not allchest[type] then
@@ -1016,7 +1023,7 @@ function com:RegByType(chest, type)
         chest:ListenForEvent("itemget", OnItemGet)
         chest:ListenForEvent("itemlose", OnItemLose)
         chest:AddTag("sorasmartchest")
-        local oldfn = chest.components.container.OnRemoveFromEntity 
+        local oldfn = chest.components.container.OnRemoveFromEntity
         chest.components.container.OnRemoveFromEntity = function(...)
             self:UnReg(chest)
         end

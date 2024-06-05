@@ -108,4 +108,18 @@ SoraAPI.MakeItemSkin("sora3sword","sora3swordskin",{
             basebank = "sora3sword",
         })
 RegisterInventoryItemAtlas("images/inventoryimages/sora3sword.xml","sora3sword.tex")
+SoraAPI.MakeAssetTable("sora3sword_rose",assets)
+SoraAPI.MakeItemSkin("sora3sword","sora3sword_rose",{
+	name = "玫语",
+	atlas = "images/inventoryimages/sora3sword_rose.xml",
+	image = "sora3sword_rose",
+	build = "sora3sword_rose",
+	bank = "sora3sword_rose",
+	basebuild = "sora3sword",
+	basebank = "sora3sword",
+	checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+RegisterInventoryItemAtlas("images/inventoryimages/sora3sword_rose.xml","sora3sword_rose.tex")
+
 return	Prefab( "sora3sword", fn, assets, prefabs)

@@ -189,6 +189,7 @@ function makelightflier()
         inst:AddTag("NOBLOCK")
         inst:AddTag("rechargeable")
         inst:AddTag("soracantpack")
+        inst:AddTag("sora_lightflier")
         inst.Transform:SetTwoFaced()
         inst.AnimState:SetBuild("lightflier")
         inst.AnimState:SetBank("lightflier")
@@ -209,7 +210,8 @@ function makelightflier()
         inst.components.sorauseable:SetOnUseFn(onuse)
         inst:AddComponent("rechargeable")
         inst.components.rechargeable:SetMaxCharge(99999999)
-
+        inst:AddComponent("soraonlyone")
+        inst.components.soraonlyone.tag = "sora_lightflier"
         inst:AddComponent("sorasavecmp")
         inst.components.sorasavecmp:AddSave("cat", function(inst, data)
             if inst.cat and inst.cat:IsValid() then

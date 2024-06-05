@@ -37,7 +37,7 @@ local islogin = {} -- 已经登录过的玩家
 local autologin = {} -- 服务器自动获取一次皮肤
 local selfid = TheNet:GetUserID()
 local selfnetid = ''
-local trylogin 
+local trylogin
 local function IsDefaultCharacterSkin(item_key)
     return string.sub(item_key, -5) == "_none"
 end
@@ -188,7 +188,7 @@ MakeSkin("sora_sby", {
     name = "永恒水兵月",
     des = "只有一个人，\n我愿意为她付出生命",
     init_fn = function(inst)
-        if inst and TheWorld.ismastersim then 
+        if inst and TheWorld.ismastersim then
             inst.sorafoot_fx = SpawnPrefab("sora_foot_fx_sby")
             inst.sorafoot_fx.entity:SetParent(inst.entity)
             inst.sorafoot_fx.owner = inst
@@ -196,11 +196,11 @@ MakeSkin("sora_sby", {
         end
     end,
     clear_fn = function(inst)
-        if inst and inst.sorafoot_fx and TheWorld.ismastersim then 
+        if inst and inst.sorafoot_fx and TheWorld.ismastersim then
             inst.sorafoot_fx:Remove()
             inst.soradancefxprefab = nil
         end
-    end,
+    end
 
 })
 MakeSkinNameMap("sora_sdsz", "sora_sdsz_r")
@@ -271,7 +271,7 @@ local tokentime = 0
 -- local apiurl = "http://127.0.0.1/api/Dst"
 local function nofn()
 end
-local logincd = SoraCD(5,true)
+local logincd = SoraCD(5, true)
 local function SkinApi(api, data, fn)
     if not api then
         return false
@@ -279,7 +279,7 @@ local function SkinApi(api, data, fn)
     data = data or {}
     data.mod = modname
     data.ext = DATASKINEXT or {}
-    if DATASKINFN then 
+    if DATASKINFN then
         DATASKINFN(data)
     end
     fn = fn or nofn
@@ -291,7 +291,7 @@ local function SkinApi(api, data, fn)
             if succ and code == 200 then
                 local re, jso = pcall(json.decode, str)
                 if re and type(jso) == "table" then
-                    if jso.code == 401 and trylogin and logincd() then 
+                    if jso.code == 401 and trylogin and logincd() then
                         trylogin()
                     end
                     fn(jso.code, jso.msg, jso.data)
@@ -376,11 +376,11 @@ local function Login(userid, netid, nick)
             lastloginfaild = nil
         else
             token = ""
-            
-            if data and data.error then 
+
+            if data and data.error then
                 lastloginfaild = data.error
             end
-            if code == -1004 then 
+            if code == -1004 then
                 lastloginfaild = "登录错误代码:-1004"
             end
             print("LoginFailed", msg, type(data) == "table" and fastdump(data) or data)
@@ -435,7 +435,7 @@ if not TheNet:IsDedicated() then
         if token ~= "" then
             return
         end
-        if lastloginfaild then 
+        if lastloginfaild then
             SoraPushPopupDialog("小穹的温馨提示", lastloginfaild)
         end
         local find = false
@@ -886,6 +886,9 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
     AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
     AddItemSkin("sora_sign_myy", "羊腿好吃,所以值得!")
+    AddItemSkin("sora2ice_bhl", "环游整个星系一万次，只为遇见你")
+    AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
+    AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
     local item_map = {
         sora_none = "sora_uniforms"
     }
@@ -937,7 +940,6 @@ if not TheNet:IsDedicated() then
             self.soraitem_btn:SetPosition(150, 0)
             self.soraitem_btn:Hide()
         end
-
 
         local old_UpdateItemSelectedInfo = self._UpdateItemSelectedInfo
         self._UpdateItemSelectedInfo = function(s, item, ...)
@@ -1154,10 +1156,10 @@ if not TheNet:IsDedicated() then
 
         self.cb = function(s, i)
             if gametimes >= time then
-                if token == "" and trylogin and logincd() then 
+                if token == "" and trylogin and logincd() then
                     trylogin()
                     SoraPushPopupDialog("小穹的温馨提示", "请稍后再试")
-                    return 
+                    return
                 end
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
                 SkinApi('c/ActiveSkin', {
@@ -1205,10 +1207,10 @@ if not TheNet:IsDedicated() then
         self.characterprogress:SetString(string.format("可用活跃度: %d ", gametimesunuse))
         self.cb = function(s, i)
             if gametimesunuse >= time then
-                if token == "" and trylogin and logincd() then 
+                if token == "" and trylogin and logincd() then
                     trylogin()
                     SoraPushPopupDialog("小穹的温馨提示", "请稍后再试")
-                    return 
+                    return
                 end
 
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
@@ -1277,12 +1279,12 @@ if not TheNet:IsDedicated() then
                     SoraPushPopupDialog("小穹的温馨提示", "请输入正确的卡密")
                     return
                 end
-                if token == "" and trylogin and logincd() then 
+                if token == "" and trylogin and logincd() then
                     trylogin()
                     SoraPushPopupDialog("小穹的温馨提示", "请稍后再试")
-                    return 
+                    return
                 end
-                
+
                 local a = SoraPushPopupDialog("小穹的温馨提示", "正在激活中,请稍后查看结果")
                 UseSkinCDK(cdk, function(code, msg, data)
                     TheFrontEnd:PopScreen(a)
@@ -1554,13 +1556,15 @@ if not TheNet:IsDedicated() then
         TheFrontEnd:PopScreen(self)
     end
 end
-
--- 获取n秒后的时间
-local function GetSecondAfter(n)
-    local t = os.clock() + n
-    while os.clock() < t do
+global("GetSecondAfter")
+if not GLOBAL.GetSecondAfter then
+    -- 获取n秒后的时间
+    function GLOBAL.GetSecondAfter(n)
+        local t = os.clock() + n
+        while os.clock() < t do
+        end
+        return os.clock()
     end
-    return os.clock()
+    GetSecondAfter(2)
 end
-GetSecondAfter(2)
 

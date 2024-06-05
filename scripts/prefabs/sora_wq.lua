@@ -76,7 +76,7 @@ end
 local function onequip(inst, owner)
     inst.owner = owner
     
-    owner.AnimState:OverrideSymbol("swap_object", "sora_wq", "swap_wq")
+    owner.AnimState:OverrideSymbol("swap_object", inst.skinname or  "sora_wq", "swap_wq")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
     if not owner:HasTag("sora") then return end
@@ -204,4 +204,19 @@ local function fn()
     return inst
 end
 RegisterInventoryItemAtlas("images/inventoryimages/sora_wq.xml", "sora_wq.tex")
+
+SoraAPI.MakeAssetTable("sora_wq_bbj",assets)
+SoraAPI.MakeItemSkin("sora_wq","sora_wq_bbj",{
+	name = "波乱月白经津",
+	atlas = "images/inventoryimages/sora_wq_bbj.xml",
+	image = "sora_wq_bbj",
+	build = "sora_wq_bbj",
+	bank = "sora_wq_bbj",
+	basebuild = "sora_wq",
+	basebank = "sora_wq",
+	--checkfn = SoraAPI.SoraSkinCheckFn,
+    --checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+RegisterInventoryItemAtlas("images/inventoryimages/sora_wq_bbj.xml","sora_wq_bbj.tex")
+
 return Prefab("sora_wq", fn, assets)

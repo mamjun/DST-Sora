@@ -41,7 +41,10 @@ local assets = {Asset("ANIM", "anim/sora2ice.zip"), Asset("ANIM", "anim/soraches
                 Asset("ATLAS", "images/inventoryimages/sora2ice_flower.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2ice_flower.tex"),
                 Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_flower.xml", 256),
-
+                Asset("ANIM", "anim/sora2ice_bhl.zip"),
+                Asset("ATLAS", "images/inventoryimages/sora2ice_bhl.xml"),
+                Asset("IMAGE", "images/inventoryimages/sora2ice_bhl.tex"),
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_bhl.xml", 256),
             }
 
 local prefabs = {"collapse_small"}
@@ -105,7 +108,7 @@ local function fn()
     inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2ice")
     inst.AnimState:SetBuild("sora2ice")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     -- MakeSnowCoveredPristine(inst)
@@ -164,5 +167,22 @@ for k, v in pairs({"flower", "seed"}) do
         checkclientfn = SoraAPI.SoraSkinCheckClientFn
     })
 end
+
+local tname = "sora2ice_bhl"
+    SoraAPI.MakeItemSkin("sora2ice",tname, {
+        
+        name = "星璃",
+        atlas = "images/inventoryimages/" .. tname .. ".xml",
+        image = tname,
+        build = tname,
+        bank = tname,
+        basebuild = "sora2ice",
+        basebank =  "sora2ice",
+        init_fn = function(inst)
+        end,
+
+        checkfn = SoraAPI.SoraSkinCheckFn,
+        checkclientfn = SoraAPI.SoraSkinCheckClientFn
+    })
 
 return Prefab("sora2ice", fn, assets, prefabs), MakePlacer("sora2ice_placer", "sora2ice", "sora2ice", "idle")

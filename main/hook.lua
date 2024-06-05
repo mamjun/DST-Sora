@@ -1185,8 +1185,12 @@ if not TUNING.SORADISABLEGLOBAL then
         inst.soraglobalbuild = net_bool(inst.GUID, "soraglobalbuild", "ingredientmoddirty")
         inst.soraglobalbuildenable = false
         inst:DoPeriodicTask(1, function()
+            local player = inst.entity:GetParent()
             local chest = inst.soraglobalbuild:value() and FindEntity(inst, 10, nil, {"sorasmartchest"}) and true or
                               false
+            if not chest and inst.soraglobalbuild:value() and player and player.components.inventory:HasItemWithTag("sorasmartchest", 1) then 
+                chest = true
+            end
             if chest ~= inst.soraglobalbuildenable then
                 inst.soraglobalbuildenable = chest
                 inst:PushEvent("ingredientmoddirty")

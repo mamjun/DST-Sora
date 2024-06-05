@@ -121,12 +121,12 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
         return atlas, t
     else
         if GLOBAL.Prefabs[name] then
-            if GLOBAL.Prefabs[name].is_skin and GLOBAL.Prefabs[name].imagename and GLOBAL.Prefabs[name].atlas then 
+            if GLOBAL.Prefabs[name].is_skin and GLOBAL.Prefabs[name].imagename and GLOBAL.Prefabs[name].atlas then
                 imagecache[name] = {
                     atlas = GLOBAL.Prefabs[name].atlas,
                     image = GLOBAL.Prefabs[name].imagename
                 }
-                return  GLOBAL.Prefabs[name].atlas ,GLOBAL.Prefabs[name].imagename
+                return GLOBAL.Prefabs[name].atlas, GLOBAL.Prefabs[name].imagename
             end
             local assets = GLOBAL.Prefabs[name].assets or {}
             for ak, av in pairs(assets) do
@@ -388,35 +388,88 @@ function comparetable(src, dst, name) -- 比较目标表
         end
     end
 end
+local alluisave = {}
+local alluiinst = {}
+local uicount = 0
+--可以使用 sora_reset_ui  来重置所有UI的位置了 
+local function ClearUI()
+    local toremove = {}
+    for k,v in pairs(alluiinst) do 
+        if not (k and k.inst and k.inst:IsValid()) then 
+            toremove[k]=1
+        end
+    end
+    for k,v in pairs(toremove) do 
+        alluiinst[k] = 1 
+    end
+end
+
+function GLOBAL.sora_reset_ui()
+    for k,v in pairs(alluisave) do 
+        TheSim:ErasePersistentString(k)
+    end
+    ClearUI()
+    for k,v in pairs(alluiinst) do 
+        if k.ReseMovabletUI then 
+            k:ReseMovabletUI()
+        end
+    end
+end
+
+
+local function ValidPos(pos,data)
+    data =data or {}
+    pos.x = data.fnx and data.fnx(pos.x) or math.clamp(pos.x,data.minx or 30,data.maxx or (data.minx and (data.minx+1870)) or 1900)
+    pos.y = data.fny and data.fny(pos.y) or math.clamp(pos.y,data.miny or 30,data.maxy or (data.miny and (data.miny+1020)) or 1050)
+    return pos 
+end
+function NextFrame(fn)
+    return function(...)
+        local args = {...}
+        TheWorld:DoTaskInTime(0, function()
+            fn(unpack(args))
+        end)
+    end
+end
 
 function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动 
     -- 第一个参数为UI实体 第二个参数为 位置存档的名称 注意如果是一个UI的多个实体 记得不同名称
     -- 第三个参数为默认位置 要求为Vector3 或者为空
     -- 第四个参数为扩展属性 是一个table 或者 nil 描述了实体的对齐的问题
+    alluiinst[s] = 1
+    uicount = uicount + 1
+    if (uicount % 20) == 0 then   --每20个清理一次
+        ClearUI()
+    end
+    data = data or {}
     s.soramovable = {}
     local m = s.soramovable
     m.nullfn = function()
     end
     m.name = name or "default"
+    alluisave[m.name] = 1 
     m.self = s
     m.cd = SoraCD(0.5)
-    m.dpos = pos or Vector3(0, 0, 0)
-    m.pos = pos or Vector3(0, 0, 0)
+    pos = pos or Vector3(0, 0, 0)
+    m.dpos = pos
+    m.pos = pos
     m.ha = data and data.ha or 1
     m.va = data and data.va or 2
-
     m.x, m.y = TheSim:GetScreenSize()
-    TheSim:GetPersistentString(m.name, function(load_success, str)
-        if load_success then
-            local fn = loadstring(str)
-            if type(fn) == "function" then
-                m.pos = fn()
-                if not (type(m.pos) == "table" and m.pos.Get) then
-                    m.pos = pos
+    if not RESETUI then
+        TheSim:GetPersistentString(m.name, function(load_success, str)
+            if load_success then
+                local fn = loadstring(str)
+                if type(fn) == "function" then
+                    m.pos = fn()
+                    if not (type(m.pos) == "table" and m.pos.Get) then
+                        m.pos = pos
+                    end
+                    m.pos = ValidPos (m.pos,data.ValidPos)
                 end
             end
-        end
-    end)
+        end)
+    end
     s:SetPosition(m.pos:Get())
     m.OnControl = s.OnControl or m.nullfn
     s.OnControl = function(self, control, down)
@@ -456,7 +509,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         local self_scale = self:GetScale()
         local offset = data and data.drag_offset or 1 -- 偏移修正(容器是0.6)
         local newpos = self.ppos + (pos - self.mousepos) / (self_scale.x / offset) -- 修正偏移值       
-        s.SetPosition(self, newpos)
+        s.SetPosition(self, ValidPos (newpos,data.ValidPos))
     end
     m.FollowMouse = function(self)
         self.mousepos = TheInput:GetScreenPosition()
@@ -478,8 +531,15 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
             m.followhandler = nil
         end
         local newpos = self:GetPosition()
+        newpos = ValidPos (newpos,data.ValidPos)
         print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
         TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
+    end
+
+    m.ReseMovabletUI = function(self)
+        
+        self:SetPosition(pos:Get())
+        TheSim:ErasePersistentString(m.name)
     end
 end
 
@@ -819,22 +879,21 @@ function CreateTaskList()
         PushTask = PushTask,
         PopTask = PopTask,
         GetTask = GetTask,
-        GetAll = GetAll,
+        GetAll = GetAll
     }
 end
 
-
-function AddMulPrefabPostInit(t,fn)
-    for k,v in pairs(t) do 
-        AddPrefabPostInit( type(k) == "string" and k or v ,fn)
+function AddMulPrefabPostInit(t, fn)
+    for k, v in pairs(t) do
+        AddPrefabPostInit(type(k) == "string" and k or v, fn)
     end
 end
 
-function MakeAssetTable(name,oldtabl)
+function MakeAssetTable(name, oldtabl)
     local t = oldtabl or {}
-    table.insert(t ,Asset("ANIM", "anim/"..name..".zip"))
-    table.insert(t ,Asset("ATLAS", "images/inventoryimages/"..name..".xml"))
-    table.insert(t ,Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256))
-    table.insert(t ,Asset("IMAGE", "images/inventoryimages/"..name..".tex"))
-    return t 
+    table.insert(t, Asset("ANIM", "anim/" .. name .. ".zip"))
+    table.insert(t, Asset("ATLAS", "images/inventoryimages/" .. name .. ".xml"))
+    table.insert(t, Asset("ATLAS_BUILD", "images/inventoryimages/" .. name .. ".xml", 256))
+    table.insert(t, Asset("IMAGE", "images/inventoryimages/" .. name .. ".tex"))
+    return t
 end

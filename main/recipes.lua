@@ -389,7 +389,20 @@ Rec("sora2prop", "神奇法杖", "打飞你的医保卡！", equip2, "soraother"
     livinglog = 60,
     hammer = 6
 }})
-
+AddInvImg2("gift", GetInventoryItemAtlas("gift_large1.tex"), "gift_large1.tex")
+Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother", {{
+    reviver = 1,
+    moonglass = 3,
+    gift = 1
+}, {
+    reviver = 2,
+    moonglass = 5,
+    gift = 2
+}, {
+    reviver = 3,
+    moonglass = 40,
+    gift = 5
+}})
 Rec("sora3sword", "银白の锋", "银白骑士团の制式长剑", equip2, "soraother", {{
     nightsword = 1,
     tentaclespike = 2,

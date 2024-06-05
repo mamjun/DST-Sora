@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] author = "FL"
-version = "11.57" -- 版本
+version = "11.58" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -138,7 +138,20 @@ local function makeconfig(name, label, des, default, min, step, num, ispercent)
     t.default = string.format("%s", default)
     return t
 end
-configuration_options = {maketitle("jichu", "基础设置"), {
+configuration_options = {{
+    name = "reset_ui",
+    label = "启动时重置UI位置(玩家自己在mod设置里设置)\n也可以使用sora_reset_ui()命令",
+    options = {{
+        description = "重置所有UI",
+        data = true,
+        hover = "重置所有UI"
+    }, {
+        description = "无影响",
+        data = false,
+        hover = "无影响"
+    }},
+    default = false
+},maketitle("jichu", "基础设置"), {
     name = "mode",
     label = "难度",
     options = {{
