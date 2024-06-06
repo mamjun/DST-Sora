@@ -52,7 +52,7 @@ local function fn()
 
     inst.AnimState:SetBank("sora3chest")
     inst.AnimState:SetBuild("sora3chest")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
