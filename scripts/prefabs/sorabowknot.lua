@@ -315,6 +315,8 @@ local function fn()
                 doer.components.bundler.preskinname = "sorapacker_sby"
             elseif inst.skinname == "sorabowknot_dw" then
                 doer.components.bundler.preskinname = "sorapacker_dw"
+            elseif inst.skinname == "sorabowknot_dw_tmp" then
+                doer.components.bundler.preskinname = "sorapacker_dw_tmp"
             else
                 doer.components.bundler.preskinname = nil
             end
