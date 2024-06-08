@@ -40,8 +40,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
                    Asset("ANIM", "anim/sorabowknot_sby.zip"),
                    Asset("ATLAS", "images/inventoryimages/sorabowknot_sby.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabowknot_sby.xml", 256),
-                   Asset("IMAGE", "images/inventoryimages/sorabowknot_sby.tex")
-                }
+                   Asset("IMAGE", "images/inventoryimages/sorabowknot_sby.tex")}
 
 local packassets = {Asset("ANIM", "anim/sora2pack.zip"), Asset("ATLAS", "images/inventoryimages/sora2pack.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora2pack.xml", 256),
@@ -52,7 +51,8 @@ local packassets = {Asset("ANIM", "anim/sora2pack.zip"), Asset("ATLAS", "images/
                     Asset("ATLAS", "images/inventoryimages/sora2pack_2.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora2pack_2.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora2pack_2.tex"), Asset("ANIM", "anim/sora3pack.zip"),
-                    Asset("ANIM", "anim/sora3pack_ld.zip"),  Asset("ANIM", "anim/sora3pack_sby.zip"),Asset("ATLAS", "images/inventoryimages/sora3pack.xml"),
+                    Asset("ANIM", "anim/sora3pack_ld.zip"), Asset("ANIM", "anim/sora3pack_sby.zip"),
+                    Asset("ATLAS", "images/inventoryimages/sora3pack.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora3pack.tex"),
                     Asset("ATLAS", "images/inventoryimages/sora3pack_1.xml"),
@@ -66,8 +66,7 @@ local packassets = {Asset("ANIM", "anim/sora2pack.zip"), Asset("ATLAS", "images/
                     Asset("IMAGE", "images/inventoryimages/sora3pack_2.tex"),
                     Asset("ATLAS", "images/inventoryimages/sora3pack_sby.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack_sby.xml", 256),
-                    Asset("IMAGE", "images/inventoryimages/sora3pack_sby.tex")
-                }
+                    Asset("IMAGE", "images/inventoryimages/sora3pack_sby.tex")}
 local function onremovelight(light)
     light._lantern._light = nil
 end
@@ -259,7 +258,7 @@ local function onsave(inst, data)
     data.exp = inst.exp
     data.lexp = inst.lexp
 end
-RegisterInventoryItemAtlas("images/inventoryimages/sorabowknot.xml","sorabowknot.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/sorabowknot.xml", "sorabowknot.tex")
 local function fn()
     local inst = CreateEntity()
     inst.entity:AddTransform()
@@ -310,10 +309,13 @@ local function fn()
     inst.components.bundlemaker:SetOnStartBundlingFn(function(inst, doer)
         if doer and doer.components.bundler then
             doer.components.bundler.itemprefab = nil
-            if inst.skinname == "sorabowknot_ld" then 
+            if inst.skinname == "sorabowknot_ld" then
                 doer.components.bundler.preskinname = "sorapacker_ld"
-            elseif inst.skinname == "sorabowknot_sby" then 
-                    doer.components.bundler.preskinname = "sorapacker_sby"else
+            elseif inst.skinname == "sorabowknot_sby" then
+                doer.components.bundler.preskinname = "sorapacker_sby"
+            elseif inst.skinname == "sorabowknot_dw" then
+                doer.components.bundler.preskinname = "sorapacker_dw"
+            else
                 doer.components.bundler.preskinname = nil
             end
         end
@@ -366,7 +368,7 @@ local function packfn()
 
     inst.AnimState:SetBank("sora2pack_1")
     inst.AnimState:SetBuild("sora2pack")
-    inst.AnimState:PlayAnimation("anim",true)
+    inst.AnimState:PlayAnimation("anim", true)
     inst:AddTag("aquatic")
     inst:AddTag("sorapacker")
     inst:AddTag("sorabowknot")
@@ -429,7 +431,7 @@ local function fullfn()
 
     inst.AnimState:SetBank("sora3pack_1")
     inst.AnimState:SetBuild("sora3pack")
-    inst.AnimState:PlayAnimation("anim",true)
+    inst.AnimState:PlayAnimation("anim", true)
     inst:AddTag("sorapacker")
     inst:AddTag("nonpackable")
     inst:AddTag("_named")
@@ -485,6 +487,37 @@ SoraAPI.MakeItemSkin("sorapacker", "sorapacker_ld", {
     bank = "sora3pack_ld",
     basebuild = "sora3pack",
     basebank = "sora3pack_1",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end
+})
+
+SoraAPI.MakeItemSkin("sorapacker", "sorapacker_dw", {
+    name = "碎玉粽",
+    atlas = "images/inventoryimages/sora3pack_dw.xml",
+    image = "sora3pack_dw",
+    build = "sora3pack_dw",
+    bank = "sora3pack_dw",
+    basebuild = "sora3pack",
+    basebank = "sora3pack_1",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end
+})
+SoraAPI.MakeItemSkin("sorapacker", "sorapacker_dw_tmp", {
+    name = "碎玉粽(限时)",
+    atlas = "images/inventoryimages/sora3pack_dw.xml",
+    image = "sora3pack_dw",
+    build = "sora3pack_dw",
+    bank = "sora3pack_dw",
+    basebuild = "sora3pack",
+    basebank = "sora3pack_1",
+    rarity = "限时体验",
+    rarityorder = 80,
+    raritycorlor = {0.957, 0.769, 0.188, 1},
+    FrameSymbol = "heirloom",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -556,11 +589,11 @@ local function GetPackLevel(data)
 end
 
 local function OnWrapped(inst, num, doer)
-    if doer and doer.components.bundler and doer.components.bundler.preskinname then 
+    if doer and doer.components.bundler and doer.components.bundler.preskinname then
         inst.preskinname = doer.components.bundler.preskinname
     end
-    inst.AnimState:PlayAnimation("anim",true)
-    if inst.preskinname then 
+    inst.AnimState:PlayAnimation("anim", true)
+    if inst.preskinname then
         TheSim:ReskinEntity(inst.GUID, inst.skinname, inst.preskinname, nil)
     elseif math.random() > 0.5 then
         TheSim:ReskinEntity(inst.GUID, inst.skinname, "sora3packer_2", nil)
@@ -621,7 +654,7 @@ local function full3fn()
 
     inst.AnimState:SetBank("sora3pack_1")
     inst.AnimState:SetBuild("sora3pack")
-    inst.AnimState:PlayAnimation("anim",true)
+    inst.AnimState:PlayAnimation("anim", true)
 
     inst:AddTag("bundle")
 
@@ -687,6 +720,36 @@ SoraAPI.MakeItemSkin("sora3packer", "sora3packer_ld", {
     end
 })
 
+SoraAPI.MakeItemSkin("sora3packer", "sora3packer_dw", {
+    name = "碎玉粽",
+    atlas = "images/inventoryimages/sora3pack_dw.xml",
+    image = "sora3pack_dw",
+    build = "sora3pack_dw",
+    bank = "sora3pack_dw",
+    basebuild = "sora3pack",
+    basebank = "sora3pack_1",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end
+})
+SoraAPI.MakeItemSkin("sora3packer", "sora3packer_dw_tmp", {
+    name = "碎玉粽(限时)",
+    atlas = "images/inventoryimages/sora3pack_dw.xml",
+    image = "sora3pack_dw",
+    build = "sora3pack_dw",
+    bank = "sora3pack_dw",
+    basebuild = "sora3pack",
+    basebank = "sora3pack_1",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    rarity = "限时体验",
+    rarityorder = 80,
+    raritycorlor = {0.957, 0.769, 0.188, 1},
+    FrameSymbol = "heirloom",
+    init_fn = function(inst)
+    end
+})
 SoraAPI.MakeItemSkin("sora3packer", "sora3packer_sby", {
     name = "永恒水兵月",
     atlas = "images/inventoryimages/sora3pack_sby.xml",
@@ -775,6 +838,37 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_ld", {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
+
+SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_dw", {
+    name = "蝴蝶结-碎玉斋",
+    atlas = "images/inventoryimages/sorabowknot_dw.xml",
+    image = "sorabowknot_dw",
+    build = "sorabowknot_dw",
+    bank = "sorabowknot_dw",
+    basebuild = "sorabowknot",
+    basebank = "sorabowknot",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
+SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_dw_tmp", {
+    name = "蝴蝶结-碎玉斋(限时)",
+    atlas = "images/inventoryimages/sorabowknot_dw.xml",
+    image = "sorabowknot_dw",
+    build = "sorabowknot_dw",
+    bank = "sorabowknot_dw",
+    basebuild = "sorabowknot",
+    basebank = "sorabowknot",
+    rarity = "限时体验",
+    rarityorder = 80,
+    raritycorlor = {0.957, 0.769, 0.188, 1},
+    FrameSymbol = "heirloom",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
+SoraAPI.MakeAssetTable("sorabowknot_dw", assets)
+SoraAPI.MakeAssetTable("sora3pack_dw", assets)
 return Prefab("sorapack_container", pack3fn), Prefab("sorabowknot", fn, assets),
     Prefab("sorapacker", fullfn, packassets), Prefab("sora2pack", packfn, packassets),
     Prefab("sora3packer", full3fn, packassets), MakePlacer("sorapacker_placer", "sorapacker", "sorapacker", "place"),

@@ -209,6 +209,13 @@ MakeSkinNameMap("sorabowknot_ld", "sorapacker_ld")
 MakeSkinNameMap("sorabowknot_ld", "sora3packer_ld")
 MakeSkinNameMap("sorabowknot_sby", "sorapacker_sby")
 MakeSkinNameMap("sorabowknot_sby", "sora3packer_sby")
+
+MakeSkinNameMap("sorabowknot_dw", "sorapacker_dw")
+MakeSkinNameMap("sorabowknot_dw", "sora3packer_dw")
+
+MakeSkinNameMap("sorabowknot_dw_tmp", "sorapacker_dw_tmp")
+MakeSkinNameMap("sorabowknot_dw_tmp", "sora3packer_dw_tmp")
+
 MakeSkinNameMap("sora_sdsz_tmp", "sora_sdsz_r_tmp")
 MakeSkinNameMap("sora_sdsz_tmp", "sorabag_sd_tmp")
 
