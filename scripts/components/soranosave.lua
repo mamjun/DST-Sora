@@ -1,3 +1,4 @@
+
 --[[
 授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
@@ -27,26 +28,19 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] GLOBAL.setmetatable(env, {
-    __index = function(t, k)
-        return GLOBAL.rawget(GLOBAL, k)
-    end
-})
+]] --[[专属交互
+]] --
+local com = Class(function(self, inst)
+    self.inst = inst
+    inst.GetPersistData = self.OnSave
+end)
 
-modimport("main/init")
--- prefab文件列表
-PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "sorahat", "sora2hat", "sora2bag",
-               "sora2sword", "sora3sword", "sora2ice", "sora2fire", "sora2plant", "soramagic", "sorapick",
-               "sorahealing", "soratele", "sorabowknot", "sorabooks", "sorahealingstar", "soraprojectile", "sorameteor",
-               "sora2buffer", "sora2prop", "sora2amulet", "sora2base", "sora2chest", "sora2tree", "sorafoods",
-               "sorahair", "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
-               "sora_nizao","sora_lock","sora_pickhat","sora2pokeball","sora_fx_feather"} --,""
-function  AddPreFile(str)
-    table.insert(PrefabFiles,str)
+function com:OnSave()
+    return 
 end
 
+function com:OnLoad()
+    self.inst:DoTaskInTime(0,self.inst.Remove)
+end
 
-AddPreFile("sora2birdchest")
-AddPreFile("sora3chest")
-AddPreFile("sora_yingyu")
---AddPreFile("sora_dieyu")
+return com

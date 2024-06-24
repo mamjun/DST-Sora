@@ -60,7 +60,9 @@ local com = Class(function(self,inst)
 end)
 function com:SetBind(bind)
     self.bind = bind
-
+end
+function com:Bind(doer)
+    self.user = doer.userid or ""
 end
 function com:OnSave()
     return {bind = self.bind,user = self.user}

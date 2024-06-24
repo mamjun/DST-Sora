@@ -70,7 +70,6 @@ function RegUseSkinFN(item, serverfn, clientfn)
     }
 end
 
-RegUseSkinFN("sora2ice")
 -- 先读取缓存  尽力而为 读不到就算了
 local cache = "SoraSkinCache"
 local servercache = cache .. "_server"
@@ -143,7 +142,11 @@ local black = {
     sora_mysora_r = 1,
     sora_sby = 1
 }
-
+RegUseSkinFN("sora_yingyu",function (doer,skin)
+    if doer and doer.components.soraitemcontrol then 
+        doer.components.soraitemcontrol:CreateItem("sora_yingyu")
+    end
+end)
 local function MakeSkin(name, data, notemp)
     local d = {}
     d.quotes = "敢动我就杀了你哦"
@@ -600,7 +603,7 @@ local skinhandle = {
                 elseif (code == -6298) then
                     mes(inst, "服务器故障")
                 elseif (code == -2) then
-                    info = "code=" .. msg .. "\n{" .. data .. "}"
+                    local info = "code=" .. msg .. "\n{" .. data .. "}"
                     mes(inst, "服务器链接失败,请稍后再试" .. info)
                 elseif (code == -3) then
                     mes(inst, "服务器内部出错,请稍后再试")
@@ -656,6 +659,20 @@ local skinhandle = {
             return
         end
 
+    end,
+    UseSkin = function(inst, skin)
+        if not skin then
+            return
+        end
+        if not SoraSkinCheckClientFn(nil, inst.userid, skin) then
+            return mes(inst, "你还没有这个皮肤")
+        end
+        if not inst.UseSkinSCD then
+            inst.UseSkinSCD = SoraCD(1)
+        end
+        if inst.UseSkinSCD() and UseSkin[skin] and UseSkin[skin].serverfn then
+            UseSkin[skin].serverfn(inst, skin)
+        end
     end,
     Message = function(inst, mes)
         if ThePlayer then
@@ -873,8 +890,8 @@ if not TheNet:IsDedicated() then
 
     }
 
-    function AddItemSkin(item, des, time)
-        table.insert(ItemSkin, {item, des, time or 300})
+    function AddItemSkin(item, des, time, hide)
+        table.insert(ItemSkin, {item, des, time or 300, hide or false})
     end
     AddItemSkin("sora2chest_sns", "情之所生，由心而起")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
@@ -896,6 +913,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2ice_bhl", "环游整个星系一万次，只为遇见你")
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
+    AddItemSkin("sora_yingyu", "跟我一起学'樱语'")
+
     local item_map = {
         sora_none = "sora_uniforms"
     }
@@ -1316,8 +1335,7 @@ if not TheNet:IsDedicated() then
                     elseif (code == -6203) then
                         SoraPushPopupDialog('小穹的温馨提示', "礼包已过期")
                     elseif (code == -2) then
-                        info = "code=" .. msg .. "\n{" .. data .. "}"
-
+                        local info = "code=" .. msg .. "\n{" .. data .. "}"
                         SoraPushPopupDialog('小穹的温馨提示', "服务器链接失败,请稍后再试" .. info)
                     elseif (code == -3) then
                         SoraPushPopupDialog('小穹的温馨提示', "服务器内部出错,请稍后再试")
@@ -1501,7 +1519,13 @@ if not TheNet:IsDedicated() then
                 des = des,
                 unlock = SoraSkinCheckFn(nil, v[1])
             }
-            table.insert(data, info)
+            if v[4] then
+                if SoraSkinCheckFn(v[1]) then
+                    table.insert(data, info)
+                end
+            else
+                table.insert(data, info)
+            end
         end
         self.grid:SetItemsData(data)
     end
@@ -1517,18 +1541,34 @@ if not TheNet:IsDedicated() then
             end
             self.iteminforoot.des:SetString(data.des or "")
             self.iteminforoot.item = item
-            self.iteminforoot.namestr:SetString((STRINGS.NAMES[GetSkinBase(item):upper()] or "") .. "|" ..
-                                                    (STRINGS.SKIN_NAMES[item] or ""))
+            if GLOBAL.Prefabs[item].is_skin then
+                self.iteminforoot.namestr:SetString((STRINGS.NAMES[GetSkinBase(item):upper()] or "") .. "|" ..
+                                                        (STRINGS.SKIN_NAMES[item] or ""))
+            else
+                self.iteminforoot.namestr:SetString((STRINGS.NAMES[item:upper()] or ""))
+            end
             self.iteminforoot:Show()
             if SoraSkinCheckFn(nil, item) then
                 self.iteminforoot.act:Hide()
                 if UseSkin[item] then
+                    self.iteminforoot.use:SetOnClick(function()
+                        if not self.usecd then
+                            self.usecd = SoraCD(1)
+                        end
+                        if self.usecd() then
+                            if not (UseSkin[item].clientfn and not UseSkin[item].clientfn(ThePlayer, item)) then
+                                SkinRPC('UseSkin', item)
+                            end
+                        end
+                    end)
                     self.iteminforoot.use:Show()
                 else
+                    self.iteminforoot.use:SetOnClick(NilFn)
                     self.iteminforoot.use:Hide()
                 end
             else
                 self.iteminforoot.use:Hide()
+                self.iteminforoot.use:SetOnClick(NilFn)
                 if SkinActive[item] then
                     self.iteminforoot.act:Show()
                 else

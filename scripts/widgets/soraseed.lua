@@ -68,6 +68,14 @@ local DB = SoraAPI.SeedCDB
 local ui = Class(Widget, function(self, owner)
     Widget._ctor(self, "sora_seed_ui")
     self.owner = owner
+    self.inst:DoPeriodicTask(0.1,function ()
+        if not (owner and owner.replica.inventory:EquipHasTag("soraseedui")) then 
+            if self.parent and self.parent.soraseedui then
+                self.parent.soraseedui = nil
+            end
+            self:Kill()
+        end
+    end)
     self.seedinfos = {}
     self.staff = nil
     self.cd = SoraAPI.SoraCD(0.1)

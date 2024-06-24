@@ -58,9 +58,10 @@ end
 local prefabhas = {}
 function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     name = name or ""
-    local BUILD = build:upper()
+    
     local PREFAB = prefab:upper()
     local build = prefab:lower() .. rec_back
+    local BUILD = build:upper()
     if prefabhas[prefab] then
         prefabhas[prefab] = prefabhas[prefab] + 1
         build = build .. "_" .. tostring(prefabhas[prefab])

@@ -105,9 +105,9 @@ local function OnGetItemFromPlayer(inst, giver, item)
 			inst.mpnum = inst.mpnum + num
 			inst.mplevel = math.min(math.floor(inst.mpnum / inst.need),inst.maxlevel)
 			if inst.mplevel < inst.maxlevel then 
-				giver.components.talker:Say("毛皮数量:"..inst.mpnum.."/"..inst.need * inst.maxlevel.."\tLV:"..inst.mplevel .."\n保温："..(hot1+hot2*inst.mplevel))
+				giver.components.talker:Say("毛皮数量:"..inst.mpnum.."/"..inst.need * inst.maxlevel.."\tLV:"..inst.mplevel .."\n护温："..(hot1+hot2*inst.mplevel))
 				else
-				giver.components.talker:Say("毛皮已满\tLV:10\n保温："..(hot1+hot2*inst.mplevel))
+				giver.components.talker:Say("毛皮已满\tLV:10\n护温："..(hot1+hot2*inst.mplevel))
 			end
 		elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") 
 			then
@@ -216,6 +216,29 @@ local function fn()
 	inst:AddComponent("insulator")
     inst.components.insulator:SetInsulation(0)
 	--防水
+
+	inst:DoPeriodicTask(1, function()
+        local owner = inst.components.inventoryitem:GetGrandOwner()
+        if not owner then
+            return
+        end
+        if owner.components.temperature then
+            local temp = owner.components.temperature.current
+            local wtemp = TheWorld.state.temperature or 0
+            if wtemp > 50 then 
+                inst.components.insulator:SetSummer()
+            elseif wtemp < 20 then 
+                inst.components.insulator:SetWinter()
+            elseif (temp - wtemp > 5) then
+                inst.components.insulator:SetSummer()
+            elseif (temp - wtemp < -5) then
+                inst.components.insulator:SetWinter()
+            else
+                inst.components.insulator:SetSummer()
+            end
+        end
+    end)
+
 	inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(0)
 	--护甲

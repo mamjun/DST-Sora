@@ -87,6 +87,19 @@ end
 
 -- GetInventoryItemAtlas is the new way of getting item atlas in porkland and DST
 
+--避免多次判断 player tag
+local oldAddPlayerPostInit = AddPlayerPostInit
+local PlayerPostInitfns= {}
+local function DoPlayerPostInit(inst)
+    for k,v in pairs(PlayerPostInitfns) do 
+        v(inst)
+    end
+end
+
+function AddPlayerPostInit(fn)
+    table.insert(PlayerPostInitfns,fn)
+end
+oldAddPlayerPostInit(DoPlayerPostInit)
 local imagecache = {}
 local repl = {}
 local notimagecache = {}

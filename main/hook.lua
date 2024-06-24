@@ -56,8 +56,8 @@ AddPrefabPostInit("world", function(inst)
         --                                            inst.components.soraworldevent.namespace ~= "4507" and
         --                                            inst.components.soraworldevent.namespace ~= "a-de")
         inst:AddComponent("soraexpsave")
-        --inst.components.soraworldevent:SetNameSpace("sora")
-        --inst.components.soraworldevent:SetTimer(5)
+        -- inst.components.soraworldevent:SetNameSpace("sora")
+        -- inst.components.soraworldevent:SetTimer(5)
         inst:ListenForEvent("ms_playerdespawn", Onplayerdespawnanddelete)
         inst:ListenForEvent("ms_playerdespawnandmigrate", Onplayerdespawnanddelete)
         inst:ListenForEvent("ms_playerdespawnanddelete", Onplayerdespawnanddelete)
@@ -1188,7 +1188,8 @@ if not TUNING.SORADISABLEGLOBAL then
             local player = inst.entity:GetParent()
             local chest = inst.soraglobalbuild:value() and FindEntity(inst, 10, nil, {"sorasmartchest"}) and true or
                               false
-            if not chest and inst.soraglobalbuild:value() and player and player.replica.inventory:HasItemWithTag("sorasmartchest", 1) then 
+            if not chest and inst.soraglobalbuild:value() and player and
+                player.replica.inventory:HasItemWithTag("sorasmartchest", 1) then
                 chest = true
             end
             if chest ~= inst.soraglobalbuildenable then
@@ -1279,16 +1280,16 @@ if not TUNING.SORADISABLEGLOBAL then
                     if x then
                         return x, y, z
                     end
-                    local x1,y1,z1 =  TheWorld.components.sorachestmanager:HasItem(inst, item, num - y)
-                    if not x1 then 
-                        if ss.soramakerecipecount then 
-                            ss.soramakerecipecount[item] = num -y - y1
+                    local x1, y1, z1 = TheWorld.components.sorachestmanager:HasItem(inst, item, num - y)
+                    if not x1 then
+                        if ss.soramakerecipecount then
+                            ss.soramakerecipecount[item] = num - y - y1
                         end
                     end
-                    if ss.sorajusttest then 
+                    if ss.sorajusttest then
                         x1 = true
                     end
-                    return x1,y1,z1
+                    return x1, y1, z1
                 end
                 local x, y, z = oldHasIngredients(ss, rec, ...)
                 inst.components.inventory.Has = oldhas
@@ -1335,9 +1336,9 @@ if not TUNING.SORADISABLEGLOBAL then
         end
 
         local oldMakeRecipeFromMenu = s.MakeRecipeFromMenu
-        s.MakeRecipeFromMenu = function(ss, rec,...)
+        s.MakeRecipeFromMenu = function(ss, rec, ...)
             ss.soramakerecipe = false
-            local x, y, z = oldMakeRecipeFromMenu(ss,rec, ...)
+            local x, y, z = oldMakeRecipeFromMenu(ss, rec, ...)
             if not ss.soramakerecipe then
                 ss.soralastrecipe = rec.name
                 ss.inst.components.locomotor:Stop()
@@ -1377,32 +1378,33 @@ if not TUNING.SORADISABLEGLOBAL then
             return x, y, z
         end
     end)
-    local oldfn = ACTIONS.BUILD.fn 
-    ACTIONS.BUILD.fn = function(act,...)
+    local oldfn = ACTIONS.BUILD.fn
+    ACTIONS.BUILD.fn = function(act, ...)
         if act.doer.components.builder ~= nil and act.recipe == "sora_cantbuild" then
             local builder = act.doer.components.builder
-            if builder.soralastrecipe  then 
+            if builder.soralastrecipe then
                 builder.sorajusttest = true
                 local tosay = "制作失败,至少还缺:\n"
                 builder.soramakerecipecount = {}
                 builder:HasIngredients(builder.soralastrecipe)
-                for k,v in pairs(builder.soramakerecipecount) do 
-                    tosay = tosay  .. (STRINGS.NAMES[k:upper()] or k ) .. " * " .. tostring(v) .."\n"
+                for k, v in pairs(builder.soramakerecipecount) do
+                    tosay = tosay .. (STRINGS.NAMES[k:upper()] or k) .. " * " .. tostring(v) .. "\n"
                 end
                 builder.sorajusttest = nil
                 builder.soramakerecipecount = nil
-                Say(act.doer,tosay)
+                Say(act.doer, tosay)
             end
             return true
         end
-        return  oldfn(act,...)
+        return oldfn(act, ...)
     end
 end
 
-for k,v in pairs({"sora2chest","sora2fire","sora2ice","sora_light","sorabag","sora2bag","sora_lightflier_cat","sora2base","sora_huapen","sora_pickhat"}) do 
-    AddPrefabPostInit(v,function (inst)
-        if not TheWorld.ismastersim then 
-            return 
+for k, v in pairs({"sora2chest", "sora2fire", "sora2ice", "sora_light", "sorabag", "sora2bag", "sora_lightflier_cat",
+                   "sora2base", "sora_huapen", "sora_pickhat"}) do
+    AddPrefabPostInit(v, function(inst)
+        if not TheWorld.ismastersim then
+            return
         end
         if inst.components.container ~= nil then
             inst.components.container:Close()
@@ -1412,41 +1414,55 @@ for k,v in pairs({"sora2chest","sora2fire","sora2ice","sora_light","sorabag","so
 end
 
 local function onitemchange(inst)
-    if not (inst.components.inventoryitem and inst.components.container ) then return end 
-    local IsEmpty  =  inst.components.container:IsEmpty() 
-    local cannotopen = (inst.components.container.openlimit or 1 ) < 0 
-    local cangotoinv = inst.components.inventoryitem.cangoincontainer == true 
-    if not cangotoinv and IsEmpty then  --不能进物品栏且为空 则改成可以进物品栏
-        inst.components.inventoryitem.cangoincontainer = true 
-    elseif cangotoinv and not IsEmpty then 
+    if not (inst.components.inventoryitem and inst.components.container) then
+        return
+    end
+    local IsEmpty = inst.components.container:IsEmpty()
+    local cannotopen = (inst.components.container.openlimit or 1) < 0
+    local cangotoinv = inst.components.inventoryitem.cangoincontainer == true
+    if not cangotoinv and IsEmpty then -- 不能进物品栏且为空 则改成可以进物品栏
+        inst.components.inventoryitem.cangoincontainer = true
+    elseif cangotoinv and not IsEmpty then
         inst.components.inventoryitem.cangoincontainer = false
     end
 end
 
-
-AddMulPrefabPostInit({sorabag=1,sora2bag=1},function (inst)
-    if TheWorld.ismastersim then 
+AddMulPrefabPostInit({
+    sorabag = 1,
+    sora2bag = 1
+}, function(inst)
+    if TheWorld.ismastersim then
         inst:ListenForEvent("itemget", onitemchange)
         inst:ListenForEvent("itemlose", onitemchange)
-        inst:DoTaskInTime(0,onitemchange)
-        inst:ListenForEvent("equipped", function (inst,data)
-            local owner = data and data.owner 
-            if not owner then return end 
+        inst:DoTaskInTime(0, onitemchange)
+        inst:ListenForEvent("equipped", function(inst, data)
+            local owner = data and data.owner
+            if not owner then
+                return
+            end
             inst.components.container.canbeopened = true
             if inst.components.container ~= nil then
                 inst.components.container:Open(owner)
             end
         end)
-        inst:ListenForEvent("unequipped", function (inst,data)
-            local owner = data and data.owner 
-            if not owner then return end 
+        inst:ListenForEvent("unequipped", function(inst, data)
+            local owner = data and data.owner
+            if not owner then
+                return
+            end
             if inst.components.container ~= nil then
                 inst.components.container:Close(owner)
             end
             inst.components.container.canbeopened = false
         end)
-        if inst.components.container then 
+        if inst.components.container then
             inst.components.container.canbeopened = false
         end
     end
 end)
+if TheNet:GetIsServer() then
+    AddPlayerPostInit(function(inst)
+        inst:AddComponent("soraitemcontrol")
+        inst.components.soraitemcontrol:InitPlayer()
+    end)
+end

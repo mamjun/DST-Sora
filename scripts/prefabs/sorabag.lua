@@ -107,9 +107,9 @@ local function OnGetItemFromPlayer(inst, giver, item)
         if inst.grlevel < inst.maxlevel * 6 then
             giver.components.talker:Say(
                 "冰数量:" .. inst.grnum .. "/" .. inst.need * inst.maxlevel * 60 .. "\tLV:" .. inst.grlevel ..
-                    "\n隔热：" .. (ice1 + ice2 * inst.grlevel))
+                    "\n护温：" .. (ice1 + ice2 * inst.grlevel))
         else
-            giver.components.talker:Say("冰已满\tLV:60\n隔热：" .. (ice1 + ice2 * inst.grlevel))
+            giver.components.talker:Say("冰已满\tLV:60\n护温：" .. (ice1 + ice2 * inst.grlevel))
         end
 
     elseif (item.prefab == "honey") then
@@ -310,7 +310,27 @@ local function fn()
     -- 隔热
     inst:AddComponent("insulator")
     inst.components.insulator:SetInsulation(ice1)
-    inst.components.insulator:SetSummer()
+    inst:DoPeriodicTask(1, function()
+        local owner = inst.components.inventoryitem:GetGrandOwner()
+        if not owner then
+            return
+        end
+        if owner.components.temperature then
+            local temp = owner.components.temperature.current
+            local wtemp = TheWorld.state.temperature or 0
+            if wtemp > 50 then 
+                inst.components.insulator:SetSummer()
+            elseif wtemp < 20 then 
+                inst.components.insulator:SetWinter()
+            elseif (temp - wtemp > 5) then
+                inst.components.insulator:SetSummer()
+            elseif (temp - wtemp < -5) then
+                inst.components.insulator:SetWinter()
+            else
+                inst.components.insulator:SetSummer()
+            end
+        end
+    end)
     inst:AddComponent("planardefense")
     inst.components.planardefense:SetBaseDefense(5)
     

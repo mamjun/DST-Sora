@@ -214,8 +214,8 @@ SoraAPI.MakeItemSkin("sora_wq","sora_wq_bbj",{
 	bank = "sora_wq_bbj",
 	basebuild = "sora_wq",
 	basebank = "sora_wq",
-	--checkfn = SoraAPI.SoraSkinCheckFn,
-    --checkclientfn = SoraAPI.SoraSkinCheckClientFn
+	checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 RegisterInventoryItemAtlas("images/inventoryimages/sora_wq_bbj.xml","sora_wq_bbj.tex")
 

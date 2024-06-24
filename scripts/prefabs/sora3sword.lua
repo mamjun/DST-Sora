@@ -122,4 +122,4 @@ SoraAPI.MakeItemSkin("sora3sword","sora3sword_rose",{
 })
 RegisterInventoryItemAtlas("images/inventoryimages/sora3sword_rose.xml","sora3sword_rose.tex")
 
-return	Prefab( "sora3sword", fn, assets, prefabs)
+return	Prefab( "sora3sword", fn, assets)
