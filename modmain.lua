@@ -49,4 +49,4 @@ end
 AddPreFile("sora2birdchest")
 AddPreFile("sora3chest")
 AddPreFile("sora_yingyu")
---AddPreFile("sora_dieyu")
+AddPreFile("sora_dieyu")

@@ -260,14 +260,16 @@ local GetOneItem
 local function AllChestDrop()
     for _, d in pairs(orderData) do
         for chest, data in pairs(allchest[d[1]] or {}) do
-            for index, c in pairs(data.c) do
-                for k, v in pairs(data.containers[index]) do
-                    local item = chest.components.container:GetItemInSlot(v)
-                    if item then
-                        local p = toprefab(item.prefab)
-                        if p ~= c and not notdrop[p] then
-                            chest.components.container:DropItemBySlot(v)
-                            item.SoraChestSkip = nil
+            if not data.notdayupdate then
+                for index, c in pairs(data.c) do
+                    for k, v in pairs(data.containers[index]) do
+                        local item = chest.components.container:GetItemInSlot(v)
+                        if item then
+                            local p = toprefab(item.prefab)
+                            if p ~= c and not notdrop[p] then
+                                chest.components.container:DropItemBySlot(v)
+                                item.SoraChestSkip = nil
+                            end
                         end
                     end
                 end
