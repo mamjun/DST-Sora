@@ -241,7 +241,19 @@ local stafftask  = {
 		end
 	end,
 }
-
+local LightPos = {
+	default=Point(0,-0.5,0),
+	sora2base_big = Point(0,0,0),
+	sora2base_small = Point(0,-1,0),
+}
+local function ResetLightPos(inst)
+	if inst._staffstar then 
+		local skin = inst.skinname or "dafault"
+		local pos = LightPos[skin] or LightPos.default
+		print(skin,pos)
+		inst._staffstar.Transform:SetPosition(pos:Get())
+	end
+end
 local function OnStaffGiven(inst, item)
     inst.SoundEmitter:PlaySound("dontstarve/common/together/moonbase/moonstaff_place")
 	CancelStaffBuffer(inst)
@@ -252,6 +264,9 @@ local function OnStaffGiven(inst, item)
 		end
         --inst.AnimState:PlayAnimation("full_"..item)
         inst._staffstar = SpawnPrefab("sorastafflight")
+		inst._staffstar:AddTag("FX")
+		inst._staffstar:AddTag("NOCLICK")
+		inst._staffstar:AddTag("NOBLOCK")
         inst._staffstar.entity:SetParent(inst.entity)
         inst._staffstar.sl:set(inst.showlight and item or 0)
         slight[item](inst._staffstar)
@@ -262,6 +277,7 @@ local function OnStaffGiven(inst, item)
 		if inst._staffstar then
 		inst._staffstar:DoPeriodicTask(item == "firestaff" and 3 or 1,stafftask[item])
 		end
+		ResetLightPos(inst)
 	end
 end
 
@@ -295,7 +311,6 @@ local function onhammered(inst, worker)
     fx:SetMaterial("metal")
     inst:Remove()
 end
-
 local function fn()
     local inst = CreateEntity()
 
@@ -309,7 +324,7 @@ local function fn()
 	inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2base")
     inst.AnimState:SetBuild("sora2base")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     inst.AnimState:SetFinalOffset(1)
 	inst.AnimState:SetScale(0.7,0.7,0.7)
     inst.MiniMapEntity:SetPriority(4)
@@ -656,6 +671,7 @@ SoraAPI.MakeItemSkin("sora2base", name, {
 	basebank = "sora2base",
 	init_fn = function(inst)
 		inst.AnimState:SetScale(v[1],v[1],v[1])
+		ResetLightPos(inst)
 	end,
 	clear_fn = function(inst)
 		inst.AnimState:SetScale(0.7,0.7,0.7)

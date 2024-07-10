@@ -142,13 +142,13 @@ local black = {
     sora_mysora_r = 1,
     sora_sby = 1
 }
-RegUseSkinFN("sora_yingyu",function (doer,skin)
-    if doer and doer.components.soraitemcontrol then 
+RegUseSkinFN("sora_yingyu", function(doer, skin)
+    if doer and doer.components.soraitemcontrol then
         doer.components.soraitemcontrol:CreateItem("sora_yingyu")
     end
 end)
-RegUseSkinFN("sora_dieyu",function (doer,skin)
-    if doer and doer.components.soraitemcontrol then 
+RegUseSkinFN("sora_dieyu", function(doer, skin)
+    if doer and doer.components.soraitemcontrol then
         doer.components.soraitemcontrol:CreateItem("sora_dieyu")
     end
 end)
@@ -918,8 +918,11 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2ice_bhl", "环游整个星系一万次，只为遇见你")
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
+    AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗")
     AddItemSkin("sora_yingyu", "跟我一起学'樱语'")
-    AddItemSkin("sora_dieyu", "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",nil,true)
+    AddItemSkin("sora_dieyu",
+        "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
+        nil, true)
     local item_map = {
         sora_none = "sora_uniforms"
     }
@@ -980,10 +983,12 @@ if not TheNet:IsDedicated() then
                 s.set_info_btn:Show()
                 s.set_item_type = item
             end
-            if item == "sora_none" then
-                self.soraitem_btn:Show()
-            else
-                self.soraitem_btn:Hide()
+            if self.soraitem_btn then
+                if item == "sora_none" then
+                    self.soraitem_btn:Show()
+                else
+                    self.soraitem_btn:Hide()
+                end
             end
             return r
         end

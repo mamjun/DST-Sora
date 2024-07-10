@@ -47,7 +47,7 @@ function PrintTags(inst)
 end
 local function AddTag(inst, stag, ...)
     if not inst or not stag then return end
-    tag = string.lower(stag)
+    local tag = string.lower(stag)
     if Tags[tag] then
         if inst[key].Tags and inst[key].Tags[tag] then
             inst[key].Tags[tag]:set_local(false)
@@ -69,7 +69,7 @@ end
 
 local function RemoveTag(inst, stag, ...)
     if not inst or not stag then return end
-    tag = string.lower(stag)
+    local tag = string.lower(stag)
     if Tags[tag] then
         if inst[key].Tags and inst[key].Tags[tag] then
             inst[key].Tags[tag]:set_local(true)
@@ -85,7 +85,7 @@ end
 
 local function HasTag(inst, stag, ...)
     if not inst or not stag then return end
-    tag = string.lower(stag)
+    local tag = string.lower(stag)
     if Tags[tag] and inst[key].Tags and inst[key].Tags[tag] then
         return inst[key].Tags[tag]:value()
     else
@@ -93,25 +93,39 @@ local function HasTag(inst, stag, ...)
     end
 end
 
-function HasTags(inst, stags, ...)
+function HasTags(inst,...)
+    local tags = select(1, ...)
+    local stags  = type(tags) == "table" and tags or {...}
     for i = 1, #stags do
-        local key = stags[i]
+        local tkey = stags[i] and stags[i]:lower() or ""
         local fn = HasTag or inst[key].HasTag
-        if not fn(inst, key, ...) then return false end
+        if not fn(inst, tkey, ...) then return false end
     end
     return true
 end
 
-function HasOneOfTags(inst, stags, ...)
+function HasOneOfTags(inst, ...)
+    local tags = select(1, ...)
+    local stags  = type(tags) == "table" and tags or {...}
     for i = 1, #stags do
-        local key = stags[i]
+        local tkey = stags[i] and stags[i]:lower() or ""
         local fn = HasTag or inst[key].HasTag
-
-        if fn(inst, key, ...) then return true end
+        if fn(inst, tkey, ...) then return true end
     end
     return false
 end
-
+function AddOrRemoveTag(inst,tag,condition,...)
+    local ltag = tag:lower()
+    if  Tags[ltag] then 
+        if condition then 
+            AddTag(inst,ltag,...)
+        else
+            RemoveTag(inst,ltag,...)
+        end
+    else
+        return inst[key].AddOrRemoveTag(inst,tag,condition,...)
+    end
+end
 function FixTag(inst) -- 传入实体 主客机一起调用
     inst[key] = {
         AddTag = inst.AddTag,
@@ -119,6 +133,7 @@ function FixTag(inst) -- 传入实体 主客机一起调用
         RemoveTag = inst.RemoveTag,
         HasTags = inst.HasTags,
         HasOneOfTags = inst.HasOneOfTags,
+        AddOrRemoveTag = inst.AddOrRemoveTag,
         Tags = {},
         TagsD = {}
     }
@@ -127,7 +142,9 @@ function FixTag(inst) -- 传入实体 主客机一起调用
     inst.RemoveTag = RemoveTag
     inst.HasTags = HasTags
     inst.HasOneOfTags = HasOneOfTags
-
+    inst.HasAnyTag = HasOneOfTags
+    inst.HasAllTags = HasTags
+    inst.AddOrRemoveTag = AddOrRemoveTag
     for k, v in pairs(Tags) do
         inst[key].Tags[k] = net_bool(inst.GUID, key .. "." .. k, GUID,
                                      key .. "." .. k .. "dirty")

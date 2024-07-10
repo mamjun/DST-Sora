@@ -132,6 +132,7 @@ local skinfn = {
             if inst.sfx then
                 inst.sfx:Cancel()
                 inst.sfx = nil
+                inst.foleysound = nil
             end
         end
     }
