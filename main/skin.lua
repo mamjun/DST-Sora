@@ -892,7 +892,12 @@ if not TheNet:IsDedicated() then
             scr.unlocktext:SetString("消耗300活跃度解锁")
             return scr
         end
-
+        ,
+        -- sora_sign_yez = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 300)
+        --     scr.unlocktext:SetString("消耗450活跃度解锁")
+        --     return scr
+        -- end
     }
 
     function AddItemSkin(item, des, time, hide)
@@ -915,6 +920,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
     AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
     AddItemSkin("sora_sign_myy", "羊腿好吃,所以值得!")
+    AddItemSkin("sora_sign_yez", "加大！加大！再描一圈！")
     AddItemSkin("sora2ice_bhl", "环游整个星系一万次，只为遇见你")
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")

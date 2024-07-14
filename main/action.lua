@@ -225,7 +225,7 @@ SORAREPAIR.fn = function(act)
                 act.invobject:Remove()
             end
         elseif num == -2 then
-            act.doer.components.talker:Say("需要更多的缝纫包才能修好")
+            act.doer.components.talker:Say("需要更多才能修好")
         else
             act.doer.components.talker:Say("这个不需要修复")
         end

@@ -471,6 +471,8 @@ local function fn()
     return inst
 end
 SoraAPI.MakeItemSkinDefaultImage("sora_sign", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item")
+SoraAPI.MakeItemSkinDefaultImage("sora_sign_item", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item")
+
 local tname = "sora_sign_myy"
 SoraAPI.MakeItemSkin("sora_sign", tname, {
     name = "棉悠悠",
@@ -491,7 +493,7 @@ SoraAPI.MakeItemSkin("sora_sign", tname, {
         inst.AnimState:PlayAnimation("idle", true)
     end
 })
-SoraAPI.MakeItemSkinDefaultImage("sora_sign_item", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item")
+
 local tname = "sora_sign_myy"
 SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_myy", {
     name = "棉悠悠",
@@ -511,6 +513,50 @@ SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_myy", {
     end
 })
 SoraAPI.MakeSkinNameMap("sora_sign_myy","sora_sign_item_myy")
+SoraAPI.MakeAssetTable("sora_sign_yez",assets)
+
+local tname = "sora_sign_yez"
+SoraAPI.MakeItemSkin("sora_sign", tname, {
+    name = "铁锅皮鼓炖妖鹅",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sign_home",
+    basebank = "sign_home",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+        inst.AnimState:SetMultColour(1, 1, 1, 1)
+        inst.AnimState:PlayAnimation("idle", true)
+    end,
+    clear_fn = function(inst)
+        inst.AnimState:SetMultColour(0 / 255, 0 / 255, 0 / 255, 0.75)
+        inst.AnimState:PlayAnimation("idle", true)
+    end
+})
+
+local tname = "sora_sign_yez"
+SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_yez", {
+    name = "铁锅皮鼓炖妖鹅",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sign_mini",
+    basebank = "sign_mini",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+        inst.AnimState:PlayAnimation("item", true)
+    end,
+    clear_fn = function(inst)
+        inst.AnimState:PlayAnimation("item", true)
+    end
+})
+SoraAPI.MakeSkinNameMap("sora_sign_yez","sora_sign_item_yez")
+
+
 local function ondeploy(inst, pt, deployer)
     local skin = nil
     local user = nil
@@ -615,7 +661,6 @@ end
 
 local tname = "sora_pearl_pd"
 SoraAPI.MakeItemSkin("sora_pearl", tname, {
-
     name = "胖丁",
     atlas = "images/inventoryimages/" .. tname .. ".xml",
     image = tname,
@@ -625,7 +670,6 @@ SoraAPI.MakeItemSkin("sora_pearl", tname, {
     basebank = "hermit_pearl",
     init_fn = function(inst)
     end,
-
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

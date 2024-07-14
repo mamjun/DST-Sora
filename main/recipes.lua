@@ -169,7 +169,7 @@ Rec("sorapocky", "百奇", "看起来很好吃", item, "sora", {{
     honey = 4
 }})
 
-Rec("sorarepairer", "穹の缝纫包", "缝缝补补又三年", item, "sora", {{
+Rec("sorarepairer", "穹の星星杖", "哪里坏了点哪里", item, "sora", {{
     silk = 4,
     goldnugget = 1
 }, {
@@ -180,7 +180,7 @@ Rec("sorarepairer", "穹の缝纫包", "缝缝补补又三年", item, "sora", {{
     goldnugget = 3
 }}).numtogive = 4
 
-Rec("sorarepairer", "穹の缝纫包", "缝缝补补又三年", item, "sora", {{
+Rec("sorarepairer", "穹の星星杖", "哪里坏了点哪里", item, "sora", {{
     spider = 1,
     goldnugget = 1
 }, {
@@ -472,6 +472,18 @@ Rec("sora2amulet", "荣誉勋章", "银白骑士团の荣耀勋章！", equip2, 
     amulet = 3,
     blueamulet = 3,
     purpleamulet = 3
+}})
+
+AddInvImg("sora_shouban", "inventoryimages/sora_shouban", "sora_shouban")
+Rec("sora_shouban", "穹の手办", "宅男一面墙", build, "sora", {{
+    goldnugget = 2,
+    marble = 2,
+}, {
+    goldnugget = 5,
+    marble = 5,
+}, {
+    goldnugget = 10,
+    marble = 10,
 }})
 
 Rec("sora2ice", "寒冰の箱子", "嘎嘣脆，鸡肉味！", build, "soraother", {{

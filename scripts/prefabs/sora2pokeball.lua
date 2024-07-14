@@ -26,7 +26,7 @@ local function fn()
     MakeInventoryPhysics(inst)
     inst.AnimState:SetBank("sora2pokeball")
     inst.AnimState:SetBuild("sora2pokeball")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     inst.entity:SetPristine()
     inst:AddTag("sorarecharge")
     if not TheWorld.ismastersim then
