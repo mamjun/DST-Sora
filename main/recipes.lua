@@ -486,6 +486,21 @@ Rec("sora_shouban", "穹の手办", "宅男一面墙", build, "sora", {{
     marble = 10,
 }})
 
+AddInvImg("sora_smalllight", "inventoryimages/sora_smalllight", "sora_smalllight")
+Rec("sora_smalllight", "穹の月华", "承月之辉", build, "sora", {{
+    moonglass = 1,
+    lightbulb = 1,
+    fireflies = 1,
+}, {
+    moonglass = 3,
+    lightbulb = 10,
+    fireflies = 3,
+}, {
+    moonglass = 10,
+    lightbulb = 10,
+    fireflies = 10,
+}})
+
 Rec("sora2ice", "寒冰の箱子", "嘎嘣脆，鸡肉味！", build, "soraother", {{
     boards = 10,
     cutstone = 10,

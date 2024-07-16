@@ -120,6 +120,7 @@ local function ondeploy(inst, pt, deployer)
     if blender ~= nil then
         blender.Transform:SetPosition(pt.x,0,pt.z)
         blender.AnimState:PlayAnimation("idle", true)
+        inst:Remove()
     end
 end
 
@@ -160,6 +161,7 @@ local function item_fn()
 end
 RegisterInventoryItemAtlas("images/inventoryimages/"..name..".xml",name..".tex")
 STRINGS.NAMES.SORA_SHOUBAN_ITEM = "穹の手办"
+
 
 return Prefab(name, fn, assets),
     Prefab(name.."_item", item_fn, assets),
