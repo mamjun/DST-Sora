@@ -49,7 +49,7 @@ local function fn()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
     inst:AddTag("nosteal")
-
+    inst:AddTag("soracontainerfix")
     inst.AnimState:SetBank("sora3chest")
     inst.AnimState:SetBuild("sora3chest")
     inst.AnimState:PlayAnimation("idle",true)
@@ -84,6 +84,7 @@ local function fn()
     inst.components.container.canbeopened = false
     inst.components.inventoryitem.canonlygoinpocket = true
     inst.prefab = "sora3chest"
+    assert(TheWorld.components.sorachestmanager,'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
     TheWorld.components.sorachestmanager:RegByType(inst, "sora3chest")
 
     inst:AddComponent("preserver")

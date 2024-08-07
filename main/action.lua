@@ -511,3 +511,36 @@ AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORA2POKEBALL,
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORA2POKEBALL, "doshortaction"))
 
 
+function MakeAndAddAction(id,name,fn,pri,sg,clientsg)
+    local act = GLOBAL.Action({priority = (pri or 999)})
+    act.id = id:upper()
+    if type(name) == "string" then 
+        act.str = name 
+    else
+        act.stroverridefn = name 
+    end
+    act.fn = fn
+    AddAction(act)
+    AddStategraphActionHandler("wilson", ActionHandler(act, sg or "doshortaction"))
+    AddStategraphActionHandler("wilson_client", ActionHandler(act, clientsg or sg or "doshortaction"))
+    return act
+end
+
+MakeAndAddAction("SORAITEMCHANGE",function (act)
+    return not act.target.replica.inventoryitem:CanBePickedUp() and "收起" or "放置"
+end,function (act)
+    local target = act.target 
+    if target.components.soraportable then 
+        target.components.soraportable:ChangToItem(act.doer)
+    end
+    return true 
+end,1,"dolongaction")
+
+
+AddComponentAction("SCENE", "soraportable", function(inst, doer, actions, right)
+    if right and inst and not inst.replica.inventoryitem:CanBePickedUp() then
+        table.insert(actions, ACTIONS.SORAITEMCHANGE)
+    end
+end)
+
+

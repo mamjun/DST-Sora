@@ -38,15 +38,24 @@ if not params then
     needhelp = true
 end
 local ImageButton = require "widgets/imagebutton"
-local function AddButton(config,name,pos,fn,postfn)
+local Image = require "widgets/image"
+local UIAnim = require "widgets/uianim"
+local Widget = require "widgets/widget"
+local function AddButton(config, name, pos, fn, postfn)
     local btn
-    local data  = {tokill = {}}
-    local SoraOnOpenFn = config.SoraOnOpenFn 
-    config.SoraOnOpenFn = function(self,inst,doer,...)
-        if btn and btn.inst and btn.inst.widget then btn:Kill() btn = nil end
-        btn = self:AddChild(ImageButton("images/ui.xml", "button_small.tex", "button_small_over.tex", "button_small_disabled.tex", nil, nil, {1,1}, {0,0}))
+    local data = {
+        tokill = {}
+    }
+    local SoraOnOpenFn = config.SoraOnOpenFn
+    config.SoraOnOpenFn = function(self, inst, doer, ...)
+        if btn and btn.inst and btn.inst.widget then
+            btn:Kill()
+            btn = nil
+        end
+        btn = self:AddChild(ImageButton("images/ui.xml", "button_small.tex", "button_small_over.tex",
+            "button_small_disabled.tex", nil, nil, {1, 1}, {0, 0}))
         btn.image:SetScale(1.07)
-        btn.text:SetPosition(2,-2)
+        btn.text:SetPosition(2, -2)
         btn:SetPosition(pos:Get())
         btn:SetText(name)
 
@@ -60,32 +69,35 @@ local function AddButton(config,name,pos,fn,postfn)
             btn:SetOnClick(function()
                 if doer ~= nil then
                     if doer:HasTag("busy") then
-                        --Ignore button click when doer is busy
+                        -- Ignore button click when doer is busy
                         return
                     elseif doer.components.playercontroller ~= nil then
                         local iscontrolsenabled, ishudblocking = doer.components.playercontroller:IsEnabled()
                         if not (iscontrolsenabled or ishudblocking) then
-                            --Ignore button click when controls are disabled
-                            --but not just because of the HUD blocking input
+                            -- Ignore button click when controls are disabled
+                            -- but not just because of the HUD blocking input
                             return
                         end
                     end
                 end
-                fn(inst, doer,btn,self,data)
+                fn(inst, doer, btn, self, data)
             end)
         end
         if postfn then
-            postfn(btn,inst,name,self,data,...)
+            postfn(btn, inst, name, self, data, ...)
         end
         if SoraOnOpenFn then
-            return SoraOnOpenFn(self,inst, doer,...)
+            return SoraOnOpenFn(self, inst, doer, ...)
         end
     end
     local SoraOnCloseFn = config.SoraOnCloseFn
-    config.SoraOnCloseFn = function(self,inst,doer,...)
-        if btn and btn.inst and btn.inst.widget  then btn:Kill() btn = nil end
-        for k,v in pairs (data.tokill) do
-            if v and v.inst and v.inst.widget then 
+    config.SoraOnCloseFn = function(self, inst, doer, ...)
+        if btn and btn.inst and btn.inst.widget then
+            btn:Kill()
+            btn = nil
+        end
+        for k, v in pairs(data.tokill) do
+            if v and v.inst and v.inst.widget then
                 v:Kill()
             end
         end
@@ -208,7 +220,8 @@ params.sora2chest = {
             position = GLOBAL.Vector3(0, -220, 0)
         }
     },
-    type = "chest"
+    type = "chest",
+    usespecificslotsforitems = true,
 }
 for y = 4, -1, -1 do
     for x = 0, 4 do
@@ -240,19 +253,43 @@ function params.sora2chest.widget:SoraOnOpenFn(inst)
     else
         SoraMakeWidgetMovable(self, "sora2chest", Vector3(-300, 100, 0), {
             drag_offset = 0.6,
-            ValidPos={minx=-700,miny=-320,maxx=700,maxy=320}
+            ValidPos = {
+                minx = -700,
+                miny = -320,
+                maxx = 700,
+                maxy = 320
+            }
         })
     end
 end
 
 function params.sora2chest.itemtestfn(container, item, slot)
-    if not slot then
-        return true -- 现在不能直接存放 和 shift存放
+    if not item then
+        return false
     end
-    return (slot > 25 and item:HasTag("gem")) or slot <= 25
+    if slot then
+        local slotitem = container:GetItemInSlot(slot)
+        if slotitem then 
+            if slotitem.prefab ~= item.prefab then 
+                return false 
+            end
+            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then 
+                return true
+            end
+            return false
+        end
+        if (slot > 25 and item:HasTag("gem")) or slot <= 25 then 
+            return true
+        end
+    else
+        return true
+    end
+    return false
 end
 function params.sora2chest.widget.buttoninfo.fn(inst)
-    r_event(nil,"Sora2ChestControl",{cmd="Collect"},inst)
+    r_event(nil, "Sora2ChestControl", {
+        cmd = "Collect"
+    }, inst)
 end
 
 params.sorabase = {
@@ -273,6 +310,7 @@ end
 local soratreepopup = require "widgets/soratreepopup"
 function params.sorabase.widget:SoraOnOpenFn(inst)
     self.text = self:AddChild(soratreepopup())
+    self:SoraAutoClose(self.text)
 end
 
 params.sora_light = {
@@ -289,6 +327,7 @@ params.sora_light = {
         }
     },
     acceptsstacks = true,
+    usespecificslotsforitems = true,
     type = "chest"
 }
 local sora_light_slot = 0
@@ -333,25 +372,44 @@ for x = 1, 5 do
     })
 end
 function params.sora_light.itemtestfn(container, item, slot)
-    if not slot then
-        return true -- 现在不能直接存放 和 shift存放
+    if not item then
+        return false
     end
-
-    return (slot > sora_light_slot and slot < (sora_light_slot + 5) and item:HasTag("sora_light_batteries")) or
-               (slot > (sora_light_slot + 4) and item:HasTag("gem") and not gemblack[item.prefab]) or slot <=
-               sora_light_slot
+    if slot then
+        local slotitem = container:GetItemInSlot(slot)
+        if slotitem then 
+            if slotitem.prefab ~= item.prefab then 
+                return false 
+            end
+            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then 
+                return true
+            end
+            return false
+        end
+        if (slot > sora_light_slot and slot < (sora_light_slot + 5) and item:HasTag("sora_light_batteries")) or (slot > (sora_light_slot + 4) and item:HasTag("gem") and not gemblack[item.prefab]) or slot <= sora_light_slot then 
+            return true
+        end
+    else
+        return true
+    end
+    return false
 end
 params.sora_light.widget.buttoninfo.fn = params.sora2chest.widget.buttoninfo.fn
 function params.sora_light.widget:SoraOnOpenFn(inst)
     self.candrag = true
     if rawget(GLOBAL, "MakeMedalDragableUI") then
-        MakeMedalDragableUI(self, self.bgimage,"sora_light", {
+        MakeMedalDragableUI(self, self.bgimage, "sora_light", {
             drag_offset = 0.6
         })
     else
         SoraMakeWidgetMovable(self, "sora_light", Vector3(200, 000, 0), {
             drag_offset = 0.6,
-            ValidPos={minx=-460,miny=-240,maxx=480,maxy=240}
+            ValidPos = {
+                minx = -460,
+                miny = -240,
+                maxx = 480,
+                maxy = 240
+            }
         })
     end
 end
@@ -411,7 +469,7 @@ function params.sora_huapen.widget.buttoninfo.fn(inst)
 end
 
 function params.sora_huapen.widget.buttoninfo.validfn(inst)
-    return inst.replica.container ~= nil and not inst.replica.container:IsEmpty() 
+    return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
 end
 
 params.sora_lightflier_cat = {
@@ -428,15 +486,15 @@ params.sora_lightflier_cat = {
     type = "chest"
 }
 sora2chestcontrol = require "widgets/sora2chestcontrol"
-AddButton(params.sora2chest.widget,"控制",Vector3(120, -220, 0),function (inst,doer,ui,s,data)
+AddButton(params.sora2chest.widget, "控制", Vector3(120, -220, 0), function(inst, doer, ui, s, data)
     if ui.sora2chestcontrol and ui.sora2chestcontrol.inst and not ui.sora2chestcontrol.inst.widget then
         ui.sora2chestcontrol = nil
     end
     if not ui.sora2chestcontrol then
-        ui.sora2chestcontrol=s:AddChild(sora2chestcontrol())
-        ui.sora2chestcontrol:SetPosition(120,-400,0)
-        table.insert(data.tokill,ui.sora2chestcontrol)
-        return 
+        ui.sora2chestcontrol = s:AddChild(sora2chestcontrol())
+        ui.sora2chestcontrol:SetPosition(120, -400, 0)
+        table.insert(data.tokill, ui.sora2chestcontrol)
+        return
     end
     if ui.sora2chestcontrol.shown then
         ui.sora2chestcontrol:Hide()
@@ -445,15 +503,15 @@ AddButton(params.sora2chest.widget,"控制",Vector3(120, -220, 0),function (inst
         ui.sora2chestcontrol:ShowTime()
     end
 end)
-AddButton(params.sora_light.widget,"控制",Vector3(530, 10, 0),function (inst,doer,ui,s,data)
+AddButton(params.sora_light.widget, "控制", Vector3(530, 10, 0), function(inst, doer, ui, s, data)
     if ui.sora2chestcontrol and ui.sora2chestcontrol.inst and not ui.sora2chestcontrol.inst.widget then
         ui.sora2chestcontrol = nil
     end
     if not ui.sora2chestcontrol then
-        ui.sora2chestcontrol=s:AddChild(sora2chestcontrol())
-        ui.sora2chestcontrol:SetPosition(680,10,0)
-        table.insert(data.tokill,ui.sora2chestcontrol)
-        return 
+        ui.sora2chestcontrol = s:AddChild(sora2chestcontrol())
+        ui.sora2chestcontrol:SetPosition(680, 10, 0)
+        table.insert(data.tokill, ui.sora2chestcontrol)
+        return
     end
     if ui.sora2chestcontrol.shown then
         ui.sora2chestcontrol:Hide()
@@ -462,14 +520,13 @@ AddButton(params.sora_light.widget,"控制",Vector3(530, 10, 0),function (inst,d
         ui.sora2chestcontrol:ShowTime()
     end
 end)
-
 
 params.sora_pickhat = {
     widget = {
         slotpos = {},
         bgatlas = "images/quagmire_recipebook.xml",
         bgimage = "quagmire_recipe_menu_bg.tex",
-        pos = Vector3(100, 80, 0),
+        pos = Vector3(100, 80, 0)
 
     },
     acceptsstacks = true,
@@ -477,17 +534,15 @@ params.sora_pickhat = {
 }
 for y = 2, 0, -1 do
     for x = 0, 2 do
-        table.insert(params.sora_pickhat.widget.slotpos, Vector3(70 * x - 70 , 70 * y - 70, 0))
+        table.insert(params.sora_pickhat.widget.slotpos, Vector3(70 * x - 70, 70 * y - 70, 0))
     end
 end
 function params.sora_pickhat.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(240, 240)
-   
 end
 params.sora_pickhat.itemtestfn = function()
     return not SoraAPI.IsTradeIteming
 end
-
 
 params.sora3chest = {
     widget = {
@@ -505,29 +560,36 @@ params.sora3chest = {
 }
 for y = 2, 0, -1 do
     for x = 0, 2 do
-        table.insert(params.sora3chest.widget.slotpos, Vector3(70 * x - 70 , 70 * y - 50, 0))
+        table.insert(params.sora3chest.widget.slotpos, Vector3(70 * x - 70, 70 * y - 50, 0))
     end
 end
 function params.sora3chest.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(240, 300)
- 
-    SoraMakeWidgetMovable(self, "sora3chest", Vector3(-100,80, 0), {
+
+    SoraMakeWidgetMovable(self, "sora3chest", Vector3(-100, 80, 0), {
         drag_offset = 0.6,
-        ValidPos={minx=-1200,miny=0,maxx=520,maxy=920}
+        ValidPos = {
+            minx = -1200,
+            miny = 0,
+            maxx = 520,
+            maxy = 920
+        }
     })
 end
 function params.sora3chest.widget.buttoninfo.fn(inst)
-    r_event(nil,"Sora2ChestControl",{cmd="Collect"},inst)
+    r_event(nil, "Sora2ChestControl", {
+        cmd = "Collect"
+    }, inst)
 end
-AddButton(params.sora3chest.widget,"控制",Vector3(60, -120, 0),function (inst,doer,ui,s,data)
+AddButton(params.sora3chest.widget, "控制", Vector3(60, -120, 0), function(inst, doer, ui, s, data)
     if ui.sora2chestcontrol and ui.sora2chestcontrol.inst and not ui.sora2chestcontrol.inst.widget then
         ui.sora2chestcontrol = nil
     end
     if not ui.sora2chestcontrol then
-        ui.sora2chestcontrol=s:AddChild(sora2chestcontrol())
-        ui.sora2chestcontrol:SetPosition(200,-50,0)
-        table.insert(data.tokill,ui.sora2chestcontrol)
-        return 
+        ui.sora2chestcontrol = s:AddChild(sora2chestcontrol())
+        ui.sora2chestcontrol:SetPosition(200, -50, 0)
+        table.insert(data.tokill, ui.sora2chestcontrol)
+        return
     end
     if ui.sora2chestcontrol.shown then
         ui.sora2chestcontrol:Hide()
@@ -536,6 +598,260 @@ AddButton(params.sora3chest.widget,"控制",Vector3(60, -120, 0),function (inst,
         ui.sora2chestcontrol:ShowTime()
     end
 end)
+
+params.sora_pot = {
+    widget = {
+        slotpos = {Vector3(-360, 160, 0), Vector3(-290, 160, 0), Vector3(-360, 90, 0), Vector3(-290, 90, 0),
+                   Vector3(-360, 20, 0), Vector3(-290, 20, 0), Vector3(-360, -140, 0), Vector3(-290, -140, 0),
+
+                   Vector3(-180, 160, 0), Vector3(-180, 20, 0), Vector3(-60, 160, 0), Vector3(-60, 20, 0),
+
+                   Vector3(-180, -140, 0), Vector3(-60, -140, 0)},
+        slotbg = {{
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "tomato.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "tomato.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "tomato.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "tomato.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "portablecookpot_item.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "spice_salt.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "meatballs.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "salt.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "meat.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "meat_dried.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "potato.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "potato_cooked.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "ice.tex"
+        }, {
+            atlas = "images/ui/sora_pot_ui.xml",
+            image = "charcoal.tex"
+        }},
+
+        bgatlas = "images/quagmire_recipebook.xml",
+        bgimage = "quagmire_recipe_menu_bg.tex",
+        pos = Vector3(100, 80, 0)
+
+    },
+    acceptsstacks = true,
+    usespecificslotsforitems=true,
+    type = "hand_inv"
+}
+for y = 4, 0, -1 do
+    for x = 0, 4 do
+        table.insert(params.sora_pot.widget.slotpos, Vector3(75 * x + 60, 75 * y - 140, 0))
+    end
+end
+local cooking = require("cooking")
+
+function params.sora_pot.widget:SoraOnOpenFn(inst)
+
+    self.bgimage:ScaleToSize(900, 500)
+
+    self.cookanim = {}
+    for k, v in pairs({1, 2, 3, 4, 5, 6, 9, 11, 13}) do
+        local anim = self:AddChild(UIAnim())
+        anim:GetAnimState():SetBank("sora_pot_ui")
+        anim:GetAnimState():SetBuild("sora_pot_ui")
+        anim:GetAnimState():PlayAnimation("idle", true)
+        anim:SetPosition(params.sora_pot.widget.slotpos[v]:Get())
+        self:SoraAutoClose(anim)
+        anim:Hide()
+        anim:SetClickable(false)
+        self.cookanim[v] = anim
+    end
+    -- self.firebgimage = self:AddChild(Image("images/hud.xml","craft_slot_place.tex"))
+    -- self.firebgimage:SetPosition(-210,-215,0)
+    -- self.firebgimage:ScaleToSize(380, 20)
+    local anim = self:AddChild(UIAnim())
+    anim:GetAnimState():SetBank("sora_pot_ui_rope")
+    anim:GetAnimState():SetBuild("sora_pot_ui_rope")
+    anim:GetAnimState():PlayAnimation("idle")
+    anim:GetAnimState():Pause()
+    anim:SetScale(0.75, 0.75)
+    anim:SetPosition(-385, -215, 0)
+    anim:SetClickable(false)
+    self:SoraAutoClose(anim)
+    self.cookrope = anim
+
+    local anim = self:AddChild(UIAnim())
+    anim:GetAnimState():SetBank("sora_pot_ui_fire")
+    anim:GetAnimState():SetBuild("sora_pot_ui_fire")
+    anim:GetAnimState():PlayAnimation("idle", true)
+    anim:SetScale(0.75, 0.75)
+    anim:SetPosition(-385, -215, 0)
+    anim:SetClickable(false)
+    self:SoraAutoClose(anim)
+    self.cookfire = anim
+    self.CookRopeTask = function()
+        if self.isopen and self.container and self.container.sorapotper then
+            self:SetCookRope(self.container.sorapotper:value() / 100)
+            for k, v in pairs({1, 2, 3, 4, 5, 6, 9, 11, 13}) do
+                if self.container.sorapotui[v] and self.cookanim[v] then
+                    if self.container.sorapotui[v]:value() and not self.cookanim[v].shown then
+                        self.cookanim[v]:Show()
+                    elseif not self.container.sorapotui[v]:value() and self.cookanim[v].shown then
+                        self.cookanim[v]:Hide()
+                    end
+                end
+            end
+        end
+    end
+    self.SetCookRopeTask = self.inst:DoPeriodicTask(0.1, self.CookRopeTask)
+
+    self.SetCookRope = function(s, per)
+        self.cookrope:GetAnimState():SetPercent('idle', 1 - per)
+        self.cookfire:SetPosition(-385 - 360 * (1 - per), -215, 0)
+    end
+    self:CookRopeTask()
+
+    SoraMakeWidgetMovable(self, "sora_pot", Vector3(-100, 80, 0), {
+        drag_offset = 0.6,
+        ValidPos = {
+            minx = -950,
+            miny = 90,
+            maxx = 360,
+            maxy = 850
+        }
+    })
+    local img = self:AddChild(Image("images/hud.xml", "inventory_bg_arrow.tex"))
+    img:SetPosition(-65, 115, 0)
+    img:SetRotation(-90)
+    img:MoveToBack()
+    self:SoraAutoClose(img)
+    local img = self:AddChild(Image("images/hud.xml", "inventory_bg_arrow.tex"))
+    img:SetPosition(-185, 115, 0)
+    img:SetRotation(-90)
+    img:MoveToBack()
+    self:SoraAutoClose(img)
+    local img = self:AddChild(Image("images/hud.xml", "inventory_bg_arrow.tex"))
+    img:SetPosition(-295, -45, 0)
+    img:SetRotation(-90)
+    img:MoveToBack()
+    self:SoraAutoClose(img)
+    local img = self:AddChild(Image("images/hud.xml", "inventory_bg_arrow.tex"))
+    img:SetPosition(-365, -45, 0)
+    img:SetRotation(-90)
+    img:MoveToBack()
+    self:SoraAutoClose(img)
+    self.bgimage:MoveToBack()
+end
+
+function params.sora_pot.itemtestfn(container, item, slot)
+    if not item then
+        return false
+    end
+    if slot then
+        local slotitem = container:GetItemInSlot(slot)
+        if slotitem then 
+            if slotitem.prefab ~= item.prefab then 
+                return false 
+            end
+            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then 
+                return true
+            end
+            return false
+        end
+        if slot > 0 and slot < 6 then
+            if item:HasTag("preparedfood") or cooking.IsCookingIngredient(item.prefab) then
+                return true
+            end
+        elseif slot == 6 then
+            if item:HasTag("preparedfood") or cooking.IsCookingIngredient(item.prefab) or item:HasTag("spice") then
+                return true
+            end
+        elseif slot == 7 then
+            if item:HasTag("preparedfood") and not item:HasTag("spicedfood") then
+                return true
+            end
+        elseif slot == 8 then
+            if item:HasTag("preparedfood") and item:HasTag("spicedfood") then
+                return true
+            end
+        elseif slot == 9 then
+            if item:HasTag("dryable") then
+                return true
+            end
+        elseif slot == 11 then
+            if item:HasTag("cookable") then
+                return true
+            end
+        elseif slot == 13 then
+            return item.prefab == "ice"
+        elseif slot == 14 then
+            return item.prefab == "charcoal"
+        else
+            if item:HasTag("preparedfood") or cooking.IsCookingIngredient(item.prefab) or item:HasTag("spice") then
+                return true
+            end
+            if item:HasTag("dryable") then
+                return true
+            end
+            if item:HasTag("cookable") then
+                return true
+            end
+            if item.prefab == "ice" or item.prefab == "charcoal" then
+                return true
+            end
+            if not (item:HasTag("fresh") or item:HasTag("stale") or item:HasTag("spoiled")) then
+                return false
+            end
+            if item:HasTag("smallcreature") then
+                return false
+            end
+            -- Edible
+            for k, v in pairs(FOODTYPE) do
+                if item:HasTag("edible_" .. v) then
+                    return true
+                end
+            end
+        end
+        return false
+    else
+        if item:HasTag("preparedfood") or cooking.IsCookingIngredient(item.prefab) or item:HasTag("spice") then
+            return true
+        end
+        if item.prefab == "ice" or item.prefab == "charcoal" then
+            return true
+        end
+        if not (item:HasTag("fresh") or item:HasTag("stale") or item:HasTag("spoiled")) then
+            return false
+        end
+        if item:HasTag("smallcreature") then
+            return false
+        end
+        -- Edible
+        for k, v in pairs(FOODTYPE) do
+            if item:HasTag("edible_" .. v) then
+                return true
+            end
+        end
+        return false
+    end
+end
 
 if needhelp then
     print("????")

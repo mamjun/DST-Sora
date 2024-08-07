@@ -27,11 +27,20 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] local Tags = {}
+]] 
+local Tags = {}
+local Tags_hash = {}
 local key = modname .. "fixtag" -- 默认用modname 做key 防止冲突
-
+if not TUNING.MoreTagsReg then 
+    TUNING.MoreTagsReg = {}
+end
 function RegTag(tag) -- 必须先注册 主客机一起注册 注册后的tag会被截留
-    Tags[tag] = string.lower(tag)
+    tag = string.lower(tag)
+    if not TUNING.MoreTagsReg[tag] then 
+        TUNING.MoreTagsReg[tag] = key
+        Tags[tag] = tag
+        Tags_hash[hash(tag)] = tag
+    end
 end
 function PrintTags(inst)
     if inst and inst[key] then 
@@ -47,7 +56,8 @@ function PrintTags(inst)
 end
 local function AddTag(inst, stag, ...)
     if not inst or not stag then return end
-    local tag = string.lower(stag)
+    local tag = type(stag) == "number" and Tags_hash[stag] or stag
+    tag = string.lower(tag)
     if Tags[tag] then
         if inst[key].Tags and inst[key].Tags[tag] then
             inst[key].Tags[tag]:set_local(false)
@@ -69,7 +79,8 @@ end
 
 local function RemoveTag(inst, stag, ...)
     if not inst or not stag then return end
-    local tag = string.lower(stag)
+    local tag = type(stag) == "number" and Tags_hash[stag] or stag
+    tag = string.lower(tag)
     if Tags[tag] then
         if inst[key].Tags and inst[key].Tags[tag] then
             inst[key].Tags[tag]:set_local(true)
@@ -85,7 +96,8 @@ end
 
 local function HasTag(inst, stag, ...)
     if not inst or not stag then return end
-    local tag = string.lower(stag)
+    local tag = type(stag) == "number" and Tags_hash[stag] or stag
+    tag = string.lower(tag)
     if Tags[tag] and inst[key].Tags and inst[key].Tags[tag] then
         return inst[key].Tags[tag]:value()
     else
@@ -114,8 +126,9 @@ function HasOneOfTags(inst, ...)
     end
     return false
 end
-function AddOrRemoveTag(inst,tag,condition,...)
-    local ltag = tag:lower()
+function AddOrRemoveTag(inst,stag,condition,...)
+    local ltag = type(stag) == "number" and Tags_hash[stag] or stag
+    ltag = string.lower(ltag)
     if  Tags[ltag] then 
         if condition then 
             AddTag(inst,ltag,...)

@@ -73,6 +73,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     --给容器组件添加一些事件
     local function containerwidgetapi(self)
         local oldOpen = self.Open
+        self.soraautoclosewidgets = {}
+        self.SoraAutoClose = function(self,widget)
+            table.insert(self.soraautoclosewidgets,widget)
+        end
         self.Open = function(self,...)
             oldOpen(self,...)
             if self.container and self.container.replica.container then
@@ -89,6 +93,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
                 if widget and widget.SoraOnCloseFn then 
                     widget.SoraOnCloseFn(self,...)
                 end
+            end
+            for k,v in pairs(self.soraautoclosewidgets) do 
+                v:Kill()
             end
             oldClose(self,...)
         end

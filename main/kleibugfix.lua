@@ -61,12 +61,12 @@ AddSimPostInit(TryToFixAllRecipes)
 -- end
 
 AddComponentPostInit("inventoryitem", function(self, inst)
-    --addsetter(self, "owner", onowner)
-    inst:ListenForEvent("onremove",function (i)
+    -- addsetter(self, "owner", onowner)
+    inst:ListenForEvent("onremove", function(i)
         if i.components.inventoryitem and i.components.inventoryitem.owner then
             local owner = i.components.inventoryitem.owner
             if owner.components.container and owner.components.container:GetItemSlot(i) then
-                owner.components.container:RemoveItem(owner,true)
+                owner.components.container:RemoveItem(owner, true)
             end
         end
     end)
@@ -85,35 +85,35 @@ if getsora("fixyzhou") then
     end
 end
 
-AddComponentPostInit("workable",function (self)
+AddComponentPostInit("workable", function(self)
     local oldWorkedBy_Internal = self.WorkedBy_Internal
-    self.WorkedBy_Internal = function(s,...)
-        return (s.workleft or 0) > 0  and oldWorkedBy_Internal (s,...) or true
-     end
-end)
-
-
-AddComponentPostInit("moonbeastspawner",function (self)
-    self.OnEntitySleep = self.Stop
-    local oldStart = self.Start
-    self.Start = function(s,...)
-        if self.inst:IsAsleep() then 
-            self:Stop()
-            return 
-        end
-        return oldStart(s,...)
+    self.WorkedBy_Internal = function(s, ...)
+        return (s.workleft or 0) > 0 and oldWorkedBy_Internal(s, ...) or true
     end
 end)
 
-AddLaterFn(function ()
-    local t = up.Get(HandleClientRPC,"CLIENT_RPC_HANDLERS","networkclientrpc.lua")
-    if t then 
-        for k,v in pairs({"PostActivateHandshake","AddSkillXP","SetSkillActivatedState","LearnBuilderRecipe","TakeOversizedPicture","ShowPopup"}) do 
-            if t[v] then 
+AddComponentPostInit("moonbeastspawner", function(self)
+    self.OnEntitySleep = self.Stop
+    local oldStart = self.Start
+    self.Start = function(s, ...)
+        if self.inst:IsAsleep() then
+            self:Stop()
+            return
+        end
+        return oldStart(s, ...)
+    end
+end)
+
+AddLaterFn(function()
+    local t = up.Get(HandleClientRPC, "CLIENT_RPC_HANDLERS", "networkclientrpc.lua")
+    if t then
+        for k, v in pairs({"PostActivateHandshake", "AddSkillXP", "SetSkillActivatedState", "LearnBuilderRecipe",
+                           "TakeOversizedPicture", "ShowPopup"}) do
+            if t[v] then
                 local old = t[v]
                 v[v] = function(...)
-                    if not ThePlayer then 
-                        return 
+                    if not ThePlayer then
+                        return
                     end
                     return old(...)
                 end
@@ -121,3 +121,33 @@ AddLaterFn(function ()
         end
     end
 end)
+
+local cmp = require "components/container"
+local GetSpecificSlotForItem = cmp.GetSpecificSlotForItem
+cmp.GetSpecificSlotForItem = function(self, item, ...)
+    if self.inst and self.inst:HasTag("soracontainerfix") then
+        for k = 1, self.numslots do
+            local other_item = self.slots[k]
+            if other_item and other_item.prefab == item.prefab and other_item.skinname == item.skinname and
+                not other_item.components.stackable:IsFull() then
+                return k
+            end
+        end
+    end
+    return GetSpecificSlotForItem(self, item, ...)
+end
+
+local cmp_rep = require "components/container_replica"
+local GetSpecificSlotForItem = cmp_rep.GetSpecificSlotForItem
+cmp_rep.GetSpecificSlotForItem = function(self, item, ...)
+    if self.inst and self.inst:HasTag("soracontainerfix") then
+        for k = 1, self._numslots do
+            local other_item = self:GetItemInSlot(k)
+            if other_item and other_item.prefab == item.prefab and other_item:StackableSkinHack(item)  and
+                not other_item.replica.stackable:IsFull() then
+                return k
+            end
+        end
+    end
+    return GetSpecificSlotForItem(self, item, ...)
+end

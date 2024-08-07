@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]] --[[专属交互
+]] --[[标准组件
 ]] --
 local com = Class(function(self, inst)
     self.inst = inst

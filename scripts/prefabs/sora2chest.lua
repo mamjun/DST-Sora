@@ -187,6 +187,7 @@ local data2 = {
             if not inst.components.preserver then
                 inst:AddComponent("preserver")
             end
+            inst:AddTag("soracontainerfix")
             inst.components.preserver:SetPerishRateMultiplier(1)
             for k, v in pairs(copy) do
                 inst.components.container[k] = copy[k]
@@ -227,6 +228,7 @@ local function fn()
     inst.MiniMapEntity:SetIcon("sora2chest.tex")
     inst:AddTag("structure")
     inst:AddTag("nosteal")
+    inst:AddTag("soracontainerfix")
     inst.AnimState:SetBank("sora2chest")
     inst.AnimState:SetBuild("sora2chest")
     inst.AnimState:PlayAnimation("idle")

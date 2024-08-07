@@ -137,7 +137,7 @@ end
 
 -- 擅动着 杀无赦
 local black = {
-    sora_llan = 1,
+    --sora_llan = 1,
     sora_mysora = 1,
     sora_mysora_r = 1,
     sora_sby = 1

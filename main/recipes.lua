@@ -210,6 +210,20 @@ Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
     purplegem = 4
 }})
 
+Rec("sora_pot", "穹の料理锅", "炖出好吃的", equip, "sora", {{
+    sora_flh=1,
+    goldnugget=10,
+    nightmare_timepiece=3
+}, {
+    sora_flh=1,
+    goldnugget=40,
+    nightmare_timepiece=5
+}, {
+    sora_flh=2,
+    goldnugget=100,
+    nightmare_timepiece=10
+}})
+
 Rec("soraclothes", "穹の护", "小穹的贴身守护", equip, "soraself", {{
     goose_feather = 5,
     dragon_scales = 1,

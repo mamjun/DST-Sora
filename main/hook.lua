@@ -1401,7 +1401,7 @@ if not TUNING.SORADISABLEGLOBAL then
 end
 
 for k, v in pairs({"sora2chest", "sora2fire", "sora2ice", "sora_light", "sorabag", "sora2bag", "sora_lightflier_cat",
-                   "sora2base", "sora_huapen", "sora_pickhat"}) do
+                   "sora2base", "sora_huapen", "sora_pickhat", "sora_pot"}) do
     AddPrefabPostInit(v, function(inst)
         if not TheWorld.ismastersim then
             return

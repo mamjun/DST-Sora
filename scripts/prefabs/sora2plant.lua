@@ -959,7 +959,7 @@ local function fn()
         return false
     end
     -- inst.components.spellbook.executesound = "dontstarve/common/together/book_maxwell/close"
-
+    assert(TheWorld.components.sorachestmanager,'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
     inst:AddComponent("aoetargeting")
     inst.components.aoetargeting:SetAllowWater(false)
     inst.components.aoetargeting.reticule.targetfn = nil

@@ -116,7 +116,8 @@ local treemap = {
         WINTERSFEASTCOOKING = 5
     },
     red = {
-        SCIENCE = 5
+        SCIENCE = 5,
+        MAGIC = 1, -- 魔法本
     }, -- 科技本
     silvery = {
         CELESTIAL = 5
@@ -313,7 +314,7 @@ local function fn()
     inst.entity:AddLight()
     inst.entity:AddNetwork()
     -- MakeObstaclePhysics(inst, 0.4)
-
+    inst:AddTag("soracontainerfix")
     anim:SetBank("sora_light_white")
     anim:SetBuild("sora_light_white")
     inst.AnimState:SetMultColour(.7, .7, .7, 1)

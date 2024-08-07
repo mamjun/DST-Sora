@@ -75,7 +75,8 @@ local function Onisfullmoon(inst, var)
         local stacksize = item and item.components.stackable and item.components.stackable.stacksize or 1
         if item and (item.prefab == "butterfly" or item.prefab == "petals") then
             local prefab = item.prefab == "butterfly" and "moonrocknugget" or "moonglass"
-            if item and item.components.stackable:IsOverStacked() and math.random(1, 10) < 4 then
+            local stack = item.components.stackable
+            if item and stack.stacksize >= (stack.originalmaxsize or stack.maxsize) and math.random(1, 10) < 4 then
                 prefab = "opalpreciousgem"
                 stacksize = 1
             end
@@ -183,10 +184,8 @@ local function CollectFood(inst, player)
                     end
                 end
             end
-
         end
     end
-
 end
 
 local function fn()
