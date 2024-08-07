@@ -128,7 +128,7 @@ cmp.GetSpecificSlotForItem = function(self, item, ...)
     if self.inst and self.inst:HasTag("soracontainerfix") then
         for k = 1, self.numslots do
             local other_item = self.slots[k]
-            if other_item and other_item.prefab == item.prefab and other_item.skinname == item.skinname and
+            if other_item and other_item.components.stackable and other_item.prefab == item.prefab and other_item.skinname == item.skinname and
                 not other_item.components.stackable:IsFull() then
                 return k
             end
@@ -143,7 +143,7 @@ cmp_rep.GetSpecificSlotForItem = function(self, item, ...)
     if self.inst and self.inst:HasTag("soracontainerfix") then
         for k = 1, self._numslots do
             local other_item = self:GetItemInSlot(k)
-            if other_item and other_item.prefab == item.prefab and other_item:StackableSkinHack(item)  and
+            if other_item and  other_item.replica.stackable and other_item.prefab == item.prefab and other_item:StackableSkinHack(item)  and
                 not other_item.replica.stackable:IsFull() then
                 return k
             end

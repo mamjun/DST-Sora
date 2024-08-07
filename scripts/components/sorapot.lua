@@ -86,7 +86,7 @@ function com:UpdateDry()
     if not self.cookslot.meat then
         return
     end
-    print("风干")
+    
     for k, v in pairs(self.cookslot.meat) do
         local skip = false
         local work = false

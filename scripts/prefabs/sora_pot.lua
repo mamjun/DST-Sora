@@ -65,7 +65,7 @@ local function fn()
     inst:AddTag("nosteal")
     inst.AnimState:SetBank(name)
     inst.AnimState:SetBuild(name)
-    inst.AnimState:PlayAnimation("idle_full", true)
+    inst.AnimState:PlayAnimation("item", true)
     inst.entity:SetPristine()
     inst.sorapotper = net_int(inst.GUID, 'sorapotper', 'sorapotperdirty')
     

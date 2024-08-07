@@ -33,7 +33,7 @@ local InvImg = {}
 local NoRec
 rec_back = "_build_sora"
 local AllSoraRec = {}
-local recmode = (GetModConfigData("recmode") or 0 )> 0 and GetModConfigData("recmode") or mode
+local recmode = (GetModConfigData("recmode") or 0) > 0 and GetModConfigData("recmode") or mode
 function AddInvImg(key, xml, tex)
     InvImg[key] = {"images/" .. xml .. ".xml", (tex or key) .. ".tex"}
 end
@@ -58,7 +58,7 @@ end
 local prefabhas = {}
 function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     name = name or ""
-    
+
     local PREFAB = prefab:upper()
     local build = prefab:lower() .. rec_back
     local BUILD = build:upper()
@@ -211,18 +211,18 @@ Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
 }})
 
 Rec("sora_pot", "穹の料理锅", "炖出好吃的", equip, "sora", {{
-    sora_flh=1,
-    goldnugget=10,
-    nightmare_timepiece=3
+    sora_flh = 1,
+    goldnugget = 10,
+    nightmare_timepiece = 3
 }, {
-    sora_flh=1,
-    goldnugget=40,
-    nightmare_timepiece=5
+    sora_flh = 1,
+    goldnugget = 40,
+    nightmare_timepiece = 5
 }, {
-    sora_flh=2,
-    goldnugget=100,
-    nightmare_timepiece=10
-}})
+    sora_flh = 2,
+    goldnugget = 100,
+    nightmare_timepiece = 10
+}}).placer = "no"
 
 Rec("soraclothes", "穹の护", "小穹的贴身守护", equip, "soraself", {{
     goose_feather = 5,
@@ -491,28 +491,28 @@ Rec("sora2amulet", "荣誉勋章", "银白骑士团の荣耀勋章！", equip2, 
 AddInvImg("sora_shouban", "inventoryimages/sora_shouban", "sora_shouban")
 Rec("sora_shouban", "穹の手办", "宅男一面墙", build, "sora", {{
     goldnugget = 2,
-    marble = 2,
+    marble = 2
 }, {
     goldnugget = 5,
-    marble = 5,
+    marble = 5
 }, {
     goldnugget = 10,
-    marble = 10,
+    marble = 10
 }})
 
 AddInvImg("sora_smalllight", "inventoryimages/sora_smalllight", "sora_smalllight")
 Rec("sora_smalllight", "穹の月华", "承月之辉", build, "sora", {{
     moonglass = 1,
     lightbulb = 1,
-    fireflies = 1,
+    fireflies = 1
 }, {
     moonglass = 3,
     lightbulb = 10,
-    fireflies = 3,
+    fireflies = 3
 }, {
     moonglass = 10,
     lightbulb = 10,
-    fireflies = 10,
+    fireflies = 10
 }})
 
 Rec("sora2ice", "寒冰の箱子", "嘎嘣脆，鸡肉味！", build, "soraother", {{
