@@ -62,7 +62,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 		Asset("ANIM", "anim/pockygame.zip"),
 		Asset("ANIM", "anim/pockybuild.zip"),
         Asset("ANIM", "anim/sorawiki.zip"),   
-        
+        --Asset("ANIM", "anim/test.zip"),  
         Asset("ANIM", "anim/skin_progressbar.zip"),  
         Asset( "IMAGE", "images/inventoryimages/mk_cloudfxsora.tex" ),
         Asset( "ATLAS", "images/inventoryimages/mk_cloudfxsora.xml" ),

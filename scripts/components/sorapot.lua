@@ -93,7 +93,7 @@ function com:UpdateDry()
         local inslot = v[1] and v[1][1]
         local outslot = v[2] and v[2][1]
         local initem = self.con:GetItemInSlot(inslot)
-        if not (initem and initem.components.dryable and initem.components.dryable.product) then
+        if not (initem and initem.components.dryable and type(initem.components.dryable.product) == "string") then
             work = false
             -- 无原料 清空任务
             v[4] = nil
@@ -167,7 +167,7 @@ function com:UpdateCook()
         local inslot = v[1] and v[1][1]
         local outslot = v[2] and v[2][1]
         local initem = self.con:GetItemInSlot(inslot)
-        if not (initem and initem.components.cookable and initem.components.cookable.product) then
+        if not (initem and initem.components.cookable and type(initem.components.cookable.product) == "string") then
             work = false
             -- 无原料 清空任务
             v[4] = nil

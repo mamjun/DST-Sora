@@ -119,6 +119,8 @@ table.insert(All, makebutter(false))
 table.insert(All, makebutter(true))
 table.insert(All, MakePlacer("sora_butterfly_placer", "butterfly", "butterfly_basic", "idle_flight_loop"))
 table.insert(All, MakePlacer("sora_moonbutterfly_placer", "butterfly", "butterfly_moon", "idle_flight_loop"))
+
+local lightasset = {}
 local function uninit(inst)
     if inst and inst.cat and inst.cat:IsValid() then
         local data, refs = inst.cat:GetPersistData()
@@ -162,7 +164,9 @@ local function onuse(inst, doer)
         end
         inst.components.rechargeable:Discharge(99999999)
         local cat = SpawnAt("sora_lightflier_cat", doer)
-
+        if inst.skinname == "sora_lightflier_beex" then
+            TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_beex", nil, nil)
+        end
         local save = inst.components.sorasavecmp:GetSave("cat")
         if save and save.data then
             cat:SetPersistData(save.data, save.refs)
@@ -240,7 +244,7 @@ function makelightflier()
         inst:ListenForEvent("onremove", uninit)
         return inst
     end
-    return Prefab("sora_lightflier", lightflierfn)
+    return Prefab("sora_lightflier", lightflierfn, lightasset)
 end
 table.insert(All, makelightflier())
 local catbrain = require "brains/sora_followerbrain"
@@ -309,9 +313,40 @@ function makelightflier_cat()
         inst.persists = false
         return inst
     end
-    return Prefab("sora_lightflier_cat", lightflier_catfn)
+    return Prefab("sora_lightflier_cat", lightflier_catfn, lightasset)
 end
 table.insert(All, makelightflier_cat())
+
+SoraAPI.MakeItemSkinDefaultImage("sora_lightflier", GetInventoryItemAtlas("lightflier.tex"), "lightflier")
+SoraAPI.MakeItemSkinDefaultImage("sora_lightflier_cat", GetInventoryItemAtlas("lightflier.tex"), "lightflier")
+local tname = "sora_lightflier_beex"
+SoraAPI.MakeItemSkin("sora_lightflier", tname, {
+    name = "Bee熊",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "lightflier",
+    basebank = "lightflier",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+local ttname = "sora_lightflier_cat_beex"
+SoraAPI.MakeItemSkin("sora_lightflier_cat", ttname, {
+    name = "Bee熊",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "lightflier",
+    basebank = "lightflier",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
+SoraAPI.MakeSkinNameMap("sora_lightflier_beex", "sora_lightflier_cat_beex")
+SoraAPI.MakeAssetTable("sora_lightflier_beex", lightasset)
+
 
 local assets = {Asset("ANIM", "anim/sign_home.zip"), Asset("ANIM", "anim/sora_sign_myy.zip"),
                 Asset("ANIM", "anim/ui_board_5x3.zip"), Asset("MINIMAP_IMAGE", "sign"),
@@ -324,14 +359,14 @@ local function OnDismantle(inst, doer)
     end
     local skin = nil
     local user = nil
-    if doer then 
-        if inst.skinname then 
-            skin = inst.skinname:gsub("sora_sign","sora_sign_item")
+    if doer then
+        if inst.skinname then
+            skin = inst.skinname:gsub("sora_sign", "sora_sign_item")
             user = doer.userid
         end
     end
 
-    local item = SpawnPrefab("sora_sign_item",skin,nil,user)
+    local item = SpawnPrefab("sora_sign_item", skin, nil, user)
     if item then
         doer.components.inventory:GiveItem(item, nil, doer:GetPosition())
         inst:Remove()
@@ -512,8 +547,8 @@ SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_myy", {
         inst.AnimState:PlayAnimation("item", true)
     end
 })
-SoraAPI.MakeSkinNameMap("sora_sign_myy","sora_sign_item_myy")
-SoraAPI.MakeAssetTable("sora_sign_yez",assets)
+SoraAPI.MakeSkinNameMap("sora_sign_myy", "sora_sign_item_myy")
+SoraAPI.MakeAssetTable("sora_sign_yez", assets)
 
 local tname = "sora_sign_yez"
 SoraAPI.MakeItemSkin("sora_sign", tname, {
@@ -554,19 +589,18 @@ SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_yez", {
         inst.AnimState:PlayAnimation("item", true)
     end
 })
-SoraAPI.MakeSkinNameMap("sora_sign_yez","sora_sign_item_yez")
-
+SoraAPI.MakeSkinNameMap("sora_sign_yez", "sora_sign_item_yez")
 
 local function ondeploy(inst, pt, deployer)
     local skin = nil
     local user = nil
-    if deployer then 
-        if inst.skinname then 
-            skin = inst.skinname:gsub("_item","")
+    if deployer then
+        if inst.skinname then
+            skin = inst.skinname:gsub("_item", "")
             user = deployer.userid
         end
     end
-    local blender = SpawnPrefab("sora_sign",skin,nil,user)
+    local blender = SpawnPrefab("sora_sign", skin, nil, user)
     if blender ~= nil then
         blender.Physics:SetCollides(false)
         blender.Physics:Teleport(pt.x, 0, pt.z)
@@ -584,7 +618,7 @@ local function item_fn()
     MakeInventoryPhysics(inst)
     inst.AnimState:SetBank("sign_mini")
     inst.AnimState:SetBuild("sign_mini")
-    inst.AnimState:PlayAnimation("item",true)
+    inst.AnimState:PlayAnimation("item", true)
     inst:AddTag("portableitem")
     MakeInventoryFloatable(inst, nil, 0.05, 0.7)
 
@@ -658,7 +692,7 @@ local function pearlfn()
     end)
     return inst
 end
-
+SoraAPI.MakeItemSkinDefaultImage("sora_pearl", GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl")
 local tname = "sora_pearl_pd"
 SoraAPI.MakeItemSkin("sora_pearl", tname, {
     name = "胖丁",
@@ -693,6 +727,21 @@ SoraAPI.MakeItemSkin("sora_pearl", tname .. "_tmp", {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 
+local tname = "sora_pearl_slm"
+SoraAPI.MakeItemSkin("sora_pearl", tname, {
+    name = "史莱姆",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "hermit_pearl",
+    basebank = "hermit_pearl",
+    init_fn = function(inst)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, pearlassets)
 table.insert(All, Prefab("sora_sign", fn, assets))
 table.insert(All, Prefab("sora_sign_item", item_fn, assets))
 table.insert(All, MakePlacer("sora_sign_placer", "sign_home", "sign_home", "idle"))

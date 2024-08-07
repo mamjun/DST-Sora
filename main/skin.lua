@@ -137,7 +137,7 @@ end
 
 -- 擅动着 杀无赦
 local black = {
-    --sora_llan = 1,
+    -- sora_llan = 1,
     sora_mysora = 1,
     sora_mysora_r = 1,
     sora_sby = 1
@@ -892,7 +892,6 @@ if not TheNet:IsDedicated() then
             scr.unlocktext:SetString("消耗300活跃度解锁")
             return scr
         end
-        ,
         -- sora_sign_yez = function(s, item)
         --     local scr = GameTimeUnLockScreen2(item, 300)
         --     scr.unlocktext:SetString("消耗450活跃度解锁")
@@ -929,6 +928,12 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_dieyu",
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)
+    AddItemSkin("sora_smalllight_fl", "这是风铃\n不是花")
+    AddItemSkin("sora_pearl_slm", "萌王是谁?")
+    AddItemSkin("sora2birdchest_ggd",
+        "在下江湖人称菇菇毒，\n暗器榜排名第七十七，\n独门绝技--好菇毒！")
+    AddItemSkin("sora_lightflier_beex",
+        "这是熊，\n不是Bee！")
     local item_map = {
         sora_none = "sora_uniforms"
     }
