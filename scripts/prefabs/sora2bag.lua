@@ -31,7 +31,6 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local assets =
 {
     Asset("ANIM", "anim/sora2bag.zip"),	
-	Asset("ANIM", "anim/ui_krampusbag_2x5.zip"),
 	Asset("ATLAS", "images/inventoryimages/sora2bag.xml"),
 	Asset("ATLAS_BUILD", "images/inventoryimages/sora2bag.xml",256),
 	Asset("IMAGE", "images/inventoryimages/sora2bag.tex"),

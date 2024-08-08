@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] local assets = {Asset("ANIM", "anim/sorabag.zip"), Asset("ANIM", "anim/sorabag_sd.zip"),
                    Asset("ANIM", "anim/sorabag_sdl.zip"), Asset("ANIM", "anim/sora2bag.zip"),
-                   Asset("ANIM", "anim/ui_krampusbag_2x5.zip"), Asset("ATLAS", "images/inventoryimages/sorabag.xml"),
+                    Asset("ATLAS", "images/inventoryimages/sorabag.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabag.xml", 256),
                    Asset("IMAGE", "images/inventoryimages/sorabag.tex"),
                    Asset("ATLAS", "images/inventoryimages/sorabag_sd.xml"),
