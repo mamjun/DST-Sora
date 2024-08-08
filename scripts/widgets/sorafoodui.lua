@@ -164,7 +164,7 @@ local ui = Class(Widget, function(self,data,parent,top,left)
 	y = y - body_font_size/2 - 4
 
     y = y -10
-    self:AddChild(Text(HEADERFONT, title_font_size, "配方", UICOLOURS.BROWN_DARK)):SetPosition(-80, y)
+    self:AddChild(Text(HEADERFONT, title_font_size,  (data.recipe_def.mustsorapot and "穹の料理" or "配方"), UICOLOURS.BROWN_DARK)):SetPosition(-80, y)
     self:AddChild(Text(HEADERFONT, title_font_size, "禁忌", UICOLOURS.BROWN_DARK)):SetPosition(80, y)
     MakeDetailsLine(self, -80, y - 7, .5, "quagmire_recipe_line_veryshort.tex")
     MakeDetailsLine(self, 80, y - 7, .5, "quagmire_recipe_line_veryshort.tex")

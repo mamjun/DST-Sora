@@ -585,7 +585,8 @@ for k, v in pairs(foods) do
             end
             return oldtest(cooker, names, tags, data, ...)
         end
-        v.cook_need = (v.cook_need or "") .. "\b需要穹の料理锅"
+        v.mustsorapot = true
+        --v.cook_need = (v.cook_need or "") .. "\b需要穹の料理锅"
     end
     if not v.hungertrue then
         v.hunger = (v.hunger or 0) * (1.3 - 0.3 * TUNING.SORAMODE)
