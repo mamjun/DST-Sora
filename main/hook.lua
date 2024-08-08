@@ -324,6 +324,9 @@ AddLaterFn(function()
                 if inst and inst:HasTag("sora_light") then
                     return
                 end
+                if inst and inst:HasTag("soranoprototyper") then
+                    return
+                end
                 return oldSCENEfn(inst, doer, ...)
             end
         end

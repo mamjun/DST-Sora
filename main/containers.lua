@@ -658,7 +658,8 @@ params.sora_pot = {
     },
     acceptsstacks = true,
     usespecificslotsforitems=true,
-    type = "hand_inv"
+    type = "hand_inv",
+    openlimit = 1,
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do

@@ -549,6 +549,44 @@ for k, v in pairs(foods) do
     v.weight = v.weight or 1
     v.priority = v.priority or 0
     v.perishtime = v.perishtime * 480
+    if not v.notsorapot then
+        local oldtest = v.test
+        v.test = function(cooker, names, tags, data, ...)
+            if not names.sora_pot_need then
+                return
+            end
+            if type(data) == "table" and data.cooker then
+                if v.mustdoer then
+                    if not data.doer then
+                        return
+                    end
+                    if type(v.mustdoer) == "string" then
+                        if not data.doer:HasTag(v.mustdoer) then
+                            return
+                        end
+                    end
+                    if type(v.mustdoer) == "table" then
+                        local ok = false
+                        for ik, tag in pairs(v.mustdoer) do
+                            if data.doer:HasTag(tag) then
+                                ok = true
+                            end
+                        end
+                        if not ok then
+                            return
+                        end
+                    end
+                end
+                if v.exttest then
+                    if not v.exttest(cooker, names, tags, data.ents, data, ...) then
+                        return
+                    end
+                end
+            end
+            return oldtest(cooker, names, tags, data, ...)
+        end
+        v.cook_need = (v.cook_need or "") .. "\b需要穹の料理锅"
+    end
     if not v.hungertrue then
         v.hunger = (v.hunger or 0) * (1.3 - 0.3 * TUNING.SORAMODE)
     end

@@ -28,8 +28,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] local assets = {Asset("IMAGE", "images/ui/sora_pot_ui.tex"), Asset("ATLAS", "images/ui/sora_pot_ui.xml"),
-                   Asset('ANIM', "anim/sora_pot_ui.zip"), Asset('ANIM', "anim/sora_pot_ui_fire.zip"),
-                   Asset('ANIM', "anim/sora_pot_ui_rope.zip")}
+                   Asset("IMAGE", "images/inventoryimages/sora_pot_need.tex"),
+                   Asset("ATLAS", "images/inventoryimages/sora_pot_need.xml"), Asset('ANIM', "anim/sora_pot_ui.zip"),
+                   Asset('ANIM', "anim/sora_pot_ui_fire.zip"), Asset('ANIM', "anim/sora_pot_ui_rope.zip")}
 local name = "sora_pot"
 SoraAPI.MakeAssetTable(name, assets)
 
@@ -42,11 +43,84 @@ end
 local function onhit(inst, worker)
 
 end
-
-local function OnDeployed(inst, item, deployer)
-    print(inst, item, deployer)
+local function OnOpen(inst, data)
+    inst.AnimState:PlayAnimation('open')
+    inst.AnimState:PushAnimation('idle_open')
+end
+local function OnClose(inst, data)
+    inst.AnimState:PlayAnimation('close')
+    inst.AnimState:PushAnimation('idle_close')
 end
 
+local function OnDeployed(inst, item, deployer)
+
+end
+
+local function UpdateAnim(inst)
+    if inst:IsAsleep() then
+        return
+    end
+    if inst:IsInLimbo() then
+        return
+    end
+    -- 不在收回
+    if inst.components.soraportable.isitem then
+        return
+    end
+    -- 不在部署
+    if inst.AnimState:IsCurrentAnimation("place") then
+        return
+    end
+    local con = inst.components.container
+    -- 不在打开关闭
+    if con:IsOpen() then
+        return
+    end
+    if inst.AnimState:IsCurrentAnimation("close") then
+        return
+    end
+    -- 动作中不重复处理
+    if inst.AnimState:IsCurrentAnimation("cook_pst") then
+        return
+    end
+
+    local potitem = con:GetItemInSlot(7)
+    local spiitem = con:GetItemInSlot(8)
+    -- 没有成品
+    if not potitem and not spiitem then
+        local loop = false
+        for i = 1, 6 do
+            if inst.sorapotui[i]:value() then
+                loop = true
+                break
+            end
+        end
+        inst.AnimState:PlayAnimation(loop and 'cook_loop' or 'idle_close', true)
+        inst.AnimState:Hide("swap_bg")
+        inst.AnimState:Hide("swap_item")
+    else
+        -- 有成品
+        local item = spiitem or potitem
+        if not inst.AnimState:IsCurrentAnimation("idle_full") then
+            inst.AnimState:PlayAnimation("cook_pst")
+            inst.AnimState:PushAnimation("idle_full")
+            local sign = {}
+            sign.image = item.replica.inventoryitem:GetImage() -- v.components.inventoryitem.imagename and (v.components.inventoryitem.imagename ..".tex") or 
+            sign.atlas = item.replica.inventoryitem:GetAtlas() -- v.components.inventoryitem.atlasname or 
+            if item.inv_image_bg and item.inv_image_bg.image then
+                sign.bgimage = item.inv_image_bg.image
+                sign.bgatlas = item.inv_image_bg.atlas
+            end
+            inst.AnimState:OverrideSymbol("swap_item", SoraAPI.sorapath(sign.atlas), sign.image)
+            if sign.bgatlas then
+                inst.AnimState:OverrideSymbol("swap_bg", SoraAPI.sorapath( sign.bgatlas), sign.bgimage)
+            end
+            inst.AnimState:Show("swap_bg")
+            inst.AnimState:Show("swap_item")
+        end
+    end
+
+end
 local function fn()
     local inst = CreateEntity()
 
@@ -63,12 +137,13 @@ local function fn()
     inst:AddTag("soracontainerfix")
     inst:AddTag("structure")
     inst:AddTag("nosteal")
+    inst:AddTag("soranoprototyper")
     inst.AnimState:SetBank(name)
     inst.AnimState:SetBuild(name)
     inst.AnimState:PlayAnimation("item", true)
     inst.entity:SetPristine()
     inst.sorapotper = net_int(inst.GUID, 'sorapotper', 'sorapotperdirty')
-    
+
     inst.sorapotui = {}
     for k, v in pairs({1, 2, 3, 4, 5, 6, 9, 11, 13}) do
         inst.sorapotui[v] = net_bool(inst.GUID, 'sorapotui.' .. tostring(v))
@@ -77,7 +152,7 @@ local function fn()
         per = math.clamp(per, 0, 1)
         inst.sorapotper:set(math.floor(per * 100))
     end
-    inst.SetPotWork = function(inst, index,num, enable)
+    inst.SetPotWork = function(inst, index, num, enable)
         local set = {
             pot = {1, 2, 3, 4},
             spice = {5, 6},
@@ -85,8 +160,8 @@ local function fn()
             cook = {11},
             ice = {13}
         }
-        if set[index] then 
-            for k,v in pairs(set[index]) do 
+        if set[index] then
+            for k, v in pairs(set[index]) do
                 inst.sorapotui[v]:set(enable and true or false)
             end
         end
@@ -107,21 +182,33 @@ local function fn()
     inst:AddComponent("soraitem")
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sora_pot")
+    inst:ListenForEvent("onopen", OnOpen)
+    inst:ListenForEvent("onclose", OnClose)
+    inst:AddComponent("prototyper")
+    inst.components.prototyper.trees = {
+        FOODPROCESSING = 5
+    }
+
     inst:AddComponent("sorapot")
-    inst.components.sorapot:RegSlot('pot',{1,2,3,4},{7},2)
-    inst.components.sorapot:RegSlot('spice',{5,6},{8},1)
-    inst.components.sorapot:RegSlot('meat',{9},{10},3)
-    inst.components.sorapot:RegSlot('cook',{11},{12},10)
-    inst.components.sorapot:RegSlot('ice',{13},{13},120)
-    inst.components.sorapot:RegPower('charcoal',{14},240)
+    inst.components.sorapot:RegSlot('sorapot', {1, 2, 3, 4, 5, 6}, {7}, 2)
+    inst.components.sorapot:RegSlot('pot', {1, 2, 3, 4}, {7}, 2)
+    inst.components.sorapot:RegSlot('spice', {5, 6}, {8}, 1)
+    inst.components.sorapot:RegSlot('meat', {9}, {10}, 3)
+    inst.components.sorapot:RegSlot('cook', {11}, {12}, 10)
+    inst.components.sorapot:RegSlot('ice', {13}, {13}, 120)
+    inst.components.sorapot:RegPower('charcoal', {14}, 240)
     inst.components.sorapot.UiFn = inst.SetPotWork
-    --inst.components.sorapot:SetRate(1)
-    
+    -- inst.components.sorapot:SetRate(1)
+
     inst:AddComponent("preserver")
     inst.components.preserver:SetPerishRateMultiplier(-1000)
     inst:ListenForEvent("onpickup", function()
         inst.components.container:Close()
     end)
+    inst:ListenForEvent("ondropped", function()
+        inst.components.container:Close()
+    end)
+    inst:DoPeriodicTask(1, UpdateAnim)
     return inst
 end
 --[[
@@ -132,7 +219,17 @@ function SpawnFood(name,spice) local a = SpawnPrefab(p) local xml,tex = SoraGetI
 c_removeall(p) i=0 for k,v in pairs({b,c,d}) do for ik,iv in pairs(v) do SpawnFood(iv.name) SpawnFood(iv.name,true) end end
 
 ]]
+
+PROTOTYPER_DEFS.sora_pot = {
+    icon_atlas = CRAFTING_ICONS_ATLAS,
+    icon_image = "filter_none.tex",
+    is_crafting_station = true,
+    filter_text = STRINGS.UI.CRAFTING_FILTERS.CRAFTING_STATION
+}
+
 RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. ".xml", name .. ".tex")
+RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. "_need.xml", name .. "_need.tex")
+STRINGS.NAMES[(name .. "_need"):upper()] = "需要穹の料理锅"
 local function MakeSkin(skinskin, skinname, free)
     local skin = name .. "_" .. skinskin
     SoraAPI.MakeAssetTable(skin, assets)
@@ -149,6 +246,12 @@ local function MakeSkin(skinskin, skinname, free)
     })
     RegisterInventoryItemAtlas("images/inventoryimages/" .. skin .. ".xml", skin .. ".tex")
 end
-
+local function needfn()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst:DoTaskInTime(0, inst.Remove)
+    return inst
+end
+AddIngredientValues({name .. "_need"}, {}, false, false)
 return Prefab(name, fn, assets), MakePlacer(name .. "_placer", name, name, "idle"),
-    MakePlacer(name .. "_placer", name, name, "idle_close")
+    Prefab(name .. "_need", needfn, assets), MakePlacer(name .. "_placer", name, name, "idle_close")

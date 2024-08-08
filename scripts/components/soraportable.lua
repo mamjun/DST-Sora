@@ -39,6 +39,8 @@ local com = Class(function(self, inst)
     self.givetime = 1
     self.toitemanim = "pick"
     self.tonoitemanim = "place"
+    self.itemanim = "item"
+    self.noitemanim = "idle_close" 
     self.inst:DoTaskInTime(0, function()
         self:Init()
     end)
@@ -100,6 +102,7 @@ function com:ChangToItem(doer)
         inst.components.container.canbeopened = false
     end
     inst.AnimState:PlayAnimation(self.toitemanim)
+    inst.AnimState:PushAnimation(self.itemanim)
     inst:DoTaskInTime(self.givetime, function()
         if inst:IsValid() then
             inst.components.inventoryitem.canbepickedup = true
@@ -138,6 +141,7 @@ function com:ChangToNoItem(doer, pos)
         })
     end
     inst.AnimState:PlayAnimation(self.tonoitemanim)
+    inst.AnimState:PushAnimation(self.noitemanim)
     if self.onnoitem then
         self.onnoitem(inst, doer, pos)
     end

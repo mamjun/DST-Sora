@@ -36,8 +36,9 @@ local com = Class(function(self, inst)
     allfl[inst]=1
     self.link = false
     self.name = nil 
-    local items = {"soratele", "sorapick", "soramagic", "sorahealing", "soraclothes", "sorahat", "sorabowknot"}
-    self.item = items[math.random(1, #items)]
+    local items = {"sora_pot"}
+    --self.item = items[math.random(1, #items)]
+    self.item = "sora_pot"
     inst:DoTaskInTime(0, function()
         self:Init()
     end)
@@ -118,6 +119,7 @@ function com:OnLoad(data)
             self.name = data.name 
         end
     end
+    self.item = "sora_pot"
 end
 
 return com

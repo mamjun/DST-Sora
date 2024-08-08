@@ -959,7 +959,7 @@ local function fn()
         return false
     end
     -- inst.components.spellbook.executesound = "dontstarve/common/together/book_maxwell/close"
-    assert(TheWorld.components.sorachestmanager,'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
+    
     inst:AddComponent("aoetargeting")
     inst.components.aoetargeting:SetAllowWater(false)
     inst.components.aoetargeting.reticule.targetfn = nil
@@ -989,7 +989,7 @@ local function fn()
         inst.components.spellbook:SelectSpell(7)
         return inst
     end
-
+    
     inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription([[桃源深处有...
 
@@ -1014,7 +1014,7 @@ local function fn()
     inst:AddComponent("soraaoespell")
     inst.components.aoespell = inst.components.soraaoespell
     inst:RegisterComponentActions("aoespell")
-
+    assert(TheWorld.components.sorachestmanager,'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
     if not inst.components.aoespell.SetSpellFn then
         inst.components.aoespell.SetSpellFn = function(self, fn, ...)
             self.aoe_cast = fn

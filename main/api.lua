@@ -87,17 +87,17 @@ end
 
 -- GetInventoryItemAtlas is the new way of getting item atlas in porkland and DST
 
---避免多次判断 player tag
+-- 避免多次判断 player tag
 local oldAddPlayerPostInit = AddPlayerPostInit
-local PlayerPostInitfns= {}
+local PlayerPostInitfns = {}
 local function DoPlayerPostInit(inst)
-    for k,v in pairs(PlayerPostInitfns) do 
+    for k, v in pairs(PlayerPostInitfns) do
         v(inst)
     end
 end
 
 function AddPlayerPostInit(fn)
-    table.insert(PlayerPostInitfns,fn)
+    table.insert(PlayerPostInitfns, fn)
 end
 oldAddPlayerPostInit(DoPlayerPostInit)
 local imagecache = {}
@@ -404,37 +404,38 @@ end
 local alluisave = {}
 local alluiinst = {}
 local uicount = 0
---可以使用 sora_reset_ui  来重置所有UI的位置了 
+-- 可以使用 sora_reset_ui  来重置所有UI的位置了 
 local function ClearUI()
     local toremove = {}
-    for k,v in pairs(alluiinst) do 
-        if not (k and k.inst and k.inst:IsValid()) then 
-            toremove[k]=1
+    for k, v in pairs(alluiinst) do
+        if not (k and k.inst and k.inst:IsValid()) then
+            toremove[k] = 1
         end
     end
-    for k,v in pairs(toremove) do 
-        alluiinst[k] = 1 
+    for k, v in pairs(toremove) do
+        alluiinst[k] = 1
     end
 end
 
 function GLOBAL.sora_reset_ui()
-    for k,v in pairs(alluisave) do 
+    for k, v in pairs(alluisave) do
         TheSim:ErasePersistentString(k)
     end
     ClearUI()
-    for k,v in pairs(alluiinst) do 
-        if k.ReseMovabletUI then 
+    for k, v in pairs(alluiinst) do
+        if k.ReseMovabletUI then
             k:ReseMovabletUI()
         end
     end
 end
 
-
-local function ValidPos(pos,data)
-    data =data or {}
-    pos.x = data.fnx and data.fnx(pos.x) or math.clamp(pos.x,data.minx or 30,data.maxx or (data.minx and (data.minx+1870)) or 1900)
-    pos.y = data.fny and data.fny(pos.y) or math.clamp(pos.y,data.miny or 30,data.maxy or (data.miny and (data.miny+1020)) or 1050)
-    return pos 
+local function ValidPos(pos, data)
+    data = data or {}
+    pos.x = data.fnx and data.fnx(pos.x) or
+                math.clamp(pos.x, data.minx or 30, data.maxx or (data.minx and (data.minx + 1870)) or 1900)
+    pos.y = data.fny and data.fny(pos.y) or
+                math.clamp(pos.y, data.miny or 30, data.maxy or (data.miny and (data.miny + 1020)) or 1050)
+    return pos
 end
 function NextFrame(fn)
     return function(...)
@@ -451,7 +452,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     -- 第四个参数为扩展属性 是一个table 或者 nil 描述了实体的对齐的问题
     alluiinst[s] = 1
     uicount = uicount + 1
-    if (uicount % 20) == 0 then   --每20个清理一次
+    if (uicount % 20) == 0 then -- 每20个清理一次
         ClearUI()
     end
     data = data or {}
@@ -460,7 +461,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     m.nullfn = function()
     end
     m.name = name or "default"
-    alluisave[m.name] = 1 
+    alluisave[m.name] = 1
     m.self = s
     m.cd = SoraCD(0.5)
     pos = pos or Vector3(0, 0, 0)
@@ -478,7 +479,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
                     if not (type(m.pos) == "table" and m.pos.Get) then
                         m.pos = pos
                     end
-                    m.pos = ValidPos (m.pos,data.ValidPos)
+                    m.pos = ValidPos(m.pos, data.ValidPos)
                 end
             end
         end)
@@ -522,7 +523,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         local self_scale = self:GetScale()
         local offset = data and data.drag_offset or 1 -- 偏移修正(容器是0.6)
         local newpos = self.ppos + (pos - self.mousepos) / (self_scale.x / offset) -- 修正偏移值       
-        s.SetPosition(self, ValidPos (newpos,data.ValidPos))
+        s.SetPosition(self, ValidPos(newpos, data.ValidPos))
     end
     m.FollowMouse = function(self)
         self.mousepos = TheInput:GetScreenPosition()
@@ -544,13 +545,13 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
             m.followhandler = nil
         end
         local newpos = self:GetPosition()
-        newpos = ValidPos (newpos,data.ValidPos)
+        newpos = ValidPos(newpos, data.ValidPos)
         print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
         TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
     end
 
     m.ReseMovabletUI = function(self)
-        
+
         self:SetPosition(pos:Get())
         TheSim:ErasePersistentString(m.name)
     end
@@ -909,4 +910,15 @@ function MakeAssetTable(name, oldtabl)
     table.insert(t, Asset("ATLAS_BUILD", "images/inventoryimages/" .. name .. ".xml", 256))
     table.insert(t, Asset("IMAGE", "images/inventoryimages/" .. name .. ".tex"))
     return t
+end
+
+local pathcache = {}
+function sorapath(path, ...)
+    if type(path) ~= "string" then
+        return path
+    end
+    if not pathcache[path] then
+        pathcache[path] = softresolvefilepath(path, ...)
+    end
+    return pathcache[path] or path
 end

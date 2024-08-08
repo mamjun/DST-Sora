@@ -27,49 +27,49 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
---local foods = require "preparefdoods_sora"
+]] -- local foods = require "preparefdoods_sora"
 local cooking = require "cooking"
-
 
 local sorafoods = require "preparedfoods_sora"
 local spicedfoods = require "spicedfoods_sora"
-for k,v in pairs(sorafoods) do
-    AddCookerRecipe("portablecookpot",v)
-    RegisterInventoryItemAtlas("images/inventoryimages/"..k..".xml",k..".tex")
+for k, v in pairs(sorafoods) do
+    if not v.notaddtopot then
+        AddCookerRecipe("portablecookpot", v)
+    end
+    RegisterInventoryItemAtlas("images/inventoryimages/" .. k .. ".xml", k .. ".tex")
 end
---mod加载完之后 修复丢失的食物配方（主要是调料）
-local oldRegisterPrefabs = GLOBAL.ModManager.RegisterPrefabs 
+-- mod加载完之后 修复丢失的食物配方（主要是调料）
+local oldRegisterPrefabs = GLOBAL.ModManager.RegisterPrefabs
 
-GLOBAL.ModManager.RegisterPrefabs = function(self,...)
-    --这个时候 PrefanFiles文件还没有被加载
-    --在这里读取所有的锅的菜谱并开始修复调味品
+GLOBAL.ModManager.RegisterPrefabs = function(self, ...)
+    -- 这个时候 PrefanFiles文件还没有被加载
+    -- 在这里读取所有的锅的菜谱并开始修复调味品
     if cooking.recipes.portablespicer then
-        for name,recipe in pairs(cooking.recipes.portablespicer) do
+        for name, recipe in pairs(cooking.recipes.portablespicer) do
             SoraNoRepairSpicedFood(recipe)
         end
     end
-    
-    for k,v in pairs(cooking.recipes) do
+
+    for k, v in pairs(cooking.recipes) do
         if k and v then
-            for name,recipe in pairs(v) do
+            for name, recipe in pairs(v) do
                 if name and recipe then
                     SoraRepairSpicedFood(recipe)
                 end
             end
         end
     end
-    for k,v in pairs(SoraGetNewRecipes()) do
-        AddCookerRecipe("portablespicer",v)
+    for k, v in pairs(SoraGetNewRecipes()) do
+        AddCookerRecipe("portablespicer", v)
     end
-    oldRegisterPrefabs(self,...)
+    oldRegisterPrefabs(self, ...)
 end
 
 AddSimPostInit(function()
     if TheCookbook then
-        for k,v in pairs(sorafoods) do
-            for i,t in pairs(v.cooktp or {}) do
-                TheCookbook:AddRecipe(k,t)
+        for k, v in pairs(sorafoods) do
+            for i, t in pairs(v.cooktp or {}) do
+                TheCookbook:AddRecipe(k, t)
             end
         end
     end

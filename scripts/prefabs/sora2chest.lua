@@ -107,10 +107,10 @@ local function updatesign(inst)
     if sign then
         inst.AnimState:Show("chestitem_bg")
         inst.AnimState:Show("swap_item")
-        inst.AnimState:OverrideSymbol("swap_item", sign.atlas, sign.image)
+        inst.AnimState:OverrideSymbol("swap_item", SoraAPI.sorapath(sign.atlas), sign.image)
         if sign.bgimage then
             inst.AnimState:Show("swap_item_bg")
-            inst.AnimState:OverrideSymbol("swap_item_bg", sign.bgatlas, sign.bgimage)
+            inst.AnimState:OverrideSymbol("swap_item_bg", SoraAPI.sorapath(sign.bgatlas), sign.bgimage)
         else
             inst.AnimState:Hide("swap_item_bg")
         end
