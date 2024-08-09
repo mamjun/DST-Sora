@@ -653,7 +653,7 @@ params.sora_pot = {
 
         bgatlas = "images/quagmire_recipebook.xml",
         bgimage = "quagmire_recipe_menu_bg.tex",
-        pos = Vector3(100, 80, 0)
+        pos = Vector3(10, 500, 0)
 
     },
     acceptsstacks = true,
@@ -729,12 +729,12 @@ function params.sora_pot.widget:SoraOnOpenFn(inst)
     end
     self:CookRopeTask()
 
-    SoraMakeWidgetMovable(self, "sora_pot", Vector3(-100, 80, 0), {
+    SoraMakeWidgetMovable(self, "sora_pot", Vector3(10, 500, 0), {
         drag_offset = 0.6,
         ValidPos = {
-            minx = -950,
+            minx = -990,
             miny = 90,
-            maxx = 360,
+            maxx = 350,
             maxy = 850
         }
     })
