@@ -136,7 +136,7 @@ function AddOrRemoveTag(inst,stag,condition,...)
             RemoveTag(inst,ltag,...)
         end
     else
-        return inst[key].AddOrRemoveTag(inst,tag,condition,...)
+        return inst[key].AddOrRemoveTag(inst,stag,condition,...)
     end
 end
 function FixTag(inst) -- 传入实体 主客机一起调用

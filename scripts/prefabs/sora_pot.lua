@@ -44,10 +44,30 @@ local function onhit(inst, worker)
 
 end
 local function OnOpen(inst, data)
+    if inst:IsAsleep() then
+        return
+    end
+    if inst:IsInLimbo() then
+        return
+    end
+    -- 不在收回
+    if inst.components.soraportable.isitem then
+        return
+    end
     inst.AnimState:PlayAnimation('open')
     inst.AnimState:PushAnimation('idle_open')
 end
 local function OnClose(inst, data)
+    if inst:IsAsleep() then
+        return
+    end
+    if inst:IsInLimbo() then
+        return
+    end
+    -- 不在收回
+    if inst.components.soraportable.isitem then
+        return
+    end
     inst.AnimState:PlayAnimation('close')
     inst.AnimState:PushAnimation('idle_close')
 end
@@ -206,6 +226,7 @@ local function fn()
         inst.components.container:Close()
     end)
     inst:ListenForEvent("ondropped", function()
+        inst.AnimState:PlayAnimation("item", true)
         inst.components.container:Close()
     end)
     inst:DoPeriodicTask(1, UpdateAnim)

@@ -802,7 +802,8 @@ function com:UpdateDry()
                             local item = SpawnPrefab(data.product)
                             self.con:GiveItem(item, outslot)
                         end
-                        self:SaveExp(outitem.prefab, true, 20)
+                        
+                        self:SaveExp(data.product, true, 20)
                         self:SaveExp('dryer', false, 10)
                         if initem.components.stackable then
                             initem.components.stackable:Get(1):Remove()
@@ -887,7 +888,7 @@ function com:UpdateCook()
                             local item = SpawnPrefab(data.product)
                             self.con:GiveItem(item, outslot)
                         end
-                        self:SaveExp(initem.prefab, true, 20)
+                        self:SaveExp(data.product, true, 20)
                         self:SaveExp('cook', false, 5)
                         if initem.components.stackable then
                             initem.components.stackable:Get(1):Remove()

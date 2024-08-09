@@ -94,5 +94,5 @@ local function MakeSkin(skinskin, skinname,free)
     RegisterInventoryItemAtlas("images/inventoryimages/"..skin..".xml",skin.. ".tex")
 end
 MakeSkin("we","捂耳兽兽")
-MakeSkin("fl","风铃")
+MakeSkin("fl","铃兰月语")
 return Prefab(name, fn, assets), MakePlacer(name .. "_placer", name, name, "idle")
