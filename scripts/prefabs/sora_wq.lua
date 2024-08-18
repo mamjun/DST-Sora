@@ -110,6 +110,19 @@ local function onunequip(inst, owner)
         owner.components.combat.external_dendro_multipliers:RemoveModifier(inst, "sora_wq")
     end
 end
+local function OnBuiltFn(inst,builder)
+    if not (builder and builder:HasTag("sora")) then 
+        return 
+    end
+    if not (builder.soralevel and builder.soralevel:value() > 19) then 
+        return
+    end
+    if builder.components.builder and builder.components.builder.freebuildmode then 
+        return 
+    end
+    inst.components.sorawq.str = builder.userid .. "|BUILDER|" .. tostring(GetTick())
+    inst.components.soraitem.user = builder.userid
+end
 local function fn()
     local inst = CreateEntity()
     local trans = inst.entity:AddTransform()
@@ -201,6 +214,7 @@ local function fn()
     inst.components.weapon:SetOnAttack(onattack)
     OnLevelChange(inst,{level=1})
     inst:ListenForEvent("sorawqlevelchange",OnLevelChange)
+    inst.OnBuiltFn = OnBuiltFn
     return inst
 end
 RegisterInventoryItemAtlas("images/inventoryimages/sora_wq.xml", "sora_wq.tex")

@@ -93,7 +93,7 @@ local function CheckMod(inst)
         end
     end
     if badstr then
-        SoraPushPopupDialog("提醒","你可能是盗版作者的受害者\n请关闭以下MOD再试\n"..badstr,"断开连接",function() DoRestart(true) end)
+        SoraPushPopupDialog("小穹的温馨提示","你可能是盗版作者的受害者\n请关闭以下MOD再试\n"..badstr,"断开连接",function() DoRestart(true) end)
     end
 end
 
@@ -107,7 +107,7 @@ local function CheckName(inst)
             
         else
             Reset(10)
-            SoraPushPopupDialog("提醒","请勿盗搬运MOD!!!","断开连接",function() DoRestart(true) end)
+            SoraPushPopupDialog("小穹的温馨提示","请勿盗搬运MOD!!!","断开连接",function() DoRestart(true) end)
         end
     end
 end

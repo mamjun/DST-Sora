@@ -275,7 +275,7 @@ function com:UpdateSubSoraPot(k, data)
             self.cookslot.pot[k][5] = true
             d.rec = rec
 
-            d.timeneed = rec.cooktime * 10
+            d.timeneed = (rec.cooktime or 2) * 10
             d.powerneed = d.timeneed * data[3]
             d.useitem = uses
             self.cookslot.spice[k][5] = false
@@ -416,7 +416,7 @@ function com:UpdateSubPot(k, data)
                 end
             end
             d.rec = rec
-            d.timeneed = rec.cooktime * 10
+            d.timeneed = (rec.cooktime or 20) * 10
             d.powerneed = d.timeneed * data[3]
             d.disable = false
             d.lastwork = 3
@@ -550,7 +550,7 @@ function com:UpdateSubSpice(k, data)
                 end
             end
             d.rec = rec
-            d.timeneed = rec.cooktime * 10
+            d.timeneed = (rec.cooktime or 20) * 10
             d.powerneed = d.timeneed * data[3]
             d.disable = false
             d.lastwork = 3

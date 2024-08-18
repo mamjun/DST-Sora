@@ -104,6 +104,26 @@ local function AddButton(config, name, pos, fn, postfn)
     end
 
 end
+
+local function MoveTo(self,targetname,targetname2,targetname3)
+    local p = self.parent and self.parent.parent  and self.parent.parent.parent
+    if not p then return end 
+    if p[targetname] then 
+        local tar = p[targetname]
+        if tar[targetname2] then
+            tar = tar[targetname2]
+            if tar[targetname3] then
+                tar = tar[targetname3]
+            end
+        end
+        p:RemoveChild(self)
+        tar:AddChild(self)
+        self:MoveToBack()
+    end
+end
+local function MoveToHandInv(self)
+    MoveTo(self,"inv","hand_inv")
+end
 params.sorapack_container = {
     widget = {
         slotpos = {},
@@ -530,7 +550,7 @@ params.sora_pickhat = {
 
     },
     acceptsstacks = true,
-    type = "hand_inv"
+    type = "sora_pickhat"
 }
 for y = 2, 0, -1 do
     for x = 0, 2 do
@@ -539,6 +559,7 @@ for y = 2, 0, -1 do
 end
 function params.sora_pickhat.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(240, 240)
+    MoveToHandInv(self)
 end
 params.sora_pickhat.itemtestfn = function()
     return not SoraAPI.IsTradeIteming
@@ -556,7 +577,7 @@ params.sora3chest = {
         }
     },
     acceptsstacks = true,
-    type = "hand_inv"
+    type = "sora3chest"
 }
 for y = 2, 0, -1 do
     for x = 0, 2 do
@@ -565,7 +586,7 @@ for y = 2, 0, -1 do
 end
 function params.sora3chest.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(240, 300)
-
+    MoveToHandInv(self)
     SoraMakeWidgetMovable(self, "sora3chest", Vector3(-100, 80, 0), {
         drag_offset = 0.6,
         ValidPos = {
@@ -658,7 +679,7 @@ params.sora_pot = {
     },
     acceptsstacks = true,
     usespecificslotsforitems=true,
-    type = "hand_inv",
+    type = "sora_pot",
     openlimit = 1,
 }
 for y = 4, 0, -1 do
@@ -732,10 +753,10 @@ function params.sora_pot.widget:SoraOnOpenFn(inst)
     SoraMakeWidgetMovable(self, "sora_pot", Vector3(10, 500, 0), {
         drag_offset = 0.6,
         ValidPos = {
-            minx = -990,
-            miny = 90,
-            maxx = 350,
-            maxy = 850
+            minx = -570,
+            miny = -320,
+            maxx = 560,
+            maxy = 320
         }
     })
     local img = self:AddChild(Image("images/hud.xml", "inventory_bg_arrow.tex"))
@@ -852,6 +873,32 @@ function params.sora_pot.itemtestfn(container, item, slot)
         end
         return false
     end
+end
+
+
+params.sora_tqy_box = {
+    widget = {
+        slotpos = {},
+        bgatlas = "images/quagmire_recipebook.xml",
+        bgimage = "quagmire_recipe_menu_bg.tex",
+        pos = Vector3(0, 130, 0)
+
+    },
+    acceptsstacks = false,
+    type = "sora_tqy_box"
+}
+for y = 5, 1, -1 do
+    for x = 0, 0 do
+        table.insert(params.sora_tqy_box.widget.slotpos, Vector3(70 * x -0, 70 * y - 210, 0))
+    end
+end
+
+function params.sora_tqy_box.widget:SoraOnOpenFn(inst)
+    self.bgimage:ScaleToSize(90, 380)
+    MoveToHandInv(self)
+end
+params.sora_tqy_box.itemtestfn = function(container, item, slot)
+    return item and item:HasTag("sora_tqy")
 end
 
 if needhelp then

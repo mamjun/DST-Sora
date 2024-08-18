@@ -909,6 +909,7 @@ function MakeAssetTable(name, oldtabl)
     table.insert(t, Asset("ATLAS", "images/inventoryimages/" .. name .. ".xml"))
     table.insert(t, Asset("ATLAS_BUILD", "images/inventoryimages/" .. name .. ".xml", 256))
     table.insert(t, Asset("IMAGE", "images/inventoryimages/" .. name .. ".tex"))
+    RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. ".xml", name .. ".tex")
     return t
 end
 

@@ -223,6 +223,46 @@ Rec("sora_pot", "穹の料理锅", "炖出好吃的", equip, "sora", {{
     goldnugget = 100,
     nightmare_timepiece = 10
 }}).placer = "no"
+Rec("sora_tqy", "穹の堂前燕", "无可奈何花落去", equip, "sora", {{
+    boomerang = 1,
+    blowdart_sleep = 1,
+    sora_flh = 1
+}, {
+    boomerang = 3,
+    blowdart_sleep = 3,
+    sora_flh = 1
+}, {
+    boomerang = 10,
+    blowdart_sleep = 10,
+    sora_flh = 1
+}})
+Rec("sora_tqy_box", "穹の归羽", "似曾相识燕归来", equip, "sora", {{
+    livinglog = 3,
+    nightmarefuel = 3,
+    marblebean = 3
+}, {
+    livinglog = 10,
+    nightmarefuel = 20,
+    marblebean = 10
+}, {
+    livinglog = 20,
+    nightmarefuel = 40,
+    marblebean = 80
+}})
+
+Rec("sora_wq", "雾切之回光", "神里流太刀术皆传\n神里绫华 参上", equip, "soraself", {{
+    sora_flh = 10,
+    sora3sword = 3,
+    sora_light_rainbow_new = 3,
+}, {
+    sora_flh = 10,
+    sora3sword = 3,
+    sora_light_rainbow_new = 3,
+}, {
+    sora_flh = 10,
+    sora3sword = 3,
+    sora_light_rainbow_new = 3,
+}})
 
 Rec("soraclothes", "穹の护", "小穹的贴身守护", equip, "soraself", {{
     goose_feather = 5,
@@ -418,6 +458,8 @@ Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother
     moonglass = 40,
     gift = 5
 }})
+
+
 Rec("sora3sword", "银白の锋", "银白骑士团の制式长剑", equip2, "soraother", {{
     nightsword = 1,
     tentaclespike = 2,

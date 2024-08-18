@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] author = "FL"
-version = "11.75" -- 版本
+version = "11.78" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -452,7 +452,20 @@ configuration_options = {{
         hover = "不禁用15级双倍采集"
     }},
     default = false
-}, {
+},  {
+    name = "mid",
+    label = "MID设置",
+    options = {{
+        description = "不懂请勿修改-1",
+        data = "1",
+        hover = "不懂请勿修改-1"
+    }, {
+        description = "不懂请勿修改-2",
+        data = "2",
+        hover = "不懂请勿修改-2"
+    }},
+    default = "1"
+},{
     name = "chest",
     label = "强迫症箱子范围",
     options = {{

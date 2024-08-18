@@ -859,7 +859,21 @@ AddComponentPostInit("combat", function(self)
         end
         return x, y, z
     end
-
+    local DoAttack = self.DoAttack
+    self.DoAttack = function(self,targ, weapon,...)
+        if weapon and weapon:HasTag("sora_tqy") then 
+            if weapon.delayowner == targ then 
+                return 
+            end
+            if not targ.sora_tqyattackcd then 
+                targ.sora_tqyattackcd = SoraCD(0.3)
+            end
+            if not targ.sora_tqyattackcd() then 
+                return 
+            end
+        end
+        return DoAttack(self,targ, weapon,...)
+    end
 end)
 
 AddComponentPostInit("locomotor", function(self)

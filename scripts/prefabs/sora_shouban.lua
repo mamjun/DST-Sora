@@ -65,7 +65,12 @@ local function Cure(inst)
     if inst:IsInLimbo() then return end
     for k,v in pairs(AllPlayers) do 
         if v and v:IsValid() and v:HasTag("sora") and not v.components.health:IsDead() and v:GetDistanceSqToInst(inst) < 225 then 
-            v.components.health:DoDelta(1)
+            if not v.shouban_curecd then 
+                v.shouban_curecd= SoraCD(5)
+            end
+            if v.shouban_curecd() then 
+                v.components.health:DoDelta(1)
+            end
         end
     end
 end

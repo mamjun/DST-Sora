@@ -292,7 +292,7 @@ TheWorld:StartThread(function () print("RPC",DB:RPC(1,"remote","print (111) retu
 
 local dbnamespace = key .. "maindb"
 dbnamespace = dbnamespace:lower()
-local intmax = 2 ^ 32 
+local intmax = 2 ^ 32
 local function hash(str)
     local n = 5381
     for index = 1, #str, 1 do
@@ -302,8 +302,8 @@ local function hash(str)
     end
     return n
 end
---坑爹玩意  klei的hash函数 在linux下和windows下对中文处理不一致
---重新抄了个  https://blog.csdn.net/weixin_36298476/article/details/113055407
+-- 坑爹玩意  klei的hash函数 在linux下和windows下对中文处理不一致
+-- 重新抄了个  https://blog.csdn.net/weixin_36298476/article/details/113055407
 
 local json = SoraAPI.json
 if not TheNet:GetIsServer() then
@@ -316,6 +316,9 @@ end
 local dbhandles = {}
 local sid = TheShard:GetShardId() -- 自身ID
 local mid = sid == "0" and "0" or SHARDID.MASTER -- 主世界ID
+if GetModConfigData("mid") ~= "1" then 
+    mid = GetModConfigData("mid") 
+end
 local ismaster = TheShard:IsMaster() or mid == "0"
 -- print("AddShardModRPCHandler",AddShardModRPCHandler,env,AddShardModRPCHandler,GLOBAL.AddShardModRPCHandler)
 env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
@@ -376,6 +379,9 @@ end)
 function MainDB:GetMiD()
     return mid
 end
+function MainDB:SetMiD(str)
+    mid = str
+end
 function MainDB:Init(namespace, syntime, roottime) -- 初始化
     if self.Inited then
         return
@@ -434,43 +440,51 @@ function MainDB:Notice(event, data)
     if self.inst and self.inst:IsValid() then
         self.inst:PushEvent(event, data)
     end
-    if self.OnNoticeHandles  and self.OnNoticeHandles[event] then 
-        for k,v in pairs(self.OnNoticeHandles[event]) do 
-            if v.cb and (not v.fn or v.fn(self,event,data)) then 
-                v.cb(self,event,data)
+    if self.OnNoticeHandles and self.OnNoticeHandles[event] then
+        for k, v in pairs(self.OnNoticeHandles[event]) do
+            if v.cb and (not v.fn or v.fn(self, event, data)) then
+                v.cb(self, event, data)
             end
         end
     end
 end
-function MainDB:OnNotice(event, key,fn,call)
-    if not (key and call) then return end
-    if not self.OnNoticeHandles[event] then 
+function MainDB:OnNotice(event, key, fn, call)
+    if not (key and call) then
+        return
+    end
+    if not self.OnNoticeHandles[event] then
         self.OnNoticeHandles[event] = {}
-    end 
-    self.OnNoticeHandles[event][key] = {fn=fn,cb=call}
+    end
+    self.OnNoticeHandles[event][key] = {
+        fn = fn,
+        cb = call
+    }
 end
 function MainDB:RemoveOnNotice(event, key)
-    if not (key ) then return end
-    if not self.OnNoticeHandles[event] then 
-        return 
-    end 
+    if not (key) then
+        return
+    end
+    if not self.OnNoticeHandles[event] then
+        return
+    end
     self.OnNoticeHandles[event][key] = nil
 end
-function MainDB:OnNoticeSet(noticekey, root,key,call)
-    if not call then return end
-    self:OnNotice("MainDBSet",noticekey, function (s,event,data)
-        if data.root == root then 
-            if key and data.key ~= key then 
+function MainDB:OnNoticeSet(noticekey, root, key, call)
+    if not call then
+        return
+    end
+    self:OnNotice("MainDBSet", noticekey, function(s, event, data)
+        if data.root == root then
+            if key and data.key ~= key then
                 return false
             end
             return true
         end
-    end,call)
+    end, call)
 end
 function MainDB:RemoveOnNoticeSet(noticekey)
     self:RemoveOnNotice("Set", noticekey)
 end
-
 
 function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数据 --数据有效性自己处理 shardRPC不存在客户端  不会被攻击
     if cmd == "event" then -- 推送事件
@@ -536,16 +550,16 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
                 end
             end
         elseif type(d) == "nil" then
-            if data then 
-                self.data[data] = {} 
+            if data then
+                self.data[data] = {}
                 self:Notice("MainDBRootSync", {
                     namespace = self.namespace,
                     root = data,
                     value = nil
                 })
-            else 
-                for k,v in pairs() do 
-                    self.data[k] = {} 
+            else
+                for k, v in pairs() do
+                    self.data[k] = {}
                     self:Notice("MainDBRootSync", {
                         namespace = self.namespace,
                         root = k,
@@ -909,11 +923,12 @@ local function MaindbUpdataFn()
         end
     end
 end
-if not ismaster then -- 主世界不需要去同步
-    AddSimPostInit(function(inst)
+
+AddSimPostInit(function(inst)
+    if not mid == sid then -- 主世界不需要去同步
         MaindbUpdataTask = TheWorld:DoPeriodicTask(1, MaindbUpdataFn)
-    end)
-end
+    end
+end)
 
 function CreateMainDB(namespace, syntime, roottime)
     local db = MainDB()
