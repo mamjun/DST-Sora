@@ -28,20 +28,28 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 穹妹重生保留经验相关
-local function Onsoradespawn(userid, soraexp)
+local function Onsoradespawn(userid, soraexp,extsave)
     TheWorld.components.soraexpsave:SetExp(userid, soraexp)
+    TheWorld.components.soraexpsave:SetExtSave(userid, extsave)
 end
 local function Onplayerdespawnanddelete(world, data)
     local player = data.player or data
-    if player:HasTag("sora") then
-        if TheWorld.ismastershard then
-            Onsoradespawn(player.userid, player.soraexp:value())
-        else
-            GLOBALDB:PushEvent("soradespawn", {
-                userid = player.userid,
-                soraexp = player.soraexp:value()
-            }, GetMID())
+    if player:HasTag("sora") and player.soraexp then
+        local extsave = {}
+        for k,v in pairs(player.components) do
+            if v.OnSoraSave then 
+                extsave[k] = v:OnSoraSave()
+            end
         end
+        -- if TheWorld.ismastershard then
+            Onsoradespawn(player.userid, player.soraexp:value(),extsave)
+        -- else
+        --     GLOBALDB:PushEvent("soradespawn", {
+        --         userid = player.userid,
+        --         soraexp = player.soraexp:value(),
+        --         extsave = extsave
+        --     }, GetMID())
+        -- end
     end
 end
 
@@ -61,11 +69,11 @@ AddPrefabPostInit("world", function(inst)
         inst:ListenForEvent("ms_playerdespawn", Onplayerdespawnanddelete)
         inst:ListenForEvent("ms_playerdespawnandmigrate", Onplayerdespawnanddelete)
         inst:ListenForEvent("ms_playerdespawnanddelete", Onplayerdespawnanddelete)
-        if inst.ismastershard then
-            GLOBALDB:ListenForEvent("soradespawn", function(inst, data)
-                Onsoradespawn(data.userid, data.soraexp)
-            end)
-        end
+        -- if inst.ismastershard then
+        --     GLOBALDB:ListenForEvent("soradespawn", function(inst, data)
+        --         Onsoradespawn(data.userid, data.soraexp,data.extsave)
+        --     end)
+        -- end
     end
 end)
 
@@ -866,7 +874,7 @@ AddComponentPostInit("combat", function(self)
                 return 
             end
             if not targ.sora_tqyattackcd then 
-                targ.sora_tqyattackcd = SoraCD(0.3)
+                targ.sora_tqyattackcd = SoraCD(0.1)
             end
             if not targ.sora_tqyattackcd() then 
                 return 

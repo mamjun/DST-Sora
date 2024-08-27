@@ -30,15 +30,29 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 local soraexpsave = Class(function(self, inst)
     self.inst = inst
-    self.exps={}
+
 end)
 
 
 function soraexpsave:SetExp(userid,setexp)      
-    self.exps[userid] = setexp
+    if not ( userid and setexp) then return end
+    SoraAPI.GLOBALDB:Set("expsave",userid,setexp)
 end
 function soraexpsave:GetExp(userid)      
-    return userid and self.exps[userid] and math.max(0,self.exps[userid]-1000) or -1
+    if not userid then return -1 end
+    local exp = SoraAPI.GLOBALDB:Get("expsave",userid,-1)
+    if exp == -1 then return -1 end 
+    return math.max(0,exp-1000)
+end
+
+function soraexpsave:SetExtSave(userid,data)      
+    if not (userid and data) then return end
+    SoraAPI.GLOBALDB:Set("sorasave",userid,data)
+end
+function soraexpsave:GetExtSave(userid)      
+    if not userid then return {} end
+    local extsave = SoraAPI.GLOBALDB:Get("sorasave",userid,{})
+    return extsave
 end
 
 

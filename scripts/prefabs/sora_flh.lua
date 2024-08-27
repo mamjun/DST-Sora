@@ -68,41 +68,7 @@ local function fn(Sim)
 	inst.components.edible.healthvalue = 1024
 	inst.components.edible.hungervalue = 1024
 	inst.components.edible.sanityvalue = 1024
-    inst.components.edible.oneaten = function(i,doer)
-        if doer and doer:HasTag("sora") then
-			local all = true
-			local unknow = {}
-			for k,v in pairs(TUNING.SORAUNLOCKRECIPES) do
-				if TUNING.SORAUNLOCKRECIPESKEYMAP[v] then
-					for ik,iv in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP[v]) do
-						if not doer.components.builder:KnowsRecipe(iv) then
-							all = false
-							table.insert(unknow,v)
-							break
-						end
-					end
-				else
-					if not doer.components.builder:KnowsRecipe(v) then
-						all = false
-						table.insert(unknow,v)
-					end
-				end
-			end
-			if all then
-            	doer.components.talker:Say("好像都掌握了")
-			else
-				local rec = unknow[math.random(1,#unknow)]
-				if TUNING.SORAUNLOCKRECIPESKEYMAP[rec] then
-					for k,v in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP[rec]) do
-						doer.components.builder:AddRecipe(v)
-					end
-				else
-					doer.components.builder:AddRecipe(rec)
-				end
-				doer.components.talker:Say("好像学会了新东西")
-			end
-        end
-    end
+    inst.components.edible.oneaten = nil
 	inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription("这个感觉.......是?")
 	inst:AddComponent("inventoryitem")

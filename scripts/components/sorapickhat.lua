@@ -126,7 +126,7 @@ function com:DoTask()
 
     local pos = self.inst:GetPosition()
     local ents = TheSim:FindEntities(pos.x, 0, pos.z, self.range, nil,
-        {"decorationitem", "FX", "player", "INLIMBO", "sora_fl"}, {"_inventoryitem", "pickable", "oceanfishable"})
+        {"decorationitem", "FX",  "NOCLICK","player", "INLIMBO", "sora_fl"}, {"_inventoryitem", "pickable", "oceanfishable"})
 
     if next(ents) then
         self.lastwork = GetTime() -- 来活了 别睡了

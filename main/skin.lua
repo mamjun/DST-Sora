@@ -911,7 +911,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
     AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群619059773\n领取方法看群公告")
-    AddItemSkin("sora2fire_hrh", "而你,我的朋友\n你才是真正的帕鲁\nQQ群619059773\n领取方法看群公告")
+    AddItemSkin("sora2fire_hrh",
+        "而你,我的朋友\n你才是真正的帕鲁\nQQ群619059773\n领取方法看群公告")
     AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!")
     AddItemSkin("sora2fire_hjl", "人家才不是伊布呢")
     AddItemSkin("sora2ice_flower", "你已被移出群聊'花开富贵'")
@@ -937,8 +938,9 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_pearl_slm", "萌王是谁?")
     AddItemSkin("sora2birdchest_ggd",
         "在下江湖人称菇菇毒，\n暗器榜排名第七十七，\n独门绝技--好菇毒！")
-    AddItemSkin("sora_lightflier_beex",
-        "这是熊，\n不是Bee！")
+    AddItemSkin("sora_lightflier_beex", "这是熊，\n不是Bee！")
+    AddItemSkin("sora_tqy_qy", "不止七夕,更在朝夕\n    ---2024七夕纪念")
+    AddItemSkin("sora_tqy_qkyz", "众生为棋,一掷钱坤")
     local item_map = {
         sora_none = "sora_uniforms"
     }

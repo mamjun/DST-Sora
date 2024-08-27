@@ -475,7 +475,7 @@ params.sora_huapen = {
     type = "chest"
 }
 function params.sora_huapen.itemtestfn(container, item, slot)
-    return item and item.prefab ~= "sora_flh" and
+    return item and not item:HasTag("sorahuapencant")  and item.prefab ~= "sora_flh" and
                (item:HasTag("sorafood") or item.prefab == "butterfly" or item.prefab == "moonrocknugget" or item.prefab ==
                    "moonglass" or item.prefab == "petals" or item.prefab == "opalpreciousgem")
 end
@@ -806,7 +806,7 @@ function params.sora_pot.itemtestfn(container, item, slot)
                 return true
             end
         elseif slot == 7 then
-            if item:HasTag("preparedfood") and not item:HasTag("spicedfood") then
+            if item:HasTag("preparedfood") and (not item:HasTag("spicedfood") or item:HasTag("sorahuapencant")) then
                 return true
             end
         elseif slot == 8 then

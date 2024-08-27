@@ -116,9 +116,15 @@ local function OnSoraSpawn(inst)
     local first = true
     if TheWorld.components.soraexpsave then
         local saveexp = TheWorld.components.soraexpsave:GetExp(inst.userid)
+        local saveext = TheWorld.components.soraexpsave:GetExtSave(inst.userid)
         first = saveexp == -1
         if saveexp > 0 then
             inst:GetExp(saveexp)
+            for k,v in pairs(saveext) do
+                if inst.components[k] and inst.components[k].OnSoraLoad then
+                    inst.components[k]:OnSoraLoad(v)
+                end
+            end
         end
     end
     if not first then
@@ -347,7 +353,7 @@ local function GetExp(inst, num, code, dmaxexp, once)
         applyupgrades(inst, true)
         ReFreshExp(inst)
     end
-    TheWorld.components.soraexpsave:SetExp(inst.userid, inst.soraexp:value())
+    --TheWorld.components.soraexpsave:SetExp(inst.userid, inst.soraexp:value())
 end
 
 local function onbecamehuman(inst)
@@ -858,6 +864,7 @@ local master_postinit = function(inst)
         end
     end
     inst:AddComponent("soraglobalsave")
+    inst:AddComponent("sorafoodrec")
     inst:AddComponent("sorafl")
     inst.SoraSound = SoraSound
     inst.wlist = wlist

@@ -7,9 +7,9 @@ SoraAPI.MakeAssetTable(boxname, assets)
 local function OnEquip(inst, owner)
     local skin = inst.skinname
     if skin ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skin, "base")
+        owner.AnimState:OverrideSymbol("swap_object", skin, "swap")
     else
-        owner.AnimState:OverrideSymbol("swap_object", name, "base")
+        owner.AnimState:OverrideSymbol("swap_object", name, "swap")
     end
     inst.delayowner = owner
     owner.AnimState:Show("ARM_carry")
@@ -21,13 +21,41 @@ local function OnUnequip(inst, owner)
 end
 
 local function OnDropped(inst)
-    inst.AnimState:PlayAnimation("idle")
-    inst.Physics:Stop()
+    inst.AnimState:PlayAnimation("idle", true)
+    -- inst.Physics:Stop()
     inst.components.inventoryitem.pushlandedevents = true
     inst:PushEvent("on_landed")
 end
-
+local ApplyCheckFn
+local function TryGiveSelfToOwner(inst)
+    if inst and inst.delayowner and inst.delayowner:IsValid() then
+        local owner = inst.components.inventoryitem:GetGrandOwner()
+        local powner = inst.entity:GetParent()
+        if not owner and powner then
+            powner:RemoveChild(inst)
+            inst.components.inventoryitem:OnRemoved()
+            inst.components.projectile:Catch(inst.delayowner)
+            return true
+        elseif owner == inst.delayowner then
+            ApplyCheckFn(inst, true)
+        elseif owner ~= inst.delayowner then
+            inst.components.inventoryitem:OnRemoved()
+            inst.components.projectile:Catch(inst.delayowner)
+        end
+    end
+end
+function ApplyCheckFn(inst, Cancel)
+    if inst.CheckGoToTask then
+        inst.CheckGoToTask:Cancel()
+        inst.CheckGoToTask = nil
+    end
+    if not Cancel then
+        inst.CheckGoToTask = inst:DoPeriodicTask(10, TryGiveSelfToOwner)
+    end
+end
 local function OnThrown(inst, owner, target)
+    ApplyCheckFn(inst)
+    inst.components.inventoryitem.canbepickedup = false
     if target ~= owner then
         owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_throw")
     end
@@ -35,11 +63,20 @@ local function OnThrown(inst, owner, target)
     inst.AnimState:PlayAnimation("spin_loop", true)
     inst.components.inventoryitem.pushlandedevents = false
 end
-
+local function onPickUP(inst, data)
+    if data and data.owner and inst.delayowner and data.owner ~= inst.delayowner  then
+        TryGiveSelfToOwner(inst)
+    elseif data and data.owner and inst.delayowner and data.owner == inst.delayowner  then
+        ApplyCheckFn(inst,true)
+    end
+end
 local function OnCaught(inst, catcher)
+    ApplyCheckFn(inst, true)
+    inst.components.inventoryitem.canbepickedup = true
     if catcher ~= nil and catcher.components.inventory ~= nil and catcher.components.inventory.isopen then
         local equip = catcher.components.inventory:GetEquippedItem(inst.components.equippable.equipslot)
         if not equip then
+            catcher.components.inventory:GiveItem(inst)
             catcher.components.inventory:Equip(inst)
         elseif equip and equip:HasTag("sora_tqy_box") and not equip.components.container:IsFull() then
             equip.components.container:GiveItem(inst)
@@ -50,9 +87,10 @@ local function OnCaught(inst, catcher)
     end
 end
 local function OnEntitySleep(inst)
-    if inst.components.projectile.target and inst.delayowner and inst.delayowner:IsValid() then
-        inst.components.projectile:Stop()
-        inst.components.projectile:Catch(inst.delayowner)
+    if not TryGiveSelfToOwner(inst) then
+        if inst.components.projectile.target and inst.delayowner and inst.delayowner:IsValid() then
+            inst.components.projectile:Catch(inst.delayowner)
+        end
     end
 end
 local function ReturnToOwner(inst, owner)
@@ -63,6 +101,7 @@ local function ReturnToOwner(inst, owner)
         inst.components.projectile:Throw(owner, owner)
     end
 end
+
 local MUST_TAGS = {"_combat", "_health"}
 local CANT_TAGS = {"player", "INLIMBO", "structure", "wall", "companion"}
 local function GetNextTarget(inst, target, try)
@@ -99,7 +138,7 @@ local function GetNextTarget(inst, target, try)
         return
     end
     inst.delayowner.soratqys[inst] = 1
-    if inst:GetDistanceSqToInst(inst.delayowner) > 900 then
+    if inst:GetDistanceSqToInst(inst.delayowner) > 1600 then
         -- 太远了 回去
         inst.components.projectile:Throw(inst.delayowner, inst.delayowner)
         return
@@ -164,6 +203,8 @@ local function GetNextTarget(inst, target, try)
     return true
 end
 local function OnHit(inst, owner, target)
+    inst.components.inventoryitem.canbepickedup = true
+    inst.components.projectile:SetSpeed(12 + math.random() * 6)
     GetNextTarget(inst, target)
     if target and not target:HasTag("player") and inst.delayowner ~= target and target:IsValid() and
         target.components.combat then
@@ -187,6 +228,7 @@ local function OnHit(inst, owner, target)
 end
 
 local function OnMiss(inst, owner, target)
+    inst.components.inventoryitem.canbepickedup = true
     if owner == target then
         OnDropped(inst)
     else
@@ -206,7 +248,7 @@ local function fn()
 
     inst.AnimState:SetBank(name)
     inst.AnimState:SetBuild(name)
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle", true)
     -- inst.AnimState:SetRayTestOnBB(true)
     inst:AddTag("sora_tqy")
     inst:AddTag("thrown")
@@ -222,7 +264,7 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
-
+    inst:ListenForEvent("onpickup", onPickUP)
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(10)
     inst.components.weapon:SetRange(14, 16)
@@ -268,9 +310,9 @@ local function BoxUpdateAnim(inst)
         inst.last.item = iitem
         local skin = iitem.skinname
         if skin ~= nil then
-            owner.AnimState:OverrideSymbol("swap_object", skin, "base")
+            owner.AnimState:OverrideSymbol("swap_object", skin, "swap")
         else
-            owner.AnimState:OverrideSymbol("swap_object", name, "base")
+            owner.AnimState:OverrideSymbol("swap_object", name, "swap")
         end
     else
         if next(inst.last) then
@@ -325,7 +367,7 @@ local function boxfn()
     if not TheWorld.ismastersim then
         return inst
     end
-
+    inst.CheckGoToTask = nil
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(10)
     inst.components.weapon:SetRange(14, 16)
@@ -342,6 +384,10 @@ local function boxfn()
         local item
         for i = 1, 5 do
             item = inst.components.container:GetItemInSlot(i)
+            if item and not item:IsValid() then
+                inst.components.container.slots[i] = nil
+                item = nil
+            end
             if item then
                 break
             end
@@ -371,12 +417,12 @@ end
 SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. name .. ".xml", name)
 SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. boxname .. ".xml", boxname)
 
-local function MakeSkin(skinskin, skinname,free)
-    local skin = name .."_"..skinskin
+local function MakeSkin(skinskin, skinname, free)
+    local skin = name .. "_" .. skinskin
     SoraAPI.MakeAssetTable(skin, assets)
     SoraAPI.MakeItemSkin(name, skin, {
         name = skinname,
-        atlas = "images/inventoryimages/"..skin..".xml",
+        atlas = "images/inventoryimages/" .. skin .. ".xml",
         image = skin,
         build = skin,
         bank = name,
@@ -385,15 +431,15 @@ local function MakeSkin(skinskin, skinname,free)
         checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
         checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
     })
-    RegisterInventoryItemAtlas("images/inventoryimages/"..skin..".xml",skin.. ".tex")
+    RegisterInventoryItemAtlas("images/inventoryimages/" .. skin .. ".xml", skin .. ".tex")
 end
 
-local function MakeBoxSkin(skinskin, skinname,free)
-    local skin = boxname .."_"..skinskin
+local function MakeBoxSkin(skinskin, skinname, free)
+    local skin = boxname .. "_" .. skinskin
     SoraAPI.MakeAssetTable(skin, assets)
     SoraAPI.MakeItemSkin(boxname, skin, {
         name = skinname,
-        atlas = "images/inventoryimages/"..skin..".xml",
+        atlas = "images/inventoryimages/" .. skin .. ".xml",
         image = skin,
         build = skin,
         bank = boxname,
@@ -402,12 +448,16 @@ local function MakeBoxSkin(skinskin, skinname,free)
         checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
         checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
     })
-    RegisterInventoryItemAtlas("images/inventoryimages/"..skin..".xml",skin.. ".tex")
+    RegisterInventoryItemAtlas("images/inventoryimages/" .. skin .. ".xml", skin .. ".tex")
 end
 
-MakeSkin("cy","翠羽")
-MakeSkin("qy","巧羽")
-MakeBoxSkin("qy","巧羽")
-SoraAPI.MakeSkinNameMap(name.."_qy",boxname.."_qy")
-
+MakeSkin("cy", "翠羽")
+MakeSkin("qy", "巧羽")
+MakeSkin("qkyz", "钱坤一掷")
+MakeSkin("qkyz_r", "钱坤一掷")
+MakeBoxSkin("qy", "巧羽")
+MakeBoxSkin("qkyz", "钱坤一掷")
+SoraAPI.MakeSkinNameMap(name .. "_qy", boxname .. "_qy")
+SoraAPI.MakeSkinNameMap(name .. "_qkyz", boxname .. "_qkyz")
+SoraAPI.MakeSkinNameMap(name .. "_qkyz", name .. "_qkyz_r")
 return Prefab("sora_tqy", fn, assets), Prefab("sora_tqy_box", boxfn, assets)

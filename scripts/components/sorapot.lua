@@ -326,8 +326,15 @@ function com:UpdateSubSoraPot(k, data)
             self.con:GiveItem(item, outslot)
             self:SaveExp(item.prefab, true, 20)
         end
+        local data = {items={},rec=d.rec}
         for index, inslot in pairs(d.useitem) do
             local initem = self.con:GetItemInSlot(inslot)
+            table.insert(data.items,initem)
+        end
+        if d.rec.OnCook then 
+            d.rec.OnCook(self.inst,self:GetDoer(),data)
+        end
+        for inde,initem in pairs(data.items) do
             if initem then
                 if initem.components.stackable then
                     initem.components.stackable:Get(1):Remove()
@@ -658,7 +665,7 @@ function com:GetSoraPotRec(slots)
             end
         end
     end
-    if #data.prefablist < 4 then
+    if #data.items < 4 then
         return nil
     end
     local ings = GetIngredientValues(data.prefablist)

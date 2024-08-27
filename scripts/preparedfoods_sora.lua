@@ -540,7 +540,89 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         cook_need = "鳗鱼 菜≥1.5",
         cook_cant = "蜂蜜 不可食用类",
         cooktp = {{"pondeel", "cutlichen", "cutlichen", "cutlichen"}, {"pondeel", "carrot", "carrot", "carrot"}}
+    },
+    sora_yaojing = {
+        str = "奇异甜食",
+        des = "它充满了无限的能量",
+        test = function(cooker, names, tags)
+            return true
+        end,
+        exttest = function(cooker, names, tags,data)
+            if not data then 
+                return false
+            end
+            if not data.doer.components.sorafoodrec then 
+                return false
+            end
+            if #data.items ~= 4 then 
+                return false
+            end
+            
+            if not data.doer.components.sorafoodrec:CanCook(data) then 
+                return false
+            end
+            return true
+        end,
+        OnCook = function(cooker, doer,data)
+            if doer and doer.components.sorafoodrec then 
+                
+                doer.components.sorafoodrec:OnCook(data)
+            end
+        end,
+        alluse = true,
+        mustdoer = "sora",
+        priority = 25,
+        foodtype = FOODTYPE.GOODIES,
+        health = 0,
+        hunger = 0,
+        hungertrue = true,
+        perishtime =20,
+        sanity = 0,
+        oneatenfn =  function(i,doer)
+            if doer and doer:HasTag("sora") then
+                local all = true
+                local unknow = {}
+                for k,v in pairs(TUNING.SORAUNLOCKRECIPES) do
+                    if TUNING.SORAUNLOCKRECIPESKEYMAP[v] then
+                        for ik,iv in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP[v]) do
+                            if not doer.components.builder:KnowsRecipe(iv) then
+                                all = false
+                                table.insert(unknow,v)
+                                break
+                            end
+                        end
+                    else
+                        if not doer.components.builder:KnowsRecipe(v) then
+                            all = false
+                            table.insert(unknow,v)
+                        end
+                    end
+                end
+                if all then
+                    doer.components.talker:Say("好像都掌握了")
+                    doer:PushEvent("soraunlockrecall")
+                else
+                    local rec = unknow[math.random(1,#unknow)]
+                    if TUNING.SORAUNLOCKRECIPESKEYMAP[rec] then
+                        for k,v in pairs(TUNING.SORAUNLOCKRECIPESKEYMAP[rec]) do
+                            doer.components.builder:AddRecipe(v)
+                        end
+                    else
+                        doer.components.builder:AddRecipe(rec)
+                    end
+                    doer.components.talker:Say("好像学会了新东西")
+                end
+            end
+        end,
+        cooktime = 1,
+        tags = {"spicedfood","sorahuapencant"},
+        floater = {"med", nil, 0.65},
+        oneat_desc = "无",
+        cook_need = "未知",
+        cook_cant = "未知",
+        cooktp = {{"meatballs", "bonestew", "kabobs", "honeyham"}, {"dragonpie", "jammypreserves", "fruitmedley", "trailmix"}}
     }
+
 
 }
 local sorafoodui = require "widgets/sorafoodui"
@@ -558,11 +640,11 @@ for k, v in pairs(foods) do
             if type(data) == "table" and data.cooker then
                 if v.mustdoer then
                     if not data.doer then
-                        return
+                        return false
                     end
                     if type(v.mustdoer) == "string" then
                         if not data.doer:HasTag(v.mustdoer) then
-                            return
+                            return false
                         end
                     end
                     if type(v.mustdoer) == "table" then
@@ -573,13 +655,17 @@ for k, v in pairs(foods) do
                             end
                         end
                         if not ok then
-                            return
+                            return false
                         end
                     end
                 end
                 if v.exttest then
-                    if not v.exttest(cooker, names, tags, data.ents, data, ...) then
-                        return
+                    if not v.exttest(cooker, names, tags, data, ...) then
+                        return false
+                    end
+                else
+                    if #data.prefablist < 4 then 
+                        return false
                     end
                 end
             end

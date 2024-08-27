@@ -1,4 +1,3 @@
-
 --[[
 授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
@@ -32,20 +31,28 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] --
 local com = Class(function(self, inst)
     self.inst = inst
+    self.hasuse = {}
 end)
-
-function com:Init(doer, pass, name, id)
-
+function com:CanCook(data)
+    local i = 0
+    for k, v in pairs(data.items) do
+        if v:IsValid() and not v:HasTag("spicedfood") and not v.prefab:match("_spice_") and not self.hasuse[v.prefab] then
+            i = i + 1
+        end
+    end
+    return i == 4
 end
-function com:OnRemoveEntity()
-    
-end
-function com:OnRemoveFromEntity()
-    
+function com:OnCook(data)
+    if data and data.items then
+        for k, v in pairs(data.items) do
+            self.hasuse[v.prefab] = 1
+        end
+    end
+    print(fastdump(self.hasuse))
 end
 function com:OnSave()
     return {
-        --add_component_if_missing_sora = (self.pass ~= "") and 1 or nil
+        hasuse = self.hasuse
     }
 end
 
@@ -53,21 +60,15 @@ function com:OnLoad(data)
     if not data then
         return
     end
-
+    if not data.hasuse then
+        return
+    end
+    for k, v in pairs(data.hasuse) do
+        self.hasuse[k] = 1
+    end
 end
-
--- function com:OnSoraSave()
---     return {
---         --add_component_if_missing_sora = (self.pass ~= "") and 1 or nil
---     }
--- end
-
--- function com:OnSoraLoad(data)
---     if not data then
---         return
---     end
-
--- end
+com.OnSoraSave = com.OnSave
+com.OnSoraLoad = com.OnLoad
 
 function com:GetDebugString()
     return ""
