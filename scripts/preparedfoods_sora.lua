@@ -547,7 +547,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         test = function(cooker, names, tags)
             return true
         end,
-        exttest = function(cooker, names, tags,data)
+        soraexttest = function(cooker, names, tags,data)
             if not data then 
                 return false
             end
@@ -571,7 +571,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         end,
         alluse = true,
         mustdoer = "sora",
-        priority = 25,
+        priority = 200,
         foodtype = FOODTYPE.GOODIES,
         health = 0,
         hunger = 0,
@@ -631,11 +631,21 @@ for k, v in pairs(foods) do
     v.weight = v.weight or 1
     v.priority = v.priority or 0
     v.perishtime = v.perishtime * 480
+    v.SetSoraExtData = function(data)
+        v.tempextdata  = data
+    end
+
     if not v.notsorapot then
         local oldtest = v.test
         v.test = function(cooker, names, tags, data, ...)
             if not names.sora_pot_need then
                 return
+            end
+            if not data then 
+                data = v.tempextdata
+            end
+            if v.soraexttest and type(data) ~= "table" then 
+                return false
             end
             if type(data) == "table" and data.cooker then
                 if v.mustdoer then
@@ -659,8 +669,8 @@ for k, v in pairs(foods) do
                         end
                     end
                 end
-                if v.exttest then
-                    if not v.exttest(cooker, names, tags, data, ...) then
+                if v.soraexttest then
+                    if not v.soraexttest(cooker, names, tags, data, ...) then
                         return false
                     end
                 else

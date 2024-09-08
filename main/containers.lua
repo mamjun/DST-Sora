@@ -832,10 +832,25 @@ function params.sora_pot.itemtestfn(container, item, slot)
             if item:HasTag("dryable") then
                 return true
             end
-            if item:HasTag("cookable") then
+            if item:HasTag("dryable") then
                 return true
             end
-            if item.prefab == "ice" or item.prefab == "charcoal" then
+            if item:HasTag("edible_GENERIC") then
+                return true
+            end
+            if item:HasTag("edible_MEAT") then
+                return true
+            end
+            if item:HasTag("edible_VEGGIE") then
+                return true
+            end
+            if item:HasTag("edible_SEEDS") then
+                return true
+            end
+            if item:HasTag("edible_GOODIES") then
+                return true
+            end
+            if item.prefab == "ice" or item.prefab == "charcoal" or item.prefab == "batnosehat"  then
                 return true
             end
             if not (item:HasTag("fresh") or item:HasTag("stale") or item:HasTag("spoiled")) then

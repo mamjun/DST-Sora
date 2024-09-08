@@ -88,7 +88,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         
     }
     
-    
+    if softresolvefilepath("anim/sora_test.zip") then 
+        table.insert( Assets,Asset("ANIM", "anim/sora_test.zip") )
+    end
         -- 小地图
     AddMinimapAtlas("images/map_icons/sora.xml")
     AddMinimapAtlas("images/inventoryimages/sora2armor.xml")

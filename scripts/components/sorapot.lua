@@ -673,6 +673,8 @@ function com:GetSoraPotRec(slots)
     local topr = {}
     ings.names.sora_pot_need = 0
     for k, v in pairs(sorafoods) do
+        --print(v.name,v.test,fastdump(ings),fastdump(data))
+        v.SetSoraExtData (data)
         if v.priority >= topp and v.test(self.inst.prefab, ings.names, ings.tags, data) then
             if v.priority > topp then
                 topp = v.priority
@@ -680,6 +682,7 @@ function com:GetSoraPotRec(slots)
             end
             topr[v.name] = v.weight
         end
+        v.SetSoraExtData (nil)
     end
     if next(topr) then
         local recs = WList()
@@ -716,12 +719,13 @@ function com:GetPotRec(slots)
         return nil
     end
     local recname = cooking.CalculateRecipe("portablecookpot", data.prefablist)
-
+    --print(fastdump(data))
     if recname then
         if recname:match("wetgoop") then
             return nil
         end
         local rec = cooking.GetRecipe("portablecookpot", recname)
+        --print(fastdump(rec))
         return rec
     end
     return nil

@@ -3,7 +3,27 @@ local name = "sora_tqy"
 local boxname = "sora_tqy_box"
 SoraAPI.MakeAssetTable(name, assets)
 SoraAPI.MakeAssetTable(boxname, assets)
-
+local function  ForceReturnToOwner(inst,catcher)
+    if not (catcher and catcher.components.inventory )then 
+        return 
+    end
+    local data = inst:GetSaveRecord()
+    local instb = SpawnSaveRecord(data)
+    inst:Remove()
+    print("ForceReturnToOwner",inst,catcher)
+    if catcher.components.inventory.isopen then
+        local equip = catcher.components.inventory:GetEquippedItem(inst.components.equippable.equipslot)
+        if not equip then
+            catcher.components.inventory:GiveItem(instb)
+            catcher.components.inventory:Equip(instb)
+        elseif equip and equip:HasTag("sora_tqy_box") and not equip.components.container:IsFull() then
+            equip.components.container:GiveItem(instb)
+        else
+            catcher.components.inventory:GiveItem(instb)
+        end
+        catcher:PushEvent("catch")
+    end
+end
 local function OnEquip(inst, owner)
     local skin = inst.skinname
     if skin ~= nil then
@@ -32,15 +52,14 @@ local function TryGiveSelfToOwner(inst)
         local owner = inst.components.inventoryitem:GetGrandOwner()
         local powner = inst.entity:GetParent()
         if not owner and powner then
-            powner:RemoveChild(inst)
-            inst.components.inventoryitem:OnRemoved()
             inst.components.projectile:Catch(inst.delayowner)
             return true
         elseif owner == inst.delayowner then
             ApplyCheckFn(inst, true)
+            return true
         elseif owner ~= inst.delayowner then
-            inst.components.inventoryitem:OnRemoved()
             inst.components.projectile:Catch(inst.delayowner)
+            return true
         end
     end
 end
@@ -51,6 +70,8 @@ function ApplyCheckFn(inst, Cancel)
     end
     if not Cancel then
         inst.CheckGoToTask = inst:DoPeriodicTask(10, TryGiveSelfToOwner)
+    else
+        inst.delayowner = nil
     end
 end
 local function OnThrown(inst, owner, target)
@@ -73,6 +94,8 @@ end
 local function OnCaught(inst, catcher)
     ApplyCheckFn(inst, true)
     inst.components.inventoryitem.canbepickedup = true
+    inst.components.inventoryitem:RemoveFromOwner()
+    inst.delayowner = nil
     if catcher ~= nil and catcher.components.inventory ~= nil and catcher.components.inventory.isopen then
         local equip = catcher.components.inventory:GetEquippedItem(inst.components.equippable.equipslot)
         if not equip then
@@ -87,6 +110,7 @@ local function OnCaught(inst, catcher)
     end
 end
 local function OnEntitySleep(inst)
+    print("OnEntitySleep",inst)
     if not TryGiveSelfToOwner(inst) then
         if inst.components.projectile.target and inst.delayowner and inst.delayowner:IsValid() then
             inst.components.projectile:Catch(inst.delayowner)
@@ -415,7 +439,7 @@ local function boxfn()
     return inst
 end
 SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. name .. ".xml", name)
-SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. boxname .. ".xml", boxname)
+SoraAPI.MakeItemSkinDefaultImage(boxname, "images/inventoryimages/" .. boxname .. ".xml", boxname)
 
 local function MakeSkin(skinskin, skinname, free)
     local skin = name .. "_" .. skinskin
