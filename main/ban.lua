@@ -139,10 +139,19 @@ local function CheckMoGu()
         end)
     end
 end
+
+local function CheckYou()
+    if IsModEnable("3283650699") or IsModEnable("2199027653598545827") then
+        (ThePlayer or TheWorld):DoTaskInTime(1,function()
+             SoraPushPopupDialog("小穹的温馨提示","您使用的\"悠\"MOD和本mod存在已知冲突,请关闭任一mod后游玩\n","退出游戏",function() DoRestart(true) end)
+        end)
+    end
+end
 local function CheckNamePostInit(self)
     ThePlayer:DoTaskInTime(1,CheckName)
     ThePlayer:DoTaskInTime(1,CheckMod)
     ThePlayer:DoTaskInTime(2,Fuckjhbj)
+    ThePlayer:DoTaskInTime(3,CheckYou)
     ThePlayer:DoTaskInTime(4,CheckMoGu)
     --ThePlayer:DoTaskInTime(2,FuckGemCore)
 end

@@ -10,7 +10,6 @@ local function  ForceReturnToOwner(inst,catcher)
     local data = inst:GetSaveRecord()
     local instb = SpawnSaveRecord(data)
     inst:Remove()
-    print("ForceReturnToOwner",inst,catcher)
     if catcher.components.inventory.isopen then
         local equip = catcher.components.inventory:GetEquippedItem(inst.components.equippable.equipslot)
         if not equip then
@@ -25,6 +24,9 @@ local function  ForceReturnToOwner(inst,catcher)
     end
 end
 local function OnEquip(inst, owner)
+    if inst.skinEquipFn then 
+        return 
+    end
     local skin = inst.skinname
     if skin ~= nil then
         owner.AnimState:OverrideSymbol("swap_object", skin, "swap")
@@ -36,6 +38,9 @@ local function OnEquip(inst, owner)
     owner.AnimState:Hide("ARM_normal")
 end
 local function OnUnequip(inst, owner)
+    if inst.skinEquipFn then 
+        return 
+    end
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 end
@@ -110,7 +115,6 @@ local function OnCaught(inst, catcher)
     end
 end
 local function OnEntitySleep(inst)
-    print("OnEntitySleep",inst)
     if not TryGiveSelfToOwner(inst) then
         if inst.components.projectile.target and inst.delayowner and inst.delayowner:IsValid() then
             inst.components.projectile:Catch(inst.delayowner)
@@ -281,7 +285,6 @@ local function fn()
     local swap_data = {
         sym_build = "base"
     }
-    MakeInventoryFloatable(inst, "small", 0.18, {0.8, 0.9, 0.8}, true, -6, swap_data)
 
     inst.entity:SetPristine()
 
@@ -346,6 +349,24 @@ local function BoxUpdateAnim(inst)
         end
     end
 end
+local function TryEquipTQY(item,owner)
+    if not item.components.equippable.onequipfn then 
+        return 
+    end
+    item.skinEquipFn = true 
+    item.components.equippable.onequipfn(item,owner,false)
+    item.skinEquipFn = false
+end
+
+local function TryUnEquipTQY(item,owner)
+    if not item.components.equippable.onunequipfn then 
+        return 
+    end
+    item.skinEquipFn = true 
+    item.components.equippable.onunequipfn(item,owner,false)
+    item.skinEquipFn = false
+end
+
 local function OnBoxEquip(inst, owner)
     inst.components.container:Open(owner)
     inst.last = {}
@@ -353,6 +374,12 @@ local function OnBoxEquip(inst, owner)
     BoxUpdateAnim(inst, owner)
     inst:ListenForEvent("itemget", BoxUpdateAnim)
     inst:ListenForEvent("itemlose", BoxUpdateAnim)
+    -- for i=1,5 do 
+    --     local item = inst.components.container:GetItemInSlot(i)
+    --     if item and item:HasTag("sora_tqy") then 
+    --         TryEquipTQY(item,owner)
+    --     end
+    -- end
 end
 
 local function OnBoxUnequip(inst, owner)
@@ -363,7 +390,34 @@ local function OnBoxUnequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
     inst.owner = nil
+    -- for i=1,5 do 
+    --     local item = inst.components.container:GetItemInSlot(i)
+    --     if item and item:HasTag("sora_tqy") then 
+    --         TryUnEquipTQY(item,owner)
+    --     end
+    -- end
 end
+local function OnItemGet(inst, data)
+    local owner = inst.components.inventoryitem:GetGrandOwner()
+    if not (owner and owner:HasTag("player")) then 
+        return 
+    end
+    if not (data and data.item and data.item:HasTag("sora_tqy")) then 
+        return 
+    end
+    TryEquipTQY(data.item,owner)
+end
+local function OnItemLose(inst, data)
+    local owner = inst.components.inventoryitem:GetGrandOwner()
+    if not (owner and owner:HasTag("player")) then 
+        return 
+    end
+    if not (data and data.prev_item and data.prev_item:HasTag("sora_tqy")) then 
+        return 
+    end
+    TryUnEquipTQY(data.prev_item,owner)
+end
+
 
 local function boxfn()
     local inst = CreateEntity()
@@ -381,11 +435,7 @@ local function boxfn()
     -- inst.AnimState:SetRayTestOnBB(true)
     inst:AddTag("sora_tqy_box")
 
-    local swap_data = {
-        sym_build = "box"
-    }
-    MakeInventoryFloatable(inst, "small", 0.18, {0.8, 0.9, 0.8}, true, -6, swap_data)
-
+ 
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then
@@ -398,6 +448,9 @@ local function boxfn()
     inst.components.weapon.CanRangedAttack = function()
         return true
     end
+    -- inst:ListenForEvent("itemget", OnItemGet)
+    -- inst:ListenForEvent("itemlose", OnItemLose)
+
     inst.components.weapon.LaunchProjectile = function(s, attacker, target)
         if inst.components.container:IsEmpty() then
             return

@@ -314,6 +314,19 @@ function com:UpdateSubSoraPot(k, data)
     d.time = math.clamp(d.time + 1, 0, d.timeneed)
     if d.time >= d.timeneed and d.power >= d.powerneed then
         -- 条件满足 尝试寻找输出点
+        local rec, uses = self:GetSoraPotRec(data[1])
+        if not (rec and (rec.name == d.rec.name)) then
+            d.lastwork = 3
+            d.time = 0
+            d.power = 0
+            if d.rec.JustOnce then
+                -- 强制清空重新计算
+                d.items = {}
+                d.disable = true
+                d.rec = nil
+            end
+            return
+        end
         if outitem then
             local stack = outitem.components.stackable
             stack:SetStackSize(stack.stacksize + num)
@@ -326,15 +339,18 @@ function com:UpdateSubSoraPot(k, data)
             self.con:GiveItem(item, outslot)
             self:SaveExp(item.prefab, true, 20)
         end
-        local data = {items={},rec=d.rec}
+        local data = {
+            items = {},
+            rec = d.rec
+        }
         for index, inslot in pairs(d.useitem) do
             local initem = self.con:GetItemInSlot(inslot)
-            table.insert(data.items,initem)
+            table.insert(data.items, initem)
         end
-        if d.rec.OnCook then 
-            d.rec.OnCook(self.inst,self:GetDoer(),data)
+        if d.rec.OnCook then
+            d.rec.OnCook(self.inst, self:GetDoer(), data)
         end
-        for inde,initem in pairs(data.items) do
+        for inde, initem in pairs(data.items) do
             if initem then
                 if initem.components.stackable then
                     initem.components.stackable:Get(1):Remove()
@@ -344,10 +360,17 @@ function com:UpdateSubSoraPot(k, data)
             end
         end
         self:SaveExp("stewer", false, 10 * num)
+
         -- 输出成功 重置计数
         d.lastwork = 3
         d.time = 0
         d.power = 0
+        if d.rec.JustOnce then
+            -- 强制清空重新计算
+            d.items = {}
+            d.disable = true
+            d.rec = nil
+        end
     end
 end
 
@@ -673,8 +696,8 @@ function com:GetSoraPotRec(slots)
     local topr = {}
     ings.names.sora_pot_need = 0
     for k, v in pairs(sorafoods) do
-        --print(v.name,v.test,fastdump(ings),fastdump(data))
-        v.SetSoraExtData (data)
+        -- print(v.name,v.test,fastdump(ings),fastdump(data))
+        v.SetSoraExtData(data)
         if v.priority >= topp and v.test(self.inst.prefab, ings.names, ings.tags, data) then
             if v.priority > topp then
                 topp = v.priority
@@ -682,7 +705,7 @@ function com:GetSoraPotRec(slots)
             end
             topr[v.name] = v.weight
         end
-        v.SetSoraExtData (nil)
+        v.SetSoraExtData(nil)
     end
     if next(topr) then
         local recs = WList()
@@ -695,6 +718,7 @@ function com:GetSoraPotRec(slots)
         if rec.speuse then
             use = rec.speuse(data, data.items, alluse)
         end
+        -- print( rec, rec.alluse and alluse or use)
         return rec, rec.alluse and alluse or use
     end
     return nil
@@ -719,13 +743,13 @@ function com:GetPotRec(slots)
         return nil
     end
     local recname = cooking.CalculateRecipe("portablecookpot", data.prefablist)
-    --print(fastdump(data))
+    -- print(recname,fastdump(data))
     if recname then
         if recname:match("wetgoop") then
             return nil
         end
         local rec = cooking.GetRecipe("portablecookpot", recname)
-        --print(fastdump(rec))
+        -- print(fastdump(rec))
         return rec
     end
     return nil
@@ -813,7 +837,7 @@ function com:UpdateDry()
                             local item = SpawnPrefab(data.product)
                             self.con:GiveItem(item, outslot)
                         end
-                        
+
                         self:SaveExp(data.product, true, 20)
                         self:SaveExp('dryer', false, 10)
                         if initem.components.stackable then

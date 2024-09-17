@@ -547,6 +547,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         test = function(cooker, names, tags)
             return true
         end,
+        JustOnce=true,
         soraexttest = function(cooker, names, tags,data)
             if not data then 
                 return false
@@ -639,7 +640,7 @@ for k, v in pairs(foods) do
         local oldtest = v.test
         v.test = function(cooker, names, tags, data, ...)
             if not names.sora_pot_need then
-                return
+                return false
             end
             if not data then 
                 data = v.tempextdata

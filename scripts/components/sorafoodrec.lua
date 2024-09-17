@@ -35,9 +35,11 @@ local com = Class(function(self, inst)
 end)
 function com:CanCook(data)
     local i = 0
+    local tempuse = {}
     for k, v in pairs(data.items) do
-        if v:IsValid() and not v:HasTag("spicedfood") and not v.prefab:match("_spice_") and not self.hasuse[v.prefab] then
+        if v:IsValid() and v:HasTag("preparedfood") and not v:HasTag("spicedfood") and not v.prefab:match("_spice_") and not self.hasuse[v.prefab] and not tempuse[v.prefab] then
             i = i + 1
+            tempuse[v.prefab] = 1
         end
     end
     return i == 4
