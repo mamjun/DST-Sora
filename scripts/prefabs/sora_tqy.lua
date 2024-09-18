@@ -493,7 +493,10 @@ local function boxfn()
 end
 SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. name .. ".xml", name)
 SoraAPI.MakeItemSkinDefaultImage(boxname, "images/inventoryimages/" .. boxname .. ".xml", boxname)
-
+SoraAPI.MakeItemSkinDefaultData(name, {"images/inventoryimages/"..name..".xml", name},
+    {name, name,'idle',true})
+SoraAPI.MakeItemSkinDefaultData(boxname, {"images/inventoryimages/"..boxname..".xml", boxname},
+    {boxname, boxname,'idle_item',true})
 local function MakeSkin(skinskin, skinname, free)
     local skin = name .. "_" .. skinskin
     SoraAPI.MakeAssetTable(skin, assets)
@@ -503,8 +506,6 @@ local function MakeSkin(skinskin, skinname, free)
         image = skin,
         build = skin,
         bank = name,
-        basebuild = name,
-        basebank = name,
         checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
         checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
     })
@@ -520,8 +521,6 @@ local function MakeBoxSkin(skinskin, skinname, free)
         image = skin,
         build = skin,
         bank = boxname,
-        basebuild = boxname,
-        basebank = boxname,
         checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
         checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
     })

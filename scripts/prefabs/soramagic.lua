@@ -288,15 +288,13 @@ local function fn()
     
     return inst
 end
-SoraAPI.MakeItemSkinDefaultImage("soramagic","images/inventoryimages/soramagic.xml","soramagic")
+SoraAPI.MakeItemSkinDefaultData("soramagic", {}, {})
 SoraAPI.MakeItemSkin("soramagic", "soramagic_sby", {
     name = "永恒水兵月",
     atlas = "images/inventoryimages/soramagic_sby.xml",
     image = "soramagic_sby",
     build = "soramagic_sby",
     bank = "soramagic_sby",
-    basebuild = "soramagic",
-    basebank = "soramagic",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
 	init_fn = function(inst)

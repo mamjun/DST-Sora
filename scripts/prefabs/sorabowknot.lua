@@ -398,15 +398,13 @@ local function packfn()
 
     return inst
 end
-SoraAPI.MakeItemSkinDefaultImage("sora2pack", "images/inventoryimages/sora2pack.xml", "sora2pack")
+SoraAPI.MakeItemSkinDefaultData("sora2pack", {}, {"sora2pack","sora2pack_1"})
 SoraAPI.MakeItemSkin("sora2pack", "sora2pack_2", {
     name = "穹の打包纸",
     atlas = "images/inventoryimages/sora2pack_2.xml",
     image = "sora2pack_2",
     build = "sora2pack",
     bank = "sora2pack_2",
-    basebuild = "sora2pack",
-    basebank = "sora2pack_1",
     init_fn = function(inst)
         inst.link_skin = "sorapacker_2"
     end,
@@ -470,15 +468,14 @@ local function fullfn()
     return inst
 end
 
-SoraAPI.MakeItemSkinDefaultImage("sorapacker", "images/inventoryimages/sora3pack.xml", "sora3pack")
+
+SoraAPI.MakeItemSkinDefaultData("sorapacker", {"images/inventoryimages/sora3pack.xml", "sora3pack"}, {"sora3pack","sora3pack_1"})
 SoraAPI.MakeItemSkin("sorapacker", "sorapacker_2", {
     name = "打包的礼物",
     atlas = "images/inventoryimages/sora3pack_2.xml",
     image = "sora3pack_2",
     build = "sora3pack",
     bank = "sora3pack_2",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     init_fn = function(inst)
     end
 })
@@ -488,8 +485,6 @@ SoraAPI.MakeItemSkin("sorapacker", "sorapacker_ld", {
     image = "sora3pack_ld",
     build = "sora3pack_ld",
     bank = "sora3pack_ld",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -502,8 +497,6 @@ SoraAPI.MakeItemSkin("sorapacker", "sorapacker_dw", {
     image = "sora3pack_dw",
     build = "sora3pack_dw",
     bank = "sora3pack_dw",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -515,8 +508,6 @@ SoraAPI.MakeItemSkin("sorapacker", "sorapacker_dw_tmp", {
     image = "sora3pack_dw",
     build = "sora3pack_dw",
     bank = "sora3pack_dw",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     rarity = "限时体验",
     rarityorder = 80,
     raritycorlor = {0.957, 0.769, 0.188, 1},
@@ -532,8 +523,6 @@ SoraAPI.MakeItemSkin("sorapacker", "sorapacker_sby", {
     image = "sora3pack_sby",
     build = "sora3pack_sby",
     bank = "sora3pack_sby",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -696,15 +685,14 @@ local function full3fn()
     return inst
 end
 
-SoraAPI.MakeItemSkinDefaultImage("sora3packer", "images/inventoryimages/sora3pack.xml", "sora3pack")
+SoraAPI.MakeItemSkinDefaultData("sora3packer", {"images/inventoryimages/sora3pack.xml", "sora3pack"},{"sora3pack","sora3pack_1"})
+
 SoraAPI.MakeItemSkin("sora3packer", "sora3packer_2", {
     name = "穹の打包纸",
     atlas = "images/inventoryimages/sora3pack_2.xml",
     image = "sora3pack_2",
     build = "sora3pack",
     bank = "sora3pack_2",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     init_fn = function(inst)
     end
 })
@@ -715,8 +703,6 @@ SoraAPI.MakeItemSkin("sora3packer", "sora3packer_ld", {
     image = "sora3pack_ld",
     build = "sora3pack_ld",
     bank = "sora3pack_ld",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -729,8 +715,6 @@ SoraAPI.MakeItemSkin("sora3packer", "sora3packer_dw", {
     image = "sora3pack_dw",
     build = "sora3pack_dw",
     bank = "sora3pack_dw",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -742,8 +726,6 @@ SoraAPI.MakeItemSkin("sora3packer", "sora3packer_dw_tmp", {
     image = "sora3pack_dw",
     build = "sora3pack_dw",
     bank = "sora3pack_dw",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     rarity = "限时体验",
@@ -759,8 +741,6 @@ SoraAPI.MakeItemSkin("sora3packer", "sora3packer_sby", {
     image = "sora3pack_sby",
     build = "sora3pack_sby",
     bank = "sora3pack_sby",
-    basebuild = "sora3pack",
-    basebank = "sora3pack_1",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -789,15 +769,13 @@ local function pack3fn()
     return inst
 end
 
-SoraAPI.MakeItemSkinDefaultImage("sorabowknot", "images/inventoryimages/sorabowknot.xml", "sorabowknot")
+SoraAPI.MakeItemSkinDefaultData("sorabowknot", {}, {})
 SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_sora", {
     name = "穹の勋章",
     atlas = "images/inventoryimages/sorabowknot_sora.xml",
     image = "sorabowknot_sora",
     build = "sorabowknot_sora",
     bank = "sorabowknot_sora",
-    basebuild = "sorabowknot",
-    basebank = "sorabowknot",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -807,8 +785,6 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_sby", {
     image = "sorabowknot_sby",
     build = "sorabowknot_sby",
     bank = "sorabowknot_sby",
-    basebuild = "sorabowknot",
-    basebank = "sorabowknot",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -818,8 +794,6 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_ld", {
     image = "sorabowknot_ld",
     build = "sorabowknot_ld",
     bank = "sorabowknot_ld",
-    basebuild = "sorabowknot",
-    basebank = "sorabowknot",
     init_fn = function(inst)
         if inst.vfx_fx then
             inst.vfx_fx:Remove()
@@ -848,8 +822,6 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_dw", {
     image = "sorabowknot_dw",
     build = "sorabowknot_dw",
     bank = "sorabowknot_dw",
-    basebuild = "sorabowknot",
-    basebank = "sorabowknot",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -860,8 +832,7 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_dw_tmp", {
     image = "sorabowknot_dw",
     build = "sorabowknot_dw",
     bank = "sorabowknot_dw",
-    basebuild = "sorabowknot",
-    basebank = "sorabowknot",
+
     rarity = "限时体验",
     rarityorder = 80,
     raritycorlor = {0.957, 0.769, 0.188, 1},

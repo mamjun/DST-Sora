@@ -246,15 +246,14 @@ local function armorfn()
 
     return inst
 end
-
+SoraAPI.MakeItemSkinDefaultData("sora2hat", {}, {})
+SoraAPI.MakeItemSkinDefaultData("sora2armor", {}, {})
 SoraAPI.MakeItemSkin("sora2hat","sora2hatskin",{
             name = "sdl,awsl",
             atlas = "images/inventoryimages/sora2hatskin.xml",
             image = "sora2hatskin",
             build = "sora2hatskin",
             bank =  "sora2hatskin",
-            basebuild = "sora2hat",
-            basebank =  "sora2hat",
         })
 SoraAPI.MakeItemSkin("sora2armor","sora2armorskin",{
             name = "sdl,awsl",
@@ -262,11 +261,8 @@ SoraAPI.MakeItemSkin("sora2armor","sora2armorskin",{
             image = "sora2armorskin",
             build = "sora2armorskin",
             bank =  "sora2armorskin",
-            basebuild = "sora2armor",
-            basebank =  "sora2armor",
         })
-SoraAPI.MakeItemSkinDefaultImage("sora2hat","images/inventoryimages/sora2hat.xml","sora2hat")
-SoraAPI.MakeItemSkinDefaultImage("sora2armor","images/inventoryimages/sora2armor.xml","sora2armor")
+
 RegisterInventoryItemAtlas("images/inventoryimages/sora2hat.xml","sora2hat.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/sora2armor.xml","sora2armor.tex")
 

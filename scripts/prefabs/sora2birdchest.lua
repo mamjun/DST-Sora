@@ -114,7 +114,7 @@ end
 RegisterInventoryItemAtlas("images/inventoryimages/sora2birdchest.xml", "sora2birdchest.tex")
 SoraAPI.MakeItemSkinDefaultImage("sora2birdchest", GetInventoryItemAtlas("sora2birdchest.tex"), "sora2birdchest")
 STRINGS.NAMES.SORA2BIRDCHEST = "咯咯哒"
-
+SoraAPI.MakeItemSkinDefaultData("sora2birdchest", {}, {})
 local tname = "sora2birdchest_ggd"
 SoraAPI.MakeItemSkin("sora2birdchest", tname, {
 
@@ -123,8 +123,6 @@ SoraAPI.MakeItemSkin("sora2birdchest", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "sora2birdchest",
-    basebank = "sora2birdchest",
     init_fn = function(inst)
     end,
 

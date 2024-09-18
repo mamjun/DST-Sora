@@ -74,6 +74,12 @@ local function fn()
 
     return inst
 end
+SoraAPI.MakeItemSkinDefaultData(name, {"images/inventoryimages/"..name..".xml", name},
+    {name, name,'idle',true})
+
+
+
+
 
 RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. ".xml", name .. ".tex")
 local function MakeSkin(skinskin, skinname,free)
@@ -85,8 +91,6 @@ local function MakeSkin(skinskin, skinname,free)
         image = skin,
         build = skin,
         bank = skin,
-        basebuild = name,
-        basebank = name,
         checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
         checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
     })

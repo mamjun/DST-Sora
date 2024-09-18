@@ -149,6 +149,7 @@ local function fn()
 
     return inst
 end
+SoraAPI.MakeItemSkinDefaultData("sora2ice", {}, {})
 for k, v in pairs({"flower", "seed"}) do
     local tname = "sora2ice_".. v
     SoraAPI.MakeItemSkin("sora2ice",tname, {
@@ -158,8 +159,6 @@ for k, v in pairs({"flower", "seed"}) do
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2ice",
-        basebank =  "sora2ice",
         init_fn = function(inst)
         end,
 
@@ -176,8 +175,7 @@ local tname = "sora2ice_bhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2ice",
-        basebank =  "sora2ice",
+
         init_fn = function(inst)
         end,
 

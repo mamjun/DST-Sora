@@ -659,6 +659,7 @@ local items = {
 	--{0.7,"medium","中"},
 	{1,"big","大"},
 }
+SoraAPI.MakeItemSkinDefaultData("sora_base", {}, {})
 for k,v in pairs(items) do
 	local name = "sora2base_"..v[2]
 SoraAPI.MakeItemSkin("sora2base", name, {
@@ -667,8 +668,6 @@ SoraAPI.MakeItemSkin("sora2base", name, {
 	image = "sora2base",
 	build = "sora2base",
 	bank = "sora2base",
-	basebuild = "sora2base",
-	basebank = "sora2base",
 	init_fn = function(inst)
 		inst.AnimState:SetScale(v[1],v[1],v[1])
 		ResetLightPos(inst)

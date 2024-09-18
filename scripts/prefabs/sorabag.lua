@@ -382,15 +382,13 @@ end
 end
 ]] --
 
-SoraAPI.MakeItemSkinDefaultImage("sorabag", "images/inventoryimages/sorabag.xml", "sorabag")
+SoraAPI.MakeItemSkinDefaultData("sorabag", {}, {})
 SoraAPI.MakeItemSkin("sorabag", "sorabag_sd", {
     name = "圣诞双子",
     atlas = "images/inventoryimages/sorabag_sd.xml",
     image = "sorabag_sd",
     build = "sorabag_sd",
     bank = "sorabag_sd",
-    basebuild = "sorabag",
-    basebank = "sorabag",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -400,8 +398,6 @@ SoraAPI.MakeItemSkin("sorabag", "sorabag_sdl", {
     image = "sorabag_sdl",
     build = "sorabag_sdl",
     bank = "sorabag_sdl",
-    basebuild = "sorabag",
-    basebank = "sorabag",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -412,8 +408,6 @@ SoraAPI.MakeItemSkin("sorabag", "sorabag_sd_tmp", {
     image = "sorabag_sd",
     build = "sorabag_sd",
     bank = "sorabag_sd",
-    basebuild = "sorabag",
-    basebank = "sorabag",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -424,8 +418,6 @@ SoraAPI.MakeItemSkin("sorabag", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "sorabag",
-    basebank = "sorabag",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

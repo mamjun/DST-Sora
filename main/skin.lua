@@ -930,7 +930,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
     AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗")
-    AddItemSkin("sora_yingyu", "跟我一起学'樱语'")
+    AddItemSkin("sora_yingyu", "跟我一起学'樱语'",
+    nil, true)
     AddItemSkin("sora_dieyu",
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)

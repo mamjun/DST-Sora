@@ -316,8 +316,8 @@ end
 local dbhandles = {}
 local sid = TheShard:GetShardId() -- 自身ID
 local mid = sid == "0" and "0" or SHARDID.MASTER -- 主世界ID
-if GetModConfigData("mid") ~= "1" then 
-    mid = GetModConfigData("mid") 
+if GetModConfigData("mid") ~= "1" then
+    mid = GetModConfigData("mid")
 end
 local ismaster = TheShard:IsMaster() or mid == "0"
 -- print("AddShardModRPCHandler",AddShardModRPCHandler,env,AddShardModRPCHandler,GLOBAL.AddShardModRPCHandler)
@@ -881,10 +881,20 @@ end
 
 local MaindbUpdataTask -- 自动同步用的周期任务
 local MainConnect = false
-
+local MainWait = 0
 local function MaindbUpdataFn()
 
     local MConnect = Shard_IsWorldAvailable(mid)
+    if not MConnect then
+        MainWait = MainWait + 1
+        if MainWait >= 180 then
+            if MainWait % 10 == 0 then
+                TheNet:Announce("小穹:数据核心连接失败,请检查配置")
+            end
+        end
+    else
+        MainWait = 0
+    end
     if not MainConnect and MConnect then
         -- 连接上主世界了 同步一次
         for k, db in pairs(dbhandles) do
@@ -928,6 +938,7 @@ AddSimPostInit(function(inst)
     if not mid == sid then -- 主世界不需要去同步
         MaindbUpdataTask = TheWorld:DoPeriodicTask(1, MaindbUpdataFn)
     end
+
 end)
 
 function CreateMainDB(namespace, syntime, roottime)

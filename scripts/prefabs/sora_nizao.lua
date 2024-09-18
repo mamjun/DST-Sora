@@ -692,7 +692,7 @@ local function pearlfn()
     end)
     return inst
 end
-SoraAPI.MakeItemSkinDefaultImage("sora_pearl", GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl")
+SoraAPI.MakeItemSkinDefaultData("sora_pearl", {GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl"}, {"hermit_pearl","hermit_pearl"})
 local tname = "sora_pearl_pd"
 SoraAPI.MakeItemSkin("sora_pearl", tname, {
     name = "胖丁",
@@ -700,8 +700,6 @@ SoraAPI.MakeItemSkin("sora_pearl", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "hermit_pearl",
-    basebank = "hermit_pearl",
     init_fn = function(inst)
     end,
     checkfn = SoraAPI.SoraSkinCheckFn,
@@ -714,8 +712,6 @@ SoraAPI.MakeItemSkin("sora_pearl", tname .. "_tmp", {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "hermit_pearl",
-    basebank = "hermit_pearl",
     init_fn = function(inst)
     end,
 
@@ -734,8 +730,6 @@ SoraAPI.MakeItemSkin("sora_pearl", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "hermit_pearl",
-    basebank = "hermit_pearl",
     init_fn = function(inst)
     end,
     checkfn = SoraAPI.SoraSkinCheckFn,

@@ -218,6 +218,7 @@ local function fn()
     return inst
 end
 RegisterInventoryItemAtlas("images/inventoryimages/sora_wq.xml", "sora_wq.tex")
+SoraAPI.MakeItemSkinDefaultData("sora_wq", {}, {})
 
 SoraAPI.MakeAssetTable("sora_wq_bbj",assets)
 SoraAPI.MakeItemSkin("sora_wq","sora_wq_bbj",{
@@ -226,8 +227,6 @@ SoraAPI.MakeItemSkin("sora_wq","sora_wq_bbj",{
 	image = "sora_wq_bbj",
 	build = "sora_wq_bbj",
 	bank = "sora_wq_bbj",
-	basebuild = "sora_wq",
-	basebank = "sora_wq",
 	checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

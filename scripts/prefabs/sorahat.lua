@@ -273,15 +273,13 @@ local function fn()
     return inst
 end
 RegisterInventoryItemAtlas("images/inventoryimages/sorahat.xml","sorahat.tex")
-SoraAPI.MakeItemSkinDefaultImage("sorahat", "images/inventoryimages/sorahat.xml", "sorahat")
+SoraAPI.MakeItemSkinDefaultData("sorahat", {}, {})
 SoraAPI.MakeItemSkin("sorahat", "sorahat_sd", {
     name = "圣诞发卡",
     atlas = "images/inventoryimages/sorahat_sd.xml",
     image = "sorahat_sd",
     build = "sorahat_sd",
     bank = "sorahat_sd",
-    basebuild = "sorahat",
-    basebank = "sorahat",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
@@ -294,8 +292,6 @@ SoraAPI.MakeItemSkin("sorahat", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "sorahat",
-    basebank = "sorahat",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

@@ -28,7 +28,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.09
+-- verion = 1.12
+-- v1.12 新增 MakeItemSkinDefaultData 和 GetItemSkinDefaultData 准备弃用 basebuild basebank baseanim等重复设置
 -- v1.11 新增 animloop 和 baseanimloop
 -- v1.10 更新 atlas 和 image直接注册到Prefab 方便调用
 --       增加 GetSkinBase  获取皮肤对应的基础prefab
@@ -54,15 +55,32 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         init_fn = function()  print("dress_init") end,
         clear_fn = function() print("dress_clear") end,
     })
-    MakeItemSkinDefaultImage("cookpot","images/inventoryimages/sora2sword.xml","sora2sword")    --设置默认皮肤的制作栏贴图
+    MakeItemSkinDefaultImage("cookpot","images/inventoryimages/sora2sword.xml","sora2sword")    --设置默认皮肤的制作栏贴图-弃用
+    MakeItemSkinDefaultData("cookpot",
+        {atlas="images/inventoryimages/sora2sword.xml",image="sora2sword"},
+        {bank="cookpot",build="cookpot",anim="idle",animloop=false},
+        {temp="111"})
+    或者 
+    MakeItemSkinDefaultData(name, {},   --默认图标为 "images/inventoryimages/"..name..".xml",image=name
+    {nil,nil,'idle',true})              --默认动画为 bank=name,build=name,anim='idle' 循环播放
+     或者 
+    MakeItemSkinDefaultData(name, {},{})    
+    --默认图标为 "images/inventoryimages/"..name..".xml",image=name  
+    --默认动画为 bank=name,build=name 不改变动作
+
+
+    MakeItemSkinDefaultData("cookpot",
+        {"images/inventoryimages/sora2sword.xml","sora2sword"},
+        {"cookpot","cookpot","idle",false},
+        {temp="111"})
     MakeItemSkin("cookpot","cookpot_portable",{
         name = "便携锅",
         atlas = "images/inventoryimages1.xml",
         image = "portablecookpot_item",
         build = "portable_cook_pot",
         bank = "portable_cook_pot",
-        basebuild = "cook_pot",
-        basebank = "cook_pot",
+        basebuild = "cook_pot",     --弃用
+        basebank = "cook_pot",      --弃用
     })
     GetSkin("sora_dress")
     如果需要在prefab里调用
@@ -135,7 +153,7 @@ function MakeCharacterSkin(base, skinname, data)
     if not STRINGS.UI.RARITY[data.rarity] then
         STRINGS.UI.RARITY[data.rarity] = data.rarity
         SKIN_RARITY_COLORS[data.rarity] = data.raritycorlor or {0.635, 0.769, 0.435, 1}
-        RARITY_ORDER[data.rarity] = data.rarityorder or -default_release_group 
+        RARITY_ORDER[data.rarity] = data.rarityorder or -default_release_group
         if data.FrameSymbol then
             FrameSymbol[data.rarity] = data.FrameSymbol
         end
@@ -199,8 +217,40 @@ local itemskins = {}
         
         ]]
 local itembaseimage = {}
+local itembasedata = {}
 function MakeItemSkinDefaultImage(base, atlas, image)
-    itembaseimage[base] = {atlas, (image or base) .. ".tex", "default.tex"}
+    itembasedata[base] = itembasedata[base] or {}
+    itembasedata[base].itemimg = {atlas, (image or base) .. ".tex", "default.tex"}
+end
+
+function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 基础名称 
+    itembasedata[base] = itembasedata[base] or {}
+    if itemimg then
+        if itemimg.atlas then
+            itembasedata[base].itemimg = {itemimg.atlas, (itemimg.image or base) .. ".tex", "default.tex"}
+        elseif itemimg[1] then
+            itembasedata[base].itemimg = {itemimg[1], (itemimg[2] or base) .. ".tex", "default.tex"}
+        else
+            itembasedata[base].itemimg = {"images/inventoryimages/" .. base .. ".xml", base .. ".tex", "default.tex"}
+        end
+    end
+    if itemanim then
+        if itemanim.bank or itemanim.build or itemanim.anim or itemanim.animloop then
+            itembasedata[base].itemanim = {itemanim.bank or base, itemanim.build or base, itemanim.anim or "idle",
+                                           itemanim.animloop and true or false}
+        elseif itemanim[1] or itemanim[2] or itemanim[3] or itemanim[4] then
+            itembasedata[base].itemanim = {itemanim[1] or base, itemanim[2] or base, itemanim[3] or "idle",
+                                           itemanim[4] and true or false}
+        else
+            itembasedata[base].itemanim = {base,base}
+        end
+    end
+    if data then
+        itembasedata.data = data
+    end
+end
+function GetItemSkinDefaultData(base) -- 基础名称 
+    return itembasedata[base]
 end
 function MakeItemSkin(base, skinname, data)
     default_release_group = default_release_group - 1
@@ -523,7 +573,7 @@ function basic_skininit_fn(inst, skinname)
     end
     inst.AnimState:SetBuild(data.build or skinname)
     if data.anim then
-        inst.AnimState:PlayAnimation(data.anim,data.animloop or nil)
+        inst.AnimState:PlayAnimation(data.anim, data.animloop or nil)
     end
     if inst.components.inventoryitem ~= nil then
         inst.components.inventoryitem.atlasname = data.atlas or ("images/inventoryimages/" .. skinname .. ".xml")
@@ -539,17 +589,28 @@ function basic_skinclear_fn(inst, skinname) -- 默认认为 build 和prefab同�
     if not data then
         return
     end
-    if data.basebank then
-        inst.AnimState:SetBank(data.basebank)
+    local basedata = itembasedata[prefab] or {}
+    if basedata.itemanim then
+        if basedata.itemanim[1] then
+            inst.AnimState:SetBank(basedata.itemanim[1])
+        end
+        inst.AnimState:SetBuild(basedata.itemanim[2] or prefab)
+        if basedata.itemanim[3] then
+            inst.AnimState:PlayAnimation(basedata.itemanim[3], basedata.itemanim[4])
+        end
+    else
+        if data.basebank then
+            inst.AnimState:SetBank(data.basebank)
+        end
+        if data.baseanim then
+            inst.AnimState:PlayAnimation(data.baseanim, data.baseanimloop or nil)
+        end
+        inst.AnimState:SetBuild(data.basebuild or prefab)
     end
-    if data.baseanim then
-        inst.AnimState:PlayAnimation(data.baseanim,data.baseanimloop or nil)
-    end
-    inst.AnimState:SetBuild(data.basebuild or prefab)
     if inst.components.inventoryitem ~= nil then
-        if itembaseimage[prefab] then 
-            inst.components.inventoryitem.atlasname = itembaseimage[prefab][1]
-            local name = itembaseimage[prefab][2]:gsub("%.tex","")
+        if basedata.itemimg then
+            inst.components.inventoryitem.atlasname = basedata.itemimg[1]
+            local name = basedata.itemimg[2]:gsub("%.tex", "")
             inst.components.inventoryitem:ChangeImageName(name)
         else
             inst.components.inventoryitem.atlasname = GetInventoryItemAtlas(prefab .. ".tex")
@@ -656,7 +717,7 @@ if fninfo and fninfo.source and not fninfo.source:match("scripts/prefabskin%.lua
         prefab_skin.granted_items = info.granted_items
         prefab_skin.marketable = info.marketable
         prefab_skin.release_group = info.release_group or default_release_group
-        
+
         prefab_skin.linked_beard = info.linked_beard
         prefab_skin.share_bigportrait_name = info.share_bigportrait_name
         if info.torso_tuck_builds ~= nil then

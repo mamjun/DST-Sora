@@ -317,7 +317,7 @@ local function placer_help(inst)
     inst.AnimState:Hide("swap_item")
     -- body
 end
-
+SoraAPI.MakeItemSkinDefaultData("sora2chest", {}, {})
 local tname = "sora2chest_pkq"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
     name = "皮卡丘",
@@ -325,8 +325,6 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "sora2chest",
-    basebank = "sora2chest",
     init_fn = updatesign,
     clear_fn = function(inst)
         inst:DoTaskInTime(0, updatesign)
@@ -341,8 +339,6 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "sora2chest",
-    basebank = "sora2chest",
     init_fn = updatesign,
     clear_fn = function(inst)
         inst:DoTaskInTime(0, updatesign)
@@ -356,8 +352,6 @@ SoraAPI.MakeItemSkin("sora2chest", tname .. "_tmp", {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "sora2chest",
-    basebank = "sora2chest",
     init_fn = updatesign,
     clear_fn = function(inst)
         inst:DoTaskInTime(0, updatesign)
@@ -377,8 +371,6 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     image = tname,
     build = tname,
     bank = tname,
-    basebuild = "sora2chest",
-    basebank = "sora2chest",
     init_fn = updatesign,
     clear_fn = function(inst)
         inst:DoTaskInTime(0, updatesign)

@@ -251,6 +251,9 @@ PROTOTYPER_DEFS.sora_pot = {
 RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. ".xml", name .. ".tex")
 RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. "_need.xml", name .. "_need.tex")
 STRINGS.NAMES[(name .. "_need"):upper()] = "需要穹の料理锅"
+SoraAPI.MakeItemSkinDefaultData(name, {"images/inventoryimages/"..name..".xml", name},
+    {name, name})
+
 local function MakeSkin(skinskin, skinname, free)
     local skin = name .. "_" .. skinskin
     SoraAPI.MakeAssetTable(skin, assets)
@@ -260,8 +263,6 @@ local function MakeSkin(skinskin, skinname, free)
         image = skin,
         build = skin,
         bank = skin,
-        basebuild = name,
-        basebank = name,
         checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
         checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
     })

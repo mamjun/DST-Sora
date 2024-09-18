@@ -97,15 +97,13 @@ local function fn()
 	
     return inst
 end
-SoraAPI.MakeItemSkinDefaultImage("sora3sword","images/inventoryimages/sora3sword.xml","sora3sword")
+SoraAPI.MakeItemSkinDefaultData("sora3sword", {}, {})
 SoraAPI.MakeItemSkin("sora3sword","sora3swordskin",{
             name = "sdl,awsl",
             atlas = "images/inventoryimages/sora3swordskin.xml",
             image = "sora3swordskin",
             build = "sora3swordskin",
             bank = "sora3swordskin",
-            basebuild = "sora3sword",
-            basebank = "sora3sword",
         })
 RegisterInventoryItemAtlas("images/inventoryimages/sora3sword.xml","sora3sword.tex")
 SoraAPI.MakeAssetTable("sora3sword_rose",assets)
@@ -115,8 +113,6 @@ SoraAPI.MakeItemSkin("sora3sword","sora3sword_rose",{
 	image = "sora3sword_rose",
 	build = "sora3sword_rose",
 	bank = "sora3sword_rose",
-	basebuild = "sora3sword",
-	basebank = "sora3sword",
 	checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })

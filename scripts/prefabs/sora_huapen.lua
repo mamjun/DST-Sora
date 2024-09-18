@@ -41,7 +41,7 @@ end
 local function onbuilt(inst)
     inst.AnimState:PlayAnimation("plant")
     inst.AnimState:PushAnimation("idle", true)
-    if not inst.skinname then 
+    if not inst.skinname then
         inst:randomskin()
     end
 end
@@ -65,7 +65,7 @@ local function SetSkin(inst, x, y)
 end
 
 local function Onisfullmoon(inst, var)
-    --SoraAPI.CheckChestValid(inst)
+    -- SoraAPI.CheckChestValid(inst)
     if var and inst and inst.components.container then
         local item = inst.components.container:GetItemInSlot(1)
         if not (item and item:IsValid()) then
@@ -275,11 +275,12 @@ local function fn()
                 "sora_huapen_" .. math.random(1, 2) .. "_" .. math.random(1, 10), nil, nil)
         end
     end
-    --inst:DoTaskInTime(0,inst.randomskin)
+    -- inst:DoTaskInTime(0,inst.randomskin)
     return inst
 end
 
-SoraAPI.MakeItemSkinDefaultImage("sora_huapen", "images/inventoryimages/sora_huapen.xml", "sora_huapen")
+SoraAPI.MakeItemSkinDefaultData("sora_huapen", {"images/inventoryimages/sora_huapen.xml", "sora_huapen"},
+    {"sora_huapen_1_1", "sora_huapen", "idle", true})
 
 for x = 1, 2 do
     for y = 1, 10 do
@@ -293,10 +294,8 @@ for x = 1, 2 do
             image = name,
             build = "sora_huapen",
             bank = name,
-            basebuild = "sora_huapen",
-            basebank = "sora_huapen_1_1",
             init_fn = function(inst)
-            end,
+            end
         })
     end
 end

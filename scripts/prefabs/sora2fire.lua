@@ -181,6 +181,7 @@ local function fn()
 
     return inst
 end
+SoraAPI.MakeItemSkinDefaultData("sora2fire", {}, {})
 local tname = "sora2fire_xhl"
     SoraAPI.MakeItemSkin("sora2fire",tname, {
         
@@ -189,8 +190,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
@@ -204,8 +203,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
@@ -226,8 +223,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
@@ -241,8 +236,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
@@ -262,8 +255,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
@@ -277,8 +268,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
@@ -299,8 +288,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
@@ -314,8 +301,6 @@ local tname = "sora2fire_xhl"
         image = tname,
         build = tname,
         bank = tname,
-        basebuild = "sora2fire",
-        basebank =  "sora2fire",
         init_fn = function(inst)
         end,
 
