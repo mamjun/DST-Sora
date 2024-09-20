@@ -854,12 +854,12 @@ if not TheNet:IsDedicated() then
         end,
         sora_hf = function(s, item)
             local scr = CdkUnLockScreen(item)
-            scr.unlocktext:SetString("QQ群(908132556)内绑定后,游戏时长+群聊天数>150可以获取 ")
+            scr.unlocktext:SetString("QQ群(943105804)内绑定后,游戏时长+群聊天数>150可以获取 ")
             return scr
         end,
         sora_shmm = function(s, item)
             local scr = CdkUnLockScreen(item)
-            scr.unlocktext:SetString("QQ群(908132556)内绑定后,领取方法看群公告")
+            scr.unlocktext:SetString("QQ群(943105804)内绑定后,领取方法看群公告")
             return scr
         end,
         sora_llan = function(s, item)
@@ -907,12 +907,12 @@ if not TheNet:IsDedicated() then
     function AddItemSkin(item, des, time, hide)
         table.insert(ItemSkin, {item, des, time or 300, hide or false})
     end
-    AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群619059773\n领取方法看群公告")
+    AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
-    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群619059773\n领取方法看群公告")
+    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2fire_hrh",
-        "而你,我的朋友\n你才是真正的帕鲁\nQQ群619059773\n领取方法看群公告")
+        "而你,我的朋友\n你才是真正的帕鲁\nQQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!")
     AddItemSkin("sora2fire_hjl", "人家才不是伊布呢")
     AddItemSkin("sora2ice_flower", "你已被移出群聊'花开富贵'")

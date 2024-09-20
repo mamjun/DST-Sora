@@ -145,6 +145,26 @@ function com:DoTask()
             end
         end
     end
+
+    local ents = TheSim:FindEntities(pos.x, 0, pos.z, self.range, nil,
+        {"decorationitem", "FX","player", "INLIMBO", "sora_fl"}, {"oceanfishable"})
+
+    if next(ents) then
+        self.lastwork = GetTime() -- 来活了 别睡了
+        if not (self.inst.fx and self.inst.fx.sg and not self.inst.fx.sg:HasStateTag("busy") and
+            self.inst.fx.components.sleeper and not self.inst.fx.components.sleeper.isasleep) then
+            return -- 睡着了 等会吧 
+        end
+        for k, v in pairs(ents) do
+            if v and not (v.sorapickhatskip and (t - v.sorapickhatskip) < 120) then
+                if not self.picking[v] and v:IsValid() and cancatch(v) then
+                    if not self:TryToPick(v) then
+                        break
+                    end
+                end
+            end
+        end
+    end
 end
 function com:GetBirdCount() -- 获取鸟数量
     local i = 0

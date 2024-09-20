@@ -151,7 +151,7 @@ cmp_rep.GetSpecificSlotForItem = function(self, item, ...)
     end
     return GetSpecificSlotForItem(self, item, ...)
 end
-
+--继续干牛牛
 AddPrefabPostInit("babybeefalo",function (inst)
     if not inst.ShouldKeepCorpse then 
         inst.ShouldKeepCorpse = function()
