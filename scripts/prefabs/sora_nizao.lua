@@ -166,6 +166,8 @@ local function onuse(inst, doer)
         local cat = SpawnAt("sora_lightflier_cat", doer)
         if inst.skinname == "sora_lightflier_beex" then
             TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_beex", nil, nil)
+        elseif inst.skinname == "sora_lightflier_tjzz" then
+                TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_tjzz", nil, nil)
         end
         local save = inst.components.sorasavecmp:GetSave("cat")
         if save and save.data then
@@ -343,10 +345,36 @@ SoraAPI.MakeItemSkin("sora_lightflier_cat", ttname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
+local tname = "sora_lightflier_tjzz"
+SoraAPI.MakeItemSkin("sora_lightflier", tname, {
+    name = "躺截竹子",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "lightflier",
+    basebank = "lightflier",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+local ttname = "sora_lightflier_cat_tjzz"
+SoraAPI.MakeItemSkin("sora_lightflier_cat", ttname, {
+    name = "躺截竹子",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "lightflier",
+    basebank = "lightflier",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
 
 SoraAPI.MakeSkinNameMap("sora_lightflier_beex", "sora_lightflier_cat_beex")
+SoraAPI.MakeSkinNameMap("sora_lightflier_tjzz", "sora_lightflier_cat_tjzz")
 SoraAPI.MakeAssetTable("sora_lightflier_beex", lightasset)
-
+SoraAPI.MakeAssetTable("sora_lightflier_tjzz", lightasset)
 
 local assets = {Asset("ANIM", "anim/sign_home.zip"), Asset("ANIM", "anim/sora_sign_myy.zip"),
                 Asset("ANIM", "anim/ui_board_5x3.zip"), Asset("MINIMAP_IMAGE", "sign"),
