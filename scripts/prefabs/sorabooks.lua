@@ -165,7 +165,7 @@ local changelist = {
     red_cap = "green_cap",
     green_cap = "blue_cap",
     blue_cap = "moon_cap",
-    moon_cap="red_cap",
+    moon_cap = "red_cap",
     -- 烤蘑菇
     red_cap_cooked = "green_cap_cooked",
     green_cap_cooked = "blue_cap_cooked",
@@ -300,7 +300,7 @@ local changelist = {
     reeds = "monkeytail",
     ccs_sakura1 = "ccs_sakura2",
     ccs_sakura2 = "ccs_sakura3",
-    ccs_sakura3 = "ccs_sakura1",
+    ccs_sakura3 = "ccs_sakura1"
 }
 local crops = {
     asparagus = 1,
@@ -316,16 +316,51 @@ local crops = {
     watermelon = 1,
     pepper = 1,
     durian = 1,
-    carrot = 1,
+    carrot = 1
 }
-for k,v in pairs(crops) do
-    changelist[k.."_seeds"] = "seeds"
+for k, v in pairs(crops) do
+    changelist[k .. "_seeds"] = "seeds"
 end
 SORAAPI.LISTCONFIG.CHANGELIST = changelist
 local function fixCostController(self)
     self.donemoisture = true
     self.donenutrient = true
     self.donetendable = true
+end
+local RETARGET_MUST_TAGS = {"_combat", "_health"}
+local RETARGET_CANT_TAGS = {}
+local function retargetfn(inst)
+    return FindEntity(inst, TUNING.TENTACLE_ATTACK_DIST, function(guy)
+        if guy.prefab == inst.prefab then
+            return false
+        end
+        if not guy.entity:IsVisible() then
+            return false
+        end
+        if guy.components.health:IsDead() then
+            return false
+        end
+        if guy:HasTag("companion") then 
+            return false
+        end
+        if guy:HasTag("character") or guy:HasTag("epic") or guy:HasTag("monster") or guy:HasTag("animal") then
+            return true
+        end
+        if guy.components.combat.target then
+            if guy.components.combat.target:HasTag("player") then
+                return true
+            end
+            if guy.components.combat.target:HasTag("soratargetthis") then
+                return true
+            end
+            if guy.components.combat.target:HasTag("companion") then
+                return true
+            end
+            return false
+        end
+
+        return false
+    end, RETARGET_MUST_TAGS, RETARGET_CANT_TAGS)
 end
 
 local function trychange(inst)
@@ -358,7 +393,7 @@ local function trychange(inst)
         inst:Remove()
     end
     -- 需要施肥的变成不需要施肥
-    if inst.components.pickable and (inst.components.pickable.transplanted or inst.components.pickable:IsBarren())then
+    if inst.components.pickable and (inst.components.pickable.transplanted or inst.components.pickable:IsBarren()) then
         inst.components.pickable.transplanted = false
         if inst.components.pickable:IsBarren() then
             inst.components.pickable:MakeEmpty()
@@ -439,7 +474,7 @@ local function TryToRemoveTentacle(doer, inst)
     doer.tentaclesindex = (doer.tentaclesindex % 20) + 1
 end
 local function SpawnPrefabChooser(inst)
-    return inst.cage == 1 and  "seeds" or nil
+    return inst.cage == 1 and "seeds" or nil
 end
 local Magic_defs = {{
     name = "sora_magics",
@@ -472,14 +507,15 @@ local Magic_defs = {{
         local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 10, nil, {"INLIMBO"}, {"magicalbird"})
         if #ents > 100 then
             maker.components.talker:Say("周围鸟太多了")
-            local san = AllRecipes and AllRecipes.sora_birds_build_sora and AllRecipes.sora_birds_build_sora.character_ingredients[1] and
+            local san = AllRecipes and AllRecipes.sora_birds_build_sora and
+                            AllRecipes.sora_birds_build_sora.character_ingredients[1] and
                             AllRecipes.sora_birds_build_sora.character_ingredients[1].amount or 50
             maker.components.sanity:DoDelta(san)
         else
             local num = math.random(30, 50)
-            local cage = FindEntity(maker,20,function ( e)
+            local cage = FindEntity(maker, 20, function(e)
                 return e and e.prefab == "birdcage"
-            end,{"cage"})
+            end, {"cage"})
             maker:StartThread(function()
                 for k = 1, num do
                     local pos = birdspawner:GetSpawnPoint(pt)
@@ -518,7 +554,7 @@ local Magic_defs = {{
             TheWorld:PushEvent("ms_forceprecipitation", true)
         end
         if TheWorld.state.islunarhailing and TheWorld.net.components.weather then
-            local _lunarhaillevel = SoraUp.Get(TheWorld.net.components.weather.GetDebugString,"_lunarhaillevel") 
+            local _lunarhaillevel = SoraUp.Get(TheWorld.net.components.weather.GetDebugString, "_lunarhaillevel")
             if _lunarhaillevel and _lunarhaillevel.set then
                 _lunarhaillevel:set_local(0.01)
             end
@@ -617,6 +653,8 @@ local Magic_defs = {{
                     tentacle.components.combat:SetRange(TUNING.TENTACLE_ATTACK_DIST * 1.5,
                         TUNING.TENTACLE_ATTACK_DIST * 2)
                     tentacle.components.combat:SetAttackPeriod(TUNING.TENTACLE_ATTACK_PERIOD / 0.7)
+
+                    tentacle.components.combat:SetRetargetFunction(GetRandomWithVariance(2, 0.5), retargetfn)
                     tentacle.replica.combat.SoraOldIsValidTarget = tentacle.replica.combat.IsValidTarget
                     tentacle.replica.combat.IsValidTarget = function(s, t) -- 不攻击人类
                         if t and t:IsValid() and (t:HasTag("player") or t:HasTag("companion")) then

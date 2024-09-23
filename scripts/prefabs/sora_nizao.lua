@@ -405,6 +405,7 @@ local cantarget = {
     hound = 1,
     firehound = 1,
     icehound = 1,
+    mutatedhound = 1,
     -- 猪人兔人
     pigman = 1,
     bunnyman = 1,
@@ -425,6 +426,7 @@ local cantarget = {
     moonpig = 1,
     moonhound = 1,
     -- 青蛙
+    lunarfrog = 1,
     frog = 1,
     -- 火鸡
     perd = 1,

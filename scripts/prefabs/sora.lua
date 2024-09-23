@@ -199,6 +199,8 @@ local function OnSoraSpawn(inst)
     inst.components.builder:AddRecipe("yotc_carratshrine")
     inst.components.builder:AddRecipe("yotb_beefaloshrine")
     inst.components.builder:AddRecipe("yotr_rabbitshrine")
+    inst.components.builder:AddRecipe("yot_catcoonshrine")
+    inst.components.builder:AddRecipe("yotd_dragonshrine")
     -- local session = TheWorld.components.shard or "main"
 end
 

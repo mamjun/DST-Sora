@@ -195,7 +195,7 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
 end
 
 local function catch(inst)
-    if not inst:IsInLimbo() and not inst:HasTag("decorationitem") and inst.components.inventoryitem and
+    if not inst:IsInLimbo() and not inst:HasTag("decorationitem")  and not inst:HasTag("outofreach") and inst.components.inventoryitem and
         not inst.components.inventoryitem.owner and not (inst.components.health and inst.components.health:IsDead()) and
         inst:IsValid() then
         return true
