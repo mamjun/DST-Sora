@@ -52,6 +52,7 @@ GLOBAL.TUNING.SORAMODE = GetModConfigData("mode")
 mode = GLOBAL.TUNING.SORAMODE
 GLOBAL.TUNING.SORAADD = GetModConfigData("add")
 GLOBAL.TUNING.SORAWIKI = GetModConfigData("wiki", true)
+GLOBAL.TUNING.SORATIME = GetModConfigData("time", true)
 GLOBAL.TUNING.SORACHESTUI = GetModConfigData("chestui", true)
 GLOBAL.TUNING.SORAPACK = GetModConfigData("pack")
 GLOBAL.TUNING.SORAADD2 = GetModConfigData("add2")

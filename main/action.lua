@@ -519,6 +519,7 @@ function MakeAndAddAction(id,name,fn,pri,sg,clientsg)
     else
         act.stroverridefn = name 
     end
+    act.mount_valid = false
     act.fn = fn
     AddAction(act)
     AddStategraphActionHandler("wilson", ActionHandler(act, sg or "doshortaction"))

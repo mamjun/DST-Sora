@@ -68,6 +68,29 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 		end  
 	end 
 	AddClassPostConstruct("widgets/controls", AddControls) 
+
+    local TextButton = require "widgets/textbutton"
+
+	local function AddControls(self)        
+            self.soratimeroot = self:AddChild(widget("root"))
+            self.soratime = self:AddChild(TextButton())
+            self.soratime:SetFont(BODYTEXTFONT)
+            self.soratime:SetTextSize(50)    
+            self.soratime:SetTextColour({1,1,1,.8})
+            self.soratime:SetTextFocusColour({1,1,1,.8})
+            self.soratime:SetTooltip("右键拖动\n双击空格重置")
+            self.soratime:SetTooltipPos(70, 0, 0)
+            self.soratime.inst:DoPeriodicTask(1,function()
+                self.soratime:SetText(os.date("%H:%M:%S"))
+            end)
+        
+            SoraMakeWidgetMovable(self.soratime,"soratime",Vector3(85,1050,0))
+            if not TUNING.SORATIME then
+                self.soratime:Hide()
+            end
+	end 
+	AddClassPostConstruct("widgets/controls", AddControls) 
+
  
 
     --给容器组件添加一些事件

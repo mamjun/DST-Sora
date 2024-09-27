@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] author = "FL"
-version = "11.87" -- 版本
+version = "11.88" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -267,7 +267,20 @@ configuration_options = {{
         hover = "可以长按等级按钮显示"
     }},
     default = true
-}, {
+},{
+    name = "time",
+    label = "是否默认显示时间图标(需要玩家自己在mod设置里设置)",
+    options = {{
+        description = "默认显示",
+        data = true,
+        hover = "显示"
+    }, {
+        description = "不显示",
+        data = false,
+        hover = "不显示"
+    }},
+    default = false
+},  {
     name = "chestui",
     label = "是否显示强迫症箱子介绍(需要玩家自己在mod设置里设置)",
     options = {{

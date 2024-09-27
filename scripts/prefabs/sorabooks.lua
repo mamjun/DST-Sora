@@ -264,7 +264,8 @@ local changelist = {
     basalt = "basalt_pillar",
     basalt_pillar = "marblepillar",
     marblepillar = "statueharp",
-    statueharp = "statue_marble_pawn",
+    statueharp = "statue_marble",
+    statue_marble_pawn = "statue_marble",
     statue_marble = "statuemaxwell",
     statuemaxwell = "marbleshrub",
 
