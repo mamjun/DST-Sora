@@ -61,7 +61,7 @@ local function onopen(inst)
     if inst.skinname == 'sora2chest_sns' then
         inst.AnimState:PlayAnimation("open")
     else
-        inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:PlayAnimation("idle",true)
     end
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
@@ -69,7 +69,7 @@ end
 local function onclose(inst, doer)
     -- TheWorld.components.sorachestmanager:OnClose(inst, doer)
     -- inst.AnimState:PlayAnimation("close")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
 end
 
@@ -136,7 +136,7 @@ local function updatesign(inst)
         inst.components.container:IsOpen() then
         inst.AnimState:PlayAnimation("open")
     else
-        inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:PlayAnimation("idle",true)
     end
     inst.sorasign = sign
 end
@@ -231,7 +231,7 @@ local function fn()
     inst:AddTag("soracontainerfix")
     inst.AnimState:SetBank("sora2chest")
     inst.AnimState:SetBuild("sora2chest")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     inst.entity:SetPristine()
@@ -290,7 +290,7 @@ local function tochestfn()
     inst.entity:AddNetwork()
     anim:SetBank("sora2stone")
     anim:SetBuild("sora2stone")
-    anim:PlayAnimation("idle")
+    anim:PlayAnimation("idle",true)
     inst:AddTag("soracontainlock")
 
     if not TheWorld.ismastersim then
@@ -378,6 +378,21 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
+local tname = "sora2chest_yb"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "叶伊布",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable("sora2chest_yb",assets)
 local function chestpt(inst)
     -- inst.AnimState:Hide("chestitem_bg")
     inst.AnimState:Hide("swap_item_bg")

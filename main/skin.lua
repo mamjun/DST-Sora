@@ -854,12 +854,12 @@ if not TheNet:IsDedicated() then
         end,
         sora_hf = function(s, item)
             local scr = CdkUnLockScreen(item)
-            scr.unlocktext:SetString("QQ群(943105804)内绑定后,游戏时长+群聊天数>150可以获取 ")
+            scr.unlocktext:SetString("QQ群(372450705)内绑定后,游戏时长+群聊天数>150可以获取 ")
             return scr
         end,
         sora_shmm = function(s, item)
             local scr = CdkUnLockScreen(item)
-            scr.unlocktext:SetString("QQ群(943105804)内绑定后,领取方法看群公告")
+            scr.unlocktext:SetString("QQ群(372450705)内绑定后,领取方法看群公告")
             return scr
         end,
         sora_llan = function(s, item)
@@ -907,12 +907,13 @@ if not TheNet:IsDedicated() then
     function AddItemSkin(item, des, time, hide)
         table.insert(ItemSkin, {item, des, time or 300, hide or false})
     end
-    AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群943105804\n领取方法看群公告")
+    AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
-    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群943105804\n领取方法看群公告")
+    AddItemSkin("sora2chest_yb", "从前的那个伊布早已经不在了，现在在你面前的是叶赫那拉伊布.")
+    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2fire_hrh",
-        "而你,我的朋友\n你才是真正的帕鲁\nQQ群943105804\n领取方法看群公告")
+        "而你,我的朋友\n你才是真正的帕鲁\nQQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!")
     AddItemSkin("sora2fire_hjl", "人家才不是伊布呢")
     AddItemSkin("sora2ice_flower", "你已被移出群聊'花开富贵'")
@@ -930,8 +931,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
     AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗")
-    AddItemSkin("sora_yingyu", "跟我一起学'樱语'",
-    nil, true)
+    AddItemSkin("sora_yingyu", "跟我一起学'樱语'", nil, true)
     AddItemSkin("sora_dieyu",
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)
@@ -943,6 +943,12 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_tqy_qy", "不止七夕,更在朝夕\n    ---2024七夕纪念")
     AddItemSkin("sora_tqy_qkyz", "众生为棋,一掷钱坤")
     AddItemSkin("sora_lightflier_tjzz", "闲来无事，躺竹听曲")
+    AddItemSkin("sorabowknot_sby", "不能因为是女孩子就觉得自己是弱者，如果不强大就不能保护身边最重要的人", nil, true)
+    AddItemSkin("soramagic_sby", "有光的地方就有黑暗，黑暗呼唤光明，光明也呼唤黑暗。", nil, true)
+    AddItemSkin("sorabag_sby", "我想成为风，穿过无形的阻力，自由地飞翔。", nil, true)
+    AddItemSkin("sorahat_sby", "一定是的，无数次的邂逅，一定是为了和那个独一无二的人相遇吧。", nil, true)
+    AddItemSkin("sora_tqy_sby", "月之冕出击！", nil, true)
+    AddItemSkin("sora_tqy_box_sby", "毁灭之后是希望和再生", nil, true)
     local item_map = {
         sora_none = "sora_uniforms"
     }

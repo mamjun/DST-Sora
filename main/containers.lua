@@ -797,6 +797,9 @@ function params.sora_pot.itemtestfn(container, item, slot)
             end
             return false
         end
+        if item.prefab == "charcoal" and slot ~= 14 then
+            return false
+        end
         if slot > 0 and slot < 6 then
             if item:HasTag("preparedfood") or cooking.IsCookingIngredient(item.prefab) then
                 return true

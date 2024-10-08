@@ -433,7 +433,7 @@ local cantarget = {
     -- 姜饼狗
     clayhound = 1,
     -- 僵尸狗
-    mutatedhound = 1,
+    --mutatedhound = 1,
     -- 蜘蛛们
     spider = 1,
     spider_dropper = 1,
