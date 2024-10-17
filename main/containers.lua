@@ -750,7 +750,7 @@ function params.sora_pot.widget:SoraOnOpenFn(inst)
     end
     self:CookRopeTask()
 
-    SoraMakeWidgetMovable(self, "sora_pot", Vector3(10, 500, 0), {
+    SoraMakeWidgetMovable(self, "sora_potv2", Vector3(0, 20, 0), {
         drag_offset = 0.6,
         ValidPos = {
             minx = -570,

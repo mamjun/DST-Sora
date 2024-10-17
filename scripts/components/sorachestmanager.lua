@@ -780,6 +780,9 @@ local function OnClose(inst, event)
     if inGamePlay and data.gem.greengem and data.gem.greengem > 0 and doer and doer:HasTag("player") and
         not data.bangreen then
         inst:DoTaskInTime(0.1, function()
+            if TUNING.SORA2CHESTGREEN then
+                return
+            end
             for k, container in pairs(data.containers) do
                 HeLiMiZhi(inst, doer, data.gem.greengem * data.gem.greengem * 2, container)
             end

@@ -130,5 +130,22 @@ SoraAPI.MakeItemSkin("sora2birdchest", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "sora2birdchest_xzyb"
+SoraAPI.MakeItemSkin("sora2birdchest", tname, {
+
+    name = "仙子伊布",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = function(inst)
+    end,
+
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
 return Prefab("sora2birdchest", fn, assets, prefabs),
     MakePlacer("sora2birdchest_placer", "sora2birdchest", "sora2birdchest", "idle")

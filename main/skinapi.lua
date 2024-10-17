@@ -28,7 +28,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.12
+-- verion = 1.13
+-- V1.13 优化SWAP_ICON的交互
 -- v1.12 新增 MakeItemSkinDefaultData 和 GetItemSkinDefaultData 准备弃用 basebuild basebank baseanim等重复设置
 -- v1.11 新增 animloop 和 baseanimloop
 -- v1.10 更新 atlas 和 image直接注册到Prefab 方便调用
@@ -242,7 +243,7 @@ function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 基础名称
             itembasedata[base].itemanim = {itemanim[1] or base, itemanim[2] or base, itemanim[3] or "idle",
                                            itemanim[4] and true or false}
         else
-            itembasedata[base].itemanim = {base,base}
+            itembasedata[base].itemanim = {base, base}
         end
     end
     if data then
@@ -679,8 +680,13 @@ if thank_help then
             if item then
                 local skin = GetSkin(item)
                 if skin and skin.swap_icon then
-                    self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.swap_icon.build,
-                        skin.swap_icon.image)
+                    if type(skin.swap_icon) == "table" then
+                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.swap_icon.build,
+                            skin.swap_icon.image)
+                    else
+                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.build,
+                            "SWAP_ICON")
+                    end
                 elseif skin and skin.image and skin.atlas then
                     self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", softresolvefilepath(skin.atlas),
                         skin.image .. ".tex")

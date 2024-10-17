@@ -910,7 +910,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
-    AddItemSkin("sora2chest_yb", "从前的那个伊布早已经不在了，现在在你面前的是叶赫那拉伊布.")
+    AddItemSkin("sora2chest_yb", "从前的那个伊布早已经不在了，\n现在在你面前的是叶赫那拉伊布.")
+    AddItemSkin("sora2chest_zzb", "珍珠贝里真的有珍珠")
     AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2fire_hrh",
         "而你,我的朋友\n你才是真正的帕鲁\nQQ群372450705\n领取方法看群公告")
@@ -927,7 +928,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
     AddItemSkin("sora_sign_myy", "羊腿好吃,所以值得!")
     AddItemSkin("sora_sign_yez", "加大！加大！再描一圈！")
-    AddItemSkin("sora2ice_bhl", "环游整个星系一万次，只为遇见你")
+    AddItemSkin("sora2ice_bhl", "环游整个星系一万次，\n只为遇见你")
+    AddItemSkin("sora2ice_byb", "穿梭风雪,绽放寒芒!")
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
     AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗")
@@ -939,16 +941,23 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_pearl_slm", "萌王是谁?")
     AddItemSkin("sora2birdchest_ggd",
         "在下江湖人称菇菇毒，\n暗器榜排名第七十七，\n独门绝技--好菇毒！")
+    AddItemSkin("sora2birdchest_xzyb",
+        "西格斯比与仙子伊布心心相印了！")
     AddItemSkin("sora_lightflier_beex", "这是熊，\n不是Bee！")
     AddItemSkin("sora_tqy_qy", "不止七夕,更在朝夕\n    ---2024七夕纪念")
     AddItemSkin("sora_tqy_qkyz", "众生为棋,一掷钱坤")
+    AddItemSkin("sora_tqy_xql", "小青龙为什么是红色的?")
     AddItemSkin("sora_lightflier_tjzz", "闲来无事，躺竹听曲")
-    AddItemSkin("sorabowknot_sby", "不能因为是女孩子就觉得自己是弱者，如果不强大就不能保护身边最重要的人", nil, true)
-    AddItemSkin("soramagic_sby", "有光的地方就有黑暗，黑暗呼唤光明，光明也呼唤黑暗。", nil, true)
-    AddItemSkin("sorabag_sby", "我想成为风，穿过无形的阻力，自由地飞翔。", nil, true)
-    AddItemSkin("sorahat_sby", "一定是的，无数次的邂逅，一定是为了和那个独一无二的人相遇吧。", nil, true)
+    AddItemSkin("sorabowknot_sby",
+        "不能因为是女孩子就觉得自己是弱\n者，如果不强大就不能保护身边\n最重要的人",
+        nil, true)
+    AddItemSkin("soramagic_sby", "有光的地方就有黑暗，\n黑暗呼唤光明，光明也呼唤黑暗。", nil,
+        true)
+    AddItemSkin("sorabag_sby", "我想成为风，穿过无形的阻力，\n自由地飞翔。", nil, true)
+    AddItemSkin("sorahat_sby",
+        "一定是的，无数次的邂逅，\n一定是为了和独一无二的\n那个人相遇吧。", nil, true)
     AddItemSkin("sora_tqy_sby", "月之冕出击！", nil, true)
-    AddItemSkin("sora_tqy_box_sby", "毁灭之后是希望和再生", nil, true)
+    AddItemSkin("sora_tqy_box_sby", "毁灭之后是希望和再生。", nil, true)
     local item_map = {
         sora_none = "sora_uniforms"
     }

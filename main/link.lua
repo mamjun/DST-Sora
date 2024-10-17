@@ -152,10 +152,10 @@ if IsMythEnable() then
         }
     }
     local first
-    AddComponentPostInit("mk_flyer", function(self)     --怎么想都是花花的错
+    AddComponentPostInit("mk_flyer", function(self) -- 怎么想都是花花的错
         if not first then
             first = true
-            if self.SetMyClond then     --都怪花花写错字母
+            if self.SetMyClond then -- 都怪花花写错字母
                 self:SetMyClond(data)
             elseif self.SetMyCloud then
                 self:SetMyCloud(data)
@@ -375,14 +375,13 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
         end
     end)
     LastWB = nil
-    AddPrefabPostInit("elaina_pirate_stash",function (inst)
-        inst:ListenForEvent("worked",function (i,data)
+    AddPrefabPostInit("elaina_pirate_stash", function(inst)
+        inst:ListenForEvent("worked", function(i, data)
             if data.worker and data.worker:HasTag("player") then
                 LastWB = data.worker
             end
         end)
     end)
-
 
 end
 
@@ -486,3 +485,33 @@ if IsModEnable("Functional Medal") or IsModEnable("能力勋章") or IsModEnable
         end
     end)
 end
+
+local AllToEquip = {}
+if IsModEnable("Xuaner") or IsModEnable("【璇儿】") then
+    AllToEquip.myxl_fan = 1
+end
+
+AddMulPrefabPostInit(AllToEquip, function(inst)
+    inst.HelpBySora = true
+    if inst.components.equippable then
+        local old = inst.components.equippable.IsRestricted
+        inst.components.equippable.IsRestricted = function(self, target, ...)
+            if target and target:HasTag("sora") then
+                return false
+            end
+            return old(self, target, ...)
+        end
+    end
+    inst:DoTaskInTime(1,function ()
+        if inst.replica.equippable then
+            local old = inst.replica.equippable.IsRestricted
+            inst.replica.equippable.IsRestricted = function(self, target, ...)
+                if target and target:HasTag("sora") then
+                    return false
+                end
+                return old(self, target, ...)
+            end
+        end
+    end)
+end)
+

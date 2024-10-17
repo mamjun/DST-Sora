@@ -61,6 +61,7 @@ GLOBAL.TUNING.SORAMODNAME = modname
 GLOBAL.TUNING.SORAVERSION = modinfo.version
 GLOBAL.TUNING.SORATOCHEST = GetModConfigData("tochest")
 GLOBAL.TUNING.SORATOCHESTGEM = GetModConfigData("tochestgem")
+GLOBAL.TUNING.SORA2CHESTGREEN = GetModConfigData("chestgreen")
 GLOBAL.TUNING.SORALOCK1 = GetModConfigData("lock1")
 GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
 GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")

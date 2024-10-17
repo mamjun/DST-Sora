@@ -33,19 +33,15 @@ local assets = {Asset("ANIM", "anim/sora2ice.zip"), Asset("ANIM", "anim/soraches
                 Asset("ATLAS", "images/inventoryimages/sora2ice.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2ice.tex"),
                 Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice.xml", 256),
-                Asset("ANIM", "anim/sora2ice_seed.zip"),
-                Asset("ATLAS", "images/inventoryimages/sora2ice_seed.xml"),
+                Asset("ANIM", "anim/sora2ice_seed.zip"), Asset("ATLAS", "images/inventoryimages/sora2ice_seed.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2ice_seed.tex"),
                 Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_seed.xml", 256),
-                Asset("ANIM", "anim/sora2ice_flower.zip"),
-                Asset("ATLAS", "images/inventoryimages/sora2ice_flower.xml"),
+                Asset("ANIM", "anim/sora2ice_flower.zip"), Asset("ATLAS", "images/inventoryimages/sora2ice_flower.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2ice_flower.tex"),
                 Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_flower.xml", 256),
-                Asset("ANIM", "anim/sora2ice_bhl.zip"),
-                Asset("ATLAS", "images/inventoryimages/sora2ice_bhl.xml"),
+                Asset("ANIM", "anim/sora2ice_bhl.zip"), Asset("ATLAS", "images/inventoryimages/sora2ice_bhl.xml"),
                 Asset("IMAGE", "images/inventoryimages/sora2ice_bhl.tex"),
-                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_bhl.xml", 256),
-            }
+                Asset("ATLAS_BUILD", "images/inventoryimages/sora2ice_bhl.xml", 256)}
 
 local prefabs = {"collapse_small"}
 -- local function onrefresh(inst)
@@ -108,7 +104,7 @@ local function fn()
     inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2ice")
     inst.AnimState:SetBuild("sora2ice")
-    inst.AnimState:PlayAnimation("idle",true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     -- MakeSnowCoveredPristine(inst)
@@ -151,10 +147,10 @@ local function fn()
 end
 SoraAPI.MakeItemSkinDefaultData("sora2ice", {}, {})
 for k, v in pairs({"flower", "seed"}) do
-    local tname = "sora2ice_".. v
-    SoraAPI.MakeItemSkin("sora2ice",tname, {
-        
-        name = "妙蛙".. (v=="seed" and "种子" or "花"),
+    local tname = "sora2ice_" .. v
+    SoraAPI.MakeItemSkin("sora2ice", tname, {
+
+        name = "妙蛙" .. (v == "seed" and "种子" or "花"),
         atlas = "images/inventoryimages/" .. tname .. ".xml",
         image = tname,
         build = tname,
@@ -168,19 +164,35 @@ for k, v in pairs({"flower", "seed"}) do
 end
 
 local tname = "sora2ice_bhl"
-    SoraAPI.MakeItemSkin("sora2ice",tname, {
-        
-        name = "星璃",
-        atlas = "images/inventoryimages/" .. tname .. ".xml",
-        image = tname,
-        build = tname,
-        bank = tname,
+SoraAPI.MakeItemSkin("sora2ice", tname, {
 
-        init_fn = function(inst)
-        end,
+    name = "星璃",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
 
-        checkfn = SoraAPI.SoraSkinCheckFn,
-        checkclientfn = SoraAPI.SoraSkinCheckClientFn
-    })
+    init_fn = function(inst)
+    end,
 
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
+local tname = "sora2ice_byb"
+SoraAPI.MakeItemSkin("sora2ice", tname, {
+
+    name = "冰伊布",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+
+    init_fn = function(inst)
+    end,
+
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
 return Prefab("sora2ice", fn, assets, prefabs), MakePlacer("sora2ice_placer", "sora2ice", "sora2ice", "idle")
