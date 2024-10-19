@@ -149,7 +149,7 @@ local function onequip(inst, owner)
         end)
 	return
 	end
-    owner.AnimState:OverrideSymbol("swap_object", "soratele", "swap_weapon")
+    owner.AnimState:OverrideSymbol("swap_object", inst.skinname or  "soratele", "swap_weapon")
     owner.AnimState:Show("ARM_carry") 
     owner.AnimState:Hide("ARM_normal")
 	if inst.magicfx ~= nil then
@@ -219,7 +219,7 @@ local function fn()
     inst:AddTag("medal_fishingrod")
     anim:SetBank("soratele")
     anim:SetBuild("soratele")
-    anim:PlayAnimation("idle")
+    anim:PlayAnimation("idle",true)
 	inst:AddTag("soratrader")
     inst:AddTag("nopunch")
 	inst:AddTag("rechargeable")
@@ -294,4 +294,16 @@ local function fn()
     
     return inst
 end
+
+-- local tname = "soratele_wsqy"
+-- SoraAPI.MakeItemSkin("soratele",tname , {
+--     name = "万圣前夜",
+--     atlas = "images/inventoryimages/"..tname..".xml",
+--     image = tname,
+--     build = tname,
+--     bank =  tname,
+--     checkfn = SoraAPI.SoraSkinCheckFn,
+--     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+-- })
+-- SoraAPI.MakeAssetTable(tname,assets)
 return	Prefab( "soratele", fn, assets, prefabs)

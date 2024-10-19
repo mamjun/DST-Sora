@@ -912,6 +912,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
     AddItemSkin("sora2chest_yb", "从前的那个伊布早已经不在了，\n现在在你面前的是叶赫那拉伊布.")
     AddItemSkin("sora2chest_zzb", "珍珠贝里真的有珍珠")
+    AddItemSkin("sora2chest_jcy", "飞叶快刀！")
     AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2fire_hrh",
         "而你,我的朋友\n你才是真正的帕鲁\nQQ群372450705\n领取方法看群公告")
@@ -958,6 +959,12 @@ if not TheNet:IsDedicated() then
         "一定是的，无数次的邂逅，\n一定是为了和独一无二的\n那个人相遇吧。", nil, true)
     AddItemSkin("sora_tqy_sby", "月之冕出击！", nil, true)
     AddItemSkin("sora_tqy_box_sby", "毁灭之后是希望和再生。", nil, true)
+
+    AddItemSkin("sora_sign_wsqy", "不给糖就捣蛋！", nil, true)
+    AddItemSkin("sora_smalllight_wsqy", "不给糖就捣蛋！", nil, true)
+    AddItemSkin("soramagic_wsqy", "不给糖就捣蛋！", nil, true)
+    AddItemSkin("sora_sign_wsqy", "不给糖就捣蛋！", nil, true)
+
     local item_map = {
         sora_none = "sora_uniforms"
     }

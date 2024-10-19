@@ -141,6 +141,12 @@ local function updatesign(inst)
         else
             inst.AnimState:PlayAnimation("idle_close",true)
         end
+    elseif (inst.skinname == "sora2chest_jcy") then
+        if sign then 
+            inst.AnimState:Show("swap")
+        else
+            inst.AnimState:Hide("swap")
+        end
     else
         inst.AnimState:PlayAnimation("idle",true)
     end
@@ -403,6 +409,22 @@ SoraAPI.MakeAssetTable("sora2chest_yb",assets)
 local tname = "sora2chest_zzb"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
     name = "珍珠贝",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "sora2chest_jcy"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "菊草叶",
     atlas = "images/inventoryimages/" .. tname .. ".xml",
     image = tname,
     build = tname,

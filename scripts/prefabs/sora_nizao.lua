@@ -167,7 +167,7 @@ local function onuse(inst, doer)
         if inst.skinname == "sora_lightflier_beex" then
             TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_beex", nil, nil)
         elseif inst.skinname == "sora_lightflier_tjzz" then
-                TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_tjzz", nil, nil)
+            TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_tjzz", nil, nil)
         end
         local save = inst.components.sorasavecmp:GetSave("cat")
         if save and save.data then
@@ -370,7 +370,6 @@ SoraAPI.MakeItemSkin("sora_lightflier_cat", ttname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 
-
 SoraAPI.MakeSkinNameMap("sora_lightflier_beex", "sora_lightflier_cat_beex")
 SoraAPI.MakeSkinNameMap("sora_lightflier_tjzz", "sora_lightflier_cat_tjzz")
 SoraAPI.MakeAssetTable("sora_lightflier_beex", lightasset)
@@ -433,7 +432,7 @@ local cantarget = {
     -- 姜饼狗
     clayhound = 1,
     -- 僵尸狗
-    --mutatedhound = 1,
+    -- mutatedhound = 1,
     -- 蜘蛛们
     spider = 1,
     spider_dropper = 1,
@@ -446,9 +445,9 @@ local cantarget = {
     -- 蝙蝠
     bat = 1,
     -- 触手
-    --tentacle_pillar = 1,
+    -- tentacle_pillar = 1,
     tentacle = 1,
-    --tentacle_pillar_arm = 1,
+    -- tentacle_pillar_arm = 1,
     -- 树精
     leif = 1,
     leif_sparse = 1,
@@ -578,6 +577,7 @@ SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_myy", {
     end
 })
 SoraAPI.MakeSkinNameMap("sora_sign_myy", "sora_sign_item_myy")
+
 SoraAPI.MakeAssetTable("sora_sign_yez", assets)
 
 local tname = "sora_sign_yez"
@@ -620,6 +620,88 @@ SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_yez", {
     end
 })
 SoraAPI.MakeSkinNameMap("sora_sign_yez", "sora_sign_item_yez")
+local birdsname = {"crow", "robin", "robin_winter", "canary", "quagmire_pigeon"}
+for k, v in pairs(birdsname) do
+    table.insert(assets, Asset("ANIM", "anim/" .. v .. "_build.zip"))
+end
+local function bind(inst, owner)
+    inst.entity:SetParent(owner.entity)
+    inst.Follower:FollowSymbol(owner.GUID, "bird", -10, -10, 0, true, nil)
+    inst.owner = owner
+    inst.AnimState:SetBuild(birdsname[math.random(1, 5)] .. "_build")
+end
+local function MakeBirds()
+    local function fn()
+        local inst = CreateEntity()
+        local trans = inst.entity:AddTransform()
+        local anim = inst.entity:AddAnimState()
+        inst.Transform:SetTwoFaced()
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("crow")
+        inst.AnimState:SetBuild("crow_build")
+        inst.AnimState:PlayAnimation("idle", true)
+        inst.AnimState:SetScale(0.5,0.5,0.5)
+        inst.entity:AddNetwork()
+        inst:AddTag("FX")
+        inst:AddTag("NOBLOCK")
+        inst:AddTag("NOCLICK")
+        inst.persists = false
+
+        if not TheWorld.ismastersim then
+            return inst
+        end
+        inst.bind = bind
+        return inst
+    end
+    return Prefab("sora_sign_fx_bird", fn)
+end
+
+SoraAPI.MakeAssetTable("sora_sign_wsqy", assets)
+SoraAPI.MakeSkinNameMap("sora_sign_wsqy", "sora_sign_item_wsqy")
+local tname = "sora_sign_wsqy"
+SoraAPI.MakeItemSkin("sora_sign", tname, {
+    name = "万圣前夜",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sign_home",
+    basebank = "sign_home",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+        inst.AnimState:SetScale(0.5,0.5,0.5)
+        inst.AnimState:SetMultColour(1, 1, 1, 1)
+        inst.AnimState:PlayAnimation("idle", true)
+        inst.birdfx = SpawnPrefab("sora_sign_fx_bird")
+        inst.birdfx:bind(inst)
+    end,
+    clear_fn = function(inst)
+        inst.AnimState:SetScale(1,1,1)
+        inst.AnimState:SetMultColour(0 / 255, 0 / 255, 0 / 255, 0.75)
+        inst.AnimState:PlayAnimation("idle", true)
+        inst.birdfx:Remove()
+    end
+})
+
+local tname = "sora_sign_wsqy"
+SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_wsqy", {
+    name = "万圣前夜",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "sign_mini",
+    basebank = "sign_mini",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+        inst.AnimState:PlayAnimation("item", true)
+    end,
+    clear_fn = function(inst)
+        inst.AnimState:PlayAnimation("item", true)
+    end
+})
 
 local function ondeploy(inst, pt, deployer)
     local skin = nil
@@ -722,7 +804,8 @@ local function pearlfn()
     end)
     return inst
 end
-SoraAPI.MakeItemSkinDefaultData("sora_pearl", {GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl"}, {"hermit_pearl","hermit_pearl"})
+SoraAPI.MakeItemSkinDefaultData("sora_pearl", {GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl"},
+    {"hermit_pearl", "hermit_pearl"})
 local tname = "sora_pearl_pd"
 SoraAPI.MakeItemSkin("sora_pearl", tname, {
     name = "胖丁",
@@ -771,4 +854,5 @@ table.insert(All, Prefab("sora_sign_item", item_fn, assets))
 table.insert(All, MakePlacer("sora_sign_placer", "sign_home", "sign_home", "idle"))
 table.insert(All, MakePlacer("sora_sign_item_placer", "sign_home", "sign_home", "idle"))
 table.insert(All, Prefab("sora_pearl", pearlfn, pearlassets))
+table.insert(All, MakeBirds())
 return unpack(All)

@@ -289,12 +289,13 @@ local function fn()
     return inst
 end
 SoraAPI.MakeItemSkinDefaultData("soramagic", {}, {})
-SoraAPI.MakeItemSkin("soramagic", "soramagic_sby", {
+local tname = "soramagic_sby"
+SoraAPI.MakeItemSkin("soramagic",tname , {
     name = "永恒水兵月",
-    atlas = "images/inventoryimages/soramagic_sby.xml",
-    image = "soramagic_sby",
-    build = "soramagic_sby",
-    bank = "soramagic_sby",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank =  tname,
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
 	init_fn = function(inst)
@@ -306,4 +307,15 @@ SoraAPI.MakeItemSkin("soramagic", "soramagic_sby", {
 
 })
 
+local tname = "soramagic_wsqy"
+SoraAPI.MakeItemSkin("soramagic",tname , {
+    name = "万圣前夜",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank =  tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname,assets)
 return	Prefab( "soramagic", fn, assets, prefabs)
