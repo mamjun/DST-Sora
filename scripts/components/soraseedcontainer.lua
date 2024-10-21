@@ -108,8 +108,8 @@ end)
 function c:GetDB()
     if TheWorld.soraismastersim then
         local db = nil
-        if self.inst and self.inst.owner and self.inst.owner.userid then
-            db = SoraAPI.GetClientDB("seeds", self.inst.owner.userid, true)
+        if self.inst and self.inst.owner and self.inst.owner.userid then  
+            db = SoraAPI.GetClientDB("seed", self.inst.owner.userid, true)
         end
         return db or SoraAPI.SeedDB
     else

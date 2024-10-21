@@ -186,6 +186,7 @@ local function fn()
             end
         end
     end
+    MakeInventoryPhysics(inst)
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
             inst.replica.container:WidgetSetup("sora_pot")

@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] author = "FL"
-version = "11.91" -- 版本
+version = "11.92" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -491,6 +491,27 @@ configuration_options = {{
         hover = "不懂请勿修改-2"
     }},
     default = "1"
+}, {
+    name = "fgmode",
+    label = "扶光权限模式",
+    options = {{
+        description = "全局共享",
+        data = 0,
+        hover = "全局共享"
+    }, {
+        description = "个人独立",
+        data = 1,
+        hover = "个人独立"
+    }, {
+        description = "队伍共享/无队共享-需开启组队系统",
+        data = 2,
+        hover = "队伍共享/无队共享-需开启组队系统"
+    }, {
+        description = "队伍共享/无队独立-需开启组队系统",
+        data = 3,
+        hover = "队伍共享/无队独立-需开启组队系统"
+    }},
+    default =0
 },{
     name = "chest",
     label = "强迫症箱子范围",

@@ -923,3 +923,15 @@ function sorapath(path, ...)
     end
     return pathcache[path] or path
 end
+
+
+local intmax = 2 ^ 32 
+function hash(str)
+    local n = 5381
+    for index = 1, #str, 1 do
+        local c = string.byte(str, index)
+        n = n * 33 + c
+        n = n % intmax
+    end
+    return n
+end

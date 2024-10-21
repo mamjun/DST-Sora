@@ -36,7 +36,7 @@ GLOBALDB:InitRoot("expsave")    --穹妹的经验存储
 GLOBALDB:InitRoot("sorasave")    --尝试在换人的时候保存更多的数据
 GLOBALDB:InitRoot("useronline")
 
-SeedDB:InitRoot("seeds")
+SeedDB:InitRoot("seeds",1)
 
 GLOBALDB:InitRoot("giftsave")    --领取过的礼包码
 GLOBALDB:InitRoot("giftitemtype")    --礼包码转ID

@@ -65,6 +65,7 @@ GLOBAL.TUNING.SORA2CHESTGREEN = GetModConfigData("chestgreen")
 GLOBAL.TUNING.SORALOCK1 = GetModConfigData("lock1")
 GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
 GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
+GLOBAL.TUNING.SORAFGMODE = GetModConfigData("fgmode")
 RESETUI = GetModConfigData("reset_ui")
 GLOBAL.TUNING.SORADISABLEGLOBAL = GetModConfigData("disableui_globalbuild")
 IsGemEnable = rawget(_G,"gemrun") and true or false

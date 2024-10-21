@@ -80,6 +80,7 @@ local ui = Class(Widget, function(self, owner)
     self.staff = nil
     self.cd = SoraAPI.SoraCD(0.1)
     self.inst:AddComponent("soraseedcontainer")
+    self.inst.owner = owner
     self.cmp = self.inst.components.soraseedcontainer
     self.inst:ListenForEvent("ClientDBSet", function()
         self:Refresh()

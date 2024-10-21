@@ -963,7 +963,6 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_sign_wsqy", "不给糖就捣蛋！", nil, true)
     AddItemSkin("sora_smalllight_wsqy", "不给糖就捣蛋！", nil, true)
     AddItemSkin("soramagic_wsqy", "不给糖就捣蛋！", nil, true)
-    AddItemSkin("sora_sign_wsqy", "不给糖就捣蛋！", nil, true)
 
     local item_map = {
         sora_none = "sora_uniforms"
