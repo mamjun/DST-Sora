@@ -4,6 +4,7 @@ end
 if not CreateMainDB then
     return
 end
+MID = SoraAPI.GetMID()
 env.SoraDB = {}
 MailDB = CreateMainDB("SoraMail", 300, 1)
 SoraDB.MailDB = MailDB
@@ -31,6 +32,7 @@ AddPrefabPostInit("world", function(inst)
 end)
 MailDB:InitRoot("Players")      --存放玩家 以及玩家拥有哪些邮件
 MailDB:InitRoot("Mails",3)      --存放邮件详细内容 
+MailDB:InitRoot("GlobalChest",3)      --存放全局箱子内容
 
 GLOBALDB:InitRoot("expsave")    --穹妹的经验存储
 GLOBALDB:InitRoot("sorasave")    --尝试在换人的时候保存更多的数据

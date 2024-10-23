@@ -105,10 +105,12 @@ local function AddButton(config, name, pos, fn, postfn)
 
 end
 
-local function MoveTo(self,targetname,targetname2,targetname3)
-    local p = self.parent and self.parent.parent  and self.parent.parent.parent
-    if not p then return end 
-    if p[targetname] then 
+local function MoveTo(self, targetname, targetname2, targetname3)
+    local p = self.parent and self.parent.parent and self.parent.parent.parent
+    if not p then
+        return
+    end
+    if p[targetname] then
         local tar = p[targetname]
         if tar[targetname2] then
             tar = tar[targetname2]
@@ -122,7 +124,7 @@ local function MoveTo(self,targetname,targetname2,targetname3)
     end
 end
 local function MoveToHandInv(self)
-    MoveTo(self,"inv","hand_inv")
+    MoveTo(self, "inv", "hand_inv")
 end
 params.sorapack_container = {
     widget = {
@@ -241,7 +243,7 @@ params.sora2chest = {
         }
     },
     type = "chest",
-    usespecificslotsforitems = true,
+    usespecificslotsforitems = true
 }
 for y = 4, -1, -1 do
     for x = 0, 4 do
@@ -289,16 +291,16 @@ function params.sora2chest.itemtestfn(container, item, slot)
     end
     if slot then
         local slotitem = container:GetItemInSlot(slot)
-        if slotitem then 
-            if slotitem.prefab ~= item.prefab then 
-                return false 
+        if slotitem then
+            if slotitem.prefab ~= item.prefab then
+                return false
             end
-            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then 
+            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then
                 return true
             end
             return false
         end
-        if (slot > 25 and item:HasTag("gem")) or slot <= 25 then 
+        if (slot > 25 and item:HasTag("gem")) or slot <= 25 then
             return true
         end
     else
@@ -397,16 +399,18 @@ function params.sora_light.itemtestfn(container, item, slot)
     end
     if slot then
         local slotitem = container:GetItemInSlot(slot)
-        if slotitem then 
-            if slotitem.prefab ~= item.prefab then 
-                return false 
+        if slotitem then
+            if slotitem.prefab ~= item.prefab then
+                return false
             end
-            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then 
+            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then
                 return true
             end
             return false
         end
-        if (slot > sora_light_slot and slot < (sora_light_slot + 5) and item:HasTag("sora_light_batteries")) or (slot > (sora_light_slot + 4) and item:HasTag("gem") and not gemblack[item.prefab]) or slot <= sora_light_slot then 
+        if (slot > sora_light_slot and slot < (sora_light_slot + 5) and item:HasTag("sora_light_batteries")) or
+            (slot > (sora_light_slot + 4) and item:HasTag("gem") and not gemblack[item.prefab]) or slot <=
+            sora_light_slot then
             return true
         end
     else
@@ -475,7 +479,7 @@ params.sora_huapen = {
     type = "chest"
 }
 function params.sora_huapen.itemtestfn(container, item, slot)
-    return item and not item:HasTag("sorahuapencant")  and item.prefab ~= "sora_flh" and
+    return item and not item:HasTag("sorahuapencant") and item.prefab ~= "sora_flh" and
                (item:HasTag("sorafood") or item.prefab == "butterfly" or item.prefab == "moonrocknugget" or item.prefab ==
                    "moonglass" or item.prefab == "petals" or item.prefab == "opalpreciousgem")
 end
@@ -678,9 +682,9 @@ params.sora_pot = {
 
     },
     acceptsstacks = true,
-    usespecificslotsforitems=true,
+    usespecificslotsforitems = true,
     type = "sora_pot",
-    openlimit = 1,
+    openlimit = 1
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do
@@ -788,11 +792,11 @@ function params.sora_pot.itemtestfn(container, item, slot)
     end
     if slot then
         local slotitem = container:GetItemInSlot(slot)
-        if slotitem then 
-            if slotitem.prefab ~= item.prefab then 
-                return false 
+        if slotitem then
+            if slotitem.prefab ~= item.prefab then
+                return false
             end
-            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then 
+            if slotitem.replica.stackable and not slotitem.replica.stackable:IsFull() then
                 return true
             end
             return false
@@ -853,7 +857,7 @@ function params.sora_pot.itemtestfn(container, item, slot)
             if item:HasTag("edible_GOODIES") then
                 return true
             end
-            if item.prefab == "ice" or item.prefab == "charcoal" or item.prefab == "batnosehat"  then
+            if item.prefab == "ice" or item.prefab == "charcoal" or item.prefab == "batnosehat" then
                 return true
             end
             if not (item:HasTag("fresh") or item:HasTag("stale") or item:HasTag("spoiled")) then
@@ -893,7 +897,6 @@ function params.sora_pot.itemtestfn(container, item, slot)
     end
 end
 
-
 params.sora_tqy_box = {
     widget = {
         slotpos = {},
@@ -907,7 +910,7 @@ params.sora_tqy_box = {
 }
 for y = 5, 1, -1 do
     for x = 0, 0 do
-        table.insert(params.sora_tqy_box.widget.slotpos, Vector3(70 * x -0, 70 * y - 210, 0))
+        table.insert(params.sora_tqy_box.widget.slotpos, Vector3(70 * x - 0, 70 * y - 210, 0))
     end
 end
 
@@ -917,6 +920,31 @@ function params.sora_tqy_box.widget:SoraOnOpenFn(inst)
 end
 params.sora_tqy_box.itemtestfn = function(container, item, slot)
     return item and item:HasTag("sora_tqy")
+end
+
+params.sora2global = {
+    widget = {
+        slotpos = {},
+        bgatlas = "images/quagmire_recipebook.xml",
+        bgimage = "quagmire_recipe_menu_bg.tex",
+        pos = Vector3(0, 130, 0)
+    },
+    type = "sora2global",
+    openlimit = 1
+}
+for y = 4, 2, -1 do
+    for x = -1, 1 do
+        table.insert(params.sora2global.widget.slotpos, Vector3(70 * x - 0, 70 * y - 210, 0))
+    end
+end
+
+function params.sora2global.widget:SoraOnOpenFn(inst)
+    self.bgimage:ScaleToSize(230, 230)
+end
+params.sora2global.itemtestfn = function(container, item, slot)
+    return item and not item:HasTag("unwrappable") and not item:HasTag("sorapacker") and not item:HasTag("cantpack") and
+               not item:HasTag("soracantpack") and not item:HasTag("irreplaceable") and not item:HasTag("nonpackable") and
+               not item.replica.container
 end
 
 if needhelp then

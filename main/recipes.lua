@@ -420,6 +420,13 @@ Rec("sora_pickhat", "咸鱼咸鱼咸", "一群咸鱼罢了", equip2, "sora", {
     [san] = 50
 })
 
+Rec("sora2global", "穹の末影箱", "妈妈我要去旅行~", equip2, "sora", {
+    cane = 1,
+    cookbook = 1,
+    lantern=1,
+    portabletent_item=1,
+})
+
 Rec("sora2sword", "奇妙法杖", "一个奇妙法杖！", equip2, "soraother", {{
     goldenshovel = 2,
     hammer = 2,

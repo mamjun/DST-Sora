@@ -353,7 +353,24 @@ AddLaterFn(function()
             end
             return oldINVENTORYfn(inst, doer, ...)
         end
+        local oldinventoryitemUSEITEMfn = old.USEITEM.inventoryitem 
+        old.USEITEM.inventoryitem = function(inst,doer,target  ,...)
+            if target and target:HasTag('soranorummage') then 
+                return 
+            end
+            return oldinventoryitemUSEITEMfn(inst,doer,target  ,...)
+        end
+
+        local oldweaponUSEITEMfn = old.USEITEM.weapon
+        old.USEITEM.weapon = function(inst,doer,target  ,...)
+            if target and target:HasTag('soranorummage') then 
+                return 
+            end
+            return oldweaponUSEITEMfn(inst,doer,target  ,...)
+        end
+
     end
+    
 end)
 
 local oldbunldefn = ACTIONS.BUNDLE.fn

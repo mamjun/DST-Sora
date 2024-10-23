@@ -327,7 +327,7 @@ local function PickPickFn(inst, doer, pos)
 end
 local function PickFn(inst, doer, pos)
     -- 大作物 
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled"},
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled","INLIMBO"},
         {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
     local prefabs = {}
     local items = {}

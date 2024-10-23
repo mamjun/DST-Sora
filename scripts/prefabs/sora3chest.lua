@@ -66,6 +66,15 @@ local function fn()
     inst:AddComponent("inventoryitem")
 	inst.components.inventoryitem.atlasname = "images/inventoryimages/sora3chest.xml"
 	inst.components.inventoryitem.imagename = "sora3chest"
+    
+    inst:AddComponent("soraonlyone")
+    inst.components.soraonlyone.tag = "sorasmartchest"
+
+    inst:AddComponent("container")
+    inst.components.container:WidgetSetup("sora3chest")
+    inst.components.container:EnableInfiniteStackSize(true)
+    inst.components.container.canbeopened = false
+    inst.components.inventoryitem.canonlygoinpocket = true
     inst:ListenForEvent("onpickup",function ()
         if inst.components.container then 
             inst.components.container.canbeopened = true
@@ -76,14 +85,6 @@ local function fn()
             inst.components.container.canbeopened = false
         end
     end)
-    inst:AddComponent("soraonlyone")
-    inst.components.soraonlyone.tag = "sorasmartchest"
-
-    inst:AddComponent("container")
-    inst.components.container:WidgetSetup("sora3chest")
-    inst.components.container:EnableInfiniteStackSize(true)
-    inst.components.container.canbeopened = false
-    inst.components.inventoryitem.canonlygoinpocket = true
     inst.prefab = "sora3chest"
     assert(TheWorld.components.sorachestmanager,'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
     TheWorld.components.sorachestmanager:RegByType(inst, "sora3chest")

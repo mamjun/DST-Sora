@@ -87,6 +87,7 @@ mi("maindbinit")
 -- 导入clientdb
 mi("clientdb")
 mi("clientdbinit")
+mi("globalchest")
 -- 导入皮肤api
 mi("skinapi")
 mi("skin")
