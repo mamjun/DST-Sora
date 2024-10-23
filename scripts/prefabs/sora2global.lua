@@ -95,7 +95,7 @@ local function fn()
     inst.components.inventoryitem.imagename = "sora2global"
 
     inst:AddComponent("inspectable")
-    inst.components.inspectable:SetDescription("")
+    inst.components.inspectable:SetDescription("妈妈我要去旅行~")
     inst:AddComponent("soraonlyone")
     inst.components.soraonlyone.tag = "soraglobalchest"
     inst:AddComponent("rechargeable")

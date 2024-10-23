@@ -940,6 +940,16 @@ end
 
 function params.sora2global.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(230, 230)
+    SoraMakeWidgetMovable(self, "sora2global", Vector3(0,130, 0), {
+        drag_offset = 0.6,
+        ValidPos = {
+            minx = -760,
+            miny = -400,
+            maxx = 760,
+            maxy = 400
+        }
+    })
+
 end
 params.sora2global.itemtestfn = function(container, item, slot)
     return item and not item:HasTag("unwrappable") and not item:HasTag("sorapacker") and not item:HasTag("cantpack") and
