@@ -27,115 +27,185 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
-local Assets =
-{
-	Asset("ANIM", "anim/sora_item_fx.zip"),
-}
-local function Bind(inst,target,time)
+]] local Assets = {Asset("ANIM", "anim/sora_item_fx.zip"),Asset("ANIM", "anim/sora_wsqt_fx.zip")}
+local function Bind(inst, target, time)
     inst.entity:SetParent(target.entity)
-    inst:DoTaskInTime(time,inst.Remove)
+    inst:DoTaskInTime(time, inst.Remove)
 end
 local function fn(Sim)
-	local inst = CreateEntity()
-	inst.entity:AddTransform()
-	inst.entity:AddAnimState()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
     inst.entity:AddNetwork()
-	inst.AnimState:SetBank("sora_item_fx")
-	inst.AnimState:SetBuild("sora_item_fx")
-	inst.AnimState:PlayAnimation("pre")
+    inst.AnimState:SetBank("sora_item_fx")
+    inst.AnimState:SetBuild("sora_item_fx")
+    inst.AnimState:PlayAnimation("pre")
     inst.AnimState:PushAnimation("loop")
-	inst.AnimState:SetLayer(LAYER_WORLD_BACKGROUND)
-	inst:AddTag("FX")
+    inst.AnimState:SetLayer(LAYER_WORLD_BACKGROUND)
+    inst:AddTag("FX")
     inst:AddTag("NOCLICK")
-	inst:AddTag("NOBLOCK")
+    inst:AddTag("NOBLOCK")
     inst.Bind = Bind
-	inst.entity:SetPristine()
-	inst.persists = false
-	return inst
+    inst.entity:SetPristine()
+    inst.persists = false
+    return inst
 end
 
-
-local tmpAssets =
-{
-	Asset("ANIM", "anim/soratmp.zip"),
-}
-local function tmpBind(inst,target,scale,offset)
-	local scale = scale or 1
-	local pos = offset or Point(0,0.5,0)
+local tmpAssets = {Asset("ANIM", "anim/soratmp.zip")}
+local function tmpBind(inst, target, scale, offset)
+    local scale = scale or 1
+    local pos = offset or Point(0, 0.5, 0)
     inst.entity:SetParent(target.entity)
-	inst.AnimState:SetScale(scale,scale,scale)
-	inst.Transform:SetPosition(pos.x,pos.y,pos.z)
+    inst.AnimState:SetScale(scale, scale, scale)
+    inst.Transform:SetPosition(pos.x, pos.y, pos.z)
 end
 local function tmpfn(Sim)
-	local inst = CreateEntity()
-	inst.entity:AddTransform()
-	inst.entity:AddAnimState()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
     inst.entity:AddNetwork()
-	inst.AnimState:SetBank("soratmp")
-	inst.AnimState:SetBuild("soratmp")
-	inst.AnimState:PlayAnimation("idle")
-	inst:AddTag("FX")
+    inst.AnimState:SetBank("soratmp")
+    inst.AnimState:SetBuild("soratmp")
+    inst.AnimState:PlayAnimation("idle")
+    inst:AddTag("FX")
     inst:AddTag("NOCLICK")
-	inst:AddTag("NOBLOCK")
+    inst:AddTag("NOBLOCK")
     inst.Bind = tmpBind
-	inst.entity:SetPristine()
-	inst.persists = false
-	return inst
+    inst.entity:SetPristine()
+    inst.persists = false
+    return inst
 end
 local function footsbycfn(Sim)
-	--print("footsbyfncc0")
-	local inst = CreateEntity()
-	inst.entity:AddTransform()
-	inst.entity:AddAnimState()
-    --inst.entity:AddNetwork()
-	inst.AnimState:SetBank("sora_foot_fx_sby")
-	inst.AnimState:SetBuild("sora_foot_fx_sby")
-	inst.AnimState:PlayAnimation("idle")
-	local scale = math.random()*0.5 +0.65
-	inst.AnimState:SetScale(scale,scale,scale)
-	inst:AddTag("FX")
+    -- print("footsbyfncc0")
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    -- inst.entity:AddNetwork()
+    inst.AnimState:SetBank("sora_foot_fx_sby")
+    inst.AnimState:SetBuild("sora_foot_fx_sby")
+    inst.AnimState:PlayAnimation("idle")
+    local scale = math.random() * 0.5 + 0.65
+    inst.AnimState:SetScale(scale, scale, scale)
+    inst:AddTag("FX")
     inst:AddTag("NOCLICK")
-	inst:AddTag("NOBLOCK")
-	inst.entity:SetPristine()
-	inst.persists = false
-	inst:ListenForEvent("animover",inst.Remove)
-	return inst
+    inst:AddTag("NOBLOCK")
+    inst.entity:SetPristine()
+    inst.persists = false
+    inst:ListenForEvent("animover", inst.Remove)
+    return inst
 end
 
 local function FootFX(inst)
-	local parent = inst.entity:GetParent()
-	if parent and not parent:HasTag("moving") then 
-		return 
-	end
-	local fx = SpawnPrefab("sora_foot_fx_sby_c")
-	local pos = inst:GetPosition()
-	pos.x = pos.x + math.random()*2 -1 
-	pos.z = pos.z + math.random()*2 -1 
-	fx.Transform:SetPosition(pos:Get())
+    local parent = inst.entity:GetParent()
+    if parent and not parent:HasTag("moving") then
+        return
+    end
+    local fx = SpawnPrefab("sora_foot_fx_sby_c")
+    local pos = inst:GetPosition()
+    pos.x = pos.x + math.random() * 2 - 1
+    pos.z = pos.z + math.random() * 2 - 1
+    fx.Transform:SetPosition(pos:Get())
 
-	-- local fx = SpawnPrefab("sora_foot_fx_sby_c")
-	-- local pos = inst:GetPosition()
-	-- pos.x = pos.x + math.random()*2 -1 
-	-- pos.z = pos.z + math.random()*2 -1 
-	-- fx.Transform:SetPosition(pos:Get())
-
+    -- local fx = SpawnPrefab("sora_foot_fx_sby_c")
+    -- local pos = inst:GetPosition()
+    -- pos.x = pos.x + math.random()*2 -1 
+    -- pos.z = pos.z + math.random()*2 -1 
+    -- fx.Transform:SetPosition(pos:Get())
 
 end
 
 local function footsbyfn(Sim)
-	local inst = CreateEntity()
-	inst.entity:AddTransform()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
     inst.entity:AddNetwork()
-	inst:AddTag("FX")
+    inst:AddTag("FX")
     inst:AddTag("NOCLICK")
-	inst:AddTag("NOBLOCK")
-	inst.entity:SetPristine()
-	inst.persists = false
-	if not TheNet:IsDedicated() then 
-		inst:DoPeriodicTask(0.3,FootFX,math.random())
-	end
-	return inst
+    inst:AddTag("NOBLOCK")
+    inst.entity:SetPristine()
+    inst.persists = false
+    if not TheNet:IsDedicated() then
+        inst:DoPeriodicTask(0.3, FootFX, math.random())
+    end
+    return inst
 end
+local function wsqt_fxbind(inst,owner,pos)
+	inst.entity:SetParent(owner.entity)
+	inst.owner = owner
+	owner:SoraLockSymbol("headbase","sora_wsqt","sora_wsqt_fx","swap_headbase")
+	owner:SoraLockSymbol("headbase_hat","sora_wsqt","sora_wsqt_fx","swap_headbase")
+	owner:SoraLockSymbol("hair","sora_wsqt","sora_wsqt_fx","swap_hair")
+	owner:SoraLockSymbol("hair_hat","sora_wsqt","sora_wsqt_fx","swap_hair")
+	owner:SoraLockSymbolShow("face","sora_wsqt",false)
+	owner:SoraLockSymbolShow("swap_face","sora_wsqt",false)
+	owner:SoraLockSymbolShow("swap_hat","sora_wsqt",false)
+	owner:SoraLockSymbolShow("beard","sora_wsqt",false)
+	owner:SoraLockSymbolShow("cheeks","sora_wsqt",false)
+	owner:SoraLockSymbolShow("hairfront","sora_wsqt",false)
+	owner:SoraLockSymbolShow("hairpigtails","sora_wsqt",false)
+	owner:SoraLockLayerShow("HAT","sora_wsqt",false)
+	owner:SoraLockLayerShow("HAIR_HAT","sora_wsqt",false)
+	owner:SoraLockLayerShow("HAIR_NOHAT","sora_wsqt",false)
+	owner:SoraLockLayerShow("HAIR","sora_wsqt",true)
 
-return Prefab( "sora_item_fx", fn, Assets ),Prefab( "sora_tmp_fx", tmpfn, tmpAssets ),Prefab( "sora_foot_fx_sby", footsbyfn ),Prefab( "sora_foot_fx_sby_c", footsbycfn )
+	owner:SoraLockLayerShow("HEAD","sora_wsqt",true)
+	owner:SoraLockLayerShow("HEAD_HAT_NOHELM","sora_wsqt",false)
+	owner:SoraLockLayerShow("HEAD_HAT_HELM","sora_wsqt",false)
+	owner:SoraLockLayerShow("HAIR_NOHAT","sora_wsqt",false)
+end
+local function wsqt_unfxbind(inst)
+	local owner = inst.owner 
+	if not owner then 
+		return 
+	end
+	owner:SoraUnlockSymbol("headbase","sora_wsqt")
+	owner:SoraUnlockSymbol("headbase_hat","sora_wsqt")
+	owner:SoraUnlockSymbol("hair","sora_wsqt")
+	owner:SoraUnlockSymbol("hair_hat","sora_wsqt")
+	owner:SoraUnlockSymbolShow("face","sora_wsqt")
+	owner:SoraUnlockSymbolShow("swap_face","sora_wsqt")
+	owner:SoraUnlockSymbolShow("swap_hat","sora_wsqt")
+	owner:SoraUnlockSymbolShow("beard","sora_wsqt")
+	owner:SoraUnlockSymbolShow("cheeks","sora_wsqt")
+	owner:SoraUnlockSymbolShow("hairfront","sora_wsqt")
+	owner:SoraUnlockSymbolShow("hairpigtails","sora_wsqt")
+	owner:SoraUnlockLayerShow("HAT","sora_wsqt")
+	owner:SoraUnlockLayerShow("HAIR_HAT","sora_wsqt")
+	owner:SoraUnlockLayerShow("HAIR_NOHAT","sora_wsqt")
+	owner:SoraUnlockLayerShow("HAIR","sora_wsqt")
+
+	owner:SoraUnlockLayerShow("HEAD","sora_wsqt")
+	owner:SoraUnlockLayerShow("HEAD_HAT_NOHELM","sora_wsqt")
+	owner:SoraUnlockLayerShow("HEAD_HAT_HELM","sora_wsqt")
+	owner:SoraUnlockLayerShow("HAIR_NOHAT","sora_wsqt")
+end
+local function ResetTime(inst)
+    if inst.killtask then 
+        inst.killtask:Cancel()
+    end
+    inst.killtask = inst:DoTaskInTime(inst.time,inst.Remove)
+end
+local function wsqt_fxfn(Sim)
+    -- print("footsbyfncc0")
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+
+	--inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
+	inst.bind= wsqt_fxbind
+    inst:AddTag("FX")
+    inst:AddTag("NOCLICK")
+    inst:AddTag("NOBLOCK")
+    inst.entity:SetPristine()
+    inst.persists = false
+    inst.time = 480
+    inst.time = 20
+	if not TheWorld.soraismastersim then 
+		return true 
+	end
+    inst.ResetTime = ResetTime 
+    inst.killtask = inst:DoTaskInTime(inst.time,inst.Remove)
+	inst:ListenForEvent("onremove",wsqt_unfxbind)
+    return inst
+end
+return Prefab("sora_item_fx", fn, Assets), Prefab("sora_tmp_fx", tmpfn, tmpAssets),
+    Prefab("sora_foot_fx_sby", footsbyfn), Prefab("sora_foot_fx_sby_c", footsbycfn), Prefab("sora_wsqt_fx", wsqt_fxfn)

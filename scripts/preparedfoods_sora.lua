@@ -622,16 +622,81 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         cook_need = "未知",
         cook_cant = "未知",
         cooktp = {{"meatballs", "bonestew", "kabobs", "honeyham"}, {"dragonpie", "jammypreserves", "fruitmedley", "trailmix"}}
+    },
+    sora_wsqt = {
+        str = "万圣奇谭",
+        des = "谁能拒绝一份咕嘟咕嘟呢?",
+        test = function(cooker, names, tags)
+            return true
+        end,
+        soraexttest = function(cooker, names, tags,data)
+            if not data then 
+                return false
+            end
+            for k,v in pairs(data.items) do 
+                names[v.prefab] = 1
+            end
+            if #data.items ~= 6 then 
+                return false
+            end
+            if not names.nightmarepie then 
+                return false
+            end
+            if not names.glowberrymousse then 
+                return false
+            end
+            if not names.voltgoatjelly then 
+                return false
+            end
+            if not names.bonesoup then 
+                return false
+            end
+            if not names.pumpkin then 
+                return false
+            end
+            if not ( tags.decoration  and tags.decoration < 2) then
+                return false
+            end
+            return true
+        end,
+        alluse = true,
+        mustdoer = "sora",
+        priority = 200,
+        foodtype = FOODTYPE.GOODIES,
+        health = 0,
+        hunger = 0,
+        hungertrue = true,
+        perishtime =nil,
+        sanity = 0,
+        oneatenfn =  function(i,doer)
+            if doer:HasTag("player") then 
+                if doer.sora_wsqt_fx and doer.sora_wsqt_fx:IsValid() then 
+                    doer.sora_wsqt_fx:ResetTime()
+                else
+                    doer.sora_wsqt_fx=SpawnPrefab("sora_wsqt_fx")
+                    doer.sora_wsqt_fx:bind(doer)
+                end
+            end
+        end,
+        cooktime = 1,
+        tags = {},
+        floater = {"med", nil, 0.65},
+        oneat_desc = "无",
+        cook_need = "四重黑暗+南瓜+装饰度",
+        cook_cant = "装饰度>=2",
+        cooktp = {{"pumpkin", "nightmarepie", "glowberrymousse", "voltgoatjelly","bonesoup","forgetmelots"}}
     }
 
 
+    
 }
+
 local sorafoodui = require "widgets/sorafoodui"
 for k, v in pairs(foods) do
     v.name = k
     v.weight = v.weight or 1
     v.priority = v.priority or 0
-    v.perishtime = v.perishtime * 480
+    v.perishtime = v.perishtime and ( v.perishtime * 480) or nil
     v.SetSoraExtData = function(data)
         v.tempextdata  = data
     end

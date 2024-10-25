@@ -98,6 +98,9 @@ local function fn()
     inst.components.inspectable:SetDescription("妈妈我要去旅行~")
     inst:AddComponent("soraonlyone")
     inst.components.soraonlyone.tag = "soraglobalchest"
+    inst:AddComponent("preserver")
+    inst.components.preserver:SetPerishRateMultiplier( 0)
+
     inst:AddComponent("rechargeable")
     inst.components.rechargeable:SetMaxCharge(999999)
     inst.components.rechargeable.OnSave = function()

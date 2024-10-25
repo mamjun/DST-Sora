@@ -32,9 +32,7 @@ function GetChestKey(userid)
         return "global"
     end
 end
-function c_pt()
-    print(fastdump(MailDB:GetRoot("GlobalChest")))
-end
+
 local function GetChestData(key)
     local data = MailDB:Get("GlobalChest", key, {})
     return data
@@ -125,7 +123,6 @@ MailDB:ListenForEvent("TryCloseChest", NextFrame(function(id, data)
     if not (data and data.player and data.name and data.guid and data.data) then
         return
     end
-    print(fastdump(data))
     local o = data.key or GetChestKey(data.player)
 
     local d = GetChestData(o)
@@ -191,7 +188,6 @@ MailDB:ListenForEvent("ChestOpenBy", function(id, data)
     end)
 end)
 MailDB:ListenForEvent("ChestData", NextFrame(function(id, data)
-    print(fastdump( data))
     if not (data and data.player and data.data and data.guid) then
         return
     end
@@ -218,7 +214,6 @@ function TryOpenGlobalChest(player, inst)
     if not (player and player.userid and player.name) then
         return
     end
-    print(player.userid, "TryOpenGlobalChest")
     MailDB:PushEvent("TryOpenChest", {
         player = player.userid,
         name = player.name,
@@ -231,7 +226,6 @@ function TryCloseGlobalChest(player, inst)
     if not (player and player.userid and player.name) then
         return
     end
-    print(player.userid, "TryCloseChest")
     local data = inst.components.container:OnSave()
     inst.components.container.ignoreoverstacked = true
     inst.components.container:DestroyContents()
@@ -250,7 +244,6 @@ function TryUpdateGlobalChest(player, inst)
     if not (player and player.userid and player.name) then
         return
     end
-    print(player.userid, "TryUpdateGlobalChest")
     MailDB:PushEvent("TryUpdateChest", {
         player = player.userid,
         name = player.name,

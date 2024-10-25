@@ -95,7 +95,7 @@ local function MakePreparedFood(data)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:SetBank(data.name)
         end
-        inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:PlayAnimation("idle",true)
         inst.AnimState:OverrideSymbol("swap_food", data.basename or "cook_pot_food", realname)
 
         if data.tags ~= nil then
@@ -222,7 +222,7 @@ if TUNING.NEVER_FINISH_SERIES_ENABLED then
 
                 inst.AnimState:SetBuild(data.name)
                 inst.AnimState:SetBank(data.name)
-            inst.AnimState:PlayAnimation("idle")
+            inst.AnimState:PlayAnimation("idle",true)
             inst.AnimState:OverrideSymbol("swap_food", data.basename or "cook_pot_food", realname)
 
             if data.tags ~= nil then

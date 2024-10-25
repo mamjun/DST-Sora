@@ -954,7 +954,7 @@ end
 params.sora2global.itemtestfn = function(container, item, slot)
     return item and not item:HasTag("unwrappable") and not item:HasTag("sorapacker") and not item:HasTag("cantpack") and
                not item:HasTag("soracantpack") and not item:HasTag("irreplaceable") and not item:HasTag("nonpackable") and
-               not item.replica.container
+               not item.replica.container and not item:HasTag("boxopener_l") and not item.components.container_proxy
 end
 
 if needhelp then

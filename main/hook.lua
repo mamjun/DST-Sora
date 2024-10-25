@@ -567,6 +567,43 @@ AddStategraphPostInit("wilson_client", function(self)
     FixSora(self)
 end)
 
+
+local ShowHook = userdata.MakeHook("AnimState", "Show", function(inst, symbol)
+    inst.SoraLayerShown[symbol] = true
+    if inst.SoraLockLayerShown[symbol] then
+        return true
+    else
+        return false
+    end
+end)
+local HideHook = userdata.MakeHook("AnimState", "Hide", function(inst, symbol)
+    inst.SoraLayerShown[symbol] = false
+    if inst.SoraLockLayerShown[symbol] then
+        return true
+    else
+        return false
+    end
+end)
+
+local ShowSymbolHook = userdata.MakeHook("AnimState", "ShowSymbol", function(inst, symbol)
+    inst.SoraSymbolShown[symbol] = true
+    if inst.SoraLockSymbolShown[symbol] then
+        return true
+    else
+        return false
+    end
+end)
+
+local HideSymbolHook = userdata.MakeHook("AnimState", "HideSymbol", function(inst, symbol)
+    inst.SoraSymbolShown[symbol] = false
+    if inst.SoraLockSymbolShown[symbol] then
+        return true
+    else
+        return false
+    end
+end)
+
+
 local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol", function(inst, symbol, build, newsymbol)
     if not inst.SoraLastSymbols[symbol] then
         inst.SoraLastSymbols[symbol] = {}
@@ -636,6 +673,108 @@ local function SoraUnlockSymbol(inst, symbol, key)
     end
 end
 
+
+local function SoraLockSymbolShow(inst, symbol, key,shown)
+    if not inst.SoraLockSymbolShown then
+        return false
+    end
+    if not inst.SoraLockSymbolShown[symbol] then
+        inst.SoraLockSymbolShown[symbol] = {}
+    end
+    for k, v in pairs(inst.SoraLockSymbolShown[symbol]) do
+        if v and v.key == key then
+            table.remove(inst.SoraLockSymbolShown[symbol], k)
+        end
+    end
+    table.insert(inst.SoraLockSymbolShown[symbol], {
+        key = key,
+        shown=shown
+    })
+    if shown then 
+        userdata.Call(inst, ShowSymbolHook, symbol)
+    else
+        userdata.Call(inst, HideSymbolHook, symbol)
+    end
+end
+local function SoraUnlockSymbolShow(inst, symbol, key)
+    if not inst.SoraLockSymbolShown then
+        return false
+    end
+    if not inst.SoraLockSymbolShown[symbol] then
+        return false
+    end
+    for k, v in pairs(inst.SoraLockSymbolShown[symbol]) do
+        if v and v.key == key then
+            table.remove(inst.SoraLockSymbolShown[symbol], k)
+        end
+    end
+    local shown = true
+    if next(inst.SoraLockSymbolShown[symbol]) then
+
+        local tb = inst.SoraLockSymbolShown[symbol]
+        local nn = #tb
+        shown = tb[nn].shown
+    elseif inst.SoraSymbolShown[symbol] ~= nil then 
+        shown = inst.SoraSymbolShown[symbol]
+    end
+    if shown then 
+        userdata.Call(inst, ShowSymbolHook, symbol)
+    else
+        userdata.Call(inst, HideSymbolHook, symbol)
+    end
+end
+
+
+local function SoraLockLayerShow(inst, symbol, key,shown)
+    if not inst.SoraLockLayerShown then
+        return false
+    end
+    if not inst.SoraLockLayerShown[symbol] then
+        inst.SoraLockLayerShown[symbol] = {}
+    end
+    for k, v in pairs(inst.SoraLockLayerShown[symbol]) do
+        if v and v.key == key then
+            table.remove(inst.SoraLockLayerShown[symbol], k)
+        end
+    end
+    table.insert(inst.SoraLockLayerShown[symbol], {
+        key = key,
+        shown=shown
+    })
+    
+    if shown then 
+        userdata.Call(inst, ShowHook, symbol)
+    else
+        userdata.Call(inst, HideHook, symbol)
+    end
+end
+local function SoraUnlockLayerShow(inst, symbol, key)
+    if not inst.SoraLockLayerShown then
+        return false
+    end
+    if not inst.SoraLockLayerShown[symbol] then
+        return false
+    end
+    for k, v in pairs(inst.SoraLockLayerShown[symbol]) do
+        if v and v.key == key then
+            table.remove(inst.SoraLockLayerShown[symbol], k)
+        end
+    end
+    local shown = true
+    if next(inst.SoraLockLayerShown[symbol]) then
+        local tb = inst.SoraLockLayerShown[symbol]
+        local nn = #tb
+        shown = tb[nn].shown
+    elseif inst.SoraLayerShown[symbol] ~= nil then 
+        shown = inst.SoraLayerShown[symbol]
+    end
+    if shown then 
+        userdata.Call(inst, ShowHook, symbol)
+    else
+        userdata.Call(inst, HideHook, symbol)
+    end
+end
+
 AddPlayerPostInit(function(inst)
     if not TheWorld.ismastersim then
         return
@@ -646,6 +785,21 @@ AddPlayerPostInit(function(inst)
     inst.SoraLastSymbols = {}
     inst.SoraLockSymbol = SoraLockSymbol
     inst.SoraUnlockSymbol = SoraUnlockSymbol
+
+    userdata.Hook(inst, ShowHook)
+    userdata.Hook(inst, HideHook)
+    userdata.Hook(inst, ShowSymbolHook)
+    userdata.Hook(inst, HideSymbolHook)
+
+    inst.SoraSymbolShown = {}
+    inst.SoraLayerShown = {}
+    inst.SoraLockSymbolShown = {}
+    inst.SoraLockLayerShown = {}
+    inst.SoraLockSymbolShow = SoraLockSymbolShow
+    inst.SoraUnlockSymbolShow = SoraUnlockSymbolShow
+    inst.SoraLockLayerShow = SoraLockLayerShow
+    inst.SoraUnlockLayerShow = SoraUnlockLayerShow
+    
     inst:ListenForEvent("trade", function(inst, data)
         if not inst:HasTag("sora") and data and data.giver and data.giver:HasTag("sora") and data.item and
             data.item.prefab == "sora2armor" and data.item.skinname == "sora2armorskin" then
@@ -873,6 +1027,18 @@ end)
 AddComponentPostInit("combat", function(self)
     local oldGetAttacked = self.GetAttacked
     self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
+        if damage > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then 
+            if not s.sora_wsqt_fxCD then 
+                s.sora_wsqt_fxCD = SoraCD(2)
+            end
+            if s.sora_wsqt_fxCD() then 
+                local fx = SpawnPrefab("shadow_shield"..tostring(math.random(1,6)))
+                fx.entity:SetParent(s.inst.entity)
+                s.inst:PushEvent("blocked", { attacker = attacker })
+                return false
+            end
+        end
+
         local olddamagetobreak
         if weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
             olddamagetobreak = s.inst.components.freezable.damagetobreak
@@ -882,6 +1048,7 @@ AddComponentPostInit("combat", function(self)
         if olddamagetobreak and weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
             s.inst.components.freezable.damagetobreak = olddamagetobreak
         end
+        
         return x, y, z
     end
     local DoAttack = self.DoAttack
@@ -975,37 +1142,6 @@ AddComponentPostInit("lunarthrall_plantspawner", function(i)
 
 end)
 
--- ControlContainers = {
---     sora2chest = 20,
---     sora_light = 150,
--- }
--- local function TryFixContainer(inst)
---     --print("inst",inst)
---     if inst.components.container then
---         local PutAllOfActiveItemInSlot = inst.components.container.PutAllOfActiveItemInSlot
---         inst.components.container.PutAllOfActiveItemInSlot = function(s,slot,...)
---             --print(1,s,s.inst,slot,...)
---             return slot and ControlContainers[inst.prefab] and slot > ControlContainers[inst.prefab]
---                  and inst.components.container.PutOneOfActiveItemInSlot(s,slot,...) or  PutAllOfActiveItemInSlot(s,slot,...)
---         end
---     end
-
---     if inst.replica.container then
---         local PutAllOfActiveItemInSlot = inst.replica.container.PutAllOfActiveItemInSlot
---         inst.replica.container.PutAllOfActiveItemInSlot = function(s,slot,...)
---             --print(2,s,s.inst,slot,...)
---             return slot and ControlContainers[inst.prefab] and slot > ControlContainers[inst.prefab]
---                  and inst.replica.container.PutOneOfActiveItemInSlot(s,slot,...) or  PutAllOfActiveItemInSlot(s,slot,...)
---         end
---     end
-
--- end
--- for k,v in pairs(ControlContainers) do
---     AddPrefabPostInit(k,function (inst)
---         inst:DoTaskInTime(0,TryFixContainer)
---     end)
-
--- end
 
 AddPrefabPostInit("treasurechest", function(inst)
     inst.sora2chest = net_bool(inst.GUID, "sora2chest", "sora2chestdirty")
