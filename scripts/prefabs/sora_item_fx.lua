@@ -198,7 +198,6 @@ local function wsqt_fxfn(Sim)
     inst.entity:SetPristine()
     inst.persists = false
     inst.time = 480
-    inst.time = 20
 	if not TheWorld.soraismastersim then 
 		return true 
 	end

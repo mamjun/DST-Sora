@@ -91,6 +91,9 @@ SORAPACK.fn = function(act)
             if invobject.skinname == "sorabowknot_dw" then 
                 skin = "sorapacker_dw"
             end
+            if invobject.skinname == "sorabowknot_wsqy" or invobject.skinname == "sorabowknot_wsqy_r"  then 
+                skin = "sorapacker_wsqy"
+            end
             if invobject.skinname == "sorabowknot_dw_tmp" then 
                 skin = "sorapacker_dw_tmp"
             end

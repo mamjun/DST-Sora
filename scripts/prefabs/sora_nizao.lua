@@ -168,6 +168,8 @@ local function onuse(inst, doer)
             TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_beex", nil, nil)
         elseif inst.skinname == "sora_lightflier_tjzz" then
             TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_tjzz", nil, nil)
+        elseif inst.skinname == "sora_lightflier_wsqy" then
+            TheSim:ReskinEntity(cat.GUID, cat.skinname, "sora_lightflier_cat_wsqy", nil, nil)
         end
         local save = inst.components.sorasavecmp:GetSave("cat")
         if save and save.data then
@@ -370,10 +372,39 @@ SoraAPI.MakeItemSkin("sora_lightflier_cat", ttname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 
+local tname = "sora_lightflier_wsqy"
+SoraAPI.MakeItemSkin("sora_lightflier", tname, {
+    name = "小恶魔",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "lightflier",
+    basebank = "lightflier",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+local ttname = "sora_lightflier_cat_wsqy"
+SoraAPI.MakeItemSkin("sora_lightflier_cat", ttname, {
+    name = "小恶魔",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    basebuild = "lightflier",
+    basebank = "lightflier",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
 SoraAPI.MakeSkinNameMap("sora_lightflier_beex", "sora_lightflier_cat_beex")
-SoraAPI.MakeSkinNameMap("sora_lightflier_tjzz", "sora_lightflier_cat_tjzz")
 SoraAPI.MakeAssetTable("sora_lightflier_beex", lightasset)
+
+SoraAPI.MakeSkinNameMap("sora_lightflier_tjzz", "sora_lightflier_cat_tjzz")
 SoraAPI.MakeAssetTable("sora_lightflier_tjzz", lightasset)
+
+SoraAPI.MakeSkinNameMap("sora_lightflier_wsqy", "sora_lightflier_cat_wsqy")
+SoraAPI.MakeAssetTable("sora_lightflier_wsqy", lightasset)
 
 local assets = {Asset("ANIM", "anim/sign_home.zip"), Asset("ANIM", "anim/sora_sign_myy.zip"),
                 Asset("ANIM", "anim/ui_board_5x3.zip"), Asset("MINIMAP_IMAGE", "sign"),
@@ -660,7 +691,7 @@ SoraAPI.MakeAssetTable("sora_sign_wsqy", assets)
 SoraAPI.MakeSkinNameMap("sora_sign_wsqy", "sora_sign_item_wsqy")
 local tname = "sora_sign_wsqy"
 SoraAPI.MakeItemSkin("sora_sign", tname, {
-    name = "万圣前夜",
+    name = "费德提克先生",
     atlas = "images/inventoryimages/" .. tname .. ".xml",
     image = tname,
     build = tname,
@@ -686,7 +717,7 @@ SoraAPI.MakeItemSkin("sora_sign", tname, {
 
 local tname = "sora_sign_wsqy"
 SoraAPI.MakeItemSkin("sora_sign_item", "sora_sign_item_wsqy", {
-    name = "万圣前夜",
+    name = "费德提克先生",
     atlas = "images/inventoryimages/" .. tname .. ".xml",
     image = tname,
     build = tname,

@@ -33,6 +33,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         str = "阿瓶酱",
         des = "人间美味！",
         test = function(cooker, names, tags)
+            print(fastdump(names))
+            print(fastdump(tags))
             return
                 (((names.tomato and names.tomato or 0) + (names.tomato_cooked and names.tomato_cooked or 0)) > 2.5) and
                     not tags.meat and not tags.inedible
@@ -633,8 +635,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             if not data then 
                 return false
             end
+            local names = {}
             for k,v in pairs(data.items) do 
-                names[v.prefab] = 1
+                names[v.prefab] =(names[v.prefab] or 0)+ 1
             end
             if #data.items ~= 6 then 
                 return false
@@ -679,7 +682,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             end
         end,
         cooktime = 1,
-        tags = {},
+        tags = {"spicedfood","soraspicedfood"},
         floater = {"med", nil, 0.65},
         oneat_desc = "无",
         cook_need = "四重黑暗+南瓜+装饰度",

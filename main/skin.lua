@@ -221,6 +221,9 @@ MakeSkinNameMap("sorabowknot_sby", "sora3packer_sby")
 MakeSkinNameMap("sorabowknot_dw", "sorapacker_dw")
 MakeSkinNameMap("sorabowknot_dw", "sora3packer_dw")
 
+MakeSkinNameMap("sorabowknot_wsqy", "sorapacker_wsqy")
+MakeSkinNameMap("sorabowknot_wsqy", "sora3packer_wsqy")
+
 MakeSkinNameMap("sorabowknot_dw_tmp", "sorapacker_dw_tmp")
 MakeSkinNameMap("sorabowknot_dw_tmp", "sora3packer_dw_tmp")
 
@@ -949,6 +952,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_tqy_qkyz", "众生为棋,一掷钱坤")
     AddItemSkin("sora_tqy_xql", "小青龙为什么是红色的?")
     AddItemSkin("sora_lightflier_tjzz", "闲来无事，躺竹听曲")
+    AddItemSkin("sora_lightflier_wsqy", "哇酷！哇酷！哇酷哇酷！")
     AddItemSkin("sorabowknot_sby",
         "不能因为是女孩子就觉得自己是弱\n者，如果不强大就不能保护身边\n最重要的人",
         nil, true)
@@ -960,10 +964,13 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_tqy_sby", "月之冕出击！", nil, true)
     AddItemSkin("sora_tqy_box_sby", "毁灭之后是希望和再生。", nil, true)
 
-    AddItemSkin("sora_sign_wsqy", "不给糖就捣蛋！", nil, true)
-    AddItemSkin("sora_smalllight_wsqy", "不给糖就捣蛋！", nil, true)
-    AddItemSkin("soramagic_wsqy", "不给糖就捣蛋！", nil, true)
-
+    AddItemSkin("sora_sign_wsqy", "万圣狂欢，无乐不作！", nil, true)
+    AddItemSkin("sora_smalllight_wsqy", "不给糖就把你抓起来吃掉！", nil, true)
+    AddItemSkin("soramagic_wsqy", "我将玫瑰藏于身后,\n期盼与你赴约.", nil, true)
+    AddItemSkin("soratele_wsqy", "在我荒瘠的土地上,\n你是最后的玫瑰", nil, true)
+    AddItemSkin("sorabowknot_wsqy", "有人骂你野心勃勃，\n有人爱你灵魂有火", nil, true)
+    
+    
     local item_map = {
         sora_none = "sora_uniforms"
     }

@@ -51,7 +51,7 @@ local packassets = {Asset("ANIM", "anim/sora2pack.zip"), Asset("ATLAS", "images/
                     Asset("ATLAS", "images/inventoryimages/sora2pack_2.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora2pack_2.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora2pack_2.tex"), Asset("ANIM", "anim/sora3pack.zip"),
-                    Asset("ANIM", "anim/sora3pack_ld.zip"), Asset("ANIM", "anim/sora3pack_sby.zip"),
+                    Asset("ANIM", "anim/sora3pack_ld.zip"),Asset("ANIM", "anim/sora3pack_wsqy.zip"), Asset("ANIM", "anim/sora3pack_sby.zip"),
                     Asset("ATLAS", "images/inventoryimages/sora3pack.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack.xml", 256),
                     Asset("IMAGE", "images/inventoryimages/sora3pack.tex"),
@@ -66,7 +66,11 @@ local packassets = {Asset("ANIM", "anim/sora2pack.zip"), Asset("ATLAS", "images/
                     Asset("IMAGE", "images/inventoryimages/sora3pack_2.tex"),
                     Asset("ATLAS", "images/inventoryimages/sora3pack_sby.xml"),
                     Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack_sby.xml", 256),
-                    Asset("IMAGE", "images/inventoryimages/sora3pack_sby.tex")}
+                    Asset("IMAGE", "images/inventoryimages/sora3pack_sby.tex"),
+                    Asset("IMAGE", "images/inventoryimages/sora3pack_wsqy.tex"),
+                    Asset("ATLAS", "images/inventoryimages/sora3pack_wsqy.xml"),
+                    Asset("ATLAS_BUILD", "images/inventoryimages/sora3pack_wsqy.xml", 256),
+                }
 local function onremovelight(light)
     light._lantern._light = nil
 end
@@ -312,6 +316,8 @@ local function fn()
             doer.components.bundler.itemprefab = nil
             if inst.skinname == "sorabowknot_ld" then
                 doer.components.bundler.preskinname = "sorapacker_ld"
+            elseif inst.skinname == "sorabowknot_wsqy" or inst.skinname == "sorabowknot_wsqy_r" then
+                doer.components.bundler.preskinname = "sorapacker_wsqy"
             elseif inst.skinname == "sorabowknot_sby" then
                 doer.components.bundler.preskinname = "sorapacker_sby"
             elseif inst.skinname == "sorabowknot_dw" then
@@ -469,7 +475,7 @@ local function fullfn()
 end
 
 
-SoraAPI.MakeItemSkinDefaultData("sorapacker", {"images/inventoryimages/sora3pack.xml", "sora3pack"}, {"sora3pack","sora3pack_1"})
+SoraAPI.MakeItemSkinDefaultData("sorapacker", {"images/inventoryimages/sora3pack.xml", "sora3pack"}, {"sora3pack_1","sora3pack","anim",true})
 SoraAPI.MakeItemSkin("sorapacker", "sorapacker_2", {
     name = "打包的礼物",
     atlas = "images/inventoryimages/sora3pack_2.xml",
@@ -497,6 +503,17 @@ SoraAPI.MakeItemSkin("sorapacker", "sorapacker_dw", {
     image = "sora3pack_dw",
     build = "sora3pack_dw",
     bank = "sora3pack_dw",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end
+})
+SoraAPI.MakeItemSkin("sorapacker", "sorapacker_wsqy", {
+    name = "万圣前夜",
+    atlas = "images/inventoryimages/sora3pack_wsqy.xml",
+    image = "sora3pack_wsqy",
+    build = "sora3pack_wsqy",
+    bank = "sora3pack_wsqy",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -685,7 +702,7 @@ local function full3fn()
     return inst
 end
 
-SoraAPI.MakeItemSkinDefaultData("sora3packer", {"images/inventoryimages/sora3pack.xml", "sora3pack"},{"sora3pack","sora3pack_1"})
+SoraAPI.MakeItemSkinDefaultData("sora3packer", {"images/inventoryimages/sora3pack.xml", "sora3pack"},{"sora3pack_1","sora3pack","anim",true})
 
 SoraAPI.MakeItemSkin("sora3packer", "sora3packer_2", {
     name = "穹の打包纸",
@@ -715,6 +732,17 @@ SoraAPI.MakeItemSkin("sora3packer", "sora3packer_dw", {
     image = "sora3pack_dw",
     build = "sora3pack_dw",
     bank = "sora3pack_dw",
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = function(inst)
+    end
+})
+SoraAPI.MakeItemSkin("sora3packer", "sora3packer_wsqy", {
+    name = "万圣前夜",
+    atlas = "images/inventoryimages/sora3pack_wsqy.xml",
+    image = "sora3pack_wsqy",
+    build = "sora3pack_wsqy",
+    bank = "sora3pack_wsqy",
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
     init_fn = function(inst)
@@ -826,6 +854,7 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_dw", {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 
+
 SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_dw_tmp", {
     name = "蝴蝶结-碎玉斋(限时)",
     atlas = "images/inventoryimages/sorabowknot_dw.xml",
@@ -843,6 +872,31 @@ SoraAPI.MakeItemSkin("sorabowknot", "sorabowknot_dw_tmp", {
 
 SoraAPI.MakeAssetTable("sorabowknot_dw", assets)
 SoraAPI.MakeAssetTable("sora3pack_dw", assets)
+
+local tname = "sorabowknot_wsqy"
+SoraAPI.MakeItemSkin("sorabowknot", tname, {
+    name = "蝴蝶结-纪念",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "sorabowknot_wsqy_r"
+SoraAPI.MakeItemSkin("sorabowknot", tname, {
+    name = "蝴蝶结☆纪念",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
 return Prefab("sorapack_container", pack3fn), Prefab("sorabowknot", fn, assets),
     Prefab("sorapacker", fullfn, packassets), Prefab("sora2pack", packfn, packassets),
     Prefab("sora3packer", full3fn, packassets), MakePlacer("sorapacker_placer", "sorapacker", "sorapacker", "place"),

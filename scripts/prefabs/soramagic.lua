@@ -309,7 +309,7 @@ SoraAPI.MakeItemSkin("soramagic",tname , {
 
 local tname = "soramagic_wsqy"
 SoraAPI.MakeItemSkin("soramagic",tname , {
-    name = "万圣前夜",
+    name = "赴约",
     atlas = "images/inventoryimages/"..tname..".xml",
     image = tname,
     build = tname,

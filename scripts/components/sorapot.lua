@@ -763,7 +763,11 @@ function com:GetSpiceRec(slots)
     }
     for k, v in pairs(slots) do
         local item = self.con:GetItemInSlot(v)
+       
         if item then
+            if item:HasTag("spicedfood") then 
+                return nil
+            end
             -- table.insert(data.items, item)
             table.insert(data.prefablist, item.prefab)
         end

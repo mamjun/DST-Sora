@@ -813,7 +813,7 @@ function params.sora_pot.itemtestfn(container, item, slot)
                 return true
             end
         elseif slot == 7 then
-            if item:HasTag("preparedfood") and (not item:HasTag("spicedfood") or item:HasTag("sorahuapencant")) then
+            if item:HasTag("preparedfood") and (item:HasTag("soraspicedfood") or  not item:HasTag("spicedfood") or item:HasTag("sorahuapencant")) then
                 return true
             end
         elseif slot == 8 then

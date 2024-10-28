@@ -137,7 +137,7 @@ local ui = Class(Widget, function(self,data,parent,top,left)
 	MakeDetailsLine(self, column_offset_x, y - 2, .3, "quagmire_recipe_line_veryshort.tex")
 	y = y - 8
 	y = y - body_font_size/2
-	local str = string.format("%.f天",(data.recipe_def.perishtime/480))
+	local str = data.recipe_def.perishtime and string.format("%.f天",(data.recipe_def.perishtime/480)) or "永不过期"
 	local tags = self:AddChild(Text(HEADERFONT, body_font_size, str, UICOLOURS.BROWN_DARK))
 	tags:SetPosition(column_offset_x, y)
 	y = y - body_font_size/2 - 4
