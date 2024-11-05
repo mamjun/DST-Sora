@@ -37,7 +37,7 @@ Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), A
                 Asset("ANIM", "anim/sora_amly.zip"), Asset("ANIM", "anim/sora_gete.zip"),
                 Asset("ANIM", "anim/sora_llan.zip"), Asset("ANIM", "anim/sora_sby.zip"),
                 Asset("ANIM", "anim/sora_mysora.zip"), Asset("ANIM", "anim/sora_mysora_r.zip"),
-                Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"),
+                Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"), Asset("ANIM", "anim/sora_wsqy.zip"),
                 Asset("ANIM", "anim/sora_sdsz_r.zip"), Asset("ANIM", "anim/sorahair.zip"),
                 Asset("ANIM", "anim/sorahair2.zip"), Asset("ANIM", "anim/sorahair3.zip"),
                 Asset("ANIM", "anim/sorahair4.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
@@ -1023,5 +1023,9 @@ MakeSkin("sora_sdsz_r", {
     des = '人家才不是穹呢。\n我是空!叫我sora也行。',
     quotes = '你好,我是sora'
 })
-
+MakeSkin("sora_wsqy", {
+    name = "万圣前夜",
+    des = '不给糖？就把你吃掉！',
+    quotes = '啊呜~'
+})
 return MakePlayerCharacter("sora", prefabs, assets, common_postinit, master_postinit, start_inv)

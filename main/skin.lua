@@ -213,6 +213,7 @@ MakeSkin("sora_sby", {
 })
 MakeSkinNameMap("sora_sdsz", "sora_sdsz_r")
 MakeSkinNameMap("sora_sdsz", "sorabag_sd")
+MakeSkinNameMap("sora_wsqy", "sorabag_wsqy")
 MakeSkinNameMap("sorabowknot_ld", "sorapacker_ld")
 MakeSkinNameMap("sorabowknot_ld", "sora3packer_ld")
 MakeSkinNameMap("sorabowknot_sby", "sorapacker_sby")
@@ -399,7 +400,7 @@ local function Login(userid, netid, nick)
                 lastloginfaild = data.error
             end
             if code == -1004 then
-                lastloginfaild = "登录错误代码:-1004"
+                lastloginfaild = "登录错误代码:-1004,请使用在线模式游玩一次"
             end
             print("LoginFailed", msg, type(data) == "table" and fastdump(data) or data)
             return false
@@ -899,6 +900,16 @@ if not TheNet:IsDedicated() then
             local scr = GameTimeUnLockScreen2(item, 300)
             scr.unlocktext:SetString("消耗300活跃度解锁")
             return scr
+        end,
+        sora2build_decor_small = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 60)
+            scr.unlocktext:SetString("消耗60活跃度解锁")
+            return scr
+        end,
+        sora2build_decor_medium = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 60)
+            scr.unlocktext:SetString("消耗60活跃度解锁")
+            return scr
         end
         -- sora_sign_yez = function(s, item)
         --     local scr = GameTimeUnLockScreen2(item, 300)
@@ -970,6 +981,9 @@ if not TheNet:IsDedicated() then
     AddItemSkin("soratele_wsqy", "在我荒瘠的土地上,\n你是最后的玫瑰", nil, true)
     AddItemSkin("sorabowknot_wsqy", "有人骂你野心勃勃，\n有人爱你灵魂有火", nil, true)
     
+    AddItemSkin("sora2build_decor_jss", "红伞伞，白杆杆\n吃完一起躺板板。")
+    AddItemSkin("sora2build_decor_small", "这是中杯，\n这是大杯，\n这是超大杯.",60)
+    AddItemSkin("sora2build_decor_medium", "这是中杯，\n这是大杯，\n这是超大杯.",60)
     
     local item_map = {
         sora_none = "sora_uniforms"

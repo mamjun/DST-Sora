@@ -253,15 +253,15 @@ Rec("sora_tqy_box", "穹の归羽", "似曾相识燕归来", equip, "sora", {{
 Rec("sora_wq", "雾切之回光", "神里流太刀术皆传\n神里绫华 参上", equip, "soraself", {{
     sora_flh = 10,
     sora3sword = 3,
-    sora_light_rainbow_new = 3,
+    sora_light_rainbow_new = 3
 }, {
     sora_flh = 10,
     sora3sword = 3,
-    sora_light_rainbow_new = 3,
+    sora_light_rainbow_new = 3
 }, {
     sora_flh = 10,
     sora3sword = 3,
-    sora_light_rainbow_new = 3,
+    sora_light_rainbow_new = 3
 }})
 
 Rec("soraclothes", "穹の护", "小穹的贴身守护", equip, "soraself", {{
@@ -423,8 +423,8 @@ Rec("sora_pickhat", "咸鱼咸鱼咸", "一群咸鱼罢了", equip2, "sora", {
 Rec("sora2global", "穹の末影箱", "妈妈我要去旅行~", equip2, "sora", {
     cane = 1,
     cookbook = 1,
-    lantern=1,
-    portabletent_item=1,
+    lantern = 1,
+    portabletent_item = 1
 })
 
 Rec("sora2sword", "奇妙法杖", "一个奇妙法杖！", equip2, "soraother", {{
@@ -465,7 +465,6 @@ Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother
     moonglass = 40,
     gift = 5
 }})
-
 
 Rec("sora3sword", "银白の锋", "银白骑士团の制式长剑", equip2, "soraother", {{
     nightsword = 1,
@@ -680,6 +679,29 @@ Rec("sora_light", "穹の玫瑰灯", "装饰你的灯吧", build, "soraother", {
     boards = 200,
     goldnugget = 200
 }})
+
+Rec("sora2build_pile_item", "穹の小木桩", "远看近看都是桩", build, "sora", {{
+    log=10
+}, {
+    boards=5,
+    goldnugget=5,
+}, {
+    boards=10,
+    goldnugget=10,
+    petals=10,
+}}).placer="no"
+
+Rec("sora2build_decor_item", "穹の绿植", "这个撞不上", build, "sora", {{
+    log=10
+}, {
+    boards=5,
+    goldnugget=5,
+}, {
+    boards=10,
+    goldnugget=10,
+    petals=10,
+}}).placer="no"
+
 local lightdata = {
     blue = {"隐藏着黑暗力量的钥匙啊\n在我面前显示你真正的力量", {
         nightmarefuel = 40
@@ -749,6 +771,14 @@ Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother",
     townportaltalisman = 5,
     purplegem = 2
 }}).numtogive = 5
+
+if IsModEnable("Legion") or IsModEnable("棱镜") then
+
+    Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother", {
+        siving_rocks = 40,
+        purplegem = 1
+    }).numtogive = 5
+end
 
 -- AddInvImg("sora_lock", "inventoryimages/sora2stone", "sora2stone")
 Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraother", {{
@@ -847,21 +877,21 @@ Rec("winona_catapult", nil, nil, DST, "sora", {
     sorarepairer = 2,
     twigs = 3,
     cutstone = 3
-})
+}).placer = "winona_catapult_item_placer"
 Rec("winona_spotlight", nil, nil, DST, "sora", {
     sorarepairer = 2,
     goldnugget = 2
-})
+}).placer = "winona_spotlight_item_placer"
 Rec("winona_battery_low", nil, nil, DST, "sora", {
     sorarepairer = 2,
     log = 2,
     nitre = 2
-})
+}).placer = "winona_battery_low_item_placer"
 Rec("winona_battery_high", nil, nil, DST, "sora", {
     sorarepairer = 2,
     boards = 2,
     transistor = 2
-})
+}).placer = "winona_battery_high_item_placer"
 Rec("portabletent_item", nil, nil, DST, "sora", {
     bedroll_straw = 1,
     twigs = 4,
@@ -921,7 +951,9 @@ Rec("sora_pearl", "拟造-珍珠", "咦,好温暖,还有一种清醒的感觉", 
     opalpreciousgem = 3,
     heatrock = 10
 })
-
+AddRecipeToFilter("sora_lightflier" .. rec_back, item)
+AddRecipeToFilter("sora_sign_item" .. rec_back, item)
+AddRecipeToFilter("sora_pearl" .. rec_back, item)
 if IsModEnable("Legion") or IsModEnable("棱镜") then
 
     Rec("petals", nil, "花花花花", maker, "sora", {
@@ -938,10 +970,6 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
         siving_rocks = 40
     }).numtogive = 10
 
-    Rec("sora2stone", "穹の传送石", "带你回到传送点", item, "soraother", {
-        siving_rocks = 40,
-        purplegem = 1
-    }).numtogive = 5
 end
 
 -- Rec("sora_butter", "拟造-黄油", "一份黄油蟹蟹!", DST, "sora", {

@@ -138,8 +138,10 @@ local function updatesign(inst)
     elseif (inst.skinname == "sora2chest_zzb") then
         if sign then 
             inst.AnimState:PlayAnimation("idle",true)
+            --inst.AnimState:Show("swap")
         else
             inst.AnimState:PlayAnimation("idle_close",true)
+            --inst.AnimState:Hide("swap")
         end
     elseif (inst.skinname == "sora2chest_jcy") then
         if sign then 
@@ -147,6 +149,7 @@ local function updatesign(inst)
         else
             inst.AnimState:Hide("swap")
         end
+        inst.AnimState:PlayAnimation("idle",true)
     else
         inst.AnimState:PlayAnimation("idle",true)
     end

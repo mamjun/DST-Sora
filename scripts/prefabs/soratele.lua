@@ -295,15 +295,15 @@ local function fn()
     return inst
 end
 
--- local tname = "soratele_wsqy"
--- SoraAPI.MakeItemSkin("soratele",tname , {
---     name = "万圣前夜",
---     atlas = "images/inventoryimages/"..tname..".xml",
---     image = tname,
---     build = tname,
---     bank =  tname,
---     checkfn = SoraAPI.SoraSkinCheckFn,
---     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
--- })
--- SoraAPI.MakeAssetTable(tname,assets)
+local tname = "soratele_wsqy"
+SoraAPI.MakeItemSkin("soratele",tname , {
+    name = "荒野",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank =  tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname,assets)
 return	Prefab( "soratele", fn, assets, prefabs)

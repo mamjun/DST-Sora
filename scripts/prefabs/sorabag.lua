@@ -255,7 +255,7 @@ local function fn()
 
     inst.AnimState:SetBank("sorabag")
     inst.AnimState:SetBuild("sorabag")
-    inst.AnimState:PlayAnimation("anim")
+    inst.AnimState:PlayAnimation("anim",true)
 
     -- inst.foleysound = "dontstarve/movement/foley/krampuspack"
     inst:AddTag("backpack")
@@ -382,7 +382,7 @@ end
 end
 ]] --
 
-SoraAPI.MakeItemSkinDefaultData("sorabag", {}, {})
+SoraAPI.MakeItemSkinDefaultData("sorabag", {}, {nil,nil,'anim',true})
 SoraAPI.MakeItemSkin("sorabag", "sorabag_sd", {
     name = "圣诞双子",
     atlas = "images/inventoryimages/sorabag_sd.xml",
@@ -422,6 +422,19 @@ SoraAPI.MakeItemSkin("sorabag", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "sorabag_wsqy"
+SoraAPI.MakeItemSkin("sorabag", tname, {
+    name = "万圣前夜",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
 return Prefab("sorabag", fn, assets)
 -- ,Prefab("soralight", soralightfn)
 
