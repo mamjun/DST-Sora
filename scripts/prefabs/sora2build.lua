@@ -144,7 +144,7 @@ local function MakeBuild(bname, fn, NAMES, DES)
         inst.AnimState:PlayAnimation("idle", true)
         inst.linkprefab = buildname
         if not TheWorld.soraismastersim then
-            return true
+            return inst
         end
         inst.components.inventoryitem.atlasname = "images/inventoryimages/" .. buildname .. ".xml"
         inst.components.inventoryitem.imagename = buildname
