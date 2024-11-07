@@ -123,6 +123,23 @@ local function commonitemfn()
     return inst
 end
 
+local function OnIsPathFindingDirty(inst)
+    if inst._ispathfinding:value() then
+        if inst._pfpos == nil and inst:GetCurrentPlatform() == nil then
+            inst._pfpos = inst:GetPosition()
+            TheWorld.Pathfinder:AddWall(inst._pfpos:Get())
+        end
+    elseif inst._pfpos ~= nil then
+        TheWorld.Pathfinder:RemoveWall(inst._pfpos:Get())
+        inst._pfpos = nil
+    end
+end
+
+local function InitializePathFinding(inst)
+    inst:ListenForEvent("onispathfindingdirty", OnIsPathFindingDirty)
+    OnIsPathFindingDirty(inst)
+end
+
 local function MakeBuild(bname, fn, NAMES, DES)
     local buildname = name_pre .. bname
     fn = fn or function()
@@ -208,8 +225,12 @@ end, "穹の小木桩", "远看近看都是桩")("soratele_wsqy", "荒野", "sor
     "sorabowknot_wsqy")("sorabowknot_wsqy_r", "纪念☆", "sorabowknot_wsqy_r", "sorabowknot_wsqy_r")
 MakeBuild("decor", function(inst)
 
-end, "穹の绿植", "这个撞不上")("small", "中杯")("medium", "大杯")("jss", "橘伞伞")("soratele_wsqy", "荒野", "soratele_wsqy", "soratele_wsqy")(
-    "soramagic_wsqy", "赴约", "soramagic_wsqy", "soramagic_wsqy")("sorabowknot_wsqy", "纪念", "sorabowknot_wsqy",
-    "sorabowknot_wsqy")("sorabowknot_wsqy_r", "纪念☆", "sorabowknot_wsqy_r", "sorabowknot_wsqy_r")
+end, "穹の绿植", "这个撞不上")("small", "中杯")("medium", "大杯")("jss", "橘伞伞")("soratele_wsqy",
+    "荒野", "soratele_wsqy", "soratele_wsqy")("soramagic_wsqy", "赴约", "soramagic_wsqy", "soramagic_wsqy")(
+    "sorabowknot_wsqy", "纪念", "sorabowknot_wsqy", "sorabowknot_wsqy")("sorabowknot_wsqy_r", "纪念☆",
+    "sorabowknot_wsqy_r", "sorabowknot_wsqy_r")("mls", "猫老师", "sora2chest_mls")
+
+--MakeBuild("gate", function(inst)end, "穹の大门", "出门记得锁好")
+
 return unpack(allprefab)
 

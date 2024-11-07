@@ -924,27 +924,51 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
-    AddItemSkin("sora2chest_yb", "从前的那个伊布早已经不在了，\n现在在你面前的是叶赫那拉伊布.")
+    AddItemSkin("sora2chest_yb",
+        "从前的那个伊布早已经不在了，\n现在在你面前的是叶赫那拉伊布.")
     AddItemSkin("sora2chest_zzb", "珍珠贝里真的有珍珠")
     AddItemSkin("sora2chest_jcy", "飞叶快刀！")
+    AddItemSkin("sora2chest_mls", "要来一杯么？")
+    AddItemSkin("sora2chest_xzz", "信被我吃掉了")
+    AddItemSkin("sora2chest_dd", "再给我讲一遍，你从一堆小猫里选中我的故事吧")
+
     AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2fire_hrh",
         "而你,我的朋友\n你才是真正的帕鲁\nQQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!")
     AddItemSkin("sora2fire_hjl", "人家才不是伊布呢")
+
     AddItemSkin("sora2ice_flower", "你已被移出群聊'花开富贵'")
     AddItemSkin("sora2ice_seed", "来点种子,蟹蟹")
-    AddItemSkin("sora_pearl_pd", "人家不是胖\n只是叫胖丁")
-    AddItemSkin("sora2base_big", "谁不喜欢大的呢\n对,我说的就是祭坛")
-    AddItemSkin("sora2base_small", "谁不喜欢小的呢\n对,我说的就是祭坛")
-    AddItemSkin("sorabowknot_sora", "我也会是第一名吗")
-    AddItemSkin("sorabowknot_ld", "叮叮当，叮叮当\n铃儿响叮当")
-    AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
-    AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
-    AddItemSkin("sora_sign_myy", "羊腿好吃,所以值得!")
-    AddItemSkin("sora_sign_yez", "加大！加大！再描一圈！")
     AddItemSkin("sora2ice_bhl", "环游整个星系一万次，\n只为遇见你")
     AddItemSkin("sora2ice_byb", "穿梭风雪,绽放寒芒!")
+
+    AddItemSkin("sora2birdchest_ggd",
+        "在下江湖人称菇菇毒，\n暗器榜排名第七十七，\n独门绝技--好菇毒！")
+    AddItemSkin("sora2birdchest_xzyb", "西格斯比与仙子伊布心心相印了！")
+    AddItemSkin("sora2birdchest_hdw", "恭喜你，被霍格沃茨录取了！")
+    AddItemSkin("sora_sign_myy", "羊腿好吃,所以值得!")
+    AddItemSkin("sora_sign_yez", "加大！加大！再描一圈！")
+
+    AddItemSkin("sora_smalllight_fl", "这是风铃\n不是花")
+    AddItemSkin("sora_smalllight_jj",
+        "嘿！\n我知道一个能让我在走路的时候，\n不被绷带绊倒的办法，\n你们想听吗？")
+
+    AddItemSkin("sora_pearl_pd", "人家不是胖\n只是叫胖丁")
+
+    AddItemSkin("sora2base_big", "谁不喜欢大的呢\n对,我说的就是祭坛")
+    AddItemSkin("sora2base_small", "谁不喜欢小的呢\n对,我说的就是祭坛")
+
+    AddItemSkin("sorabowknot_sora", "我也会是第一名吗")
+    AddItemSkin("sorabowknot_ld", "叮叮当，叮叮当\n铃儿响叮当")
+
+    AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
+    AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
+
+    AddItemSkin("sora2build_decor_jss", "红伞伞，白杆杆\n吃完一起躺板板。")
+    AddItemSkin("sora2build_decor_small", "这是中杯，\n这是大杯，\n这是超大杯.", 60)
+    AddItemSkin("sora2build_decor_medium", "这是中杯，\n这是大杯，\n这是超大杯.", 60)
+
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
     AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗")
@@ -952,18 +976,14 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_dieyu",
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)
-    AddItemSkin("sora_smalllight_fl", "这是风铃\n不是花")
+
     AddItemSkin("sora_pearl_slm", "萌王是谁?")
-    AddItemSkin("sora2birdchest_ggd",
-        "在下江湖人称菇菇毒，\n暗器榜排名第七十七，\n独门绝技--好菇毒！")
-    AddItemSkin("sora2birdchest_xzyb",
-        "西格斯比与仙子伊布心心相印了！")
-    AddItemSkin("sora_lightflier_beex", "这是熊，\n不是Bee！")
+
     AddItemSkin("sora_tqy_qy", "不止七夕,更在朝夕\n    ---2024七夕纪念")
     AddItemSkin("sora_tqy_qkyz", "众生为棋,一掷钱坤")
     AddItemSkin("sora_tqy_xql", "小青龙为什么是红色的?")
     AddItemSkin("sora_lightflier_tjzz", "闲来无事，躺竹听曲")
-    AddItemSkin("sora_lightflier_wsqy", "哇酷！哇酷！哇酷哇酷！")
+    AddItemSkin("sora_lightflier_beex", "这是熊，\n不是Bee！")
     AddItemSkin("sorabowknot_sby",
         "不能因为是女孩子就觉得自己是弱\n者，如果不强大就不能保护身边\n最重要的人",
         nil, true)
@@ -975,16 +995,13 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_tqy_sby", "月之冕出击！", nil, true)
     AddItemSkin("sora_tqy_box_sby", "毁灭之后是希望和再生。", nil, true)
 
-    AddItemSkin("sora_sign_wsqy", "万圣狂欢，无乐不作！", nil, true)
-    AddItemSkin("sora_smalllight_wsqy", "不给糖就把你抓起来吃掉！", nil, true)
-    AddItemSkin("soramagic_wsqy", "我将玫瑰藏于身后,\n期盼与你赴约.", nil, true)
-    AddItemSkin("soratele_wsqy", "在我荒瘠的土地上,\n你是最后的玫瑰", nil, true)
-    AddItemSkin("sorabowknot_wsqy", "有人骂你野心勃勃，\n有人爱你灵魂有火", nil, true)
-    
-    AddItemSkin("sora2build_decor_jss", "红伞伞，白杆杆\n吃完一起躺板板。")
-    AddItemSkin("sora2build_decor_small", "这是中杯，\n这是大杯，\n这是超大杯.",60)
-    AddItemSkin("sora2build_decor_medium", "这是中杯，\n这是大杯，\n这是超大杯.",60)
-    
+    AddItemSkin("sora_sign_wsqy", "万圣狂欢，无乐不作！")
+    AddItemSkin("sora_smalllight_wsqy", "不给糖就把你抓起来吃掉！")
+    AddItemSkin("soramagic_wsqy", "我将玫瑰藏于身后,\n期盼与你赴约.")
+    AddItemSkin("soratele_wsqy", "在我荒瘠的土地上,\n你是最后的玫瑰")
+    AddItemSkin("sorabowknot_wsqy", "有人骂你野心勃勃，\n有人爱你灵魂有火")
+    AddItemSkin("sora_lightflier_wsqy", "哇酷！哇酷！哇酷哇酷！")
+
     local item_map = {
         sora_none = "sora_uniforms"
     }

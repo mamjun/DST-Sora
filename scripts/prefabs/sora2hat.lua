@@ -88,9 +88,9 @@ local function onequip(inst, owner)
     end
     owner.AnimState:OverrideSymbol("swap_hat", inst.skinname or "sora2hat", "swap_hat")
     owner.AnimState:Show("HAT")
-    owner.AnimState:Show("HAIR_HAT")
-    owner.AnimState:Hide("HAIR_NOHAT")
-    owner.AnimState:Hide("HAIR")
+    owner.AnimState:Hide("HAIR_HAT")
+    owner.AnimState:Show("HAIR_NOHAT")
+    owner.AnimState:Show("HAIR")
 end
 
 local function onunequip(inst, owner) 

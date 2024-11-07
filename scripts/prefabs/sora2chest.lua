@@ -80,6 +80,7 @@ local function onhammered(inst, worker)
     fx:SetMaterial("metal")
     inst:Remove()
 end
+local chestname = {sora2chest_sns=1,sora2chest_sns_tmp=1,sora2chest_mls=1,sora2chest_xzz=1,sora2chest_dd=1}
 local function updatesign(inst)
     if not TheWorld.ismastersim then
         return
@@ -114,7 +115,7 @@ local function updatesign(inst)
         else
             inst.AnimState:Hide("swap_item_bg")
         end
-        if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp") then
+        if inst.skinname and chestname[inst.skinname] then
             inst.AnimState:Hide("chest")
         else
             inst.AnimState:Show("chest")
@@ -160,7 +161,7 @@ local function onhit(inst, worker)
     updatesign(inst)
     if inst.hitcount and inst.hitcount > 0 then
         inst.components.container:DropEverything()
-        TheWorld.components.sorachestmanager:OnClose(inst, worker)
+        TheWorld.components.sorachestmanager:OnClose(inst, worker,true)
     end
     -- inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()
@@ -441,6 +442,52 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
 })
 SoraAPI.MakeAssetTable(tname,assets)
 
+local tname = "sora2chest_mls"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "猫老师",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "sora2chest_xzz"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "小猪",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+local tname = "sora2chest_dd"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "黛黛",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
 local function chestpt(inst)
     -- inst.AnimState:Hide("chestitem_bg")
     inst.AnimState:Hide("swap_item_bg")

@@ -99,4 +99,5 @@ local function MakeSkin(skinskin, skinname,free)
 end
 MakeSkin("fl","铃兰夜语")
 MakeSkin("wsqy","小幽宁")
+MakeSkin("jj","僵僵")
 return Prefab(name, fn, assets), MakePlacer(name .. "_placer", name, name, "idle")

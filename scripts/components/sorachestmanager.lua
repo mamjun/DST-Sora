@@ -770,6 +770,9 @@ local function OnClose(inst, event)
     if not inst.components.container then
         return
     end
+    if event and event.dontget  then 
+        return 
+    end
     -- SoraAPI.CheckChestValid(inst)
     local data = inst.sorachestdata
     inst:DoTaskInTime(0,
@@ -792,10 +795,11 @@ end
 FindPrefab()
 
 local function HitProtect(inst, data)
+    print("HitProtect")
     if not inst.components.workable then
         return
     end
-    if not inst.hitcount then
+    if not (inst.hitcount and inst.hitcd)then
         inst.hitcount = 0
         inst.hitcd = SoraCD(30)
     end
@@ -804,6 +808,9 @@ local function HitProtect(inst, data)
         inst.components.workable.workleft = 10
     else
         inst.hitcount = inst.hitcount + 1
+        if inst.components.container and not inst.components.container:IsEmpty() then 
+            inst.hitcount = 1
+        end
         if inst.hitcount > 4 then
             inst.components.workable.workleft = 0
         else
@@ -1052,9 +1059,9 @@ end
 function com:UpdateChest(chest)
     UpdateChest(chest)
 end
-function com:OnClose(chest, doer)
+function com:OnClose(chest, doer,dontget)
     OnClose(chest, {
-        doer = doer
+        doer = doer,dontget= dontget or false
     })
 end
 function com:UpdateChest(chest)
