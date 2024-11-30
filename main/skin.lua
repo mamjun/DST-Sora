@@ -171,6 +171,9 @@ local function MakeSkin(name, data, notemp)
     for k, v in pairs(data) do
         d[k] = v
     end
+    if d.is_longhair then 
+        d.skins.ghost_skin = "ghost_sora_r_build"
+    end
     MakeCharacterSkin("sora", name, d)
     if not notemp then
         local d2 = shallowcopy(d)
@@ -189,7 +192,8 @@ MakeSkin("sora_mysora", {
 })
 
 MakeSkin("sora_mysora_r", {
-    name = "花嫁",
+    name = "花嫁-长发",
+    is_longhair = true,
     des = "执子之手,与子偕老"
 })
 MakeSkin("sora_sby", {

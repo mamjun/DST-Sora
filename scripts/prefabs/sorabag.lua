@@ -435,6 +435,18 @@ SoraAPI.MakeItemSkin("sorabag", tname, {
 })
 SoraAPI.MakeAssetTable(tname,assets)
 
+local tname = "sorabag_yhjd"
+SoraAPI.MakeItemSkin("sorabag", tname, {
+    name = "樱华绝代",
+    atlas = "images/inventoryimages/"..tname..".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeSkinNameMap("sora_yhjd","sorabag_yhjd")
 return Prefab("sorabag", fn, assets)
 -- ,Prefab("soralight", soralightfn)
 

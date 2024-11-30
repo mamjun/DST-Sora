@@ -952,6 +952,16 @@ function params.sora2global.widget:SoraOnOpenFn(inst)
 
 end
 params.sora2global.itemtestfn = function(container, item, slot)
+    if item and item.prefab:match("_bell$") then
+        return false
+    end
+    if container.IsOpen then 
+        if not container:IsOpen() then 
+            return false
+        end
+    elseif not container._isopen then 
+        return false
+    end
     return item and not item:HasTag("unwrappable") and not item:HasTag("sorapacker") and not item:HasTag("cantpack") and
                not item:HasTag("soracantpack") and not item:HasTag("irreplaceable") and not item:HasTag("nonpackable") and
                not item.replica.container and not item:HasTag("boxopener_l") and not item.components.container_proxy

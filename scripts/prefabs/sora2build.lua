@@ -117,7 +117,7 @@ local function commonitemfn()
     inst:AddComponent("deployable")
     inst.components.deployable.ondeploy = OnDeploy
     inst.components.deployable.spacing = DEPLOYSPACING.MEDIUM
-    inst.components.deployable:SetDeployMode(DEPLOYMODE.PLANT)
+    inst.components.deployable:SetDeployMode(DEPLOYMODE.ANYWHERE)
     -- inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2stone.xml"
     -- inst.components.inventoryitem.imagename = "sora2stone"
     return inst

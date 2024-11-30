@@ -38,10 +38,11 @@ Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), A
                 Asset("ANIM", "anim/sora_llan.zip"), Asset("ANIM", "anim/sora_sby.zip"),
                 Asset("ANIM", "anim/sora_mysora.zip"), Asset("ANIM", "anim/sora_mysora_r.zip"),
                 Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"), Asset("ANIM", "anim/sora_wsqy.zip"),
-                Asset("ANIM", "anim/sora_sdsz_r.zip"), Asset("ANIM", "anim/sorahair.zip"),
+                Asset("ANIM", "anim/sora_sdsz_r.zip"),Asset("ANIM", "anim/sora_yhjd.zip"), Asset("ANIM", "anim/sorahair.zip"),
                 Asset("ANIM", "anim/sorahair2.zip"), Asset("ANIM", "anim/sorahair3.zip"),
                 Asset("ANIM", "anim/sorahair4.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
-                Asset("ANIM", "anim/ghost_sora_build.zip")}
+                Asset("ANIM", "anim/ghost_sora_build.zip"),
+                Asset("ANIM", "anim/ghost_sora_r_build.zip")}
 -- 追加新版本选人提示
 if TUNING.GAMEMODE_STARTING_ITEMS then
     if TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT then
@@ -949,6 +950,9 @@ local function MakeSkin(name, data, notemp)
     for k, v in pairs(data) do
         d[k] = v
     end
+    if d.is_longhair then 
+        d.skins.ghost_skin = "ghost_sora_r_build"
+    end
     SoraAPI.MakeCharacterSkin("sora", name, d)
     if not notemp then
         local d2 = shallowcopy(d)
@@ -984,11 +988,13 @@ MakeSkin("sora_gete", {
 
 MakeSkin("sora_llan", {
     name = "llan",
-    des = "世间美好，不过松花酿酒，春水煎茶"
+    is_longhair = true,
+    des = "世间美好，不过松花酿酒，春水煎茶",
 })
 
 MakeSkin("sora_zhizheng", {
     name = "执政官",
+    is_longhair = true,
     des = '愿我的世界总有你\n  ----献给那些热心奉献的人们',
     quotes = '请遵从我的指令'
 })
@@ -1005,6 +1011,7 @@ MakeSkin("sora_amly", {
 
 MakeSkin("sora_hf", {
     name = "关雎",
+    is_longhair = true,
     des = '关关雎鸠，在河之洲。\n窈窕淑女，君子好逑。',
     quotes = '悠...我在等你...'
 })
@@ -1020,12 +1027,18 @@ MakeSkin("sora_sdsz", {
 })
 MakeSkin("sora_sdsz_r", {
     name = "圣诞双子-空",
+    is_longhair = true,
     des = '人家才不是穹呢。\n我是空!叫我sora也行。',
     quotes = '你好,我是sora'
 })
 MakeSkin("sora_wsqy", {
     name = "万圣前夜",
-    des = '不给糖？就把你吃掉！',
+    des = '不给糖就捣蛋！！',
     quotes = '啊呜~'
+})
+MakeSkin("sora_yhjd", {
+    name = "樱华绝代",
+    des = '芳华已逝？\n樱华绝代！\n',
+    quotes = '樱花飘落的速度\n是五厘米'
 })
 return MakePlayerCharacter("sora", prefabs, assets, common_postinit, master_postinit, start_inv)

@@ -623,10 +623,11 @@ local function TryCacheEnt(inst, all) -- 尝试缓存下来
         inst.SoraChestSkip = true
         return
     end
-    if inst.components.projectile and (inst.components.projectile.target or inst.components.projectile.dest) then -- 投射物
+    if inst:HasTag("activeprojectile") then -- 投射物
         inst.SoraChestSkip = true
         return
     end
+    
     if inst:IsInLimbo() then -- 不可见实体
         return true
     end
