@@ -152,6 +152,11 @@ RegUseSkinFN("sora_dieyu", function(doer, skin)
         doer.components.soraitemcontrol:CreateItem("sora_dieyu")
     end
 end)
+RegUseSkinFN("sora_qiyu", function(doer, skin)
+    if doer and doer.components.soraitemcontrol then
+        doer.components.soraitemcontrol:CreateItem("sora_qiyu")
+    end
+end)
 local function MakeSkin(name, data, notemp)
     local d = {}
     d.quotes = "敢动我就杀了你哦"
@@ -914,6 +919,11 @@ if not TheNet:IsDedicated() then
             local scr = GameTimeUnLockScreen2(item, 60)
             scr.unlocktext:SetString("消耗60活跃度解锁")
             return scr
+        end,
+        sora_qiyu = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 888)
+            scr.unlocktext:SetString("消耗888活跃度解锁")
+            return scr
         end
         -- sora_sign_yez = function(s, item)
         --     local scr = GameTimeUnLockScreen2(item, 300)
@@ -925,6 +935,12 @@ if not TheNet:IsDedicated() then
     function AddItemSkin(item, des, time, hide)
         table.insert(ItemSkin, {item, des, time or 300, hide or false})
     end
+    AddItemSkin("sora_yingyu", "跟我一起学'樱语'", nil, true)
+    AddItemSkin("sora_dieyu",
+        "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
+        nil, true)
+    AddItemSkin("sora_qiyu", "修理雨伞~修理雨伞~修理雨伞~",888)
+    
     AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群372450705\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
@@ -976,11 +992,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
     AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗")
-    AddItemSkin("sora_yingyu", "跟我一起学'樱语'", nil, true)
-    AddItemSkin("sora_dieyu",
-        "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
-        nil, true)
-
+    
     AddItemSkin("sora_pearl_slm", "萌王是谁?")
 
     AddItemSkin("sora_tqy_qy", "不止七夕,更在朝夕\n    ---2024七夕纪念")

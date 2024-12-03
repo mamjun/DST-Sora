@@ -207,6 +207,7 @@ MailDB:ListenForEvent("ChestData", NextFrame(function(id, data)
     inst.OpenedKey = data.key
     inst.components.container:OnLoad(data.data)
     inst.ChestOpen(inst.components.container, doer)
+    inst.components.container.SoraStartOpen = false
     inst.ResetTaskTask = inst:DoTaskInTime(inst.CloseTime, inst.ResetTask)
 end))
 -- 尝试打开箱子

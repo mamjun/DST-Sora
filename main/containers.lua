@@ -955,6 +955,14 @@ params.sora2global.itemtestfn = function(container, item, slot)
     if item and item.prefab:match("_bell$") then
         return false
     end
+    if container.inst and container.inst.components and  container.inst.components.container then 
+        container = container.inst.components.container
+    end
+    
+    if container.SoraStartOpen then 
+        return true
+    end
+    
     if container.IsOpen then 
         if not container:IsOpen() then 
             return false

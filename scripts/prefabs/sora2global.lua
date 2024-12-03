@@ -150,6 +150,7 @@ local function fn()
     end)
 
     inst.ChestOpen = inst.components.container.Open
+    inst.components.container.SoraStartOpen = false
     inst.components.container.Open = function(s, doer, ...)
         if not (doer and doer:HasTag("player")) then
             return false
@@ -159,12 +160,14 @@ local function fn()
             return
         end
         if not inst.components.container:IsOpenedBy(doer) then
+            inst.components.container.SoraStartOpen = true
             SoraAPI.TryOpenGlobalChest(doer, inst)
         end
         return false
     end
     inst.ChestClose = inst.components.container.Close
     inst.components.container.Close = function(s, doer, ...)
+        inst.components.container.SoraStartOpen = false
         if (doer and doer:HasTag("player")) then
             if inst.components.container:IsOpenedBy(doer) then
                 SoraAPI.TryCloseGlobalChest(doer, inst)

@@ -29,6 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 请提前一键global 然后 modimport导入
 -- verion = 1.13
+-- v1.14 优化MakeItemSkin 
 -- V1.13 优化SWAP_ICON的交互
 -- v1.12 新增 MakeItemSkinDefaultData 和 GetItemSkinDefaultData 准备弃用 basebuild basebank baseanim等重复设置
 -- v1.11 新增 animloop 和 baseanimloop
@@ -314,8 +315,10 @@ function MakeItemSkin(base, skinname, data)
         prefab_skin.imagename = data.image .. ".tex"
     end
     prefab_skin.type = "item"
-    RegisterPrefabs(prefab_skin) -- 注册并加载皮肤的prefab
-    TheSim:LoadPrefabs({skinname})
+    if not data.dontload then
+        RegisterPrefabs(prefab_skin) -- 注册并加载皮肤的prefab
+        TheSim:LoadPrefabs({skinname})
+    end
     return prefab_skin
 end
 
@@ -684,8 +687,7 @@ if thank_help then
                         self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.swap_icon.build,
                             skin.swap_icon.image)
                     else
-                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.build,
-                            "SWAP_ICON")
+                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.build, "SWAP_ICON")
                     end
                 elseif skin and skin.image and skin.atlas then
                     self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", softresolvefilepath(skin.atlas),
