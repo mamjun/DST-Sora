@@ -1038,7 +1038,7 @@ MakeSkin("sora_wsqy", {
 })
 MakeSkin("sora_yhjd", {
     name = "樱华绝代",
-    des = '芳华已逝？\n樱华绝代！\n',
+    des = '芳华易逝？\n樱华绝代！\n    ---感谢每一个陪我走过低谷的人',
     quotes = '樱花飘落的速度\n是五厘米'
 })
 return MakePlayerCharacter("sora", prefabs, assets, common_postinit, master_postinit, start_inv)

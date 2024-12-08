@@ -140,6 +140,7 @@ local black = {
     -- sora_llan = 1,
     sora_mysora = 1,
     sora_mysora_r = 1,
+    sora_yhjd = 1,
     sora_sby = 1
 }
 RegUseSkinFN("sora_yingyu", function(doer, skin)
@@ -155,6 +156,16 @@ end)
 RegUseSkinFN("sora_qiyu", function(doer, skin)
     if doer and doer.components.soraitemcontrol then
         doer.components.soraitemcontrol:CreateItem("sora_qiyu")
+    end
+end)
+RegUseSkinFN("sora_lantern", function(doer, skin)
+    if doer and doer.components.soraitemcontrol then
+        doer.components.soraitemcontrol:CreateItem("sora_lantern")
+    end
+end)
+RegUseSkinFN("sora_lantern_yh", function(doer, skin)
+    if doer and doer.components.soraitemcontrol then
+        doer.components.soraitemcontrol:CreateItem("sora_lantern","sora_lantern_yh")
     end
 end)
 local function MakeSkin(name, data, notemp)
@@ -924,6 +935,11 @@ if not TheNet:IsDedicated() then
             local scr = GameTimeUnLockScreen2(item, 888)
             scr.unlocktext:SetString("消耗888活跃度解锁")
             return scr
+        end,
+        sora_lantern = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 450)
+            scr.unlocktext:SetString("消耗450活跃度解锁")
+            return scr
         end
         -- sora_sign_yez = function(s, item)
         --     local scr = GameTimeUnLockScreen2(item, 300)
@@ -940,8 +956,9 @@ if not TheNet:IsDedicated() then
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)
     AddItemSkin("sora_qiyu", "修理雨伞~修理雨伞~修理雨伞~",888)
-    
-    AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群372450705\n领取方法看群公告")
+    AddItemSkin("sora_lantern", "让它带你找到回家的路",450)
+    AddItemSkin("sora_lantern_yh", "落樱指引回家的路", nil, true)
+    AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
     AddItemSkin("sora2chest_yb",
@@ -952,9 +969,9 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_xzz", "信被我吃掉了")
     AddItemSkin("sora2chest_dd", "再给我讲一遍，你从一堆小猫里选中我的故事吧")
 
-    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群372450705\n领取方法看群公告")
+    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2fire_hrh",
-        "而你,我的朋友\n你才是真正的帕鲁\nQQ群372450705\n领取方法看群公告")
+        "而你,我的朋友\n你才是真正的帕鲁\nQQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!")
     AddItemSkin("sora2fire_hjl", "人家才不是伊布呢")
 

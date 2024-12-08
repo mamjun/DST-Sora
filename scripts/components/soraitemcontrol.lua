@@ -80,8 +80,8 @@ function com.OnPlayerRemove(inst)
     end
     self.items = {}
 end
-function com:CreateItem(prefab)
-    local item = SpawnPrefab(prefab)
+function com:CreateItem(prefab,skin)
+    local item = SpawnPrefab(prefab,skin)
     if not item then
         return
     end

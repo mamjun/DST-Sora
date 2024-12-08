@@ -121,7 +121,7 @@ local function fn()
     inst.entity:AddAnimState()
     inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
-
+	inst.entity:AddSoundEmitter()
     MakeInventoryPhysics(inst)
 
     inst.MiniMapEntity:SetIcon("sora2bag.tex")
