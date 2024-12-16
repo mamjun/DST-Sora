@@ -839,7 +839,7 @@ local function pearlfn()
     return inst
 end
 SoraAPI.MakeItemSkinDefaultData("sora_pearl", {GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl"},
-    {"hermit_pearl", "hermit_pearl"})
+    {"hermit_pearl", "hermit_pearl",nil,true})
 local tname = "sora_pearl_pd"
 SoraAPI.MakeItemSkin("sora_pearl", tname, {
     name = "胖丁",

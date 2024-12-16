@@ -341,7 +341,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/" .. lyjname .. ".xml", lyjna
 STRINGS.NAMES[lyjname:upper()] = "穹の留影机"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE[lyjname:upper()] = "这是一个不完美的留影机"
 
-local lyj = SoraAPI.MakeItemSkin(name, lyjname, {
+local lyj = SoraAPI.MakeItemSkin(lyjname, lyjname, {
     name = "穹の留影机",
     atlas = "images/inventoryimages/" .. lyjname .. ".xml",
     image = lyjname,
