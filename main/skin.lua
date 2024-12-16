@@ -942,8 +942,8 @@ if not TheNet:IsDedicated() then
             return scr
         end,
         sora_lyj = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 888)
-            scr.unlocktext:SetString("消耗888活跃度解锁")
+            local scr = GameTimeUnLockScreen2(item, 88)
+            scr.unlocktext:SetString("消耗888活跃度解锁\n           限时一折！！！")
             return scr
         end,
         sora_lantern = function(s, item)
@@ -966,7 +966,7 @@ if not TheNet:IsDedicated() then
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)
     AddItemSkin("sora_qiyu", "修理雨伞~修理雨伞~修理雨伞~",888)
-    AddItemSkin("sora_lyj", "异世相遇,尽享留影",888,nil, true)
+    AddItemSkin("sora_lyj", "异世相遇,尽享留影\n\t\t\t限时一折大促销！！！",888)
     AddItemSkin("sora_lantern", "让它带你找到回家的路",450)
     AddItemSkin("sora_lantern_yh", "落樱指引回家的路", nil, true)
     AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群943105804\n领取方法看群公告")

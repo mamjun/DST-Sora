@@ -120,6 +120,8 @@ HookAnim("Hide", "layer", Hidefn)
 
 HookAnim("ShowSymbol", "symbol", Showfn)
 HookAnim("HideSymbol", "symbol", Hidefn)
+HookAnim("AddOverrideBuild", "overbuild", Showfn)
+HookAnim("ClearOverrideBuild", "overbuild", Hidefn)
 HookAnim("SetOrientation", "orientation", SaveLast)
 HookAnim("SetScale", "animscale", SaveLast)
 HookAnim("SetFinalOffset", "finaloffset", SaveLast)

@@ -729,9 +729,9 @@ function CheckChestValid(inst)
     end
 end
 
-function Say(doer, str)
+function Say(doer, str,nosay)
     if doer and doer.components.talker then
-        doer.components.talker:Say(str)
+        doer.components.talker:Say(str,nil,nosay and true or nil)
     end
     return true
 end

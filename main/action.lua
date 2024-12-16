@@ -177,7 +177,7 @@ SORAPHOTO.fn = function(act)
             end
             return true
         end
-        local data = SoraAPI.TryPhoto(target, doer)
+        local data = SoraAPI.TryPhoto(target, doer,invobject)
         if not data then
             return true
         end

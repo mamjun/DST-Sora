@@ -1,7 +1,7 @@
 local Say = SoraAPI.Say
 local assets = {}
 
-function SoraAPI.TryPhoto(inst, doer)
+function SoraAPI.TryPhoto(inst, doer,lyj, must)
     if not inst.AnimState then
         return
     end
@@ -18,14 +18,38 @@ function SoraAPI.TryPhoto(inst, doer)
             Say(doer, "这个暂时不能留影")
             return
         end
+        if inst.components.skinedlegion then
+            Say(doer, "这个皮肤暂时不能留影")
+            return
+        end
         if inst.skinname and not TheInventory:CheckClientOwnership(doer.userid, inst.skinname) then
             Say(doer, "你还没有拥有这个皮肤")
             return
         end
     end
+    if inst == doer and SoraAPI.IsSuperAdmin(doer.userid) and not must then
+        if lyj.components.rechargeable then 
+            lyj.components.rechargeable:Discharge(3)
+        end
+        inst:StartThread(function()
+            Sleep(3)
+            local data = SoraAPI.TryPhoto(inst, doer,lyj, true)
+            if not data then
+                Say(doer, "拍照失败咯", true)
+                return true
+            end
+            local item = SpawnPrefab("sora_photo_item")
+            if not item then
+                return
+            end
+            item:SetData(data)
+            doer.components.inventory:GiveItem(item, nil, doer:GetPosition())
+        end)
+        return 
+    end
     local skinbuild = inst.AnimState:GetSkinBuild()
     if skinbuild and skinbuild ~= "" then
-        Say(doer, "这个暂时不能留影")
+        Say(doer, "这个皮肤暂时不能留影")
         return
     end
     local bank = inst.AnimState:GetCurrentBankName()
@@ -64,7 +88,8 @@ function SoraAPI.TryPhoto(inst, doer)
     }
 
     if inst.soramoreanimdata then
-        for k, v in pairs(inst.soramoreanimdata) do
+        local newdata = deepcopy(inst.soramoreanimdata)
+        for k, v in pairs(newdata) do
             data[k] = v
         end
     end
@@ -152,6 +177,15 @@ local function SetData(inst, data)
             inst.AnimState:Show("snow")
         else
             inst.AnimState:Hide("snow")
+        end
+        if data.overbuild then 
+            for k, v in pairs(data.overbuild) do
+                if v then
+                    inst.AnimState:AddOverrideBuild(k)
+                else
+                    inst.AnimState:ClearOverrideBuild(k)
+                end
+            end
         end
         inst.data = data
         if laterfn[data.prefab] then
@@ -355,15 +389,16 @@ lyj.fn = fn
 lyj.is_skin = false
 lyj.assets = assets
 local function placer_fn(inst)
-    inst.trytimes = (inst.trytimes or 0) +1 
-    if SoraAPI.SoraRPC then 
-        local data = SoraAPI.SoraRPC:Get('data','photodata',{})
-        if data and data.bank then 
-            SetData(inst,data)
-        elseif inst.trytimes < 5 then 
-            inst:DoTaskInTime(0.3,placer_fn)
+    inst.trytimes = (inst.trytimes or 0) + 1
+    if SoraAPI.SoraRPC then
+        local data = SoraAPI.SoraRPC:Get('data', 'photodata', {})
+        if data and data.bank then
+            SetData(inst, data)
+        elseif inst.trytimes < 5 then
+            inst:DoTaskInTime(0.3, placer_fn)
         end
     end
 end
-return Prefab(name, photofn, assets), Prefab(itemname, photo_itemfn, assets), lyj,MakePlacer(itemname.."_placer",nil,nil,nil,nil,nil,nil,nil,nil,nil,placer_fn)
+return Prefab(name, photofn, assets), Prefab(itemname, photo_itemfn, assets), lyj,
+    MakePlacer(itemname .. "_placer", nil, nil, nil, nil, nil, nil, nil, nil, nil, placer_fn)
 
