@@ -54,12 +54,13 @@ local function fn()
     inst.Light:SetColour(180 / 255, 195 / 255, 150 / 255)
     inst.Light:Enable(true)
     inst.Light:EnableClientModulation(true)
-
+    inst:AddComponent("soratwoface")
     inst:AddTag("structure")
     inst:AddTag("nosteal")
     inst.AnimState:SetBank(name)
     inst.AnimState:SetBuild(name)
     inst.AnimState:PlayAnimation("idle", true)
+    
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst

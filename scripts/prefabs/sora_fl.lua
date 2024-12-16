@@ -86,7 +86,7 @@ local function fn()
     inst.AnimState:SetBank("sora_fl")
     inst.AnimState:SetBuild("sora_fl")
     inst.AnimState:PlayAnimation("idle_flower", true)
-
+    inst:AddComponent("soratwoface")
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then

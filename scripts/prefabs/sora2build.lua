@@ -75,7 +75,7 @@ local function commonfn()
     inst.entity:AddNetwork()
     inst:AddTag("structure")
     inst.entity:SetPristine()
-
+    inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
         return inst
     end

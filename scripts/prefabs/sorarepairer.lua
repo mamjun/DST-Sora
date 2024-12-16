@@ -53,6 +53,7 @@ local function fn(Sim)
 	inst:AddTag("aquatic")
     inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("sorarepairer.tex")
+	inst:AddComponent("soratwoface")
 	if not TheNet:GetIsServer() then
         return inst
     end

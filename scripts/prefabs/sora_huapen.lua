@@ -200,6 +200,7 @@ local function fn()
     inst:AddTag("structure")
     inst:AddTag("flower")
     inst:AddTag("nosteal")
+    inst:AddComponent("soratwoface")
     anim:PlayAnimation("idle", true)
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)

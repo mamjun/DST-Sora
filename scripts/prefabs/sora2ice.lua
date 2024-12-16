@@ -102,6 +102,7 @@ local function fn()
     inst:AddTag("fridge")
     inst:AddTag("structure")
     inst:AddTag("nosteal")
+    inst:AddComponent("soratwoface")
     inst.AnimState:SetBank("sora2ice")
     inst.AnimState:SetBuild("sora2ice")
     inst.AnimState:PlayAnimation("idle", true)
@@ -127,7 +128,7 @@ local function fn()
     inst:AddComponent("preserver")
     inst.components.preserver:SetPerishRateMultiplier(-500000)
     -- inst:DoPeriodicTask(30,onrefresh)
-
+    
     inst:AddComponent("lootdropper")
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
@@ -195,4 +196,22 @@ SoraAPI.MakeItemSkin("sora2ice", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "sora2ice_jqr"
+SoraAPI.MakeItemSkin("sora2ice", tname, {
+
+    name = "叽企仁",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+
+    init_fn = function(inst)
+    end,
+
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
 return Prefab("sora2ice", fn, assets, prefabs), MakePlacer("sora2ice_placer", "sora2ice", "sora2ice", "idle")

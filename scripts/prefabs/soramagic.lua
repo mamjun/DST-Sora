@@ -230,7 +230,7 @@ local function fn()
 	inst:AddTag("rechargeable")
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("soramagic.tex")
-	
+	inst:AddComponent("soratwoface")
 	if not TheWorld.ismastersim then
         return inst
     end

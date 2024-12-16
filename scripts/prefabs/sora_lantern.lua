@@ -9,8 +9,11 @@ SoraAPI.MakeAssetTable(name, assets)
 
 local prefabs = {"sora_lanternlight", "sora_lanternbody"}
 
-local LIGHT_RADIUS = 2.5
-local LIGHT_COLOUR = Vector3(200 / 255, 100 / 255, 100 / 255)
+local LIGHT_RADIUS = 1.8
+local LIGHT_COLOUR = {
+    default = Vector3(200/ 255, 141 / 255, 181 / 255),
+    sora_lantern_yh=Vector3(243 / 255, 181 / 255, 241 / 255),
+}
 local LIGHT_INTENSITY = .8
 local LIGHT_FALLOFF = .5
 
@@ -20,7 +23,13 @@ local function OnUpdateFlicker(inst, starttime)
     flicker = (1 + flicker) * .5 -- range = 0:1
     inst.Light:SetRadius(LIGHT_RADIUS + .1 * flicker)
     flicker = flicker * 2 / 255
-    inst.Light:SetColour(LIGHT_COLOUR.x + flicker, LIGHT_COLOUR.y + flicker, LIGHT_COLOUR.z + flicker)
+    if inst._lantern and inst._lantern.skinname and LIGHT_COLOUR[inst._lantern.skinname] then
+        inst.Light:SetColour(LIGHT_COLOUR[inst._lantern.skinname].x + flicker, LIGHT_COLOUR[inst._lantern.skinname].y + flicker,
+            LIGHT_COLOUR[inst._lantern.skinname].z + flicker)
+    else
+        inst.Light:SetColour(LIGHT_COLOUR.default.x + flicker, LIGHT_COLOUR.default.y + flicker,
+            LIGHT_COLOUR.default.z + flicker)
+    end
 end
 
 local function onremovelight(light)
@@ -45,7 +54,7 @@ local function starttrackingowner(inst, owner)
 end
 
 local function turnon(inst)
-    
+
     if inst._light == nil then
         inst._light = SpawnPrefab("sora_lanternlight")
         inst._light._lantern = inst
@@ -119,18 +128,18 @@ end
 local function onequip(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
-    owner.AnimState:OverrideSymbol("lantern_overlay",inst.skinname or  "sora_lantern", "sora_lantern_overlay")
+    owner.AnimState:OverrideSymbol("lantern_overlay", inst.skinname or "sora_lantern", "sora_lantern_overlay")
 
     if inst._body ~= nil then
         inst._body:Remove()
     end
     local skin = nil
-    if inst.skinname then 
-        if inst.skinname == "sora_lantern_yh" then 
+    if inst.skinname then
+        if inst.skinname == "sora_lantern_yh" then
             skin = "sora_lanternbody_yh"
         end
     end
-    inst._body = SpawnPrefab("sora_lanternbody",skin)
+    inst._body = SpawnPrefab("sora_lanternbody", skin)
     inst._body._lantern = inst
     inst:ListenForEvent("onremove", onremovebody, inst._body)
 
@@ -183,7 +192,7 @@ local function onequiptomodel(inst, owner, from_ground)
     if inst._body ~= nil then
         if inst._body.entity:IsVisible() then
             -- need to see the lantern when animating putting away the object
-            owner.AnimState:OverrideSymbol("swap_object",inst.skinname or  "sora_lantern", "swap_sora_lantern")
+            owner.AnimState:OverrideSymbol("swap_object", inst.skinname or "sora_lantern", "swap_sora_lantern")
         end
         if inst._light ~= nil then
             inst._light.entity:SetParent((inst.components.inventoryitem.owner or inst).entity)
@@ -223,7 +232,7 @@ local function lanternlightfn()
     -- inst.Light:SetColour(LIGHT_COLOUR.x, LIGHT_COLOUR.y, LIGHT_COLOUR.z)
     inst.Light:SetFalloff(LIGHT_FALLOFF)
     inst.Light:SetRadius(LIGHT_RADIUS)
-    
+
     inst.Light:EnableClientModulation(true)
 
     inst:DoPeriodicTask(.1, OnUpdateFlicker, nil, GetTime())
@@ -252,7 +261,7 @@ local function fn()
     inst.AnimState:SetBank("sora_lantern")
     inst.AnimState:SetBuild("sora_lantern")
     inst.AnimState:PlayAnimation("idle_loop", true)
-
+    inst:AddComponent("soratwoface")
     inst:AddTag("light")
 
     MakeInventoryFloatable(inst, "med", nil, {0.775, 0.5, 0.775})
@@ -279,7 +288,8 @@ local function fn()
     inst.components.waterproofer:SetEffectiveness(0)
     inst:AddComponent("soraitemcontrol")
     inst.components.soraitemcontrol.tags = {"sora_lantern"}
-
+    inst:AddComponent("soraitem")
+    inst.components.soraitem:SetBind(true)
     inst:ListenForEvent("floater_startfloating", function(inst)
         inst.AnimState:PlayAnimation("idle_loop", true)
     end)
@@ -317,8 +327,8 @@ local function lanternbodyfn()
     inst.AnimState:SetBank("sora_lantern")
     inst.AnimState:SetBuild("sora_lantern")
     inst.AnimState:PlayAnimation("idle_body_loop", true)
-    --inst.AnimState:SetSortOrder(3)
-    --inst.AnimState:SetLayer(3)
+    -- inst.AnimState:SetSortOrder(3)
+    -- inst.AnimState:SetLayer(3)
     inst:AddTag("FX")
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -329,45 +339,44 @@ local function lanternbodyfn()
     return inst
 end
 
-local skin  = SoraAPI.MakeItemSkin(name, name, {
+local skin = SoraAPI.MakeItemSkin(name, name, {
     name = "归途",
-    atlas = "images/inventoryimages/"..name..".xml",
+    atlas = "images/inventoryimages/" .. name .. ".xml",
     image = name,
     build = name,
     bank = name,
-    checkfn =  SoraAPI.SoraSkinCheckFn,
-    dontload=true,
-    checkclientfn =  SoraAPI.SoraSkinCheckClientFn 
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    dontload = true,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-skin.fn = fn 
+skin.fn = fn
 skin.is_skin = false
 skin.assets = assets
-SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/"..name..".xml", name)
-RegisterInventoryItemAtlas("images/inventoryimages/"..name..".xml", name..".tex")
-STRINGS.NAMES[name:upper()] ="莲叶东"
+SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. name .. ".xml", name)
+RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. ".xml", name .. ".tex")
+STRINGS.NAMES[name:upper()] = "莲叶东"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE[name:upper()] = "让它带你找到回家的路"
-local skinname  = "sora_lantern_yh"
+local skinname = "sora_lantern_yh"
 SoraAPI.MakeItemSkin(name, skinname, {
     name = "春迟",
-    atlas = "images/inventoryimages/"..skinname..".xml",
+    atlas = "images/inventoryimages/" .. skinname .. ".xml",
     image = skinname,
     build = skinname,
     bank = skinname,
-    checkfn =  SoraAPI.SoraSkinCheckFn,
-    checkclientfn =  SoraAPI.SoraSkinCheckClientFn 
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(skinname,assets)
+SoraAPI.MakeAssetTable(skinname, assets)
 
 SoraAPI.MakeItemSkin("sora_lanternbody", "sora_lanternbody_yh", {
     name = "春迟",
-    atlas = "images/inventoryimages/"..skinname..".xml",
+    atlas = "images/inventoryimages/" .. skinname .. ".xml",
     image = skinname,
     build = skinname,
     bank = skinname,
-    checkfn =  SoraAPI.SoraSkinCheckFn,
-    checkclientfn =  SoraAPI.SoraSkinCheckClientFn 
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeSkinNameMap("sora_lantern_yh","sora_lanternbody_yh")
+SoraAPI.MakeSkinNameMap("sora_lantern_yh", "sora_lanternbody_yh")
 
-return skin, Prefab("sora_lanternlight", lanternlightfn),
-    Prefab("sora_lanternbody", lanternbodyfn)
+return skin, Prefab("sora_lanternlight", lanternlightfn), Prefab("sora_lanternbody", lanternbodyfn)

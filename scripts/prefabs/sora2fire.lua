@@ -147,6 +147,7 @@ local function fn()
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
     inst.AnimState:PlayAnimation("idle")
+    inst:AddComponent("soratwoface")
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     --MakeSnowCoveredPristine(inst)

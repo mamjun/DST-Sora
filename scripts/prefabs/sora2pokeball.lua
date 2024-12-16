@@ -27,6 +27,7 @@ local function fn()
     inst.AnimState:SetBank("sora2pokeball")
     inst.AnimState:SetBuild("sora2pokeball")
     inst.AnimState:PlayAnimation("idle",true)
+    inst:AddComponent("soratwoface")
     inst.entity:SetPristine()
     inst:AddTag("sorarecharge")
     if not TheWorld.ismastersim then

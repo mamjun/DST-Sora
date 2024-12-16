@@ -245,6 +245,7 @@ local function fn()
     inst:AddTag("structure")
     inst:AddTag("nosteal")
     inst:AddTag("soracontainerfix")
+    inst:AddComponent("soratwoface")
     inst.AnimState:SetBank("sora2chest")
     inst.AnimState:SetBuild("sora2chest")
     inst.AnimState:PlayAnimation("idle",true)
@@ -308,7 +309,7 @@ local function tochestfn()
     anim:SetBuild("sora2stone")
     anim:PlayAnimation("idle",true)
     inst:AddTag("soracontainlock")
-
+    inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
         return inst
     end

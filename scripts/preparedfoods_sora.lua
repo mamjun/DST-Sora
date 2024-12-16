@@ -33,8 +33,6 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         str = "阿瓶酱",
         des = "人间美味！",
         test = function(cooker, names, tags)
-            print(fastdump(names))
-            print(fastdump(tags))
             return
                 (((names.tomato and names.tomato or 0) + (names.tomato_cooked and names.tomato_cooked or 0)) > 2.5) and
                     not tags.meat and not tags.inedible

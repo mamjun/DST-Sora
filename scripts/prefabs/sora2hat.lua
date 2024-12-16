@@ -150,6 +150,7 @@ local function fn()
     inst.entity:SetPristine()
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("sora2hat.tex")
+    inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
         return inst
     end

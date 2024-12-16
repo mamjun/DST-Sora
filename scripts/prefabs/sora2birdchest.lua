@@ -79,7 +79,7 @@ local function fn()
     inst.AnimState:SetBuild("sora2birdchest")
     inst.AnimState:PlayAnimation("idle", true)
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
-
+    inst:AddComponent("soratwoface")
     -- MakeSnowCoveredPristine(inst)
     inst:AddComponent("talker")
     inst.components.talker.offset = Vector3(0, -200, 0)

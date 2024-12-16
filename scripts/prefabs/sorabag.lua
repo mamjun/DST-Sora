@@ -256,7 +256,7 @@ local function fn()
     inst.AnimState:SetBank("sorabag")
     inst.AnimState:SetBuild("sorabag")
     inst.AnimState:PlayAnimation("anim",true)
-
+    inst:AddComponent("soratwoface")
     -- inst.foleysound = "dontstarve/movement/foley/krampuspack"
     inst:AddTag("backpack")
     inst:AddTag("SoraBag")

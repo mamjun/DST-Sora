@@ -135,6 +135,7 @@ local function fn()
     anim:SetBank("sora_wq")
     anim:SetBuild("sora_wq")
     anim:PlayAnimation("idle")
+    inst:AddComponent("soratwoface")
     inst.entity:AddMiniMapEntity()
     inst.MiniMapEntity:SetIcon("sora_wq.tex")
     inst.inv_image_bg = {

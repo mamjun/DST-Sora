@@ -301,7 +301,11 @@ local changelist = {
     reeds = "monkeytail",
     ccs_sakura1 = "ccs_sakura2",
     ccs_sakura2 = "ccs_sakura3",
-    ccs_sakura3 = "ccs_sakura1"
+    ccs_sakura3 = "ccs_sakura1",
+    --纯粹辉煌 纯粹恐惧
+    horrorfuel = 'purebrilliance',
+    purebrilliance = 'horrorfuel'
+
 }
 local crops = {
     asparagus = 1,
@@ -341,7 +345,7 @@ local function retargetfn(inst)
         if guy.components.health:IsDead() then
             return false
         end
-        if guy:HasTag("companion") then 
+        if guy:HasTag("companion") then
             return false
         end
         if guy:HasTag("character") or guy:HasTag("epic") or guy:HasTag("monster") or guy:HasTag("animal") then

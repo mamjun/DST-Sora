@@ -121,6 +121,7 @@ local function fn()
     anim:SetBank(name)
     anim:SetBuild(name)
     anim:PlayAnimation("idle", true)
+    inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
         return inst
     end

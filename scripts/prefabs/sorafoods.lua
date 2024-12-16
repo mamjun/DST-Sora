@@ -72,7 +72,7 @@ local function MakePreparedFood(data)
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
-
+        inst:AddComponent("soratwoface")
         MakeInventoryPhysics(inst)
 
         if spicename ~= nil then
@@ -95,7 +95,7 @@ local function MakePreparedFood(data)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:SetBank(data.name)
         end
-        inst.AnimState:PlayAnimation("idle",true)
+        inst.AnimState:PlayAnimation("idle", true)
         inst.AnimState:OverrideSymbol("swap_food", data.basename or "cook_pot_food", realname)
 
         if data.tags ~= nil then
@@ -210,7 +210,8 @@ if TUNING.NEVER_FINISH_SERIES_ENABLED then
         local function DisplayNameFn(inst)
             return "绝对吃不完的" .. STRINGS.NAMES[string.upper(data.name)]
         end
-        STRINGS.NAMES[string.upper("mi_nfs_"..data.name)] = "绝对吃不完的" .. STRINGS.NAMES[string.upper(data.name)]
+        STRINGS.NAMES[string.upper("mi_nfs_" .. data.name)] = "绝对吃不完的" ..
+                                                                  STRINGS.NAMES[string.upper(data.name)]
         local function fn()
             local inst = CreateEntity()
 
@@ -220,9 +221,9 @@ if TUNING.NEVER_FINISH_SERIES_ENABLED then
 
             MakeInventoryPhysics(inst)
 
-                inst.AnimState:SetBuild(data.name)
-                inst.AnimState:SetBank(data.name)
-            inst.AnimState:PlayAnimation("idle",true)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:PlayAnimation("idle", true)
             inst.AnimState:OverrideSymbol("swap_food", data.basename or "cook_pot_food", realname)
 
             if data.tags ~= nil then
@@ -278,7 +279,7 @@ if TUNING.NEVER_FINISH_SERIES_ENABLED then
             return inst
         end
 
-        return Prefab("mi_nfs_"..data.name, fn, foodassets, foodprefabs)
+        return Prefab("mi_nfs_" .. data.name, fn, foodassets, foodprefabs)
     end
 
     for k, v in pairs(require("preparedfoods_sora")) do

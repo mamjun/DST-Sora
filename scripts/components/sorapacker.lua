@@ -50,6 +50,7 @@ function sorapacker:HasPackage() return self.item ~= nil end
 function sorapacker:SetCanPackFn(fn) self.canpackfn = fn end
 local cantpack = {}
 function sorapacker:DefaultCanPackTest(target) -- 目标待改
+   
     if target and target:HasTag("soracantpack") then return false end
     if target and target:HasTag("cantpack") then return false end
     if cantpack[target.prefab] then return false end
@@ -58,7 +59,7 @@ function sorapacker:DefaultCanPackTest(target) -- 目标待改
         return target and
                    not (target:HasTag("teleportato") -- or target:HasTag("irreplaceable")
             or target:HasTag("player") or target:HasTag("nonpackable") or
-                       target:HasTag("companion") or target:HasTag("character") -- or target.prefab == "wormhole"--虫洞
+                       target:HasTag("companion") -- or target.prefab == "wormhole"--虫洞
             -- or target.prefab == "beequeenhivegrown"--蜂王窝-底座
             -- or target.prefab =="beequeenhive"--蜂王窝
             -- or target.prefab =="cave_entrance"--虫洞入口
@@ -72,7 +73,7 @@ function sorapacker:DefaultCanPackTest(target) -- 目标待改
         return target and target:IsValid() and
                    not (target:HasTag("teleportato") or target:HasTag("player") or
                        target:HasTag("nonpackable") or
-                       target:HasTag("companion") or target:HasTag("character") -- or target.prefab == "wormhole"--虫洞
+                       target:HasTag("companion")  -- or target.prefab == "wormhole"--虫洞
             -- or target.prefab == "beequeenhivegrown"--蜂王窝-底座
             or target.prefab == "beequeenhive" -- 蜂王窝
             or target.prefab == "cave_entrance" -- 虫洞入口
@@ -86,6 +87,7 @@ function sorapacker:DefaultCanPackTest(target) -- 目标待改
 end
 
 function sorapacker:CanPack(target)
+    if SoraAPI.TESTPACK then return true end
     return self.inst:IsValid() and not self:HasPackage() and
                self:DefaultCanPackTest(target) and
                (not self.canpackfn or self.canpackfn(target, self.inst)) and

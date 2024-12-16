@@ -137,6 +137,7 @@ local function fn()
 	inst:AddTag("aquatic")
 	inst:AddTag("waterproofer")
 	inst:AddTag("nosteal")
+	inst:AddComponent("soratwoface")
 	inst.entity:SetPristine()
     if not TheWorld.ismastersim then
        inst.OnEntityReplicated = function(inst)

@@ -278,6 +278,7 @@ local function fn()
     inst.AnimState:SetBank("sorabowknot")
     inst.AnimState:SetBuild("sorabowknot")
     inst.AnimState:PlayAnimation("idle", true)
+    inst:AddComponent("soratwoface")
     inst:AddTag("aquatic")
     inst:AddTag("waterproofer")
     inst:AddTag("sorabowknot")
@@ -378,10 +379,10 @@ local function packfn()
     inst.AnimState:SetBank("sora2pack_1")
     inst.AnimState:SetBuild("sora2pack")
     inst.AnimState:PlayAnimation("anim", true)
+    inst:AddComponent("soratwoface")
     inst:AddTag("aquatic")
     inst:AddTag("sorapacker")
     inst:AddTag("sorabowknot")
-    inst:AddTag("nonpackable")
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then
@@ -393,6 +394,7 @@ local function packfn()
 
     inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription("一次性的打包纸，拿来打包什么好呢？")
+    inst:AddComponent("soracantpack")
     inst:AddComponent("tradable")
     inst:AddComponent("stackable")
     inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
@@ -439,8 +441,9 @@ local function fullfn()
     inst.AnimState:SetBank("sora3pack_1")
     inst.AnimState:SetBuild("sora3pack")
     inst.AnimState:PlayAnimation("anim", true)
+    inst:AddComponent("soratwoface")
     inst:AddTag("sorapacker")
-    inst:AddTag("nonpackable")
+
     inst:AddTag("_named")
     -- inst.displaynamefn = get_name
     inst.entity:SetPristine()
@@ -463,7 +466,7 @@ local function fullfn()
 
     inst:AddComponent("sorapacker")
     inst:AddComponent("deployable")
-
+    inst:AddComponent("soracantpack")
     inst.components.deployable.ondeploy = ondeploy
     inst.components.deployable:SetDeploySpacing(1)
     inst:AddComponent("inventoryitem")
@@ -622,7 +625,7 @@ local function OnWrapped(inst, num, doer)
     if inst.sorapacklevel >= 30 then
         inst:AddTag("nobundling")
         inst:AddTag("soranobundling")
-        inst:AddTag("soracantpack")
+        inst:AddComponent("soracantpack")
         inst.components.inventoryitem.canonlygoinpocket = true
     end
 end
@@ -640,7 +643,7 @@ local function Onfull3Load(inst, data)
     if inst.sorapacklevel >= 30 then
         inst:AddTag("nobundling")
         inst:AddTag("soranobundling")
-        inst:AddTag("soracantpack")
+        inst:AddComponent("soracantpack")
         inst.components.inventoryitem.canonlygoinpocket = true
     end
     if data.superdata then
@@ -664,7 +667,7 @@ local function full3fn()
     inst.AnimState:SetBank("sora3pack_1")
     inst.AnimState:SetBuild("sora3pack")
     inst.AnimState:PlayAnimation("anim", true)
-
+    inst:AddComponent("soratwoface")
     inst:AddTag("bundle")
 
     -- unwrappable (from unwrappable component) added to pristine state for optimization

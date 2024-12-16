@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] author = "FL"
-version = "12.03" -- 版本
+version = "12.05" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -202,6 +202,19 @@ configuration_options = {{
         hover = "不进行额外兼容尝试"
     }},
     default = 1
+}, {
+    name = "moreanimdata",
+    label = "留影机兼容模式",
+    options = {{
+        description = "兼容",
+        data = 1,
+        hover = "不进行更多尝试"
+    }, {
+        description = "激进",
+        data = 0,
+        hover = "建议打开，如果崩了就关闭试试"
+    }},
+    default = 0
 }, {
     name = "foodmemory",
     label = "食物记录",

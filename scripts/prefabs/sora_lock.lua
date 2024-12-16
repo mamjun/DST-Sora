@@ -43,7 +43,7 @@ local function fn()
     anim:SetBuild("sora_lock")
     anim:PlayAnimation("idle",true)
     inst:AddTag("soracontainlock")
-
+    inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
         return inst
     end

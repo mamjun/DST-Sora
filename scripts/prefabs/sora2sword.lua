@@ -80,6 +80,7 @@ local function fn()
     anim:SetBank("sora2sword")
     anim:SetBuild("sora2sword")
     anim:PlayAnimation("anim")
+	inst:AddComponent("soratwoface")
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("sora2sword.tex")
 	if not TheWorld.ismastersim then

@@ -81,20 +81,20 @@ SORAPACK.fn = function(act)
     if target ~= nil then
         local targetpos = target:GetPosition()
         local skin = invobject and invobject.prefab == "sora2pack" and invobject.link_skin or nil
-        if invobject and invobject.prefab == "sorabowknot" then 
-            if invobject.skinname == "sorabowknot_ld" then 
+        if invobject and invobject.prefab == "sorabowknot" then
+            if invobject.skinname == "sorabowknot_ld" then
                 skin = "sorapacker_ld"
             end
-            if invobject.skinname == "sorabowknot_sby" then 
+            if invobject.skinname == "sorabowknot_sby" then
                 skin = "sorapacker_sby"
             end
-            if invobject.skinname == "sorabowknot_dw" then 
+            if invobject.skinname == "sorabowknot_dw" then
                 skin = "sorapacker_dw"
             end
-            if invobject.skinname == "sorabowknot_wsqy" or invobject.skinname == "sorabowknot_wsqy_r"  then 
+            if invobject.skinname == "sorabowknot_wsqy" or invobject.skinname == "sorabowknot_wsqy_r" then
                 skin = "sorapacker_wsqy"
             end
-            if invobject.skinname == "sorabowknot_dw_tmp" then 
+            if invobject.skinname == "sorabowknot_dw_tmp" then
                 skin = "sorapacker_dw_tmp"
             end
         end
@@ -123,16 +123,89 @@ AddComponentAction("USEITEM", "sorapacker", function(inst, doer, target, actions
         table.insert(actions, ACTIONS.SORAPACK)
     end
 end)
+
 -- --辅助打包
 AddComponentAction("SCENE", "inspectable", function(inst, doer, actions, right)
     if right and doer and doer:HasTag("player") and doer.replica.inventory:EquipHasTag("sorabowknot") and
         doer.components.playercontroller and doer.components.playercontroller:IsControlPressed(CONTROL_FORCE_INSPECT) then
         table.insert(actions, ACTIONS.SORAPACK)
     end
+    if right and doer and doer:HasTag("player") and doer.replica.inventory:EquipHasTag("sora_lyj") and
+        doer.components.playercontroller and doer.components.playercontroller:IsControlPressed(CONTROL_FORCE_INSPECT) then
+        table.insert(actions, ACTIONS.SORAPHOTO)
+    end
 end)
 
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORAPACK, "doshortaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORAPACK, "doshortaction"))
+
+local SORAPHOTO = GLOBAL.Action({
+    priority = 99,
+    distance = 10
+})
+
+SORAPHOTO.fn = function(act)
+    local target = act.target
+    local invobject = act.invobject
+    local doer = act.doer
+    if not invobject then
+        invobject = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.NECK or EQUIPSLOTS.HEAD)
+        if not (invobject and invobject:HasTag("sora_lyj")) then
+            return true
+        end
+    end
+
+    if not invobject then
+        return true
+    end
+    if invobject.components.rechargeable then
+        if not invobject.components.rechargeable:IsCharged() then
+            Say(doer, '要稍等一会哦')
+            return true
+        end
+    end
+    if not doer.components.inventory:Has("papyrus", 2, false) and not SoraAPI.IsSuperAdmin(doer.userid) then
+        Say(doer, '拍照需要消耗两张莎草纸')
+        return true
+    end
+    if target ~= nil then
+        if target:HasTag("sora_photo") then
+            if target.components.soratwoface then
+                local face = target.components.soratwoface:NextFace()
+                Say(doer, "已尝试切换为" .. tostring(face) ..
+                    '面动画\n如果照片消失了请切换角度\n然后重新切换')
+            end
+            return true
+        end
+        local data = SoraAPI.TryPhoto(target, doer)
+        if not data then
+            return true
+        end
+        if not SoraAPI.IsSuperAdmin(doer.userid) then
+            doer.components.inventory:ConsumeByName("papyrus", 2)
+            invobject.components.rechargeable:Discharge(5)
+        end
+        local item = SpawnPrefab("sora_photo_item")
+        if not item then
+            return
+        end
+        item:SetData(data)
+        doer.components.inventory:GiveItem(item, nil, doer:GetPosition())
+        return true
+    end
+    return true
+end
+SORAPHOTO.id = "SORAPHOTO"
+SORAPHOTO.str = "留影"
+AddAction(SORAPHOTO)
+AddComponentAction("USEITEM", "sora_lyj", function(inst, doer, target, actions)
+    if inst:HasTag("sora_lyj") and not target:HasTag("player") then
+        table.insert(actions, ACTIONS.SORAPHOTO)
+    end
+end)
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORAPHOTO, "doshortaction"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORAPHOTO, "doshortaction"))
 
 -- 打包盒拆包
 local SORAUNPACK = GLOBAL.Action({
@@ -452,10 +525,6 @@ end)
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
 
-
-
-
-
 local SORATELEITEM = GLOBAL.Action({
     priority = 999
 })
@@ -463,8 +532,8 @@ SORATELEITEM.id = "SORATELEITEM"
 SORATELEITEM.str = "传送"
 SORATELEITEM.fn = function(act)
     local invobject = act.invobject
-    if act.target ~= nil and act.doer ~= nil  and invobject then
-        invobject.components.sorateleitem:TryTele(act.doer,act.target)
+    if act.target ~= nil and act.doer ~= nil and invobject then
+        invobject.components.sorateleitem:TryTele(act.doer, act.target)
     end
     return true
 end
@@ -479,8 +548,6 @@ end)
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORATELEITEM, "doshortaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORATELEITEM, "doshortaction"))
 
-
-
 local SORA2POKEBALL = GLOBAL.Action({
     priority = 999
 })
@@ -492,20 +559,22 @@ SORA2POKEBALL.fn = function(act)
     local invobject = act.invobject
     local doer = act.doer
     if doer and invobject then
-        if not invobject.components.sora2pokeball.userid  then 
-            invobject.components.sora2pokeball:Bind(doer.userid,doer.name)
-            Say(doer,"你才到球里去")
+        if not invobject.components.sora2pokeball.userid then
+            invobject.components.sora2pokeball:Bind(doer.userid, doer.name)
+            Say(doer, "你才到球里去")
             return true
         end
-        local x,t = invobject.components.sora2pokeball:Tele(doer)
-        if not x then Say(doer,t) end
+        local x, t = invobject.components.sora2pokeball:Tele(doer)
+        if not x then
+            Say(doer, t)
+        end
     end
     return true
 end
 
 AddAction(SORA2POKEBALL)
 AddComponentAction("INVENTORY", "sora2pokeball", function(inst, doer, actions, right)
-    if inst and doer and inst:HasTag("sorarecharge") then 
+    if inst and doer and inst:HasTag("sorarecharge") then
         table.insert(actions, ACTIONS.SORA2POKEBALL)
     end
 end)
@@ -513,14 +582,15 @@ end)
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORA2POKEBALL, "doshortaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORA2POKEBALL, "doshortaction"))
 
-
-function MakeAndAddAction(id,name,fn,pri,sg,clientsg)
-    local act = GLOBAL.Action({priority = (pri or 999)})
+function MakeAndAddAction(id, name, fn, pri, sg, clientsg)
+    local act = GLOBAL.Action({
+        priority = (pri or 999)
+    })
     act.id = id:upper()
-    if type(name) == "string" then 
-        act.str = name 
+    if type(name) == "string" then
+        act.str = name
     else
-        act.stroverridefn = name 
+        act.stroverridefn = name
     end
     act.mount_valid = false
     act.fn = fn
@@ -530,16 +600,15 @@ function MakeAndAddAction(id,name,fn,pri,sg,clientsg)
     return act
 end
 
-MakeAndAddAction("SORAITEMCHANGE",function (act)
+MakeAndAddAction("SORAITEMCHANGE", function(act)
     return not act.target.replica.inventoryitem:CanBePickedUp() and "收起" or "放置"
-end,function (act)
-    local target = act.target 
-    if target.components.soraportable then 
+end, function(act)
+    local target = act.target
+    if target.components.soraportable then
         target.components.soraportable:ChangToItem(act.doer)
     end
-    return true 
-end,1,"dolongaction")
-
+    return true
+end, 1, "dolongaction")
 
 AddComponentAction("SCENE", "soraportable", function(inst, doer, actions, right)
     if right and inst and not inst.replica.inventoryitem:CanBePickedUp() then
@@ -547,4 +616,17 @@ AddComponentAction("SCENE", "soraportable", function(inst, doer, actions, right)
     end
 end)
 
+-- AddComponentAction("POINT", "deployable", function(inst, doer, pos, actions, right)
+--     print("POINT", inst, doer, actions, right)
+--     if right and inst:HasTag("sora_photo") and doer then
+--         table.insert(actions, ACTIONS.DEPLOY)
+--     end
+-- end)
+
+-- AddComponentAction("USEITEM", "deployable", function(inst, doer,target, actions, right)
+--     print("USEITEM",inst, doer, actions, right)
+--     if right and inst:HasTag("sora_photo") and doer then
+--        table.insert(actions, ACTIONS.DEPLOY)
+--     end
+-- end)
 

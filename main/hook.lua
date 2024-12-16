@@ -1644,3 +1644,25 @@ if TheNet:GetIsServer() then
         inst.components.soraitemcontrol:InitPlayer()
     end)
 end
+
+
+local oldSaveGame= GLOBAL.SaveGame
+SoraAPI.IsSaveGaming = false
+SoraAPI.IsSavePlayering = 0 
+GLOBAL.SaveGame = function(...)
+    SoraAPI.IsSaveGaming = true
+    local r = oldSaveGame(...)
+    SoraAPI.IsSaveGaming = false
+    return r 
+end
+
+AddPlayerPostInit(function (inst)
+    local oldGetPersistData = inst.GetPersistData
+    inst.GetPersistData = function(...)
+        SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering + 1
+        local x,y,z,a,b,c = oldGetPersistData(...)
+        SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering - 1
+        return x,y,z,a,b,c
+    end
+end)
+

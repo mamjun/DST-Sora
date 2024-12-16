@@ -62,7 +62,7 @@ local function fn()
     inst.AnimState:SetBank("sora2prop")
     inst.AnimState:SetBuild("sora2prop")
     inst.AnimState:PlayAnimation("anim")
-
+    inst:AddComponent("soratwoface")
     inst:AddTag("propweapon")
     inst:AddTag("nonpotatable")
 	inst:AddTag("waterproofer")

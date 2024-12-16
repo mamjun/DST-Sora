@@ -66,6 +66,7 @@ GLOBAL.TUNING.SORALOCK1 = GetModConfigData("lock1")
 GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
 GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
 GLOBAL.TUNING.SORAFGMODE = GetModConfigData("fgmode")
+GLOBAL.TUNING.SORAMOREANIMDATA = GetModConfigData("moreanimdata") == 0
 RESETUI = GetModConfigData("reset_ui")
 GLOBAL.TUNING.SORADISABLEGLOBAL = GetModConfigData("disableui_globalbuild")
 IsGemEnable = rawget(_G,"gemrun") and true or false
@@ -80,6 +81,7 @@ end
 mi("logupload")
 -- 相关API 提供给mod使用
 mi("soraenv")
+mi("moreanimdata")
 mi("api")
 -- 导入maindb
 mi("maindb")

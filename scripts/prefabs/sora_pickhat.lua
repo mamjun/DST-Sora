@@ -151,8 +151,6 @@ local function fn()
     anim:PlayAnimation("sleep_loop", true)
     inst.Transform:SetSixFaced()
     inst:AddTag("NOBLOCK")
-    inst:AddTag("cantpack")
-    inst:AddTag("nonpackable")
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
             inst.replica.container:WidgetSetup("sora_pickhat")
@@ -177,6 +175,7 @@ local function fn()
     inst.components.container.onclosefn = OnClose
     inst.components.container.onopenfn = OnOpen
     inst:AddComponent("sorapickhat")
+    inst:AddComponent("soracantpack")
     -- inst.components.container.onopenfn = onopen
     -- inst.components.container.onclosefn = onclose
     inst:AddComponent("fueled")
@@ -341,7 +340,7 @@ local function MakeBirds()
         local inst = CreateEntity()
         local trans = inst.entity:AddTransform()
         local anim = inst.entity:AddAnimState()
-        inst.Transform:SetTwoFaced()
+        inst:AddComponent("soratwoface")
         inst.AnimState:SetBank("crow")
         inst.AnimState:SetBuild("crow_build")
         inst.AnimState:PlayAnimation("glide", true)

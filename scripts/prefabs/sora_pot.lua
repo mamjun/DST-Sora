@@ -161,6 +161,7 @@ local function fn()
     inst.AnimState:SetBank(name)
     inst.AnimState:SetBuild(name)
     inst.AnimState:PlayAnimation("item", true)
+    inst:AddComponent("soratwoface")
     inst.entity:SetPristine()
     inst.sorapotper = net_int(inst.GUID, 'sorapotper', 'sorapotperdirty')
 

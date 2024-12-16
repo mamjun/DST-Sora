@@ -220,6 +220,7 @@ local function fn()
     anim:SetBank("soratele")
     anim:SetBuild("soratele")
     anim:PlayAnimation("idle",true)
+	inst:AddComponent("soratwoface")
 	inst:AddTag("soratrader")
     inst:AddTag("nopunch")
 	inst:AddTag("rechargeable")
@@ -294,7 +295,7 @@ local function fn()
     
     return inst
 end
-
+SoraAPI.MakeItemSkinDefaultData("soratele", {}, {})
 local tname = "soratele_wsqy"
 SoraAPI.MakeItemSkin("soratele",tname , {
     name = "荒野",

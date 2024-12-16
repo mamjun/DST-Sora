@@ -370,6 +370,7 @@ local function fn()
 	inst:AddTag("rechargeable")
 	inst.entity:AddMiniMapEntity()
 	inst.MiniMapEntity:SetIcon("sorapick.tex")
+	inst:AddComponent("soratwoface")
 	if not TheWorld.ismastersim then
         return inst
     end
@@ -429,4 +430,5 @@ local function fn()
     
     return inst
 end
+SoraAPI.MakeItemSkinDefaultData("sorapick", {}, {})
 return	Prefab( "sorapick", fn, assets, prefabs)

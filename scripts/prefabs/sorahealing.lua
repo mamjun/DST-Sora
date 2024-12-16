@@ -267,6 +267,7 @@ local function fn()
     inst:AddTag("rechargeable")
     inst.entity:AddMiniMapEntity()
     inst.MiniMapEntity:SetIcon("sorahealing.tex")
+    inst:AddComponent("soratwoface")
     --[[inst:AddComponent("aoetargeting")
     inst.components.aoetargeting:SetAlwaysValid(true)
 	inst.components.aoetargeting.reticule.reticuleprefab = "reticuleaoe"

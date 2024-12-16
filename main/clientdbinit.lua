@@ -75,7 +75,7 @@ temp.serverfn = function(ns, db, userid)
             return "S_" .. userid
         end
         if mode == 2 then
-            if rawget(GLOBAL,"FSAPI") then
+            if rawget(GLOBAL, "FSAPI") then
                 local team, level = GLOBAL.FSAPI.GetTeamByPlayer(userid)
                 if level and level > 0 then
                     return "T_" .. team
@@ -84,7 +84,7 @@ temp.serverfn = function(ns, db, userid)
             return ""
         end
         if mode == 3 then
-            if rawget(GLOBAL,"FSAPI") then
+            if rawget(GLOBAL, "FSAPI") then
                 local team, level = GLOBAL.FSAPI.GetTeamByPlayer(userid)
                 if level and level > 0 then
                     return "T_" .. team
@@ -210,6 +210,7 @@ temp.clientfn = function(ns, db, userid)
 end
 
 local temp = CreateClientDBTemple("RPC", 300, 1)
+temp:InitRoot("data")
 temp.serverfn = function(ns, db, userid)
 
     db:ListenForEvent("SelectBook", function(id, data, event, ent)
@@ -334,6 +335,23 @@ function r_event(user, event, data, ent)
     end
     db:PushEvent(event, data, nil, ent)
 end
+
+AddPlayerPostInit(function(inst)
+    if TheWorld.soraismastersim then
+        inst:ListenForEvent("newactiveitem", function(i, data)
+            if data and i.userid then 
+                local db = GetClientDB("RPC",  i.userid, true)
+                if not db then return end
+                if data.item and data.item:HasTag("sora_photo") and data.item.data  and data.item.data.bank  then 
+                    db:Set('data','photodata',data.item.data)
+                else
+                    db:Set('data','photodata',nil)
+                end
+            end
+        end)
+    end
+end)
+
 --[[
 
 CDB = SoraAPI.CDB SDB = SoraAPI.SDB MDB = SoraAPI.MailDB

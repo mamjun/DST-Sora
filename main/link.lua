@@ -502,7 +502,7 @@ AddMulPrefabPostInit(AllToEquip, function(inst)
             return old(self, target, ...)
         end
     end
-    inst:DoTaskInTime(1,function ()
+    inst:DoTaskInTime(1, function()
         if inst.replica.equippable then
             local old = inst.replica.equippable.IsRestricted
             inst.replica.equippable.IsRestricted = function(self, target, ...)
@@ -515,3 +515,12 @@ AddMulPrefabPostInit(AllToEquip, function(inst)
     end)
 end)
 
+AddLaterFn(function()
+    if AddActionQueuerAction then
+        AddActionQueuerAction("allclick", "SORAPHOTO", true)
+        AddActionQueuerAction("allclick", "SORAPACK", true)
+        AddActionQueuerAction("allclick", "SORAUNPACK", true)
+        AddActionQueuerAction("allclick", "SORAGIFT", true)
+        AddActionQueuerAction("allclick", "SORAREPAIR", true)
+    end
+end)

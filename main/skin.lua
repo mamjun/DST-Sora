@@ -158,6 +158,11 @@ RegUseSkinFN("sora_qiyu", function(doer, skin)
         doer.components.soraitemcontrol:CreateItem("sora_qiyu")
     end
 end)
+RegUseSkinFN("sora_lyj", function(doer, skin)
+    if doer and doer.components.soraitemcontrol then
+        doer.components.soraitemcontrol:CreateItem("sora_lyj")
+    end
+end)
 RegUseSkinFN("sora_lantern", function(doer, skin)
     if doer and doer.components.soraitemcontrol then
         doer.components.soraitemcontrol:CreateItem("sora_lantern")
@@ -936,6 +941,11 @@ if not TheNet:IsDedicated() then
             scr.unlocktext:SetString("消耗888活跃度解锁")
             return scr
         end,
+        sora_lyj = function(s, item)
+            local scr = GameTimeUnLockScreen2(item, 888)
+            scr.unlocktext:SetString("消耗888活跃度解锁")
+            return scr
+        end,
         sora_lantern = function(s, item)
             local scr = GameTimeUnLockScreen2(item, 450)
             scr.unlocktext:SetString("消耗450活跃度解锁")
@@ -956,6 +966,7 @@ if not TheNet:IsDedicated() then
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)
     AddItemSkin("sora_qiyu", "修理雨伞~修理雨伞~修理雨伞~",888)
+    AddItemSkin("sora_lyj", "异世相遇,尽享留影",888,nil, true)
     AddItemSkin("sora_lantern", "让它带你找到回家的路",450)
     AddItemSkin("sora_lantern_yh", "落樱指引回家的路", nil, true)
     AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群943105804\n领取方法看群公告")
@@ -979,7 +990,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2ice_seed", "来点种子,蟹蟹")
     AddItemSkin("sora2ice_bhl", "环游整个星系一万次，\n只为遇见你")
     AddItemSkin("sora2ice_byb", "穿梭风雪,绽放寒芒!")
-
+    AddItemSkin("sora2ice_jqr", "叽企刃不是机器人!")
     AddItemSkin("sora2birdchest_ggd",
         "在下江湖人称菇菇毒，\n暗器榜排名第七十七，\n独门绝技--好菇毒！")
     AddItemSkin("sora2birdchest_xzyb", "西格斯比与仙子伊布心心相印了！")

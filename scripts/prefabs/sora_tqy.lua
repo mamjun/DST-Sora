@@ -434,7 +434,7 @@ local function boxfn()
     inst.AnimState:PlayAnimation("idle_item",true)
     -- inst.AnimState:SetRayTestOnBB(true)
     inst:AddTag("sora_tqy_box")
-
+    inst:AddComponent("soratwoface")
  
     inst.entity:SetPristine()
 

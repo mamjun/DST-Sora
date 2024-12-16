@@ -319,7 +319,7 @@ local function fn()
     anim:SetBuild("sora_light_white")
     inst.AnimState:SetMultColour(.7, .7, .7, 1)
     anim:PlayAnimation("idle", true)
-
+    inst:AddComponent("soratwoface")
     inst.Light:SetColour(.65, .65, .5)
     inst.Light:Enable(false)
     inst:AddTag("structure")
@@ -387,6 +387,7 @@ local function MakeLight(str, istrue)
         anim:SetBank(name)
         anim:SetBuild(name)
         anim:PlayAnimation("idle", true)
+        inst:AddComponent("soratwoface")
         if not TheWorld.ismastersim then
             return inst
         end

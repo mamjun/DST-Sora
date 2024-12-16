@@ -314,7 +314,7 @@ local function MakeBuffer(name, des, bufferfn)
         inst.AnimState:SetBank("sora2buffers")
         inst.AnimState:SetBuild("sora2buffers")
         inst.AnimState:PlayAnimation(name)
-
+        inst:AddComponent("soratwoface")
         inst.entity:SetPristine()
 
         if not TheWorld.ismastersim then
