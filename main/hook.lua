@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 穹妹重生保留经验相关
-local function Onsoradespawn(userid, soraexp,extsave)
+local function Onsoradespawn(userid, soraexp, extsave)
     TheWorld.components.soraexpsave:SetExp(userid, soraexp)
     TheWorld.components.soraexpsave:SetExtSave(userid, extsave)
 end
@@ -36,13 +36,13 @@ local function Onplayerdespawnanddelete(world, data)
     local player = data.player or data
     if player:HasTag("sora") and player.soraexp then
         local extsave = {}
-        for k,v in pairs(player.components) do
-            if v.OnSoraSave then 
+        for k, v in pairs(player.components) do
+            if v.OnSoraSave then
                 extsave[k] = v:OnSoraSave()
             end
         end
         -- if TheWorld.ismastershard then
-            Onsoradespawn(player.userid, player.soraexp:value(),extsave)
+        Onsoradespawn(player.userid, player.soraexp:value(), extsave)
         -- else
         --     GLOBALDB:PushEvent("soradespawn", {
         --         userid = player.userid,
@@ -353,24 +353,24 @@ AddLaterFn(function()
             end
             return oldINVENTORYfn(inst, doer, ...)
         end
-        local oldinventoryitemUSEITEMfn = old.USEITEM.inventoryitem 
-        old.USEITEM.inventoryitem = function(inst,doer,target  ,...)
-            if target and target:HasTag('soranorummage') then 
-                return 
+        local oldinventoryitemUSEITEMfn = old.USEITEM.inventoryitem
+        old.USEITEM.inventoryitem = function(inst, doer, target, ...)
+            if target and target:HasTag('soranorummage') then
+                return
             end
-            return oldinventoryitemUSEITEMfn(inst,doer,target  ,...)
+            return oldinventoryitemUSEITEMfn(inst, doer, target, ...)
         end
 
         local oldweaponUSEITEMfn = old.USEITEM.weapon
-        old.USEITEM.weapon = function(inst,doer,target  ,...)
-            if target and target:HasTag('soranorummage') then 
-                return 
+        old.USEITEM.weapon = function(inst, doer, target, ...)
+            if target and target:HasTag('soranorummage') then
+                return
             end
-            return oldweaponUSEITEMfn(inst,doer,target  ,...)
+            return oldweaponUSEITEMfn(inst, doer, target, ...)
         end
 
     end
-    
+
 end)
 
 local oldbunldefn = ACTIONS.BUNDLE.fn
@@ -567,7 +567,6 @@ AddStategraphPostInit("wilson_client", function(self)
     FixSora(self)
 end)
 
-
 local ShowHook = userdata.MakeHook("AnimState", "Show", function(inst, symbol)
     inst.SoraLayerShown[symbol] = true
     if inst.SoraLockLayerShown[symbol] then
@@ -602,7 +601,6 @@ local HideSymbolHook = userdata.MakeHook("AnimState", "HideSymbol", function(ins
         return false
     end
 end)
-
 
 local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol", function(inst, symbol, build, newsymbol)
     if not inst.SoraLastSymbols[symbol] then
@@ -673,8 +671,7 @@ local function SoraUnlockSymbol(inst, symbol, key)
     end
 end
 
-
-local function SoraLockSymbolShow(inst, symbol, key,shown)
+local function SoraLockSymbolShow(inst, symbol, key, shown)
     if not inst.SoraLockSymbolShown then
         return false
     end
@@ -688,9 +685,9 @@ local function SoraLockSymbolShow(inst, symbol, key,shown)
     end
     table.insert(inst.SoraLockSymbolShown[symbol], {
         key = key,
-        shown=shown
+        shown = shown
     })
-    if shown then 
+    if shown then
         userdata.Call(inst, ShowSymbolHook, symbol)
     else
         userdata.Call(inst, HideSymbolHook, symbol)
@@ -714,18 +711,17 @@ local function SoraUnlockSymbolShow(inst, symbol, key)
         local tb = inst.SoraLockSymbolShown[symbol]
         local nn = #tb
         shown = tb[nn].shown
-    elseif inst.SoraSymbolShown[symbol] ~= nil then 
+    elseif inst.SoraSymbolShown[symbol] ~= nil then
         shown = inst.SoraSymbolShown[symbol]
     end
-    if shown then 
+    if shown then
         userdata.Call(inst, ShowSymbolHook, symbol)
     else
         userdata.Call(inst, HideSymbolHook, symbol)
     end
 end
 
-
-local function SoraLockLayerShow(inst, symbol, key,shown)
+local function SoraLockLayerShow(inst, symbol, key, shown)
     if not inst.SoraLockLayerShown then
         return false
     end
@@ -739,10 +735,10 @@ local function SoraLockLayerShow(inst, symbol, key,shown)
     end
     table.insert(inst.SoraLockLayerShown[symbol], {
         key = key,
-        shown=shown
+        shown = shown
     })
-    
-    if shown then 
+
+    if shown then
         userdata.Call(inst, ShowHook, symbol)
     else
         userdata.Call(inst, HideHook, symbol)
@@ -765,10 +761,10 @@ local function SoraUnlockLayerShow(inst, symbol, key)
         local tb = inst.SoraLockLayerShown[symbol]
         local nn = #tb
         shown = tb[nn].shown
-    elseif inst.SoraLayerShown[symbol] ~= nil then 
+    elseif inst.SoraLayerShown[symbol] ~= nil then
         shown = inst.SoraLayerShown[symbol]
     end
-    if shown then 
+    if shown then
         userdata.Call(inst, ShowHook, symbol)
     else
         userdata.Call(inst, HideHook, symbol)
@@ -799,7 +795,7 @@ AddPlayerPostInit(function(inst)
     inst.SoraUnlockSymbolShow = SoraUnlockSymbolShow
     inst.SoraLockLayerShow = SoraLockLayerShow
     inst.SoraUnlockLayerShow = SoraUnlockLayerShow
-    
+
     inst:ListenForEvent("trade", function(inst, data)
         if not inst:HasTag("sora") and data and data.giver and data.giver:HasTag("sora") and data.item and
             data.item.prefab == "sora2armor" and data.item.skinname == "sora2armorskin" then
@@ -1027,14 +1023,16 @@ end)
 AddComponentPostInit("combat", function(self)
     local oldGetAttacked = self.GetAttacked
     self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
-        if damage > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then 
-            if not s.sora_wsqt_fxCD then 
+        if damage > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
+            if not s.sora_wsqt_fxCD then
                 s.sora_wsqt_fxCD = SoraCD(2)
             end
-            if s.sora_wsqt_fxCD() then 
-                local fx = SpawnPrefab("shadow_shield"..tostring(math.random(1,6)))
+            if s.sora_wsqt_fxCD() then
+                local fx = SpawnPrefab("shadow_shield" .. tostring(math.random(1, 6)))
                 fx.entity:SetParent(s.inst.entity)
-                s.inst:PushEvent("blocked", { attacker = attacker })
+                s.inst:PushEvent("blocked", {
+                    attacker = attacker
+                })
                 return false
             end
         end
@@ -1048,23 +1046,23 @@ AddComponentPostInit("combat", function(self)
         if olddamagetobreak and weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
             s.inst.components.freezable.damagetobreak = olddamagetobreak
         end
-        
+
         return x, y, z
     end
     local DoAttack = self.DoAttack
-    self.DoAttack = function(self,targ, weapon,...)
-        if weapon and weapon:HasTag("sora_tqy") then 
-            if weapon.delayowner == targ then 
-                return 
+    self.DoAttack = function(self, targ, weapon, ...)
+        if weapon and weapon:HasTag("sora_tqy") then
+            if weapon.delayowner == targ then
+                return
             end
-            if not targ.sora_tqyattackcd then 
+            if not targ.sora_tqyattackcd then
                 targ.sora_tqyattackcd = SoraCD(0.1)
             end
-            if not targ.sora_tqyattackcd() then 
-                return 
+            if not targ.sora_tqyattackcd() then
+                return
             end
         end
-        return DoAttack(self,targ, weapon,...)
+        return DoAttack(self, targ, weapon, ...)
     end
 end)
 
@@ -1141,7 +1139,6 @@ AddComponentPostInit("lunarthrall_plantspawner", function(i)
     end
 
 end)
-
 
 AddPrefabPostInit("treasurechest", function(inst)
     inst.sora2chest = net_bool(inst.GUID, "sora2chest", "sora2chestdirty")
@@ -1645,24 +1642,36 @@ if TheNet:GetIsServer() then
     end)
 end
 
-
-local oldSaveGame= GLOBAL.SaveGame
+local oldSaveGame = GLOBAL.SaveGame
 SoraAPI.IsSaveGaming = false
-SoraAPI.IsSavePlayering = 0 
+SoraAPI.IsSavePlayering = 0
 GLOBAL.SaveGame = function(...)
     SoraAPI.IsSaveGaming = true
     local r = oldSaveGame(...)
     SoraAPI.IsSaveGaming = false
-    return r 
+    return r
 end
 
-AddPlayerPostInit(function (inst)
+AddPlayerPostInit(function(inst)
     local oldGetPersistData = inst.GetPersistData
     inst.GetPersistData = function(...)
         SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering + 1
-        local x,y,z,a,b,c = oldGetPersistData(...)
+        local x, y, z, a, b, c = oldGetPersistData(...)
         SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering - 1
-        return x,y,z,a,b,c
+        return x, y, z, a, b, c
     end
 end)
 
+AddComponentPostInit("unwrappable", function(self)
+    local oldWrapItems = self.WrapItems
+    function self.WrapItems(s, items, ...)
+        if type(items) == "table" then
+            for k,v in ipairs(items) do 
+                if type(v) == "table" then 
+                    v.stoppackprotect = true
+                end
+            end
+        end
+        return oldWrapItems(s, items, ...)
+    end
+end)

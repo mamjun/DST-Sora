@@ -260,7 +260,7 @@ local function fn()
 
     inst.AnimState:SetBank("sora_lantern")
     inst.AnimState:SetBuild("sora_lantern")
-    inst.AnimState:PlayAnimation("idle_loop", true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
     inst:AddTag("light")
 
@@ -291,10 +291,10 @@ local function fn()
     inst:AddComponent("soraitem")
     inst.components.soraitem:SetBind(true)
     inst:ListenForEvent("floater_startfloating", function(inst)
-        inst.AnimState:PlayAnimation("idle_loop", true)
+        inst.AnimState:PlayAnimation("idle", true)
     end)
     inst:ListenForEvent("floater_stopfloating", function(inst)
-        inst.AnimState:PlayAnimation("idle_loop", true)
+        inst.AnimState:PlayAnimation("idle", true)
     end)
 
     MakeSmallBurnable(inst, TUNING.TINY_BURNTIME)
@@ -340,7 +340,7 @@ local function lanternbodyfn()
 end
 
 local skin = SoraAPI.MakeItemSkin(name, name, {
-    name = "归途",
+    name = "莲叶东",
     atlas = "images/inventoryimages/" .. name .. ".xml",
     image = name,
     build = name,

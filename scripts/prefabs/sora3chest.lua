@@ -29,17 +29,16 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] require "prefabutil"
 
-
 local assets = {}
-SoraAPI.MakeAssetTable("sora3chest",assets)
+SoraAPI.MakeAssetTable("sora3chest", assets)
 local prefabs = {"collapse_small"}
 local cmp = require "components/sorachestmanager"
 local data = {
-    containers = {{1},{2},{3},{4},{5},{6},{7},{8},{9},},
+    containers = {{1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}},
     controls = {},
     pri = 0,
-    notdayupdate =1,
-    selfcontainer=1
+    notdayupdate = 1,
+    selfcontainer = 1
 }
 cmp:RegType("sora3chest", data)
 
@@ -52,9 +51,9 @@ local function fn()
     inst:AddTag("soracontainerfix")
     inst.AnimState:SetBank("sora3chest")
     inst.AnimState:SetBuild("sora3chest")
-    inst.AnimState:PlayAnimation("idle",true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
-    inst.AnimState:SetScale(1.3,1.3,1.3)
+    inst.AnimState:SetScale(1.3, 1.3, 1.3)
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
@@ -65,9 +64,9 @@ local function fn()
     inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription("这个只能带一个哦")
     inst:AddComponent("inventoryitem")
-	inst.components.inventoryitem.atlasname = "images/inventoryimages/sora3chest.xml"
-	inst.components.inventoryitem.imagename = "sora3chest"
-    
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora3chest.xml"
+    inst.components.inventoryitem.imagename = "sora3chest"
+
     inst:AddComponent("soraonlyone")
     inst.components.soraonlyone.tag = "sorasmartchest"
 
@@ -76,25 +75,29 @@ local function fn()
     inst.components.container:EnableInfiniteStackSize(true)
     inst.components.container.canbeopened = false
     inst.components.inventoryitem.canonlygoinpocket = true
-    inst:ListenForEvent("onpickup",function ()
-        if inst.components.container then 
+    inst:ListenForEvent("onpickup", function()
+        if inst.components.container then
             inst.components.container.canbeopened = true
         end
     end)
-    inst:ListenForEvent("ondropped",function ()
-        if inst.components.container then 
+    inst:ListenForEvent("ondropped", function()
+        if inst.components.container then
             inst.components.container.canbeopened = false
         end
     end)
     inst.prefab = "sora3chest"
-    assert(TheWorld.components.sorachestmanager,'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
+    if not TheWorld.components.sorachestmanager then
+        SoraPushPopupDialog("小穹的温馨提示",'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯\n某些客户端属性显示mod不兼容,请关闭后再试',"断开连接",function() assert(TheWorld.components.sorachestmanager,
+            '小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯/某些客户端属性显示mod不兼容,请关闭后再试') end)
+        return inst
+    end
     TheWorld.components.sorachestmanager:RegByType(inst, "sora3chest")
 
     inst:AddComponent("preserver")
     inst.components.preserver:SetPerishRateMultiplier(0)
     return inst
 end
-SoraAPI.MakeItemSkinDefaultImage("sora3chest","images/inventoryimages/sora3chest.xml","sora3chest")
+SoraAPI.MakeItemSkinDefaultImage("sora3chest", "images/inventoryimages/sora3chest.xml", "sora3chest")
 
-RegisterInventoryItemAtlas("images/inventoryimages/sora3chest.xml","sora3chest.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/sora3chest.xml", "sora3chest.tex")
 return Prefab("sora3chest", fn, assets, prefabs)

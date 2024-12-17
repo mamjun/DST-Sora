@@ -222,15 +222,17 @@ MakeBuild("pile", function(inst)
     MakeObstaclePhysics(inst, .5)
 end, "穹の小木桩", "远看近看都是桩")("soratele_wsqy", "荒野", "soratele_wsqy", "soratele_wsqy")(
     "soramagic_wsqy", "赴约", "soramagic_wsqy", "soramagic_wsqy")("sorabowknot_wsqy", "纪念", "sorabowknot_wsqy",
-    "sorabowknot_wsqy")("sorabowknot_wsqy_r", "纪念☆", "sorabowknot_wsqy_r", "sorabowknot_wsqy_r")
+    "sorabowknot_wsqy")("sorabowknot_wsqy_r", "纪念☆", "sorabowknot_wsqy_r", "sorabowknot_wsqy_r")("lantern",
+    "莲叶东", "sora_lantern", "sora_lantern")("sora_lantern_yh", "春迟", "sora_lantern_yh", "sora_lantern_yh")
 MakeBuild("decor", function(inst)
 
 end, "穹の绿植", "这个撞不上")("small", "中杯")("medium", "大杯")("jss", "橘伞伞")("soratele_wsqy",
     "荒野", "soratele_wsqy", "soratele_wsqy")("soramagic_wsqy", "赴约", "soramagic_wsqy", "soramagic_wsqy")(
     "sorabowknot_wsqy", "纪念", "sorabowknot_wsqy", "sorabowknot_wsqy")("sorabowknot_wsqy_r", "纪念☆",
-    "sorabowknot_wsqy_r", "sorabowknot_wsqy_r")("mls", "猫老师", "sora2chest_mls")
+    "sorabowknot_wsqy_r", "sorabowknot_wsqy_r")("mls", "猫老师", "sora2chest_mls")("lantern", "莲叶东",
+    "sora_lantern", "sora_lantern")("sora_lantern_yh", "春迟", "sora_lantern_yh", "sora_lantern_yh")
 
---MakeBuild("gate", function(inst)end, "穹の大门", "出门记得锁好")
+-- MakeBuild("gate", function(inst)end, "穹の大门", "出门记得锁好")
 
 return unpack(allprefab)
 

@@ -53,7 +53,7 @@ end
 -- 防止自身被移除
 local function protectGetPersistData(inst, ...)
     assert(inst.components.soracantpack, "意外的打包,请截图反馈给风铃")
-    if inst.stoppackprotect or   SoraAPI.IsSaveGaming or SoraAPI.IsSavePlayering > 0 then
+    if inst.stoppackprotect or inst.components.soracantpack.newspawn or   SoraAPI.IsSaveGaming or SoraAPI.IsSavePlayering > 0 then
         return inst.components.soracantpack.oldGetPersistData(inst, ...)
         -- 不应该走到这
     else
@@ -78,6 +78,10 @@ function com:Init()
     self.oldRemove = self.inst.Remove
     self.inst.Remove = protectRemove
     self.inst.GetPersistData = protectGetPersistData
+    self.newspawn = true
+    self.inst:DoTaskInTime(0,function ()
+        self.newspawn = false
+    end)
 end
 function com:OnRemoveFromEntity()
     self.inst.GetPersistData = self.oldGetPersistData
