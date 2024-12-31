@@ -281,8 +281,8 @@ local function photo_itemfn()
     MakeInventoryPhysics(inst)
     inst.entity:AddNetwork()
     inst.SetData = SetItemData
-    inst.AnimState:SetBank("sorabowknot_sora")
-    inst.AnimState:SetBuild("sorabowknot_sora")
+    inst.AnimState:SetBank("sora_photo_item")
+    inst.AnimState:SetBuild("sora_photo_item")
     inst.AnimState:PlayAnimation('idle', true)
     inst:AddComponent("soratwoface")
     inst:AddTag("sora_photo")
@@ -316,9 +316,6 @@ local function photo_itemfn()
     inst.components.deployable.ondeploy = OnDeploy
     inst.components.deployable.spacing = DEPLOYSPACING.NONE
     inst.components.deployable:SetDeployMode(DEPLOYMODE.CUSTOM)
-
-    inst.fx = SpawnPrefab("sora_tmp_fx")
-    inst.fx:Bind(inst)
     return inst
 end
 local lyjname = "sora_lyj"
@@ -332,8 +329,8 @@ local function fn()
     inst:AddTag("sora_lyj")
     inst.entity:AddNetwork()
     inst:AddComponent("soratwoface")
-    inst.AnimState:SetBank("sorabowknot_sora")
-    inst.AnimState:SetBuild("sorabowknot_sora")
+    inst.AnimState:SetBank("sora_lyj")
+    inst.AnimState:SetBuild("sora_lyj")
     inst.AnimState:PlayAnimation('idle', true)
     if not TheWorld.ismastersim then
         return inst
@@ -344,7 +341,7 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/" .. lyjname .. ".xml"
     inst.components.inventoryitem.imagename = lyjname
     inst:AddComponent("waterproofer")
-    inst.components.waterproofer:SetEffectiveness(1)
+    inst.components.waterproofer:SetEffectiveness(0)
     inst:AddComponent("rechargeable")
     inst.components.rechargeable:SetMaxCharge(5)
     inst:AddComponent("equippable")
@@ -355,8 +352,6 @@ local function fn()
     inst.components.soraitemcontrol.tags = {"sora_lyj"}
 
     inst:AddComponent("sora_lyj")
-    inst.fx = SpawnPrefab("sora_tmp_fx")
-    inst.fx:Bind(inst)
     return inst
 end
 
@@ -379,8 +374,8 @@ local lyj = SoraAPI.MakeItemSkin(lyjname, lyjname, {
     name = "穹の留影机",
     atlas = "images/inventoryimages/" .. lyjname .. ".xml",
     image = lyjname,
-    build = "sorabowknot_sora",
-    bank = "sorabowknot_sora",
+    build = "sora_lyj",
+    bank = "sora_lyj",
     checkfn = SoraAPI.SoraSkinCheckFn,
     dontload = true,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn

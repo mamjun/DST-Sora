@@ -168,6 +168,37 @@ end
 RegisterInventoryItemAtlas("images/inventoryimages/"..name..".xml",name..".tex")
 STRINGS.NAMES.SORA_SHOUBAN_ITEM = "穹の手办"
 
+SoraAPI.MakeItemSkinDefaultData(name, {"images/inventoryimages/"..name..".xml", name},
+    {name, name,'idle',true})
+
+local function MakeSkin(skinskin, skinname,free)
+    local skin = name .."_"..skinskin
+    SoraAPI.MakeAssetTable(skin, assets)
+    SoraAPI.MakeItemSkin(name, skin, {
+        name = skinname,
+        atlas = "images/inventoryimages/"..skin..".xml",
+        image = skin,
+        build = skin,
+        bank = skin,
+        checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
+        checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
+    })
+    local itemskin = name .."_item_"..skinskin
+    SoraAPI.MakeItemSkin(name.."_item", itemskin, {
+        name = skinname,
+        atlas = "images/inventoryimages/"..skin..".xml",
+        image = skin,
+        build = skin,
+        bank = skin,
+        checkfn = not free and SoraAPI.SoraSkinCheckFn or nil,
+        checkclientfn = not free and SoraAPI.SoraSkinCheckClientFn or nil
+    })
+
+    SoraAPI.MakeSkinNameMap(skin, itemskin)
+    RegisterInventoryItemAtlas("images/inventoryimages/"..skin..".xml",skin.. ".tex")
+end
+MakeSkin("xd","小蛋")
+
 
 return Prefab(name, fn, assets),
     Prefab(name.."_item", item_fn, assets),

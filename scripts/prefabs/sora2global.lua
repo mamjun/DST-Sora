@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] require "prefabutil"
 
 local assets = {}
-SoraAPI.MakeAssetTable("sora2global",assets)
+SoraAPI.MakeAssetTable("sora2global", assets)
 local prefabs = {"collapse_small"}
 
 local function onopen(inst)
@@ -42,7 +42,7 @@ local function onclose(inst)
     -- inst.AnimState:PlayAnimation("close")
     -- inst.AnimState:PlayAnimation("closed")
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
-    if inst.ResetTaskTask then 
+    if inst.ResetTaskTask then
         inst.ResetTaskTask:Cancel()
         inst.ResetTaskTask = nil
     end
@@ -60,11 +60,11 @@ local function tryupdatechest(inst)
     end
     local doer = next(inst.components.container.openlist)
     SoraAPI.TryUpdateGlobalChest(doer, inst)
-    if inst.ResetTaskTask then 
+    if inst.ResetTaskTask then
         inst.ResetTaskTask:Cancel()
         inst.ResetTaskTask = nil
     end
-    inst.ResetTaskTask = inst:DoTaskInTime(inst.CloseTime ,ResetTask)
+    inst.ResetTaskTask = inst:DoTaskInTime(inst.CloseTime, ResetTask)
 end
 local function fn()
     local inst = CreateEntity()
@@ -80,7 +80,7 @@ local function fn()
     inst:AddComponent("soratwoface")
     inst.AnimState:SetBank("sora2global")
     inst.AnimState:SetBuild("sora2global")
-    inst.AnimState:PlayAnimation("idle",true)
+    inst.AnimState:PlayAnimation("idle", true)
     -- MakeSnowCoveredPristine(inst)
     MakeInventoryPhysics(inst)
     inst.entity:SetPristine()
@@ -101,7 +101,7 @@ local function fn()
     inst:AddComponent("soraonlyone")
     inst.components.soraonlyone.tag = "soraglobalchest"
     inst:AddComponent("preserver")
-    inst.components.preserver:SetPerishRateMultiplier( 0)
+    inst.components.preserver:SetPerishRateMultiplier(0)
 
     inst:AddComponent("rechargeable")
     inst.components.rechargeable:SetMaxCharge(999999)
@@ -112,7 +112,7 @@ local function fn()
     inst.components.rechargeable.OnLoad = function()
         return {}
     end
-    inst.CloseTime  = 50
+    inst.CloseTime = 50
     inst:AddComponent("named")
     inst.Reset = function()
         if inst.components.container:IsOpen() then
@@ -177,6 +177,12 @@ local function fn()
         end
         inst.ChestClose(s, doer, ...)
     end
+    inst.components.container.OnSave = function()
+        return {
+            items = {}
+        }, {}
+    end
+
     inst:ListenForEvent("itemget", tryupdatechest)
     inst:ListenForEvent("itemlose", tryupdatechest)
     inst:ListenForEvent("stacksizechange", tryupdatechest)

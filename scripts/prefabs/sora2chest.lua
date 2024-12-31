@@ -120,6 +120,8 @@ local function updatesign(inst)
         else
             inst.AnimState:Show("chest")
         end
+        inst.AnimState:Show("chest_item")
+        inst.AnimState:Hide("chest_hide")
     else
         if not inst.skinname then
             inst.AnimState:Show("chest")
@@ -132,6 +134,8 @@ local function updatesign(inst)
             inst.AnimState:Hide("swap_item_bg")
             inst.AnimState:Hide("swap_item")
         end
+        inst.AnimState:Show("chest_hide")
+        inst.AnimState:Hide("chest_item")
     end
     if (inst.skinname == "sora2chest_sns" or inst.skinname == "sora2chest_sns_tmp") and
         inst.components.container:IsOpen() then
@@ -144,13 +148,13 @@ local function updatesign(inst)
             inst.AnimState:PlayAnimation("idle_close",true)
             --inst.AnimState:Hide("swap")
         end
-    elseif (inst.skinname == "sora2chest_jcy") then
-        if sign then 
-            inst.AnimState:Show("swap")
-        else
-            inst.AnimState:Hide("swap")
-        end
-        inst.AnimState:PlayAnimation("idle",true)
+    -- elseif (inst.skinname == "sora2chest_jcy") then
+    --     if sign then 
+    --         inst.AnimState:Show("swap")
+    --     else
+    --         inst.AnimState:Hide("swap")
+    --     end
+    --     inst.AnimState:PlayAnimation("idle",true)
     else
         inst.AnimState:PlayAnimation("idle",true)
     end
@@ -489,6 +493,23 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "sora2chest_sgj"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "时光叽",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
 local function chestpt(inst)
     -- inst.AnimState:Hide("chestitem_bg")
     inst.AnimState:Hide("swap_item_bg")

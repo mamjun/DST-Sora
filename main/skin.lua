@@ -170,7 +170,7 @@ RegUseSkinFN("sora_lantern", function(doer, skin)
 end)
 RegUseSkinFN("sora_lantern_yh", function(doer, skin)
     if doer and doer.components.soraitemcontrol then
-        doer.components.soraitemcontrol:CreateItem("sora_lantern","sora_lantern_yh")
+        doer.components.soraitemcontrol:CreateItem("sora_lantern", "sora_lantern_yh")
     end
 end)
 local function MakeSkin(name, data, notemp)
@@ -192,7 +192,7 @@ local function MakeSkin(name, data, notemp)
     for k, v in pairs(data) do
         d[k] = v
     end
-    if d.is_longhair then 
+    if d.is_longhair then
         d.skins.ghost_skin = "ghost_sora_r_build"
     end
     MakeCharacterSkin("sora", name, d)
@@ -890,67 +890,67 @@ if not TheNet:IsDedicated() then
             local scr = CdkUnLockScreen(item)
             scr.unlocktext:SetString("QQ群(372450705)内绑定后,领取方法看群公告")
             return scr
-        end,
-        sora_llan = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 600)
-            scr.unlocktext:SetString("消耗600活跃度解锁")
-            return scr
-        end,
-        sora2base_big = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 300)
-            scr.unlocktext:SetString("消耗300活跃度解锁")
-            return scr
-        end,
-        sora2base_small = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 300)
-            scr.unlocktext:SetString("消耗300活跃度解锁")
-            return scr
-        end,
-        sora2ice_seed = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 300)
-            scr.unlocktext:SetString("消耗300活跃度解锁")
-            return scr
-        end,
-        sora2ice_flower = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 300)
-            scr.unlocktext:SetString("消耗300活跃度解锁")
-            return scr
-        end,
-        sora2chest_pkq = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 300)
-            scr.unlocktext:SetString("消耗300活跃度解锁")
-            return scr
-        end,
-        sora2chest_jng = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 300)
-            scr.unlocktext:SetString("消耗300活跃度解锁")
-            return scr
-        end,
-        sora2build_decor_small = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 60)
-            scr.unlocktext:SetString("消耗60活跃度解锁")
-            return scr
-        end,
-        sora2build_decor_medium = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 60)
-            scr.unlocktext:SetString("消耗60活跃度解锁")
-            return scr
-        end,
-        sora_qiyu = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 888)
-            scr.unlocktext:SetString("消耗888活跃度解锁")
-            return scr
-        end,
-        sora_lyj = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 88)
-            scr.unlocktext:SetString("消耗888活跃度解锁\n           限时一折！！！")
-            return scr
-        end,
-        sora_lantern = function(s, item)
-            local scr = GameTimeUnLockScreen2(item, 450)
-            scr.unlocktext:SetString("消耗450活跃度解锁")
-            return scr
         end
+        -- sora_llan = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 600)
+        --     scr.unlocktext:SetString("消耗600活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2base_big = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 300)
+        --     scr.unlocktext:SetString("消耗300活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2base_small = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 300)
+        --     scr.unlocktext:SetString("消耗300活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2ice_seed = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 300)
+        --     scr.unlocktext:SetString("消耗300活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2ice_flower = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 300)
+        --     scr.unlocktext:SetString("消耗300活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2chest_pkq = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 300)
+        --     scr.unlocktext:SetString("消耗300活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2chest_jng = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 300)
+        --     scr.unlocktext:SetString("消耗300活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2build_decor_small = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 60)
+        --     scr.unlocktext:SetString("消耗60活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora2build_decor_medium = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 60)
+        --     scr.unlocktext:SetString("消耗60活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora_qiyu = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 888)
+        --     scr.unlocktext:SetString("消耗888活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora_lyj = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 888)
+        --     scr.unlocktext:SetString("消耗888活跃度解锁")
+        --     return scr
+        -- end,
+        -- sora_lantern = function(s, item)
+        --     local scr = GameTimeUnLockScreen2(item, 450)
+        --     scr.unlocktext:SetString("消耗450活跃度解锁")
+        --     return scr
+        -- end
         -- sora_sign_yez = function(s, item)
         --     local scr = GameTimeUnLockScreen2(item, 300)
         --     scr.unlocktext:SetString("消耗450活跃度解锁")
@@ -959,15 +959,25 @@ if not TheNet:IsDedicated() then
     }
 
     function AddItemSkin(item, des, time, hide)
-        table.insert(ItemSkin, {item, des, time or 300, hide or false})
+        local unlocktime = time or 300
+        local data = {item, des, unlocktime, hide or false}
+        table.insert(ItemSkin, data)
+        if time and not SkinActive[item] then
+            SkinActive[item] = function(s, item)
+                local scr = GameTimeUnLockScreen2(item, unlocktime)
+                scr.unlocktext:SetString("消耗" .. tostring(unlocktime) .. "活跃度解锁")
+                return scr
+            end
+        end
+        return data
     end
     AddItemSkin("sora_yingyu", "跟我一起学'樱语'", nil, true)
     AddItemSkin("sora_dieyu",
         "锦瑟无端五十弦，一弦一柱思华年.\n庄生晓梦迷蝴蝶，望帝春心托杜鹃.\n沧海月明珠有泪，蓝田日暖玉生烟.\n此情可待成追忆？只是当时已惘然.",
         nil, true)
-    AddItemSkin("sora_qiyu", "修理雨伞~修理雨伞~修理雨伞~",888)
-    AddItemSkin("sora_lyj", "异世相遇,尽享留影\n\t\t\t限时一折大促销！！！",888)
-    AddItemSkin("sora_lantern", "让它带你找到回家的路",450)
+    AddItemSkin("sora_qiyu", "修理雨伞~修理雨伞~修理雨伞~", 888)
+    AddItemSkin("sora_lyj", "异世相遇,尽享留影", 888)
+    AddItemSkin("sora_lantern", "让它带你找到回家的路", 450)
     AddItemSkin("sora_lantern_yh", "落樱指引回家的路", nil, true)
     AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
@@ -975,33 +985,32 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_yb",
         "从前的那个伊布早已经不在了，\n现在在你面前的是叶赫那拉伊布.")
     AddItemSkin("sora2chest_zzb", "珍珠贝里真的有珍珠")
-    AddItemSkin("sora2chest_jcy", "飞叶快刀！")
+    AddItemSkin("sora2chest_jcy", "飞叶快刀！", 300)
     AddItemSkin("sora2chest_mls", "要来一杯么？")
     AddItemSkin("sora2chest_xzz", "信被我吃掉了")
     AddItemSkin("sora2chest_dd", "再给我讲一遍，你从一堆小猫里选中我的故事吧")
 
-    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火\nQQ群943105804\n领取方法看群公告")
-    AddItemSkin("sora2fire_hrh",
-        "而你,我的朋友\n你才是真正的帕鲁\nQQ群943105804\n领取方法看群公告")
-    AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!")
-    AddItemSkin("sora2fire_hjl", "人家才不是伊布呢")
+    AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火", 300)
+    AddItemSkin("sora2fire_hrh", "而你,我的朋友\n你才是真正的帕鲁", 300)
+    AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!", 300)
+    AddItemSkin("sora2fire_hjl", "人家才不是伊布呢", 300)
 
     AddItemSkin("sora2ice_flower", "你已被移出群聊'花开富贵'")
     AddItemSkin("sora2ice_seed", "来点种子,蟹蟹")
     AddItemSkin("sora2ice_bhl", "环游整个星系一万次，\n只为遇见你")
-    AddItemSkin("sora2ice_byb", "穿梭风雪,绽放寒芒!")
+    AddItemSkin("sora2ice_byb", "穿梭风雪,绽放寒芒!", 300)
     AddItemSkin("sora2ice_jqr", "叽企刃不是机器人!")
     AddItemSkin("sora2birdchest_ggd",
         "在下江湖人称菇菇毒，\n暗器榜排名第七十七，\n独门绝技--好菇毒！")
-    AddItemSkin("sora2birdchest_xzyb", "西格斯比与仙子伊布心心相印了！")
+    AddItemSkin("sora2birdchest_xzyb", "西格斯比与仙子伊布心心相印了！", 300)
     AddItemSkin("sora2birdchest_hdw", "恭喜你，被霍格沃茨录取了！")
     AddItemSkin("sora_sign_myy", "羊腿好吃,所以值得!")
-    AddItemSkin("sora_sign_yez", "加大！加大！再描一圈！")
+    AddItemSkin("sora_sign_yez", "加大！加大！再描一圈！", 300)
 
     AddItemSkin("sora_smalllight_fl", "这是风铃\n不是花")
     AddItemSkin("sora_smalllight_jj",
         "嘿！\n我知道一个能让我在走路的时候，\n不被绷带绊倒的办法，\n你们想听吗？")
-
+    --AddItemSkin("sora_smalllight_xd", "不吃饭，这样我就长不大了，\n我就可以不离开你了吗")
     AddItemSkin("sora_pearl_pd", "人家不是胖\n只是叫胖丁")
 
     AddItemSkin("sora2base_big", "谁不喜欢大的呢\n对,我说的就是祭坛")
@@ -1013,14 +1022,14 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sorabag_sdl", "嘘,圣诞老人要来了")
     AddItemSkin("sorahat_sd", "嘘,圣诞老人要来了")
 
-    AddItemSkin("sora2build_decor_jss", "红伞伞，白杆杆\n吃完一起躺板板。")
+    AddItemSkin("sora2build_decor_jss", "红伞伞，白杆杆\n吃完一起躺板板。", 300)
     AddItemSkin("sora2build_decor_small", "这是中杯，\n这是大杯，\n这是超大杯.", 60)
     AddItemSkin("sora2build_decor_medium", "这是中杯，\n这是大杯，\n这是超大杯.", 60)
 
     AddItemSkin("sora3sword_rose", "是玫语！不是梅雨！")
     AddItemSkin("sora_wq_bbj", "这玩意真的能出皮肤吗?")
-    AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗")
-    
+    AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗", 300)
+
     AddItemSkin("sora_pearl_slm", "萌王是谁?")
 
     AddItemSkin("sora_tqy_qy", "不止七夕,更在朝夕\n    ---2024七夕纪念")

@@ -28,7 +28,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.13
+-- verion = 1.15
+-- v1.15 优化DefaultImage的处理
 -- v1.14 优化MakeItemSkin 
 -- V1.13 优化SWAP_ICON的交互
 -- v1.12 新增 MakeItemSkinDefaultData 和 GetItemSkinDefaultData 准备弃用 basebuild basebank baseanim等重复设置
@@ -223,6 +224,7 @@ local itembasedata = {}
 function MakeItemSkinDefaultImage(base, atlas, image)
     itembasedata[base] = itembasedata[base] or {}
     itembasedata[base].itemimg = {atlas, (image or base) .. ".tex", "default.tex"}
+    GLOBAL.RegisterInventoryItemAtlas(itembasedata[base].itemimg[1],itembasedata[base].itemimg[2])
 end
 
 function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 基础名称 
@@ -234,6 +236,9 @@ function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 基础名称
             itembasedata[base].itemimg = {itemimg[1], (itemimg[2] or base) .. ".tex", "default.tex"}
         else
             itembasedata[base].itemimg = {"images/inventoryimages/" .. base .. ".xml", base .. ".tex", "default.tex"}
+        end
+        if itembasedata[base].itemimg then 
+            GLOBAL.RegisterInventoryItemAtlas(itembasedata[base].itemimg[1],itembasedata[base].itemimg[2])
         end
     end
     if itemanim then
