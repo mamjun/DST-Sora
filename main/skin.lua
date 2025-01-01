@@ -989,7 +989,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_mls", "要来一杯么？")
     AddItemSkin("sora2chest_xzz", "信被我吃掉了")
     AddItemSkin("sora2chest_dd", "再给我讲一遍，你从一堆小猫里选中我的故事吧")
-
+    AddItemSkin("sora2chest_sgj", "知道你受了好多委屈，所以抱抱你",nil,true)
+    
     AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火", 300)
     AddItemSkin("sora2fire_hrh", "而你,我的朋友\n你才是真正的帕鲁", 300)
     AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!", 300)
@@ -1010,7 +1011,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_smalllight_fl", "这是风铃\n不是花")
     AddItemSkin("sora_smalllight_jj",
         "嘿！\n我知道一个能让我在走路的时候，\n不被绷带绊倒的办法，\n你们想听吗？")
-    --AddItemSkin("sora_smalllight_xd", "不吃饭，这样我就长不大了，\n我就可以不离开你了吗")
+    AddItemSkin("sora_shouban_xd", "不吃饭，这样我就长不大了，\n我就可以不离开你了吗",nil,true)
     AddItemSkin("sora_pearl_pd", "人家不是胖\n只是叫胖丁")
 
     AddItemSkin("sora2base_big", "谁不喜欢大的呢\n对,我说的就是祭坛")
@@ -1054,7 +1055,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("soratele_wsqy", "在我荒瘠的土地上,\n你是最后的玫瑰")
     AddItemSkin("sorabowknot_wsqy", "有人骂你野心勃勃，\n有人爱你灵魂有火")
     AddItemSkin("sora_lightflier_wsqy", "哇酷！哇酷！哇酷哇酷！")
-
+    AddItemSkin("sora_lightflier_wsqy", "哇酷！哇酷！哇酷哇酷！")
     local item_map = {
         sora_none = "sora_uniforms"
     }

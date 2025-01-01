@@ -227,7 +227,7 @@ function TryCloseGlobalChest(player, inst)
     if not (player and player.userid and player.name) then
         return
     end
-    local data = inst.components.container:OnSave()
+    local data = inst.components.container:SoraOnGlobalSave()
     inst.components.container.ignoreoverstacked = true
     inst.components.container:DestroyContents()
     inst.components.container.ignoreoverstacked = false

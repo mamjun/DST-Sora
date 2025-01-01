@@ -177,6 +177,7 @@ local function fn()
         end
         inst.ChestClose(s, doer, ...)
     end
+    inst.components.container.SoraOnGlobalSave = inst.components.container.OnSave
     inst.components.container.OnSave = function()
         return {
             items = {}
