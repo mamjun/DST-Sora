@@ -38,7 +38,7 @@ end)
 function com:SetPosOffset(offset)
     local pos = self.inst:GetPosition()
     offset.x = math.clamp(offset.x, -20, 20)
-    offset.y = math.clamp(offset.y, -20, 20)
+    offset.y = math.clamp(offset.y, -7, 7)
     offset.z = math.clamp(offset.z, -20, 20)
     local newoffet = offset - self.offset
     self.offset = offset

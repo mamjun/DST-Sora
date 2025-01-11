@@ -101,6 +101,8 @@ mi("editedanim")
 mi("recipes")
 -- 食物
 mi("food")
+--地皮
+mi("tile")
 -- 容器
 mi("containers")
 -- 字符

@@ -713,7 +713,23 @@ Rec("sora2build_decor_item", "穹の绿植", "这个撞不上", build, "sora", {
     goldnugget=10,
     petals=10,
 }}).placer="no"
-
+Rec("sora2build_flower_item", "穹の花球", "拿来装饰你的家", build, "sora", {{
+    petals=10,
+}, {
+    petals=20,
+}, {
+    petals=40,
+}}).placer="no"
+Rec("turf_sora_flower", "穹の花毯", "铺在地上", build, "sora", {{
+    petals=10,
+    seeds=10,
+}, {
+    petals=20,
+    seeds=20,
+}, {
+    petals=40,
+    seeds=40,
+}}).numtogive=4
 local lightdata = {
     blue = {"隐藏着黑暗力量的钥匙啊\n在我面前显示你真正的力量", {
         nightmarefuel = 40
