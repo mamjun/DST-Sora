@@ -68,7 +68,7 @@ function InitSoraEnv()
         line:SetPosition(data.pos[1],data.pos[2])
         return line
     end
-
+    require "widgets/sorastdui"
 end
 
 

@@ -84,7 +84,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
                 self.soratime:SetText(os.date("%H:%M:%S"))
             end)
         
-            SoraMakeWidgetMovable(self.soratime,"soratime",Vector3(85,1050,0))
+            SoraMakeWidgetMovable(self.soratime,"soratime",Vector3(85,1050,0),{
+                
+            })
             if not TUNING.SORATIME then
                 self.soratime:Hide()
             end

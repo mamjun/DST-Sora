@@ -51,20 +51,33 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/" .. name .. ".xml"
     inst.components.inventoryitem.imagename = name
     inst:AddComponent("waterproofer")
-    inst.components.waterproofer:SetEffectiveness(1)
+    inst.components.waterproofer:SetEffectiveness(0)
+    inst:AddComponent("soraring")
+    inst:AddComponent("soraitem")
+    inst.components.soraitem:SetBind(true)
+    inst:AddComponent("soraitemcontrol")
+    inst.components.soraitemcontrol.tags = {"sora_ring"}
 
-    --inst:AddComponent("soraitem")
-    --inst.components.soraitem:SetBind(true)
-    --inst:AddComponent("soraitemcontrol")
-    --inst.components.soraitemcontrol.tags = {"sora_ring"}
 
-    --inst:DoTaskInTime(0, CheckOwner)
     return inst
 end
+local skin  = SoraAPI.MakeItemSkin(name, name, {
+    name = "穹の戒",
+    atlas = "images/inventoryimages/"..name..".xml",
+    image = name,
+    build = name,
+    bank = name,
+    checkfn =  SoraAPI.SoraSkinCheckFn,
+    dontload=true,
+    checkclientfn =  SoraAPI.SoraSkinCheckClientFn 
+})
+skin.fn = fn 
+skin.is_skin = false
+skin.assets = assets
 
 SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. name .. ".xml", name)
 RegisterInventoryItemAtlas("images/inventoryimages/" .. name .. ".xml", name .. ".tex")
 STRINGS.NAMES[name:upper()] = "穹の戒"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE[name:upper()] = "你会记得我吗?"
 
-return Prefab(name, fn, assets), Prefab(name .. "_fx", fn, assets)
+return skin

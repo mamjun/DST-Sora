@@ -465,7 +465,19 @@ Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother
     moonglass = 40,
     gift = 5
 }})
-
+Rec("sora_build", "华章", "可以用他来调整建筑", equip2, "soraother", {{
+    sora_flh=1,
+    reskin_tool=3,
+    sketch=3
+}, {
+    sora_flh=1,
+    reskin_tool=10,
+    sketch=5
+}, {
+    sora_flh=1,
+    reskin_tool=20,
+    sketch=10
+}})
 Rec("sora3sword", "银白の锋", "银白骑士团の制式长剑", equip2, "soraother", {{
     nightsword = 1,
     tentaclespike = 2,

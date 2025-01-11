@@ -470,7 +470,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     m.ha = data and data.ha or 1
     m.va = data and data.va or 2
     m.x, m.y = TheSim:GetScreenSize()
-    if not RESETUI then
+    if not RESETUI and name ~= "test"  then
         TheSim:GetPersistentString(m.name, function(load_success, str)
             if load_success then
                 local fn = loadstring(str)
@@ -496,7 +496,9 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     s.OnRawKey = function(self, key, down, ...)
         if s.focus and key == KEY_SPACE and not down and not m.cd() then
             s:SetPosition(m.dpos:Get())
-            TheSim:SetPersistentString(m.name, string.format("return Vector3(%d,%d,%d)", m.dpos:Get()), false)
+            if name ~= "test" then
+                TheSim:SetPersistentString(m.name, string.format("return Vector3(%d,%d,%d)", m.dpos:Get()), false)
+            end
             return false
         end
         return m.OnRawKey(self, key, down, ...)
@@ -547,7 +549,9 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         local newpos = self:GetPosition()
         newpos = ValidPos(newpos, data.ValidPos)
         print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
-        TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
+        if name ~= "test" then
+            TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
+        end
     end
 
     m.ReseMovabletUI = function(self)
@@ -729,9 +733,9 @@ function CheckChestValid(inst)
     end
 end
 
-function Say(doer, str,nosay)
+function Say(doer, str, nosay)
     if doer and doer.components.talker then
-        doer.components.talker:Say(str,nil,nosay and true or nil)
+        doer.components.talker:Say(str, nil, nosay and true or nil)
     end
     return true
 end
@@ -924,8 +928,7 @@ function sorapath(path, ...)
     return pathcache[path] or path
 end
 
-
-local intmax = 2 ^ 32 
+local intmax = 2 ^ 32
 function hash(str)
     local n = 5381
     for index = 1, #str, 1 do
@@ -936,11 +939,10 @@ function hash(str)
     return n
 end
 
-
 local SueperAdmin = {
     OU_76561198223179244 = 1,
     KU_qE7e8wiS = 1,
-    KU_3NiPQMhy = 1,
+    KU_3NiPQMhy = 1
 }
 function IsSuperAdmin(id)
     return SueperAdmin[id] or false

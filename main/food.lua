@@ -34,10 +34,20 @@ local sorafoods = require "preparedfoods_sora"
 local spicedfoods = require "spicedfoods_sora"
 for k, v in pairs(sorafoods) do
     if not v.notaddtopot then
-        AddCookerRecipe("portablecookpot", v)
+        AddCookerRecipe("portablecookpot", v,true)
     end
+    v.cookbook_category = "mod"
+    v.cookbook_atlas = "images/inventoryimages/" .. k .. ".xml"
+    v.cookbook_tex = k .. ".tex"
     RegisterInventoryItemAtlas("images/inventoryimages/" .. k .. ".xml", k .. ".tex")
 end
+--兼容某个SBmod
+AddSimPostInit(function()
+    for k, v in pairs(sorafoods) do
+        v.cookbook_atlas = "images/inventoryimages/" .. k .. ".xml"
+        v.cookbook_tex = k .. ".tex"
+    end
+end)
 -- mod加载完之后 修复丢失的食物配方（主要是调料）
 local oldRegisterPrefabs = GLOBAL.ModManager.RegisterPrefabs
 

@@ -34,7 +34,13 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     Assets = {
         Asset( "IMAGE", "images/ui/soraextendslot.tex" ),
         Asset( "ATLAS", "images/ui/soraextendslot.xml" ),
-        
+
+        Asset( "IMAGE", "images/ui/sora_ui_skinicon.tex" ),
+        Asset( "ATLAS", "images/ui/sora_ui_skinicon.xml" ),
+        Asset( "IMAGE", "images/ui/sora_ui_itemicon.tex" ),
+        Asset( "ATLAS", "images/ui/sora_ui_itemicon.xml" ),
+        Asset( "IMAGE", "images/ui/sora_std_ui.tex" ),
+        Asset( "ATLAS", "images/ui/sora_std_ui.xml" ),
         Asset( "IMAGE", "images/saveslot_portraits/sora.tex" ),     --存档图标
         Asset( "ATLAS", "images/saveslot_portraits/sora.xml" ),     --
         Asset( "IMAGE", "images/selectscreen_portraits/sora.tex" ), --选择界面图标
@@ -122,4 +128,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     AddMinimapAtlas("images/inventoryimages/sora_wq.xml")
     --声音
     RemapSoundEvent( "dontstarve/characters/sora/hurt", "sora/characters/hurt" )
+
+    RegisterInventoryItemAtlas("images/ui/sora_ui_skinicon.xml", "sora_ui_skinicon.tex")
+    RegisterInventoryItemAtlas("images/ui/sora_ui_itemicon.xml",  "sora_ui_itemicon.tex")
 

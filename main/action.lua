@@ -28,6 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] --
+local TIMEOUT = 2
 -----打包
 local SORAPACK = GLOBAL.Action({
     priority = 99,
@@ -177,7 +178,7 @@ SORAPHOTO.fn = function(act)
             end
             return true
         end
-        local data = SoraAPI.TryPhoto(target, doer,invobject)
+        local data = SoraAPI.TryPhoto(target, doer, invobject)
         if not data then
             return true
         end
@@ -595,8 +596,10 @@ function MakeAndAddAction(id, name, fn, pri, sg, clientsg)
     act.mount_valid = false
     act.fn = fn
     AddAction(act)
-    AddStategraphActionHandler("wilson", ActionHandler(act, sg or "doshortaction"))
-    AddStategraphActionHandler("wilson_client", ActionHandler(act, clientsg or sg or "doshortaction"))
+    if sg ~= "nosg" then
+        AddStategraphActionHandler("wilson", ActionHandler(act, sg or "doshortaction"))
+        AddStategraphActionHandler("wilson_client", ActionHandler(act, clientsg or sg or "doshortaction"))
+    end
     return act
 end
 
@@ -616,6 +619,109 @@ AddComponentAction("SCENE", "soraportable", function(inst, doer, actions, right)
     end
 end)
 
+MakeAndAddAction("SORARINGFIND", "使用", function(act)
+    local invobject = act.invobject
+    local doer = act.doer
+    if doer and invobject then
+        if invobject.components.soraring then
+            invobject.components.soraring:Use(doer)
+            return true
+        end
+    end
+    return true
+end, 500, "soraringuse")
+
+AddComponentAction("INVENTORY", "soraring", function(inst, doer, actions, right)
+    if inst and doer and doer:HasTag("sora") then
+        table.insert(actions, ACTIONS.SORARINGFIND)
+    end
+end)
+
+AddStategraphState("wilson", State {
+    name = "soraringuse",
+    tags = {"doing", "busy", "nodangle", "canrotate"},
+
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("wendy_channel")
+        inst.AnimState:PushAnimation("wendy_channel_pst", false)
+        inst.AnimState:OverrideSymbol("flower", "flower", "flower")
+    end,
+
+    timeline = {TimeEvent(6 * FRAMES, function(inst)
+        inst.SoundEmitter:PlaySound("dontstarve/characters/wendy/summon_pre")
+    end), TimeEvent(53 * FRAMES, function(inst)
+        inst.SoundEmitter:PlaySound("dontstarve/characters/wendy/summon")
+    end), TimeEvent(52 * FRAMES, function(inst)
+        if inst:PerformBufferedAction() then
+            -- inst.sg.statemem.fx = nil
+        else
+            inst.sg.statemem.action_failed = true
+        end
+    end), TimeEvent(69 * FRAMES, function(inst)
+        if inst.sg.statemem.action_failed then
+            inst.AnimState:SetFrame(45)
+        end
+    end), TimeEvent(73 * FRAMES, function(inst)
+        if inst.sg.statemem.action_failed then
+            inst.sg:RemoveStateTag("busy")
+        end
+    end), TimeEvent(74 * FRAMES, function(inst)
+        if not inst.sg.statemem.action_failed then
+            inst.sg:RemoveStateTag("busy")
+        end
+    end)},
+
+    events = {EventHandler("animqueueover", function(inst)
+        if inst.AnimState:AnimDone() then
+            inst.sg:GoToState("idle")
+        end
+    end)},
+
+    onexit = function(inst)
+        inst.AnimState:ClearOverrideSymbol("flower")
+        if inst.sg.statemem.fx ~= nil then
+            inst.sg.statemem.fx:Remove()
+        end
+        if inst.bufferedaction == inst.sg.statemem.action and
+            (inst.components.playercontroller == nil or inst.components.playercontroller.lastheldaction ~=
+                inst.bufferedaction) then
+            inst:ClearBufferedAction()
+        end
+    end
+})
+
+AddStategraphState("wilson_client", State {
+    name = "soraringuse",
+    tags = {"doing", "busy", "canrotate"},
+    server_states = {"soraringuse"},
+
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("wendy_channel")
+
+        inst:PerformPreviewBufferedAction()
+        inst.sg:SetTimeout(TIMEOUT)
+    end,
+
+    onupdate = function(inst)
+        if inst.sg:ServerStateMatches() then
+            if inst.entity:FlattenMovementPrediction() then
+                inst.sg:GoToState("idle", "noanim")
+            end
+        elseif inst.bufferedaction == nil then
+            inst.AnimState:PlayAnimation("wendy_channel_pst")
+            inst.AnimState:SetFrame(45)
+            inst.sg:GoToState("idle", true)
+        end
+    end,
+
+    ontimeout = function(inst)
+        inst:ClearBufferedAction()
+        inst.AnimState:SetFrame(45)
+        inst.sg:GoToState("idle", true)
+    end
+})
 -- AddComponentAction("POINT", "deployable", function(inst, doer, pos, actions, right)
 --     print("POINT", inst, doer, actions, right)
 --     if right and inst:HasTag("sora_photo") and doer then
@@ -630,3 +736,26 @@ end)
 --     end
 -- end)
 
+local act = MakeAndAddAction("SORAOPENUI", function(act)
+    if act.invobject and act.invobject.components.soraopenui then 
+        return act.invobject.components.soraopenui:GetStr(act.doer)
+    end
+    return "施法"
+end, function(act)
+    return true
+end, 500, "nosg")
+act.pre_action_cb = function(act)
+    if act.doer.HUD ~= nil and act.invobject ~= nil and act.invobject.components.soraopenui.CanOpenUI and
+        act.invobject.components.soraopenui:CanOpenUI(act.doer) then
+        if act.invobject.components.soraopenui.OpenOrCloseUI then
+            act.invobject.components.soraopenui:OpenOrCloseUI(act.doer)
+        end
+    end
+    return true
+end
+AddComponentAction("INVENTORY", "soraopenui", function(inst, doer, actions, right)
+    if inst and doer and doer:HasTag("sora") and inst.components.soraopenui and
+        inst.components.soraopenui:CanOpenUI(doer) then
+        table.insert(actions, ACTIONS.SORAOPENUI)
+    end
+end)

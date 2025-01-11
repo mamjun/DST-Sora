@@ -300,7 +300,38 @@ temp.serverfn = function(ns, db, userid)
         end
         TheWorld.components.sorachestmanager:GetStopTime(doer)
     end)
-
+    db:ListenForEvent("SoraBuild", function(id, data, event, ent)
+        if not (data and type(data) == "table" and data.cmd) then
+            return
+        end
+        local cmd = data.cmd
+        local doer = UserToPlayer(id)
+        -- print(doer.userid,cmd,data.pass or "0")
+        if not (doer) then
+            print(111)
+            return
+        end
+        if not doer.sorabuildcd then
+            doer.sorabuildcd = SoraCD(0.1)
+        end
+        if not (ent and ent.prefab == "sora_build") then
+            print(222)
+            return
+        end
+        print(id,data,event,ent)
+        if cmd == "Reset" then
+            ent:ResetBuild(doer)
+        elseif cmd == "Set" then
+            if data.pos and data.scale then
+                ent:FixBuild(doer,Point(data.pos.x,data.pos.y,data.pos.z),data.scale)
+            else
+                return
+            end
+        elseif cmd == "Clear" then
+            ent:ClearAllTarget(doer)
+        end
+        return
+    end)
     db.inst = TheWorld
 
 end
@@ -339,13 +370,15 @@ end
 AddPlayerPostInit(function(inst)
     if TheWorld.soraismastersim then
         inst:ListenForEvent("newactiveitem", function(i, data)
-            if data and i.userid then 
-                local db = GetClientDB("RPC",  i.userid, true)
-                if not db then return end
-                if data.item and data.item:HasTag("sora_photo") and data.item.data  and data.item.data.bank  then 
-                    db:Set('data','photodata',data.item.data)
+            if data and i.userid then
+                local db = GetClientDB("RPC", i.userid, true)
+                if not db then
+                    return
+                end
+                if data.item and data.item:HasTag("sora_photo") and data.item.data and data.item.data.bank then
+                    db:Set('data', 'photodata', data.item.data)
                 else
-                    db:Set('data','photodata',nil)
+                    db:Set('data', 'photodata', nil)
                 end
             end
         end)

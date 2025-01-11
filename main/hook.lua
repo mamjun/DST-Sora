@@ -1156,6 +1156,7 @@ EntityScript.SetPersistData = function(self, data, newents, ...)
         for k, v in pairs(data) do
             if v and type(v) == "table" and v.add_component_if_missing_sora then
                 v.add_component_if_missing = true
+                data.add_component_if_missing = true
             end
         end
     end
@@ -1443,6 +1444,9 @@ if not TUNING.SORADISABLEGLOBAL then
             end
         end)
     end)
+
+    
+    
     AddComponentPostInit("builder", function(s)
         local oldHasIngredients = s.HasIngredients
         -- local oldRemoveIngredients = s.RemoveIngredients

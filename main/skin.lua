@@ -173,6 +173,11 @@ RegUseSkinFN("sora_lantern_yh", function(doer, skin)
         doer.components.soraitemcontrol:CreateItem("sora_lantern", "sora_lantern_yh")
     end
 end)
+RegUseSkinFN("sora_ring", function(doer, skin)
+    if doer and doer.components.soraitemcontrol then
+        doer.components.soraitemcontrol:CreateItem("sora_ring")
+    end
+end)
 local function MakeSkin(name, data, notemp)
     local d = {}
     d.quotes = "敢动我就杀了你哦"
@@ -979,6 +984,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_lyj", "异世相遇,尽享留影", 888)
     AddItemSkin("sora_lantern", "让它带你找到回家的路", 450)
     AddItemSkin("sora_lantern_yh", "落樱指引回家的路", nil, true)
+    AddItemSkin("sora_ring", "死生契阔,与子成说", 450)
     AddItemSkin("sora2chest_sns", "情之所生，由心而起\nQ群943105804\n领取方法看群公告")
     AddItemSkin("sora2chest_pkq", "就决定是你了,皮卡丘!")
     AddItemSkin("sora2chest_jng", "杰尼杰尼杰尼杰尼杰！")
@@ -989,8 +995,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora2chest_mls", "要来一杯么？")
     AddItemSkin("sora2chest_xzz", "信被我吃掉了")
     AddItemSkin("sora2chest_dd", "再给我讲一遍，你从一堆小猫里选中我的故事吧")
-    AddItemSkin("sora2chest_sgj", "知道你受了好多委屈，所以抱抱你",nil,true)
-    
+    AddItemSkin("sora2chest_sgj", "知道你受了好多委屈，所以抱抱你", nil, true)
+
     AddItemSkin("sora2fire_xhl", "禁止用尾巴烤火", 300)
     AddItemSkin("sora2fire_hrh", "而你,我的朋友\n你才是真正的帕鲁", 300)
     AddItemSkin("sora2fire_hhl", "摸耳朵是禁止事项!", 300)
@@ -1011,7 +1017,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_smalllight_fl", "这是风铃\n不是花")
     AddItemSkin("sora_smalllight_jj",
         "嘿！\n我知道一个能让我在走路的时候，\n不被绷带绊倒的办法，\n你们想听吗？")
-    AddItemSkin("sora_shouban_xd", "不吃饭，这样我就长不大了，\n我就可以不离开你了吗",nil,true)
+    AddItemSkin("sora_shouban_xd", "不吃饭，这样我就长不大了，\n我就可以不离开你了吗", nil, true)
     AddItemSkin("sora_pearl_pd", "人家不是胖\n只是叫胖丁")
 
     AddItemSkin("sora2base_big", "谁不喜欢大的呢\n对,我说的就是祭坛")
@@ -1512,7 +1518,17 @@ if not TheNet:IsDedicated() then
             end
         end
     end)
-
+    local function IsItem(data)
+        local name = data[1]
+        if UseSkin[name] then
+            return true
+        else
+            return false
+        end
+    end
+    local function IsSkin(data)
+        return not IsItem(data)
+    end
     ItemScreen = Class(Screen, function(self)
         Screen._ctor(self, "ItemScreen")
         self.root = self:AddChild(Widget("root"))
@@ -1521,6 +1537,7 @@ if not TheNet:IsDedicated() then
         self.root:SetVAnchor(ANCHOR_MIDDLE)
         self.bgimage = self.root:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_menu_bg.tex"))
         self.bgimage:ScaleToSize(850, 500)
+        self.filterfn = nil
         AddLine(self.root, 4, 450, false, {
             pos = {30, 0}
         })
@@ -1529,6 +1546,24 @@ if not TheNet:IsDedicated() then
         local row_w = cell_size
         local row_h = cell_size;
         local row_spacing = 3
+        AddButton(self, "全部", function()
+            self:SetFilter(nil)
+        end, {
+            size = {60, 35},
+            pos = {-360, 220}
+        })
+        AddButton(self, "道具", function()
+            self:SetFilter(IsItem)
+        end, {
+            size = {60, 35},
+            pos = {-290, 220}
+        })
+        AddButton(self, "皮肤", function()
+            self:SetFilter(IsSkin)
+        end, {
+            size = {60, 35},
+            pos = {-220, 220}
+        })
         local function ScrollWidgetsCtor(context, index)
             local w = Widget("skin-cell-" .. index)
             w.cell_root = w:AddChild(ImageButton("images/quagmire_recipebook.xml", "cookbook_known.tex",
@@ -1605,11 +1640,11 @@ if not TheNet:IsDedicated() then
             scrollbar_height_offset = -60
         })
         self.grid = self.root:AddChild(grid)
-        grid:SetPosition(-200, 0)
+        grid:SetPosition(-200, -10)
         self:RefreshItems()
 
         self.iteminforoot = self.root:AddChild(Widget("root"))
-        self.iteminforoot:SetPosition(210, 0)
+        self.iteminforoot:SetPosition(210, -10)
         local r = self.iteminforoot
         r.namestr = AddText(r, "", {
             size = 40,
@@ -1650,8 +1685,14 @@ if not TheNet:IsDedicated() then
         })
         r:Hide()
     end)
+    function ItemScreen:SetFilter(fn)
+        self.filterfn = fn
+        self:RefreshItems()
+        self:SetItem()
+    end
     function ItemScreen:RefreshItems()
         local data = {}
+
         for k, v in ipairs(ItemSkin) do
             local des = v[2]
             if SkinActive[v[1]] and v[3] then
@@ -1662,12 +1703,14 @@ if not TheNet:IsDedicated() then
                 des = des,
                 unlock = SoraSkinCheckFn(nil, v[1])
             }
-            if v[4] then
-                if SoraSkinCheckFn(v[1]) then
+            if not self.filterfn or self.filterfn(v) then
+                if v[4] then
+                    if SoraSkinCheckFn(v[1]) then
+                        table.insert(data, info)
+                    end
+                else
                     table.insert(data, info)
                 end
-            else
-                table.insert(data, info)
             end
         end
         self.grid:SetItemsData(data)
@@ -1745,7 +1788,27 @@ if not TheNet:IsDedicated() then
         end
         TheFrontEnd:PopScreen(self)
     end
+
+    -- AddClassPostConstruct("widgets/redux/craftingmenu_pinbar", function(s)
+    --     if s.owner and s.owner:HasTag("sora") and s.open_menu_button then
+    --         AddImgButton(s.open_menu_button, "sora_ui_itemicon", function()
+    --             local scr = PushItemScr()
+    --             scr:SetFilter(IsItem)
+    --         end, {
+         
+    --             pos = {80, -20}
+    --         })
+    --         AddImgButton(s.open_menu_button, "sora_ui_skinicon", function()
+    --             local scr = PushItemScr()
+    --             scr:SetFilter(IsSkin)
+    --         end, {
+
+    --             pos = {80, 20}
+    --         })
+    --     end
+    -- end)
 end
+
 global("GetSecondAfter")
 if not GLOBAL.GetSecondAfter then
     -- 获取n秒后的时间
