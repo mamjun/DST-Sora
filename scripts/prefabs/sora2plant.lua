@@ -682,6 +682,8 @@ local function FeiFn(inst, doer, pos)
                         v.components.perennialcrop2.infested_max = 100
                         v.components.perennialcrop2.getsickchance = 0
                         v.components.perennialcrop2.CostController = fixCostController
+                        v.components.perennialcrop2.CostNutrition = fixCostController
+                        v.components.perennialcrop2:CostNutrition()
                         v.components.perennialcrop2:CostController()
                         fix = v
                     end
@@ -695,7 +697,7 @@ local function FeiFn(inst, doer, pos)
                         cmp.nutrientsick = 999 -- 当前肥量（预防疾病）
                         cmp.sickness = 0 -- 当前病害程度
                         cmp.infested = 0 -- 被骚扰次数
-
+                        cmp.nosick = true
                         cmp.moisture_max = 999 -- 最大蓄水量
                         cmp.nutrient_max = 999 -- 最大蓄肥量（生长必需）
                         cmp.nutrientgrow_max = 999 -- 最大蓄肥量（生长加速）

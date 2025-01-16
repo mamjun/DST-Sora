@@ -1,6 +1,6 @@
 
 local tiles = {
-    flower = "carpet"
+    flower = "cave"
 }
 local reg = {}
 -- table.insert(Assets, Asset("IMAGE", "levels/tiles/map_edge.tex"))
@@ -33,5 +33,6 @@ for k, v in pairs(tiles) do
     -- end
     table.insert(Assets, Asset("ATLAS", "images/inventoryimages/turf_"..turf .. ".xml"))
     table.insert(Assets, Asset("IMAGE", "images/inventoryimages/turf_"..turf .. ".tex"))
+    ChangeTileRenderOrder(WORLD_TILES[name],WORLD_TILES.FOREST)
 end
 

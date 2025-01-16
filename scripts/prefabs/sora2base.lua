@@ -681,6 +681,44 @@ SoraAPI.MakeItemSkin("sora2base", name, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 end
+SoraAPI.MakeAssetTable("sora2base_hlh",assets)
+SoraAPI.MakeAssetTable("sora2base_zlh",assets)
+
+
+SoraAPI.MakeItemSkin("sora2base", "sora2base_hlh", {
+	name = "阿朱",
+	atlas = "images/inventoryimages/sora2base_hlh.xml",
+	image = "sora2base_hlh",
+	build = "sora2base_hlh",
+	bank = "sora2base_hlh",
+	init_fn = function(inst)
+		inst.AnimState:SetScale(0.7,0.7,0.7)
+		ResetLightPos(inst)
+	end,
+	clear_fn = function(inst)
+		inst.AnimState:SetScale(0.7,0.7,0.7)
+	end,
+	checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+
+
+SoraAPI.MakeItemSkin("sora2base", "sora2base_zlh", {
+	name = "阿紫",
+	atlas = "images/inventoryimages/sora2base_zlh.xml",
+	image = "sora2base_zlh",
+	build = "sora2base_zlh",
+	bank = "sora2base_zlh",
+	init_fn = function(inst)
+		inst.AnimState:SetScale(0.7,0.7,0.7)
+		ResetLightPos(inst)
+	end,
+	clear_fn = function(inst)
+		inst.AnimState:SetScale(0.7,0.7,0.7)
+	end,
+	checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
 
 return Prefab("sora2base", fn, assets, prefabs),
 	Prefab("sora2stone", stonefn, stoneassets),

@@ -413,6 +413,8 @@ local function trychange(inst)
         inst.components.perennialcrop2.infested_max = 100
         inst.components.perennialcrop2.getsickchance = 0
         inst.components.perennialcrop2.CostController = fixCostController
+        inst.components.perennialcrop2.CostNutrition = fixCostController
+        inst.components.perennialcrop2:CostNutrition()
         inst.components.perennialcrop2:CostController()
         fix = inst
     end
@@ -426,7 +428,7 @@ local function trychange(inst)
         cmp.nutrientsick = 999 -- 当前肥量（预防疾病）
         cmp.sickness = 0 -- 当前病害程度
         cmp.infested = 0 -- 被骚扰次数
-
+        cmp.nosick = true   --无虫害
         cmp.moisture_max = 999 -- 最大蓄水量
         cmp.nutrient_max = 999 -- 最大蓄肥量（生长必需）
         cmp.nutrientgrow_max = 999 -- 最大蓄肥量（生长加速）
