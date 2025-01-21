@@ -89,6 +89,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         Asset( "IMAGE", "images/inventoryimages/sora_tab_knows2.tex" ),
         Asset( "ATLAS", "images/inventoryimages/sora_tab_knows2.xml" ),
         
+        Asset( "IMAGE", "images/inventoryimages/sora_tab_zwq.tex" ),
+        Asset( "ATLAS", "images/inventoryimages/sora_tab_zwq.xml" ),
+
         Asset( "IMAGE", "images/inventoryimages/sora_fl.tex" ),
         Asset( "ATLAS", "images/inventoryimages/sora_fl.xml" ),
         

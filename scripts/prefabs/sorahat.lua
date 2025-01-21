@@ -172,7 +172,11 @@ local function onequip(inst, owner)
             end
         end)
     end
-    owner.AnimState:OverrideSymbol("swap_hat", inst.skinname or "sorahat", "swap_hat")
+    if inst.skinname == "sorahat_no" then
+        owner.AnimState:OverrideSymbol("swap_hat", inst.skinname or "sorahat", "swap_hat")
+    else
+        owner.AnimState:ClearOverrideSymbol("swap_hat")
+    end
     owner.AnimState:Show("HAT")
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")
@@ -282,6 +286,14 @@ local function fn()
 end
 RegisterInventoryItemAtlas("images/inventoryimages/sorahat.xml", "sorahat.tex")
 SoraAPI.MakeItemSkinDefaultData("sorahat", {}, {})
+local tname = "sorahat_no"
+SoraAPI.MakeItemSkin("sorahat", tname, {
+    name = "幻影",
+    atlas = "images/inventoryimages/sorahat.xml",
+    image = "sorahat",
+    build = "sorahat",
+    bank = "sorahat"
+})
 SoraAPI.MakeItemSkin("sorahat", "sorahat_sd", {
     name = "圣诞发卡",
     atlas = "images/inventoryimages/sorahat_sd.xml",

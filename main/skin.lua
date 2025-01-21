@@ -1018,6 +1018,8 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sora_smalllight_jj",
         "嘿！\n我知道一个能让我在走路的时候，\n不被绷带绊倒的办法，\n你们想听吗？")
     AddItemSkin("sora_shouban_xd", "不吃饭，这样我就长不大了，\n我就可以不离开你了吗", nil, true)
+    AddItemSkin("sora_shouban_kfk", "妈!", nil, true)
+    AddItemSkin("sora_shouban_ly", "流萤烤串~三元一串~十元三串~", nil, true)
     AddItemSkin("sora_pearl_pd", "人家不是胖\n只是叫胖丁")
 
     AddItemSkin("sora2base_big", "谁不喜欢大的呢\n对,我说的就是祭坛")
@@ -1039,7 +1041,7 @@ if not TheNet:IsDedicated() then
     AddItemSkin("sorabowknot_dw", "端午节必须吃粽子吗", 300)
 
     AddItemSkin("sora_pearl_slm", "萌王是谁?")
-
+    AddItemSkin("sora_pearl_ty", "阿珍爱上了阿强")
     AddItemSkin("sora_tqy_qy", "不止七夕,更在朝夕\n    ---2024七夕纪念")
     AddItemSkin("sora_tqy_qkyz", "众生为棋,一掷钱坤")
     AddItemSkin("sora_tqy_xql", "小青龙为什么是红色的?")
@@ -1061,7 +1063,6 @@ if not TheNet:IsDedicated() then
     AddItemSkin("soramagic_wsqy", "我将玫瑰藏于身后,\n期盼与你赴约.")
     AddItemSkin("soratele_wsqy", "在我荒瘠的土地上,\n你是最后的玫瑰")
     AddItemSkin("sorabowknot_wsqy", "有人骂你野心勃勃，\n有人爱你灵魂有火")
-    AddItemSkin("sora_lightflier_wsqy", "哇酷！哇酷！哇酷哇酷！")
     AddItemSkin("sora_lightflier_wsqy", "哇酷！哇酷！哇酷哇酷！")
     local item_map = {
         sora_none = "sora_uniforms"
@@ -1790,24 +1791,24 @@ if not TheNet:IsDedicated() then
         TheFrontEnd:PopScreen(self)
     end
 
-    -- AddClassPostConstruct("widgets/redux/craftingmenu_pinbar", function(s)
-    --     if s.owner and s.owner:HasTag("sora") and s.open_menu_button then
-    --         AddImgButton(s.open_menu_button, "sora_ui_itemicon", function()
-    --             local scr = PushItemScr()
-    --             scr:SetFilter(IsItem)
-    --         end, {
-         
-    --             pos = {80, -20}
-    --         })
-    --         AddImgButton(s.open_menu_button, "sora_ui_skinicon", function()
-    --             local scr = PushItemScr()
-    --             scr:SetFilter(IsSkin)
-    --         end, {
-
-    --             pos = {80, 20}
-    --         })
-    --     end
-    -- end)
+    AddClassPostConstruct("widgets/redux/craftingmenu_pinbar", function(s)
+        if s.owner and s.owner:HasTag("sora") and s.open_menu_button then
+            AddImgButton(s.open_menu_button, "sora_ui_itemicon", function()
+                local scr = PushItemScr()
+                scr:SetFilter(IsItem)
+            end, {
+                size={30,30},
+                pos = {80, -32}
+            })
+            AddImgButton(s.open_menu_button, "sora_ui_skinicon", function()
+                local scr = PushItemScr()
+                scr:SetFilter(IsSkin)
+            end, {
+                size={30,30},
+                pos = {80, 32}
+            })
+        end
+    end)
 end
 
 global("GetSecondAfter")

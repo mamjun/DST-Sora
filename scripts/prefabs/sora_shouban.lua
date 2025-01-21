@@ -198,7 +198,8 @@ local function MakeSkin(skinskin, skinname,free)
     RegisterInventoryItemAtlas("images/inventoryimages/"..skin..".xml",skin.. ".tex")
 end
 MakeSkin("xd","小蛋")
-
+MakeSkin("kfk","卡妈")
+MakeSkin("ly","流萤")
 
 return Prefab(name, fn, assets),
     Prefab(name.."_item", item_fn, assets),

@@ -56,6 +56,7 @@ function RecTab(name, des, img, sxml, stex)
     return name:upper()
 end
 local prefabhas = {}
+local lastrec = ""
 function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
     name = name or ""
 
@@ -99,7 +100,7 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
         rec.image = prefab .. ".tex"
         rec.atlas = softresolvefilepath("images/inventoryimages/" .. prefab .. ".xml")
     end
-
+    lastrec = build
     -- rec.description = des or STRINGS.RECIPE_DESC[PREFAB]
     AllSoraRec[prefab] = rec
     return rec
@@ -137,8 +138,13 @@ soralight = RecTab("SoraLightTab", "玫瑰", nil, "images/inventoryimages/sora_l
 DST = RecTab("SoraDSTTab", "知识", "sora_tab_knows")
 maker = RecTab("SoraMakerTab", "奇怪的知识", "sora_tab_knows2")
 itembuff = RecTab("SoraItemBuffTab", "药剂", "sora2ry")
+ZWQ = RecTab("SoraZWQTab", "致吾栖", "sora_tab_zwq")
 -- DSTlight = RecTab("SoraDSTlightTab","圣诞彩灯",nil,"images/inventoryimages.xml","winter_ornament_light1.tex")
-
+local function AddZWQ()
+    if lastrec ~= "" then
+        AddRecipeToFilter(lastrec, ZWQ)
+    end
+end
 if IsMythEnable() then
     AddInvImg("myth_flyskill_sora", "inventoryimages/mk_cloudfxsora", "mk_cloudfxsora")
     Rec("myth_flyskill_sora", "七彩祥云", "待我脚踏七彩祥云", skill, "sora", {
@@ -195,6 +201,7 @@ Rec("sora2pokeball", "穹の精灵球", "你才到球里去", item, "sora", {
     telestaff = 1,
     sora_flh = 1
 })
+AddZWQ()
 Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
     goose_feather = 5,
     beefalowool = 6,
@@ -419,7 +426,7 @@ Rec("sora_pickhat", "咸鱼咸鱼咸", "一群咸鱼罢了", equip2, "sora", {
     seeds = 5,
     [san] = 50
 })
-
+AddZWQ()
 Rec("sora2global", "穹の末影箱", "妈妈我要去旅行~", equip2, "sora", {
     cane = 1,
     cookbook = 1,
@@ -466,18 +473,19 @@ Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother
     gift = 5
 }})
 Rec("sora_build", "华章", "可以用他来调整建筑", equip2, "soraother", {{
-    sora_flh=1,
-    reskin_tool=3,
-    sketch=3
+    sora_flh = 1,
+    reskin_tool = 3,
+    sketch = 3
 }, {
-    sora_flh=1,
-    reskin_tool=10,
-    sketch=5
+    sora_flh = 1,
+    reskin_tool = 10,
+    sketch = 5
 }, {
-    sora_flh=1,
-    reskin_tool=20,
-    sketch=10
+    sora_flh = 1,
+    reskin_tool = 20,
+    sketch = 10
 }})
+AddZWQ()
 Rec("sora3sword", "银白の锋", "银白骑士团の制式长剑", equip2, "soraother", {{
     nightsword = 1,
     tentaclespike = 2,
@@ -559,7 +567,7 @@ Rec("sora_shouban", "穹の手办", "宅男一面墙", build, "sora", {{
     goldnugget = 10,
     marble = 10
 }})
-
+AddZWQ()
 AddInvImg("sora_smalllight", "inventoryimages/sora_smalllight", "sora_smalllight")
 Rec("sora_smalllight", "穹の月华", "承月之辉", build, "sora", {{
     moonglass = 1,
@@ -574,7 +582,7 @@ Rec("sora_smalllight", "穹の月华", "承月之辉", build, "sora", {{
     lightbulb = 10,
     fireflies = 10
 }})
-
+AddZWQ()
 Rec("sora2ice", "寒冰の箱子", "嘎嘣脆，鸡肉味！", build, "soraother", {{
     boards = 10,
     cutstone = 10,
@@ -693,43 +701,59 @@ Rec("sora_light", "穹の玫瑰灯", "装饰你的灯吧", build, "soraother", {
 }})
 
 Rec("sora2build_pile_item", "穹の小木桩", "远看近看都是桩", build, "sora", {{
-    log=10
+    log = 10
 }, {
-    boards=5,
-    goldnugget=5,
+    boards = 5,
+    goldnugget = 5
 }, {
-    boards=10,
-    goldnugget=10,
-    petals=10,
-}}).placer="no"
-
+    boards = 10,
+    goldnugget = 10,
+    petals = 10
+}}).placer = "no"
+AddZWQ()
 Rec("sora2build_decor_item", "穹の绿植", "这个撞不上", build, "sora", {{
-    log=10
+    log = 10
 }, {
-    boards=5,
-    goldnugget=5,
+    boards = 5,
+    goldnugget = 5
 }, {
-    boards=10,
-    goldnugget=10,
-    petals=10,
-}}).placer="no"
+    boards = 10,
+    goldnugget = 10,
+    petals = 10
+}}).placer = "no"
+AddZWQ()
 Rec("sora2build_flower_item", "穹の花球", "拿来装饰你的家", build, "sora", {{
-    petals=10,
+    petals = 10
 }, {
-    petals=20,
+    petals = 20
 }, {
-    petals=40,
-}}).placer="no"
+    petals = 40
+}}).placer = "no"
+AddZWQ()
 Rec("turf_sora_flower", "穹の花毯", "铺在地上", build, "sora", {{
-    petals=10,
-    seeds=10,
+    petals = 10,
+    seeds = 10
 }, {
-    petals=20,
-    seeds=20,
+    petals = 20,
+    seeds = 20
 }, {
-    petals=40,
-    seeds=40,
-}}).numtogive=4
+    petals = 40,
+    seeds = 40
+}}).numtogive = 4
+AddZWQ()
+
+Rec("sora_plant_bhh", "穹の百合", "漂亮的百合花", build, "sora", {{
+    petals = 3,
+    seeds = 3
+}, {
+    petals = 10,
+    seeds = 10
+}, {
+    petals = 20,
+    seeds = 20
+}})
+AddZWQ()
+
 local lightdata = {
     blue = {"隐藏着黑暗力量的钥匙啊\n在我面前显示你真正的力量", {
         nightmarefuel = 40
@@ -822,7 +846,7 @@ Rec("sora_lock", "总有刁民偷东西", "总有刁民偷东西", item, "soraot
     coontail = 1,
     mole = 1
 }})
-
+AddZWQ()
 AddInvImg("sora_tochest", "inventoryimages/sora2stone", "sora2stone")
 Rec("sora_tochest", "原来你也有强迫症", "原来你也有强迫症", item, "soraother", {{
     [san] = 10,
@@ -836,7 +860,7 @@ Rec("sora_tochest", "原来你也有强迫症", "原来你也有强迫症", item
     boards = 10,
     cutstone = 10
 }})
-
+AddZWQ()
 -- 魔法
 Rec("sora_birds", "鸽子还没到", "一定来,一定来\n不会咕,不会咕", skill, "sorabook", {
     [san] = 10 + 10 * mode

@@ -883,6 +883,23 @@ SoraAPI.MakeItemSkin("sora_pearl", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 SoraAPI.MakeAssetTable(tname, pearlassets)
+
+
+local tname = "sora_pearl_ty"
+SoraAPI.MakeItemSkin("sora_pearl", tname, {
+    name = "阿珍",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = function(inst)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, pearlassets)
+
+
 table.insert(All, Prefab("sora_sign", fn, assets))
 table.insert(All, Prefab("sora_sign_item", item_fn, assets))
 table.insert(All, MakePlacer("sora_sign_placer", "sign_home", "sign_home", "idle"))
