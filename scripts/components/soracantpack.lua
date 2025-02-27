@@ -53,7 +53,7 @@ end
 -- 防止自身被移除
 local function protectGetPersistData(inst, ...)
     assert(inst.components.soracantpack, "意外的打包,请截图反馈给风铃")
-    if inst.stoppackprotect or inst.components.soracantpack.newspawn or   SoraAPI.IsSaveGaming or SoraAPI.IsSavePlayering > 0 then
+    if inst.stoppackprotect or inst.components.soracantpack.newspawn or SoraAPI.IsSerializeWorlding or SoraAPI.IsSaveGaming or SoraAPI.IsSavePlayering > 0 then
         return inst.components.soracantpack.oldGetPersistData(inst, ...)
         -- 不应该走到这
     else

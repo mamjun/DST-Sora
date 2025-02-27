@@ -2,6 +2,10 @@ local Say = SoraAPI.Say
 local assets = {}
 
 function SoraAPI.TryPhoto(inst, doer,lyj, must)
+    local srcinst = inst
+    if inst.highlightforward  then 
+        inst = inst.highlightforward
+    end
     if not inst.AnimState then
         return
     end
@@ -61,11 +65,13 @@ function SoraAPI.TryPhoto(inst, doer,lyj, must)
     local debugstring = inst.entity:GetDebugString()
 
     local dbank, dbuild, anim = debugstring:match("bank: (.+) build: (.+) anim: .+:(.+) Frame")
-    if not bank and build and anim then
+    print(bank,build,dbank, dbuild, anim)
+    if not (bank and build and anim) then
         Say(doer, "这个暂时不能留影")
         return
     end
-    local name = inst:GetDisplayName()
+    
+    local name = srcinst:GetDisplayName()
     local swaps = {}
     for k, v in pairs(SoraAPI.AllSwap) do
         local build, symbol = inst.AnimState:GetSymbolOverride(k)
@@ -132,7 +138,7 @@ local function SetData(inst, data)
     if data and data.prefab and Prefabs[data.prefab] then
         inst.AnimState:SetBank(data.bank)
         inst.AnimState:SetBuild(data.build)
-        inst.AnimState:PlayAnimation(data.anim, data.loop)
+        inst.AnimState:PlayAnimation(data.anim or "", data.loop)
         for k, v in pairs(data.swaps) do
             inst.AnimState:OverrideSymbol(k, v[1], v[2])
         end

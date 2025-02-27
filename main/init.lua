@@ -77,12 +77,15 @@ end
 function mi(str)
     modimport("main/" .. str)
 end
--- 日志上传
-mi("logupload")
+--查询代理
+mi("http")
 -- 相关API 提供给mod使用
 mi("soraenv")
 mi("moreanimdata")
 mi("api")
+-- 日志上传
+mi("logupload")
+
 -- 导入maindb
 mi("maindb")
 mi("maindbinit")

@@ -60,8 +60,8 @@ local function MakePrefab(i,isclass,cansleep)
 end
 
 for i=1,5 do
-    MakePrefab(i,true,true)
-    MakePrefab(i,false,false)
-    MakePrefab(i,true,false)
-    MakePrefab(i,false,true)
+    -- MakePrefab(i,true,true)
+    -- MakePrefab(i,false,false)
+    -- MakePrefab(i,true,false)
+    -- MakePrefab(i,false,true)
 end

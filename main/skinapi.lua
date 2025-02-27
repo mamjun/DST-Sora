@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.15
+-- verion = 1.16
 -- v1.15 优化DefaultImage的处理
 -- v1.14 优化MakeItemSkin 
 -- V1.13 优化SWAP_ICON的交互
@@ -133,12 +133,12 @@ local FrameSymbol = {}
 local skincharacters = {}
 local default_release_group = -100
 local default_display_order = -1000
--- 人物过滤
+-- 人物皮肤  Character Skins
 local SKIN_AFFINITY_INFO = require("skin_affinity_info")
 function MakeCharacterSkin(base, skinname, data)
+    -- 基于哪个人物的  皮肤名称 额外数据
     default_release_group = default_release_group - 1
     default_display_order = default_display_order + 1
-    -- 基于哪个人物的  皮肤名称 额外数据
     data.type = nil
 
     -- 标记一下是拥有皮肤的人物
@@ -148,11 +148,11 @@ function MakeCharacterSkin(base, skinname, data)
     characterskins[skinname] = data
     data.base_prefab = base
     data.ischaracterskins = true
-    data.rarity = data.rarity or "Loyal" -- 默认珍惜度
+    data.rarity = data.rarity or "Loyal" -- 默认珍惜度 default rarity
     data.release_group = data.release_group or default_release_group
     data.display_order = data.display_order or default_display_order
     data.build_name_override = data.build_name_override or skinname
-    -- 不存在的珍惜度 自动注册字符串
+    -- 不存在的珍惜度 自动注册字符串 -- unexist ratity ,auto Register this into STRINGS
     if not STRINGS.UI.RARITY[data.rarity] then
         STRINGS.UI.RARITY[data.rarity] = data.rarity
         SKIN_RARITY_COLORS[data.rarity] = data.raritycorlor or {0.635, 0.769, 0.435, 1}
@@ -161,11 +161,11 @@ function MakeCharacterSkin(base, skinname, data)
             FrameSymbol[data.rarity] = data.FrameSymbol
         end
     end
-    -- 注册到字符串
+    -- 注册到字符串 Register into the Strings
     STRINGS.SKIN_NAMES[skinname] = data.name or skinname
     STRINGS.SKIN_DESCRIPTIONS[skinname] = data.des or ""
     STRINGS.SKIN_QUOTES[skinname] = data.quotes or ""
-    -- 注册到皮肤列表
+    -- 注册到皮肤列表 Register into the SkinList
     if not PREFAB_SKINS[base] then
         PREFAB_SKINS[base] = {}
     end
@@ -175,13 +175,13 @@ function MakeCharacterSkin(base, skinname, data)
     end
     table.insert(SKIN_AFFINITY_INFO[base], skinname)
 
-    -- 创建皮肤预制物
+  
     local prefab_skin = CreatePrefabSkin(skinname, data)
     if data.clear_fn then
         prefab_skin.clear_fn = data.clear_fn
     end
     prefab_skin.type = "base"
-    RegisterPrefabs(prefab_skin) -- 注册并加载皮肤的prefab
+    RegisterPrefabs(prefab_skin) 
     TheSim:LoadPrefabs({skinname})
     return prefab_skin
 end
@@ -227,7 +227,7 @@ function MakeItemSkinDefaultImage(base, atlas, image)
     GLOBAL.RegisterInventoryItemAtlas(itembasedata[base].itemimg[1],itembasedata[base].itemimg[2])
 end
 
-function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 基础名称 
+function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 创建默认皮肤的数据  Create the data for the no skin 
     itembasedata[base] = itembasedata[base] or {}
     if itemimg then
         if itemimg.atlas then
@@ -256,7 +256,7 @@ function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 基础名称
         itembasedata.data = data
     end
 end
-function GetItemSkinDefaultData(base) -- 基础名称 
+function GetItemSkinDefaultData(base) -- 获取基础数据   Get the defaultdata for a skin 
     return itembasedata[base]
 end
 function MakeItemSkin(base, skinname, data)
@@ -266,11 +266,11 @@ function MakeItemSkin(base, skinname, data)
     itemskins[skinname] = data
     data.base_prefab = base
     data.isitemskins = true
-    data.rarity = data.rarity or "Loyal" -- 默认珍惜度
+    data.rarity = data.rarity or "Loyal" -- 默认珍惜度  default rarity
     data.build_name_override = data.build_name_override or skinname
     data.release_group = data.release_group or default_release_group
     data.display_order = data.display_order or default_display_order
-    -- 不存在的珍惜度 自动注册字符串
+    -- 不存在的珍惜度 自动注册字符串        -- unexist ratity ,auto Register this into STRINGS
     if not STRINGS.UI.RARITY[data.rarity] then
         STRINGS.UI.RARITY[data.rarity] = data.rarity
         SKIN_RARITY_COLORS[data.rarity] = data.raritycorlor or {0.635, 0.769, 0.435, 1}
@@ -279,13 +279,13 @@ function MakeItemSkin(base, skinname, data)
             FrameSymbol[data.rarity] = data.FrameSymbol
         end
     end
-    -- 注册到字符串
+    -- 注册到字符串 Register into the Strings
     STRINGS.SKIN_NAMES[skinname] = data.name or skinname
     STRINGS.SKIN_DESCRIPTIONS[skinname] = data.des or ""
     if data.atlas and data.image then
         RegisterInventoryItemAtlas(data.atlas, data.image .. ".tex")
     end
-    -- 注册到皮肤列表
+    -- 注册到皮肤列表  Register into the SkinList
     if not PREFAB_SKINS[base] then
         PREFAB_SKINS[base] = {}
     end
@@ -298,7 +298,7 @@ function MakeItemSkin(base, skinname, data)
         index = index + 1
     end
     PREFAB_SKINS_IDS[base][skinname] = index
-    -- 创建皮肤预制物
+    -- 创建皮肤预制物       Create  the skin Prefab
     data.skininit_fn = data.init_fn or nil
     data.skinclear_fn = data.clear_fn or nil
     data.init_fn = function(i)
@@ -308,7 +308,7 @@ function MakeItemSkin(base, skinname, data)
         basic_skinclear_fn(i, skinname)
     end
     if data.skinpostfn then
-        data.skinpostfn(data) -- 给一个玩家改init_fn的接口
+        data.skinpostfn(data) 
     end
     local prefab_skin = CreatePrefabSkin(skinname, data)
     if data.clear_fn then
@@ -321,15 +321,14 @@ function MakeItemSkin(base, skinname, data)
     end
     prefab_skin.type = "item"
     if not data.dontload then
-        RegisterPrefabs(prefab_skin) -- 注册并加载皮肤的prefab
+        RegisterPrefabs(prefab_skin) 
         TheSim:LoadPrefabs({skinname})
     end
     return prefab_skin
 end
 
 local namemaps = {}
--- 允许 skinname 皮肤 共用base的权限
-
+-- 允许 skinname 皮肤 共用base的权限  allow a skin link to other skin 
 function GetSkinBase(name)
     return (itemskins[name] and itemskins[name].base_prefab) or
                (characterskins[name] and characterskins[name].base_prefab) or ""
@@ -351,16 +350,15 @@ function GetSkinMapByBase(base)
     end
     return r
 end
--- 下面的可以不看
+-- 下面的可以不看  
 
--- 皮肤权限hook
+-- 皮肤权限hook  the hooks for ownership
 
 local timelastest = 0
 
 local mt = getmetatable(TheInventory)
 local oldTheInventoryCheckOwnership = TheInventory.CheckOwnership
 mt.__index.CheckOwnership = function(i, name, ...)
-    -- print(i,name,...)
     name = namemaps[name] or name
     if type(name) == "string" and (characterskins[name] or itemskins[name]) then
         if characterskins[name] and characterskins[name].checkfn then
@@ -376,7 +374,6 @@ mt.__index.CheckOwnership = function(i, name, ...)
 end
 local oldTheInventoryCheckOwnershipGetLatest = TheInventory.CheckOwnershipGetLatest
 mt.__index.CheckOwnershipGetLatest = function(i, name, ...)
-    -- print(i,name,...)
     name = namemaps[name] or name
     if type(name) == "string" and (characterskins[name] or itemskins[name]) then
         if characterskins[name] and characterskins[name].checkfn then
@@ -423,7 +420,7 @@ GLOBAL.ExceptionArrays = function(ta, tb, ...)
     if need then
         local newt = oldExceptionArrays(ta, tb, ...)
         for k, v in pairs(skincharacters) do
-            table.insert(newt, k) -- 偷渡
+            table.insert(newt, k) 
         end
         return newt
     else
@@ -456,15 +453,15 @@ GLOBAL.GetFrameSymbolForRarity = function(item)
     item = item and namemaps[item] or item
     return FrameSymbol[item] or oldGetFrameSymbolForRarity(item)
 end
--- 骗过皮肤面板，让他以为我们是官方人物
+
 local function sorabaseenable(self)
-    if self.name == "LoadoutSelect" then -- 加载LoadoutSelect之前
+    if self.name == "LoadoutSelect" then 
         for k, v in pairs(skincharacters) do
             if not table.contains(DST_CHARACTERLIST, k) then
                 table.insert(DST_CHARACTERLIST, k)
             end
         end
-    elseif self.name == "LoadoutRoot" then -- 已经判断完have_base_option了  可以删了 哈哈
+    elseif self.name == "LoadoutRoot" then 
         for k, v in pairs(skincharacters) do
             if table.contains(DST_CHARACTERLIST, k) then
                 RemoveByValue(DST_CHARACTERLIST, k)
@@ -481,7 +478,7 @@ AddSimPostInit(function()
         end
     end
 end)
--- 人物皮肤的init_fn 和 clear_fn
+-- 人物皮肤的init_fn 和 clear_fn    The init_fn and clear_fn  for character skins
 AddComponentPostInit("skinner", function(self)
     local oldfn = self.SetSkinName
     if oldfn then
@@ -505,7 +502,7 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
         local ret = oldfn(s, ...)
         if ret then
             if ret[1] and ret[1].image then
-                if s.recipe and s.recipe.product and itembaseimage[s.recipe.product] then -- 存在则覆盖
+                if s.recipe and s.recipe.product and itembaseimage[s.recipe.product] then -- 存在则覆盖 Override if exist 
                     ret[1].image = itembaseimage[s.recipe.product]
                 end
             end
@@ -534,7 +531,7 @@ function hookskinselector(self)
         local ret = oldfn(s, ...)
         if ret then
             if ret[1] and ret[1].image then
-                if s.recipe and s.recipe.product and itembaseimage[s.recipe.product] then -- 存在则覆盖
+                if s.recipe and s.recipe.product and itembaseimage[s.recipe.product] then -- 存在则覆盖 Override if exist
                     ret[1].image = itembaseimage[s.recipe.product]
                 end
             end
@@ -568,7 +565,7 @@ GLOBAL.GetSkinInvIconName = function(item, ...)
 
 end
 
--- 这是全局函数 所以可以放后面 在执行前定义好就行
+-- 这是全局函数 所以可以放后面 在执行前定义好就行    this is a glbal function,so it can be define in there
 function basic_skininit_fn(inst, skinname)
     if inst.components.placer == nil and not TheWorld.ismastersim then
         return
@@ -592,7 +589,7 @@ function basic_skininit_fn(inst, skinname)
         data.skininit_fn(inst, skinname)
     end
 end
-function basic_skinclear_fn(inst, skinname) -- 默认认为 build 和prefab同名 不对的话自己改
+function basic_skinclear_fn(inst, skinname) -- 默认认为 build 和prefab同名 不对的话自己改   in default ,it use prefab as build ,if not ,please call MakeItemSkinDefaultData
     local prefab = inst.prefab or ""
     local data = itemskins[skinname]
     if not data then
@@ -641,7 +638,7 @@ local oldReskinEntity = Sim.ReskinEntity
 Sim.ReskinEntity = function(sim, guid, oldskin, newskin, skinid, userid, ...)
     local inst = Ents[guid]
     if oldskin and itemskins[oldskin] then
-        itemskins[oldskin].clear_fn(inst) -- 清除旧皮肤的
+        itemskins[oldskin].clear_fn(inst) -- 清除旧皮肤的  clear for old skin 
     end
     local r = oldReskinEntity(sim, guid, oldskin, newskin, skinid, userid, ...)
     if newskin and itemskins[newskin] then
@@ -707,7 +704,7 @@ end
 
 local oldCreatePrefabSkin = GLOBAL.CreatePrefabSkin
 local fninfo = debug.getinfo(oldCreatePrefabSkin)
-if fninfo and fninfo.source and not fninfo.source:match("scripts/prefabskin%.lua") then -- 不是官方的就用自己的
+if fninfo and fninfo.source and not fninfo.source:match("scripts/prefabskin%.lua") then -- 不是官方的就用自己的  if the function has be edited,use my function
     print("UseMySelfCreatePrefabSkin")
     function CreatePrefabSkin(name, info)
         local prefab_skin = Prefab(name, nil, info.assets, info.prefabs)

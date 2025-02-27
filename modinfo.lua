@@ -28,7 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
 ]] author = "FL"
-version = "13.06" -- 版本
+version = "13.07" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -139,6 +139,19 @@ local function makeconfig(name, label, des, default, min, step, num, ispercent)
     return t
 end
 configuration_options = {{
+    name = "ClientProxy",
+    label = "允许客户端协助服务器连接服务器,需要客户端启用SoraProxy",
+    options = {{
+        description = "允许,不安全,但是只需要客户端启用SoraProxy",
+        data = "1",
+        hover = "允许,不安全,但是只需要客户端启用SoraProxy"
+    }, {
+        description = "不允许,更安全,需要专服启用SoraProxy",
+        data = "0",
+        hover = "不允许,更安全,需要专服启用SoraProxy"
+    }},
+    default = "0"
+},{
     name = "reset_ui",
     label = "启动时重置UI位置(玩家自己在mod设置里设置)\n也可以使用sora_reset_ui()命令",
     options = {{

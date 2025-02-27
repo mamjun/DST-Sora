@@ -1655,6 +1655,14 @@ GLOBAL.SaveGame = function(...)
     SoraAPI.IsSaveGaming = false
     return r
 end
+local oldSerializeWorldSession = GLOBAL.SerializeWorldSession 
+SoraAPI.IsSerializeWorlding = false
+GLOBAL.SerializeWorldSession = function(...)
+    SoraAPI.IsSerializeWorlding = true
+    local x, y, z, a, b, c = oldSerializeWorldSession(...)
+    SoraAPI.IsSerializeWorlding = false
+    return x, y, z, a, b, c 
+end
 
 AddPlayerPostInit(function(inst)
     local oldGetPersistData = inst.GetPersistData

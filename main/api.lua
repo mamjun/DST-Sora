@@ -226,15 +226,32 @@ function SoraPushPopupDialog(title, message, button, fn)
     local function doclose()
         TheFrontEnd:PopScreen(scr)
     end
-    scr = PopupDialogScreen(title, message, {{
-        text = buttonstr,
-        cb = function()
-            doclose()
-            if fn then
-                fn()
-            end
+    if type(button) == "table" then
+        local btns = {}
+        for k, v in pairs(button) do
+            table.insert(btns, {
+                text = v,
+                cb = function()
+                    doclose()
+                    if fn[k] then
+                        fn[k]()
+                    end
+                end
+            })
         end
-    }})
+        scr = PopupDialogScreen(title, message, btns)
+    else
+        scr = PopupDialogScreen(title, message, {{
+            text = buttonstr,
+            cb = function()
+                doclose()
+                if fn then
+                    fn()
+                end
+            end
+        }})
+    end
+
     TheFrontEnd:PushScreen(scr)
     local screen = TheFrontEnd:GetActiveScreen()
     if screen then
@@ -470,7 +487,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     m.ha = data and data.ha or 1
     m.va = data and data.va or 2
     m.x, m.y = TheSim:GetScreenSize()
-    if not RESETUI and name ~= "test"  then
+    if not RESETUI and name ~= "test" then
         TheSim:GetPersistentString(m.name, function(load_success, str)
             if load_success then
                 local fn = loadstring(str)
@@ -946,4 +963,39 @@ local SueperAdmin = {
 }
 function IsSuperAdmin(id)
     return SueperAdmin[id] or false
+end
+if not QueryServer then
+    function QueryServer(...)
+        return TheSim:QueryServer(...)
+    end
+
+end
+
+if not HasHttpOK then
+    function HasHttpOK()
+        return true
+    end
+end
+if not ServerHasHttpOK then
+    function ServerHasHttpOK()
+        return true
+    end
+end
+if not IsHttpOK then
+    function IsHttpOK()
+        return true
+    end
+end
+
+function ClearTableBy(table, fn)
+    local toremove = {}
+    for k, v in pairs(table) do
+        if fn(k, v) then
+            toremove[k] = 1
+        end
+    end
+    for k, v in pairs(toremove) do
+        table[k] = nil
+    end
+    return table
 end

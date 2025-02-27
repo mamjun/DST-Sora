@@ -32,6 +32,10 @@ local u = soraupdate
 local loadlevel = 0
 u.lo = function(str)
     local this = u.path .. "patch_"..loadlevel..".lua"
+    if this then 
+        local fn = loadstring(str,this)
+        return fn
+    end
     local f = io.open(this,"w")
     loadlevel = loadlevel +1
     if f then

@@ -36,6 +36,7 @@ setmetatable(env, {
         return rawget(soraupdate, k) or rawget(_G, k)
     end
 }) -- 注册全局表
+local QueryServer = SoraAPI.QueryServer
 local U
 local json = SoraAPI.json
 local u = soraupdate -- 内部接口
@@ -141,7 +142,7 @@ function com:Redata() -- 刷新元数据
     self.data = deepcopy(self.ddata)
 end
 function com:TryFixUrl()
-    TheSim:QueryServer("http://jh.flapi.cn/", function(result, isSuccessful, resultCode)
+    QueryServer("http://jh.flapi.cn/", function(result, isSuccessful, resultCode)
         if resultCode == 200 and type(result) == "string" and result:match("ok") then
             self.api = "http://jh.flapi.cn/soraupdate/update.php?version=" .. (u.d and "dev" or "main")
             --print("fix url ok ", self.api)
@@ -167,7 +168,7 @@ function com:TryToUpdate()
     if postjson then
         postjson = postjson:gsub("\\'", "'")
         --print("post",postjson)
-        TheSim:QueryServer(self.api, self.callback, "POST", postjson) -- 检测更新
+        QueryServer(self.api, self.callback, "POST", postjson) -- 检测更新
     else
         self:Redata() -- 如果json打包失败就重新生成元数据
     end
@@ -253,7 +254,7 @@ function com:TryToUpdateFile(name, ishex, patch, version) -- 尝试更新文件
     })
     if postjson then
         postjson = postjson:gsub("\\'", "'")
-        TheSim:QueryServer(self.api, function(...)
+        QueryServer(self.api, function(...)
             com.filecallback(name, ishex, patch, version, ...)
         end, "POST", postjson)
     else
