@@ -683,9 +683,9 @@ function Pfn(fn, ret) -- MakePcallFn
     return newfn
 end
 MakePcallFn = Pfn
+
 local lastui = nil
 global("TheUI")
-
 function TryLoadUI(str, ...) -- MakePcallFn
     if lastui then
         lastui:Kill()
