@@ -131,9 +131,9 @@ local notdrop = {
     sora3packer = 1,
     sorapacker = 1
 }
-local cacheents = {}
-local updateents = {}
-local updatechests = {}
+local cacheents = SoraAPI.LeakTableKV()
+local updateents = SoraAPI.LeakTableKV()
+local updatechests = SoraAPI.LeakTableKV()
 local UpdateEnts
 local overfullfn = function(chest, inst)
     return inst:HasTag("bird")
@@ -196,9 +196,9 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
 end
 
 local function catch(inst)
-    if not inst:IsInLimbo() and not inst:HasTag("decorationitem")  and not inst:HasTag("outofreach") and inst.components.inventoryitem and
-        not inst.components.inventoryitem.owner and not (inst.components.health and inst.components.health:IsDead()) and
-        inst:IsValid() then
+    if not inst:IsInLimbo() and not inst:HasTag("decorationitem") and not inst:HasTag("outofreach") and
+        inst.components.inventoryitem and not inst.components.inventoryitem.owner and
+        not (inst.components.health and inst.components.health:IsDead()) and inst:IsValid() then
         return true
     end
     return false
@@ -289,19 +289,20 @@ local function ChestDrop(chest)
                     local p = toprefab(item.prefab)
                     if p ~= c and not notdrop[p] then
                         chest.components.container:DropItemBySlot(v)
-                        item.SoraChestSkip = nil
                     end
                 end
             end
         end
     end
 end
+local maxrange = TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE
 if TUNING.SORACHESTRANGE > 2000 then
     function DayUpdate() -- 只负责收东西
         if cmp:IsStop() then
             return
         end
         TheWorld.components.sorachestmanager:UpdateAllChest()
+        TheWorld.components.sorachestmanager.HasDayUpdate = true
         AllChestDrop()
         UpdateEnts()
         local topick = {}
@@ -357,12 +358,13 @@ if TUNING.SORACHESTRANGE > 2000 then
         end
     end
 else
-    local maxrange = TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE
+
     function DayUpdate(inst, chest, container)
         if cmp:IsStop() then
             return
         end
         TheWorld.components.sorachestmanager:UpdateAllChest()
+        TheWorld.components.sorachestmanager.HasDayUpdate = true
         AllChestDrop()
         UpdateEnts()
         local topick = {}
@@ -433,8 +435,6 @@ local function GetItem(inst, data) -- 箱子收东西
 
 end
 
-SoraAPI.DayUpdate = DayUpdate
-SoraAPI.GetItem = GetItem
 local function GetData(inst)
     return allchest[inst.sorachesttype] and allchest[inst.sorachesttype][inst] and
                allchest[inst.sorachesttype][inst].data
@@ -445,7 +445,7 @@ local function OnChestRemove(chest)
 end
 local updategem = {
     opalpreciousgem = 100,
-    orangegem = 50,
+    -- orangegem = 50,
     yellowgem = 60,
     purplegem = 60
 }
@@ -481,10 +481,10 @@ local GemTask = {
             end
         end
     end,
-    orangegem = function(inst, data, v)
-        GetItem(inst, data)
-        ChestDrop()
-    end,
+    -- orangegem = function(inst, data, v)
+    -- GetItem(inst, data)
+    -- ChestDrop()
+    -- end,
     yellowgem = function(inst, data, v)
         local pos = inst:GetPosition()
         local con = inst.components.container
@@ -571,6 +571,64 @@ local GemTask = {
         end
     end
 }
+local OrangeTaskTick = {}
+for i = 1, 50 do
+    local TickLevel = {false, false, false, false, false}
+    table.insert(OrangeTaskTick, TickLevel)
+    for level = 1, 5 do
+        local LevelTick = math.ceil(50 / level / level)
+        if i % LevelTick == 0 then
+            OrangeTaskTick[i][level] = true
+        end
+    end
+end
+local OrangeCurrTick = 0
+local function OrangeTask()
+    OrangeCurrTick = (OrangeCurrTick % 50) + 1
+    -- 统计需要更新的橙箱子
+    local needupdate = {}
+    local CurTick = OrangeTaskTick[OrangeCurrTick]
+    for type, chests in pairs(allchest) do -- 统计失效箱子
+        for chest, data in pairs(chests) do
+            if data.gem.orangegem and data.gem.orangegem > 0 then
+                if CurTick[data.gem.orangegem] then
+                    for ci, cprefab in pairs(data.c) do
+                        if not needupdate[cprefab] then
+                            needupdate[cprefab] = {}
+                        end
+                        table.insert(needupdate[cprefab], {chest, data, ci})
+                    end
+                end
+            end
+        end
+    end
+    -- 如果有更新 整理一下实体
+    UpdateEnts()
+    -- 抓取需要的实体
+    local topick = {}
+    for ent, v in pairs(cacheents) do
+        local p = toprefab(ent.prefab)
+        if needupdate[p] then
+            if not topick[p] then
+                topick[p] = {}
+            end
+            topick[p][ent] = 1
+        end
+    end
+    for prefab, ents in pairs(topick) do
+        local containers = needupdate[prefab]
+        table.sort(containers, function(a, b)
+            return (a[2].pri) > (b[2].pri or 0)
+        end)
+        for _, chestinfo in pairs(containers) do
+            TryPutToContainer(chestinfo[1], ents, chestinfo[2].containers[chestinfo[3]],
+                TUNING.SORACHESTRANGE < 2000 and function(a, b)
+                    return a:GetDistanceSqToInst(b) < maxrange
+                end)
+        end
+    end
+
+end
 local function UpdateChest(inst, data)
     for k, v in pairs(data.gem) do
         if updategem[k] then
@@ -591,6 +649,10 @@ local function UpdateChest(inst, data)
 end
 
 local function UpdateAllChest()
+    if cmp.HasDayUpdate then
+        cmp.HasDayUpdate = false
+        return
+    end
     local UnReg = {}
     for type, chests in pairs(allchest) do -- 统计失效箱子
         for k, v in pairs(chests) do
@@ -611,41 +673,33 @@ local function UpdateAllChest()
     for k, v in pairs(updatechests) do -- 刷新有宝石的箱子
         UpdateChest(k, v) -- 只负责刷新宝石类  
     end
+    OrangeTask()
     -- body
 end
 local function TryCacheEnt(inst, all) -- 尝试缓存下来
-    if not inst.replica then
-        inst.SoraChestSkip = true
-        return
-    end
-    if not inst.replica.inventoryitem then
-        inst.SoraChestSkip = true
-        return
-    end
-    if inst:HasTag("decorationitem") then
-        inst.SoraChestSkip = true
-        return
-    end
-    if inst:HasTag("activeprojectile") then -- 投射物
-        inst.SoraChestSkip = true
-        return
-    end
-    
+
     if inst:IsInLimbo() then -- 不可见实体
         return true
     end
-    if inst.components.health and inst.components.health:IsDead() then -- 已经死了
-        inst.SoraChestSkip = true
+    if inst.components.health and inst.components.health:IsDead() then
+        return
+    end
+    if inst:HasTag("decorationitem") then
+        return
+    end
+    if inst:HasTag("activeprojectile") then
         return
     end
     if inst.components.inventoryitem and not inst.components.inventoryitem.owner then -- 无主的 缓存
         all[inst] = 1
     end
 end
-local function UpdateAllEnts() -- 尝试清除所有实体的跳过标记
+local AllEnts = SoraAPI.LeakTable()
+local function UpdateAllEnts() -- 初步筛选一下不可能需要的实体
+    AllEnts = SoraAPI.LeakTable()
     for k, v in pairs(Ents) do
-        if v.SoraChestSkip and v.replica and v.replica.inventoryitem then
-            v.SoraChestSkip = nil
+        if v.prefab and v.persists and v.replica.inventoryitem and not v:IsInLimbo() then
+            AllEnts[v] = 1
         end
     end
 end
@@ -654,14 +708,14 @@ function UpdateEnts() -- 尝试缓存有用的实体 减少运算量
     if not TheWorld.components.sorachestmanager.UpdateEntsCD() then
         return
     end
-    if TheWorld.components.sorachestmanager.UpdateAllEntsCD() then
+
+    local UpdateAllEntsCD = TheWorld.components.sorachestmanager.UpdateAllEntsCD()
+    if UpdateAllEntsCD then
         UpdateAllEnts()
     end
-    cacheents = {}
-    for k, v in pairs(Ents) do
-        if not v.SoraChestSkip then
-            TryCacheEnt(v, cacheents)
-        end
+    cacheents = SoraAPI.LeakTableKV()
+    for v, k in pairs(AllEnts) do
+        TryCacheEnt(v, cacheents)
     end
 end
 
@@ -698,7 +752,7 @@ local function ResetChestData(inst, doer)
             end
         elseif item then
             container:DropItemBySlot(v)
-            item.SoraChestSkip = nil
+
         end
     end
     if inst.components.preserver then
@@ -734,7 +788,6 @@ local function ResetChestData(inst, doer)
                     end
                     if first ~= p and not notdrop[p] then -- 丢弃多余的 
                         container:DropItemBySlot(slot)
-                        item.SoraChestSkip = nil
                     end
                 end
             end
@@ -774,8 +827,8 @@ local function OnClose(inst, event)
     if not inst.components.container then
         return
     end
-    if event and event.dontget  then 
-        return 
+    if event and event.dontget then
+        return
     end
     -- SoraAPI.CheckChestValid(inst)
     local data = inst.sorachestdata
@@ -803,7 +856,7 @@ local function HitProtect(inst, data)
     if not inst.components.workable then
         return
     end
-    if not (inst.hitcount and inst.hitcd)then
+    if not (inst.hitcount and inst.hitcd) then
         inst.hitcount = 0
         inst.hitcd = SoraCD(30)
     end
@@ -812,7 +865,7 @@ local function HitProtect(inst, data)
         inst.components.workable.workleft = 10
     else
         inst.hitcount = inst.hitcount + 1
-        if inst.components.container and not inst.components.container:IsEmpty() then 
+        if inst.components.container and not inst.components.container:IsEmpty() then
             inst.hitcount = 1
         end
         if inst.hitcount > 4 then
@@ -849,11 +902,12 @@ local com = Class(function(self, inst)
     self.UpdateAllChestTask = inst:DoPeriodicTask(1, UpdateAllChest)
     -- self.UpdateEntsTask = inst:DoPeriodicTask(1, UpdateEnts)
     inst:WatchWorldState("cycles", function()
-        UpdateAllEnts()
         inst:DoTaskInTime(1, DayUpdate)
         inst:DoTaskInTime(3, DayUpdate)
         inst:DoTaskInTime(5, DayUpdate)
     end)
+    self.DayUpdate = DayUpdate
+    self.GetItem = GetItem
 end)
 function com:SetStopTime(time)
     self.stoptime = time + GetTime()
@@ -1063,13 +1117,11 @@ end
 function com:UpdateChest(chest)
     UpdateChest(chest)
 end
-function com:OnClose(chest, doer,dontget)
+function com:OnClose(chest, doer, dontget)
     OnClose(chest, {
-        doer = doer,dontget= dontget or false
+        doer = doer,
+        dontget = dontget or false
     })
-end
-function com:UpdateChest(chest)
-    UpdateChest(chest)
 end
 
 function com:UpdateAllChest()

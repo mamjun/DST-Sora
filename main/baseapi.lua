@@ -30,25 +30,31 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] -- 初始化
 -- 基础API
-local LeakMeta = {__mode="k"}
-function LeakTable(tbl)    --生成一个弱引用表
+local LeakMeta = {
+    __mode = "k"
+}
+function LeakTable(tbl) -- 生成一个弱引用表
     local t = tbl or {}
-    setmetatable(t,LeakMeta)
-    return t 
+    setmetatable(t, LeakMeta)
+    return t
 end
 
-local LeakMetaV = {__mode="v"}
-function LeakTableV(tbl)    --生成一个弱引用表
+local LeakMetaV = {
+    __mode = "v"
+}
+function LeakTableV(tbl) -- 生成一个弱引用表
     local t = tbl or {}
-    setmetatable(t,LeakMetaV)
-    return t 
+    setmetatable(t, LeakMetaV)
+    return t
 end
 
-local LeakMetaKV = {__mode="kv"}
-function LeakTableKV(tbl)    --生成一个弱引用表
+local LeakMetaKV = {
+    __mode = "kv"
+}
+function LeakTableKV(tbl) -- 生成一个弱引用表
     local t = tbl or {}
-    setmetatable(t,LeakMetaKV)
-    return t 
+    setmetatable(t, LeakMetaKV)
+    return t
 end
 
 function ClearTableBy(table, fn)
@@ -62,4 +68,16 @@ function ClearTableBy(table, fn)
         table[k] = nil
     end
     return table
+end
+local TimeFNName =nil
+function TimeCallName(fnname)
+    TimeFNName = fnname
+end
+function TimeCall(fn, ...)
+    local FNname = TimeFNName
+    local t = os.clock()
+    local ret = {fn(...)}
+    print("TimeCall",FNname , fn, os.clock() - t)
+    TimeFNName = nil
+    return unpack(ret)
 end
