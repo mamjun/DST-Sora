@@ -65,7 +65,7 @@ function SoraAPI.TryPhoto(inst, doer,lyj, must)
     local debugstring = inst.entity:GetDebugString()
 
     local dbank, dbuild, anim = debugstring:match("bank: (.+) build: (.+) anim: .+:(.+) Frame")
-    print(bank,build,dbank, dbuild, anim)
+    --print(bank,build,dbank, dbuild, anim)
     if not (bank and build and anim) then
         Say(doer, "这个暂时不能留影")
         return

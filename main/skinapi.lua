@@ -26,9 +26,11 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 未标明的文件，默认授权级别为'参考级'。
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
-4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
+4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
+如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.16
+-- verion = 1.17
+-- v1.17 感谢Jerusalem的建议,优化了一处hook的处理,优化了性能
 -- v1.15 优化DefaultImage的处理
 -- v1.14 优化MakeItemSkin 
 -- V1.13 优化SWAP_ICON的交互
@@ -175,13 +177,12 @@ function MakeCharacterSkin(base, skinname, data)
     end
     table.insert(SKIN_AFFINITY_INFO[base], skinname)
 
-  
     local prefab_skin = CreatePrefabSkin(skinname, data)
     if data.clear_fn then
         prefab_skin.clear_fn = data.clear_fn
     end
     prefab_skin.type = "base"
-    RegisterPrefabs(prefab_skin) 
+    RegisterPrefabs(prefab_skin)
     TheSim:LoadPrefabs({skinname})
     return prefab_skin
 end
@@ -224,7 +225,7 @@ local itembasedata = {}
 function MakeItemSkinDefaultImage(base, atlas, image)
     itembasedata[base] = itembasedata[base] or {}
     itembasedata[base].itemimg = {atlas, (image or base) .. ".tex", "default.tex"}
-    GLOBAL.RegisterInventoryItemAtlas(itembasedata[base].itemimg[1],itembasedata[base].itemimg[2])
+    GLOBAL.RegisterInventoryItemAtlas(itembasedata[base].itemimg[1], itembasedata[base].itemimg[2])
 end
 
 function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 创建默认皮肤的数据  Create the data for the no skin 
@@ -237,8 +238,8 @@ function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 创建默认�
         else
             itembasedata[base].itemimg = {"images/inventoryimages/" .. base .. ".xml", base .. ".tex", "default.tex"}
         end
-        if itembasedata[base].itemimg then 
-            GLOBAL.RegisterInventoryItemAtlas(itembasedata[base].itemimg[1],itembasedata[base].itemimg[2])
+        if itembasedata[base].itemimg then
+            GLOBAL.RegisterInventoryItemAtlas(itembasedata[base].itemimg[1], itembasedata[base].itemimg[2])
         end
     end
     if itemanim then
@@ -308,7 +309,7 @@ function MakeItemSkin(base, skinname, data)
         basic_skinclear_fn(i, skinname)
     end
     if data.skinpostfn then
-        data.skinpostfn(data) 
+        data.skinpostfn(data)
     end
     local prefab_skin = CreatePrefabSkin(skinname, data)
     if data.clear_fn then
@@ -321,7 +322,7 @@ function MakeItemSkin(base, skinname, data)
     end
     prefab_skin.type = "item"
     if not data.dontload then
-        RegisterPrefabs(prefab_skin) 
+        RegisterPrefabs(prefab_skin)
         TheSim:LoadPrefabs({skinname})
     end
     return prefab_skin
@@ -420,7 +421,7 @@ GLOBAL.ExceptionArrays = function(ta, tb, ...)
     if need then
         local newt = oldExceptionArrays(ta, tb, ...)
         for k, v in pairs(skincharacters) do
-            table.insert(newt, k) 
+            table.insert(newt, k)
         end
         return newt
     else
@@ -454,7 +455,22 @@ GLOBAL.GetFrameSymbolForRarity = function(item)
     return FrameSymbol[item] or oldGetFrameSymbolForRarity(item)
 end
 
-local function sorabaseenable(self)
+-- 选人界面 --感谢Jerusalem的建议
+local LoadoutSelect = require("widgets/redux/loadoutselect")
+local oldLoadoutSelectCtor = LoadoutSelect._ctor
+LoadoutSelect._ctor = function(self, ...)
+    local old_contains = GLOBAL.table.contains
+    GLOBAL.table.contains = function(t, v, ...)
+        if t == DST_CHARACTERLIST and skincharacters[v] then
+            return true
+        end
+        return old_contains(t, v, ...)
+    end
+    oldLoadoutSelectCtor(self, ...)
+    GLOBAL.table.contains = old_contains
+end
+
+--[[ local function sorabaseenable(self)
     if self.name == "LoadoutSelect" then 
         for k, v in pairs(skincharacters) do
             if not table.contains(DST_CHARACTERLIST, k) then
@@ -469,7 +485,8 @@ local function sorabaseenable(self)
         end
     end
 end
-AddClassPostConstruct("widgets/widget", sorabaseenable)
+AddClassPostConstruct("widgets/widget", sorabaseenable) ]]
+
 AddSimPostInit(function()
     if not TheNet:IsOnlineMode() then
         local net = getmetatable(GLOBAL.TheNet)

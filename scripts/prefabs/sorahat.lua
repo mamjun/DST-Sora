@@ -26,7 +26,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 未标明的文件，默认授权级别为'参考级'。
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
-4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
+4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
+如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] local assets = {Asset("ANIM", "anim/sorahat.zip"), Asset("ATLAS", "images/inventoryimages/sorahat.xml"),
                    Asset("IMAGE", "images/inventoryimages/sorahat.tex"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorahat.xml", 256),
@@ -173,14 +174,19 @@ local function onequip(inst, owner)
         end)
     end
     if inst.skinname == "sorahat_no" then
-        owner.AnimState:OverrideSymbol("swap_hat", inst.skinname or "sorahat", "swap_hat")
-    else
         owner.AnimState:ClearOverrideSymbol("swap_hat")
+        owner.AnimState:Hide("HAT")
+        owner.AnimState:Hide("HAIR_HAT")
+        owner.AnimState:Show("HAIR_NOHAT")
+        owner.AnimState:Show("HAIR")
+    else
+        owner.AnimState:OverrideSymbol("swap_hat", inst.skinname or "sorahat", "swap_hat")
+        owner.AnimState:Show("HAT")
+        owner.AnimState:Show("HAIR_HAT")
+        owner.AnimState:Hide("HAIR_NOHAT")
+        owner.AnimState:Hide("HAIR")
     end
-    owner.AnimState:Show("HAT")
-    owner.AnimState:Hide("HAIR_HAT")
-    owner.AnimState:Show("HAIR_NOHAT")
-    owner.AnimState:Show("HAIR")
+   
     -- owner.AnimState:ClearOverrideSymbol("swap_body")
 end
 

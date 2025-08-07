@@ -1,4 +1,3 @@
-
 --[[
 授权级别:参考级
 Copyright 2022 [FL]。此产品仅授权在 Steam 和WeGame平台指定账户下，
@@ -29,32 +28,38 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
-]] --[[专属交互
-]] --
-local com = Class(function(self, inst)
-    self.inst = inst
-end)
-
-function com:Init(doer, pass, name, id)
-
+]] -- 初始化
+-- 基础API
+local LeakMeta = {__mode="k"}
+function LeakTable(tbl)    --生成一个弱引用表
+    local t = tbl or {}
+    setmetatable(t,LeakMeta)
+    return t 
 end
 
-
-function com:OnSave()
-    return {
-        --add_component_if_missing_sora = (self.pass ~= "") and 1 or nil
-    }
+local LeakMetaV = {__mode="v"}
+function LeakTableV(tbl)    --生成一个弱引用表
+    local t = tbl or {}
+    setmetatable(t,LeakMetaV)
+    return t 
 end
 
-function com:OnLoad(data)
-    if not data then
-        return
+local LeakMetaKV = {__mode="kv"}
+function LeakTableKV(tbl)    --生成一个弱引用表
+    local t = tbl or {}
+    setmetatable(t,LeakMetaKV)
+    return t 
+end
+
+function ClearTableBy(table, fn)
+    local toremove = {}
+    for k, v in pairs(table) do
+        if fn(k, v) then
+            toremove[k] = 1
+        end
     end
-
+    for k, v in pairs(toremove) do
+        table[k] = nil
+    end
+    return table
 end
-
-function com:GetDebugString()
-    return ""
-end
-
-return com

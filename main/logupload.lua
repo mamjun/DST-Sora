@@ -26,11 +26,12 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 未标明的文件，默认授权级别为'参考级'。
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
-4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
+4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
+如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] local ismodmain = false
 -- 自己设置一下 modkey 然后在 modmain里面 modimport一下就行
 local modkey = TUNING.SORAMODNAME
-local logtopath = true -- 如果需要输出本地日志 请设置成true
+local logtopath = false -- 如果需要输出本地日志 请设置成true
 local path = nil -- 默认输出路径 可以自己设置
 local DontTraceEntity = true -- 堆栈追踪的时候 不详细展开实体 (太占空间了)
 local TableTraceLevel = 1 -- 堆栈追踪的时候 表展开的等级 (太占空间了) 默认4
@@ -177,12 +178,12 @@ local function getextendtrace(start)
 end
 if logtopath and not path then
     if ismodmain then
-        path = "../mods/" .. modname .. "/log/"
+        path = "./unsafedata/" .. modname .. "_log_"
     else
         local info = debug.getinfo(getextendinfo).source
         local modname = info and info:match("%.%./mods/([^/]+)/")
         if modname then
-            path = "../mods/" .. modname .. "/log/"
+            path = "./unsafedata/" .. modname .. "_log_"
         end
     end
 end
@@ -347,7 +348,7 @@ local function InitLogUpload()
         end, "POST", topost or "Error") -- packlog(ret))
         -- io.open()
         if logtopath and path then -- 输出本地日志
-            local file = io.open(path .. logid .. ".log", "w")
+            local file = io.open(path .. logid .. ".txt", "w")
             if file then
                 file:write(topost)
                 file:close()

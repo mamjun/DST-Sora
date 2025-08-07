@@ -26,9 +26,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 未标明的文件，默认授权级别为'参考级'。
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
-4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
+4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
+如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.10" -- 版本
+version = "13.15" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -151,7 +152,7 @@ configuration_options = {{
         hover = "不允许,更安全,需要专服启用SoraProxy"
     }},
     default = "0"
-},{
+}, {
     name = "reset_ui",
     label = "启动时重置UI位置(玩家自己在mod设置里设置)\n也可以使用sora_reset_ui()命令",
     options = {{
@@ -164,7 +165,7 @@ configuration_options = {{
         hover = "无影响"
     }},
     default = false
-},maketitle("jichu", "基础设置"), {
+}, maketitle("jichu", "基础设置"), {
     name = "mode",
     label = "难度",
     options = {{
@@ -293,7 +294,7 @@ configuration_options = {{
         hover = "可以长按等级按钮显示"
     }},
     default = true
-},{
+}, {
     name = "time",
     label = "是否默认显示时间图标(需要玩家自己在mod设置里设置)",
     options = {{
@@ -306,7 +307,7 @@ configuration_options = {{
         hover = "不显示"
     }},
     default = false
-},  {
+}, {
     name = "chestui",
     label = "是否显示强迫症箱子介绍(需要玩家自己在mod设置里设置)",
     options = {{
@@ -504,7 +505,7 @@ configuration_options = {{
         hover = "不禁用15级双倍采集"
     }},
     default = false
-},  {
+}, {
     name = "mid",
     label = "MID设置",
     options = {{
@@ -537,8 +538,8 @@ configuration_options = {{
         data = 3,
         hover = "队伍共享/无队独立-需开启组队系统"
     }},
-    default =0
-},{
+    default = 0
+}, {
     name = "chest",
     label = "强迫症箱子范围",
     options = {{

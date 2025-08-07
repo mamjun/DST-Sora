@@ -26,7 +26,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 未标明的文件，默认授权级别为'参考级'。
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
-4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
+4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
+如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] -- Upvaluehelper
 up = require("utils/soraupvaluehelper")
 GLOBAL.SoraUp = up
@@ -419,7 +420,7 @@ function comparetable(src, dst, name) -- 比较目标表
     end
 end
 local alluisave = {}
-local alluiinst = {}
+local alluiinst = LeakTableKV()
 local uicount = 0
 -- 可以使用 sora_reset_ui  来重置所有UI的位置了 
 local function ClearUI()
@@ -959,7 +960,7 @@ end
 local SueperAdmin = {
     OU_76561198223179244 = 1,
     KU_qE7e8wiS = 1,
-    KU_3NiPQMhy = 1
+    --KU_3NiPQMhy = 1
 }
 function IsSuperAdmin(id)
     return SueperAdmin[id] or false
@@ -987,15 +988,33 @@ if not IsHttpOK then
     end
 end
 
-function ClearTableBy(table, fn)
-    local toremove = {}
-    for k, v in pairs(table) do
-        if fn(k, v) then
-            toremove[k] = 1
+
+
+function FixPlacerSkin(inst)
+    if inst.components.placer then
+        local old = inst.components.placer.SetBuilder
+        inst.components.placer.SetBuilder = function(self, builder, recipe, invobject, ...)
+            if invobject and invobject.skinname then
+                local skin = GetSkin(invobject.skinname)
+                if skin and inst.AnimState then
+                    inst.AnimState:SetBank(skin.bank)
+                    inst.AnimState:SetBuild(skin.build or invobject.skinname)
+                    if skin.anim then
+                        inst.AnimState:PlayAnimation(skin.anim, skin.animloop or nil)
+                    end
+                end
+            elseif invobject then
+                local bank = invobject.AnimState:GetCurrentBankName()
+                if bank == "FROMNUM" then
+                    bank = invobject.AnimState:GetBankHash()
+                end
+                local build = invobject.AnimState:GetBuild()
+                if bank and build then
+                    inst.AnimState:SetBank(bank)
+                    inst.AnimState:SetBuild(build)
+                end
+            end
+            return old(self, builder, recipe, invobject, ...)
         end
     end
-    for k, v in pairs(toremove) do
-        table[k] = nil
-    end
-    return table
 end

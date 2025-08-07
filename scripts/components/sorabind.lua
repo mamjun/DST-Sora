@@ -26,54 +26,67 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 未标明的文件，默认授权级别为'参考级'。
 2,本mod内贴图、动画相关文件禁止挪用,毕竟这是我自己花钱买的.
 3,严禁直接修改本mod内文件后二次发布。
-4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。
-]]
---[[专属交互
+4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
+如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
+]] --[[专属交互
 ]] --
-
-local function dropitem(doer,inst)
+local function dropitem(doer, inst)
     if inst and inst.components.inventoryitem then
         doer.components.inventory:DropItem(inst)
     end
 end
-local function checkowner(inst,data)
-    local owner = data.owner 
-    if owner and not (owner.userid == inst.components.sorabind.bind ) then
-        owner:DoTaskInTime(0,dropitem,inst)
+local function checkowner(inst, data)
+    local owner = data.owner
+    if owner and not (owner.userid == inst.components.sorabind.bind) then
+        owner:DoTaskInTime(0, dropitem, inst)
     end
 end
-
 local com = Class(function(self, inst)
     self.inst = inst
     self.bind = nil
     self.name = nil
-    inst:ListenForEvent("equipped",checkowner)
-    inst:ListenForEvent("onpickup",checkowner)
+    inst:ListenForEvent("equipped", checkowner)
+    inst:ListenForEvent("onpickup", checkowner)
     inst:AddTag("sorabind")
-    inst:DoTaskInTime(0,function()
+    inst:DoTaskInTime(0, function()
         self:Init()
     end)
 end)
 function com:Init()
     if self.inst.components.pickable then
-        local old = self.inst.components.pickable.Pick 
-        self.inst.components.pickable.Pick = function(s,doer,...)
-            if not (doer and (doer:HasTag("sora") and doer.userid == self.bind  or  TUNING.ENABLESORABINDPICK and doer and doer.Network and doer.Network:IsServerAdmin())) then
+        local old = self.inst.components.pickable.Pick
+        self.inst.components.pickable.Pick = function(s, doer, ...)
+            if not (doer and
+                (doer:HasTag("sora") and doer.userid == self.bind or TUNING.ENABLESORABINDPICK and doer and doer.Network and
+                    doer.Network:IsServerAdmin())) then
                 return true
             end
-            return old(s,doer,...)
+            return old(s, doer, ...)
         end
     end
 end
-function com:Bind(userid,name)
-    if self.bind then self.inst:RemoveTag(self.bind) end
+function com:Bind(userid, name)
+    if self.bind then
+        self.inst:RemoveTag(self.bind)
+    end
     self.bind = userid
-    if self.bind then self.inst:AddTag(self.bind) end
+    if self.bind then
+        self.inst:AddTag(self.bind)
+    end
     self.name = name
 end
 
-function com:OnSave() return {bind = self.bind,name=self.name} end
+function com:OnSave()
+    return {
+        bind = self.bind,
+        name = self.name
+    }
+end
 
-function com:OnLoad(data) if data and data.bind then self:Bind(data.bind,data.name) end  end
+function com:OnLoad(data)
+    if data and data.bind then
+        self:Bind(data.bind, data.name)
+    end
+end
 
 return com
