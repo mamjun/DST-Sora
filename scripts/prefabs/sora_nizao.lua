@@ -123,7 +123,7 @@ table.insert(All, MakePlacer("sora_moonbutterfly_placer", "butterfly", "butterfl
 local lightasset = {}
 local function uninit(inst)
     if inst and inst.cat and inst.cat:IsValid() then
-        inst.cat.stoppackprotect = true
+        --inst.cat.stoppackprotect = true
         local data, refs = inst.cat:GetPersistData()
         inst.components.sorasavecmp:SetSave("cat", {
             init = 0,

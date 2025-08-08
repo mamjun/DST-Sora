@@ -69,7 +69,7 @@ function ClearTableBy(table, fn)
     end
     return table
 end
-local TimeFNName =nil
+local TimeFNName = nil
 function TimeCallName(fnname)
     TimeFNName = fnname
 end
@@ -77,7 +77,16 @@ function TimeCall(fn, ...)
     local FNname = TimeFNName
     local t = os.clock()
     local ret = {fn(...)}
-    print("TimeCall",FNname , fn, os.clock() - t)
+    print("TimeCall", FNname, fn, os.clock() - t)
     TimeFNName = nil
     return unpack(ret)
+end
+
+function TimeRecordCall(fn, fnname)
+    return function(...)
+        local t = os.clock()
+        local ret = {fn(...)}
+        print("TimeRecord", fnname, fn, os.clock() - t)
+        return unpack(ret)
+    end
 end

@@ -33,16 +33,16 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 MODKEY = "sora"
 SORADEBUG = modname:find("dev") and true or false
 DebugPrint = function(...)
-    if SORADEBUG  then
+    if SORADEBUG then
         local args = {...}
-        for k,v in pairs(args or {}) do 
-            if type(v) == "string" and v:utf8len() > 200 then 
+        for k, v in pairs(args or {}) do
+            if type(v) == "string" and v:utf8len() > 200 then
                 local t = {}
-                TheSim:LuaPrint("----more "..tostring(t):sub(-8).."---")
+                TheSim:LuaPrint("----more " .. tostring(t):sub(-8) .. "---")
                 TheSim:LuaPrint(v)
 
-                args[k] = v:sub(1,20) .. " ...| " .. tostring(t):sub(-8)
-                
+                args[k] = v:sub(1, 20) .. " ...| " .. tostring(t):sub(-8)
+
             end
         end
         print(unpack(args))
@@ -68,10 +68,11 @@ GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
 GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
 GLOBAL.TUNING.SORAFGMODE = GetModConfigData("fgmode")
 GLOBAL.TUNING.SORAMOREANIMDATA = GetModConfigData("moreanimdata") == 0
+GLOBAL.TUNING.SORASKINUI = true
 RESETUI = GetModConfigData("reset_ui")
 GLOBAL.TUNING.SORADISABLEGLOBAL = GetModConfigData("disableui_globalbuild")
-IsGemEnable = rawget(_G,"gemrun") and true or false
-if IsGemEnable then 
+IsGemEnable = rawget(_G, "gemrun") and true or false
+if IsGemEnable then
     GLOBAL.TUNING.SORADISABLEGLOBAL = true
 end
 -- 加载模块
@@ -80,13 +81,13 @@ function mi(str)
 end
 
 mi("baseapi")
---查询代理
+-- 查询代理
 mi("http")
 -- 相关API 提供给mod使用
 mi("soraenv")
 mi("moreanimdata")
 mi("api")
---debug模块
+-- debug模块
 mi("debug/main")
 -- 日志上传
 mi("logupload")
@@ -109,7 +110,7 @@ mi("editedanim")
 mi("recipes")
 -- 食物
 mi("food")
---地皮
+-- 地皮
 mi("tile")
 -- 容器
 mi("containers")
@@ -138,5 +139,4 @@ modimport("scripts/soraupdate/main")
 
 -- 添加角色
 AddModCharacter("sora", "FEMALE")
-
 

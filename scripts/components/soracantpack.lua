@@ -32,61 +32,61 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] --
 local com = Class(function(self, inst)
     self.inst = inst
-    self.protect = false
+    --self.protect = false
     inst:AddTag("nonpackable")
     inst:AddTag("cantpack")
     inst:AddTag("soracantpack")
     self:Init()
 end)
 -- 防止自身被移除
-local function protectRemove(inst, ...)
-    assert(inst.components.soracantpack, "意外的打包,请截图反馈给风铃")
-    if inst.components.soracantpack then
-        if inst.components.soracantpack.protect then
-            return
-        else
-            return inst.components.soracantpack.oldRemove(inst, ...)
-        end
-    end
-    return
-end
+-- local function protectRemove(inst, ...)
+--     assert(inst.components.soracantpack, "意外的打包,请截图反馈给风铃")
+--     if inst.components.soracantpack then
+--         if inst.components.soracantpack.protect then
+--             return
+--         else
+--             return inst.components.soracantpack.oldRemove(inst, ...)
+--         end
+--     end
+--     return
+-- end
 
 -- 防止自身被移除
-local function protectGetPersistData(inst, ...)
-    assert(inst.components.soracantpack, "意外的打包,请截图反馈给风铃")
-    if inst.stoppackprotect or inst.components.soracantpack.newspawn or SoraAPI.IsSerializeWorlding or SoraAPI.IsSaveGaming or SoraAPI.IsSavePlayering > 0 then
-        return inst.components.soracantpack.oldGetPersistData(inst, ...)
-        -- 不应该走到这
-    else
-        if not inst.components.soracantpack.protect then
-            inst.components.soracantpack.protect = true -- 保护一帧
-            inst:DoTaskInTime(0, function()
-                inst.components.soracantpack.protect = false
-            end)
-        end
-        -- 虚假数据
-        return {
-            soracantpack = {
-                add_component_if_missing_sora = 1,
-                needremove = 1
-            }
-        }, {}
-    end
-end
+-- local function protectGetPersistData(inst, ...)
+--     assert(inst.components.soracantpack, "意外的打包,请截图反馈给风铃")
+--     if inst.stoppackprotect or inst.components.soracantpack.newspawn or SoraAPI.IsSerializeWorlding or SoraAPI.IsSaveGaming or SoraAPI.IsSavePlayering > 0 then
+--         return inst.components.soracantpack.oldGetPersistData(inst, ...)
+--         -- 不应该走到这
+--     else
+--         if not inst.components.soracantpack.protect then
+--             inst.components.soracantpack.protect = true -- 保护一帧
+--             inst:DoTaskInTime(0, function()
+--                 inst.components.soracantpack.protect = false
+--             end)
+--         end
+--         -- 虚假数据
+--         return {
+--             soracantpack = {
+--                 add_component_if_missing_sora = 1,
+--                 needremove = 1
+--             }
+--         }, {}
+--     end
+-- end
 
 function com:Init()
-    self.oldGetPersistData = self.inst.GetPersistData
-    self.oldRemove = self.inst.Remove
-    self.inst.Remove = protectRemove
-    self.inst.GetPersistData = protectGetPersistData
-    self.newspawn = true
-    self.inst:DoTaskInTime(0,function ()
-        self.newspawn = false
-    end)
+    -- self.oldGetPersistData = self.inst.GetPersistData
+    -- self.oldRemove = self.inst.Remove
+    -- self.inst.Remove = protectRemove
+    -- self.inst.GetPersistData = protectGetPersistData
+    -- self.newspawn = true
+    -- self.inst:DoTaskInTime(0,function ()
+    --     self.newspawn = false
+    -- end)
 end
 function com:OnRemoveFromEntity()
-    self.inst.GetPersistData = self.oldGetPersistData
-    self.inst.Remove = self.oldRemove
+    -- self.inst.GetPersistData = self.oldGetPersistData
+    -- self.inst.Remove = self.oldRemove
     self.inst:RemoveTag("nonpackable")
     self.inst:RemoveTag("cantpack")
     self.inst:RemoveTag("soracantpack")
@@ -98,9 +98,9 @@ function com:OnSave()
 end
 
 function com:OnLoad(data)
-    if data and data.needremove then
-        self.inst:DoTaskInTime(0, self.oldRemove)
-    end
+    -- if data and data.needremove then
+    --     self.inst:DoTaskInTime(0, self.oldRemove)
+    -- end
 end
 function com:GetDebugString()
     return ""

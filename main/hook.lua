@@ -1446,8 +1446,6 @@ if not TUNING.SORADISABLEGLOBAL then
         end)
     end)
 
-    
-    
     AddComponentPostInit("builder", function(s)
         local oldHasIngredients = s.HasIngredients
         -- local oldRemoveIngredients = s.RemoveIngredients
@@ -1647,44 +1645,44 @@ if TheNet:GetIsServer() then
     end)
 end
 
-local oldSaveGame = GLOBAL.SaveGame
-SoraAPI.IsSaveGaming = false
-SoraAPI.IsSavePlayering = 0
-GLOBAL.SaveGame = function(...)
-    SoraAPI.IsSaveGaming = true
-    local r = oldSaveGame(...)
-    SoraAPI.IsSaveGaming = false
-    return r
-end
-local oldSerializeWorldSession = GLOBAL.SerializeWorldSession 
-SoraAPI.IsSerializeWorlding = false
-GLOBAL.SerializeWorldSession = function(...)
-    SoraAPI.IsSerializeWorlding = true
-    local x, y, z, a, b, c = oldSerializeWorldSession(...)
-    SoraAPI.IsSerializeWorlding = false
-    return x, y, z, a, b, c 
-end
+-- local oldSaveGame = GLOBAL.SaveGame
+-- SoraAPI.IsSaveGaming = false
+-- SoraAPI.IsSavePlayering = 0
+-- GLOBAL.SaveGame = function(...)
+--     SoraAPI.IsSaveGaming = true
+--     local r = oldSaveGame(...)
+--     SoraAPI.IsSaveGaming = false
+--     return r
+-- end
+-- local oldSerializeWorldSession = GLOBAL.SerializeWorldSession
+-- SoraAPI.IsSerializeWorlding = false
+-- GLOBAL.SerializeWorldSession = function(...)
+--     SoraAPI.IsSerializeWorlding = true
+--     local x, y, z, a, b, c = oldSerializeWorldSession(...)
+--     SoraAPI.IsSerializeWorlding = false
+--     return x, y, z, a, b, c
+-- end
 
-AddPlayerPostInit(function(inst)
-    local oldGetPersistData = inst.GetPersistData
-    inst.GetPersistData = function(...)
-        SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering + 1
-        local x, y, z, a, b, c = oldGetPersistData(...)
-        SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering - 1
-        return x, y, z, a, b, c
-    end
-end)
+-- AddPlayerPostInit(function(inst)
+--     local oldGetPersistData = inst.GetPersistData
+--     inst.GetPersistData = function(...)
+--         SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering + 1
+--         local x, y, z, a, b, c = oldGetPersistData(...)
+--         SoraAPI.IsSavePlayering = SoraAPI.IsSavePlayering - 1
+--         return x, y, z, a, b, c
+--     end
+-- end)
 
-AddComponentPostInit("unwrappable", function(self)
-    local oldWrapItems = self.WrapItems
-    function self.WrapItems(s, items, ...)
-        if type(items) == "table" then
-            for k,v in ipairs(items) do 
-                if type(v) == "table" then 
-                    v.stoppackprotect = true
-                end
-            end
-        end
-        return oldWrapItems(s, items, ...)
-    end
-end)
+-- AddComponentPostInit("unwrappable", function(self)
+--     local oldWrapItems = self.WrapItems
+--     function self.WrapItems(s, items, ...)
+--         if type(items) == "table" then
+--             for k, v in ipairs(items) do
+--                 if type(v) == "table" then
+--                     v.stoppackprotect = true
+--                 end
+--             end
+--         end
+--         return oldWrapItems(s, items, ...)
+--     end
+-- end)

@@ -603,7 +603,9 @@ local function OrangeTask()
         end
     end
     -- 如果有更新 整理一下实体
-    UpdateEnts()
+    if next(needupdate) then
+        UpdateEnts()
+    end
     -- 抓取需要的实体
     local topick = {}
     for ent, v in pairs(cacheents) do
@@ -703,7 +705,11 @@ local function UpdateAllEnts() -- 初步筛选一下不可能需要的实体
         end
     end
 end
-
+local function NewEnt(inst, v)
+    if v.prefab and v.persists and v.replica.inventoryitem and not v:IsInLimbo() then
+        AllEnts[v] = 1
+    end
+end
 function UpdateEnts() -- 尝试缓存有用的实体 减少运算量
     if not TheWorld.components.sorachestmanager.UpdateEntsCD() then
         return
@@ -906,6 +912,7 @@ local com = Class(function(self, inst)
         inst:DoTaskInTime(3, DayUpdate)
         inst:DoTaskInTime(5, DayUpdate)
     end)
+    inst:ListenForEvent("entity_spawned", NewEnt)
     self.DayUpdate = DayUpdate
     self.GetItem = GetItem
 end)

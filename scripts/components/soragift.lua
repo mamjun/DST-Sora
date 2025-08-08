@@ -90,7 +90,7 @@ function soragift:GetItem()
         if item then
             local prefab, expget = self.data.toprefabfn(item)
             -- if self.data.sale[item.prefab] then
-            if (item:HasTag("irreplaceable") or item.components.unwrappable) and not self.data.sales[prefab] then
+            if (item:HasTag("irreplaceable") or item.components.unwrappable or (item.components.sorapacker and item.components.sorapacker.item and item.components.sorapacker.item.irreplaceable )) and not self.data.sales[prefab] then
 
             else
                 self.inst.components.container:RemoveItem(item, true) -- 否则会内存泄露
