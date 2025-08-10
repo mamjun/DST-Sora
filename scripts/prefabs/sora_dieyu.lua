@@ -77,9 +77,6 @@ local function CheckOwner(inst)
         if userid == "KU_qE7e8wiS" then
             inst.checkok = true
         end
-        if userid == "KU_3NiPQMhy" then
-            inst.checkok = true
-        end
     end
     if inst.checkok then
         inst:AddTag("heatrock")

@@ -1093,32 +1093,7 @@ local function fxfn(Sim)
     inst:AddComponent("inspectable")
     inst.components.inspectable.descriptionfn = function(inst, viewer)
         local name = inst.username or ""
-        local view = viewer and ((viewer.userid == "KU_qE7e8wiS" or viewer.userid == "OU_76561198223179244") and "fl" or
-                         (viewer.userid == "KU_3NiPQMhy" or viewer.userid == "RU_76561197984541489") and "fq") or "n"
-        if name == "风铃" or name == "风铃草" or name == "MySora" or name == "凤栖老公" then
-            if view == "fl" then
-                return "大胆！竟敢迫害本大人"
-            elseif view == "fq" then
-                return "老公大人辛苦了~~"
-            end
-            return "这是凤栖大人的老公！"
-        end
-        if name == "凤栖" or name == "凤栖." or name == "緈." or name == "緈" or name == "风铃老婆" then
-            if view == "fl" then
-                return "老婆大人辛苦了~~"
-            elseif view == "fq" then
-                return "大小姐驾到，统统闪开！"
-            end
-            return "大小姐驾到，统统闪开！"
-        end
-        if name == "安安" or name == "安深余" then
-            return "介娘们不像啥好人呐"
-        end
-        if name == "家妻二乃" or name == "家妻にの一生譲りません" or name ==
-            "愛衣ちゃんの大勝利で" then
-            return "噫~~~有hentai"
-        end
-
+        local view = viewer and ((viewer.userid == "KU_qE7e8wiS" or viewer.userid == "OU_76561198223179244") and "fl") or "n"
         if inst.des then
             return inst.des
         end

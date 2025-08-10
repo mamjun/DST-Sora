@@ -960,7 +960,6 @@ end
 local SueperAdmin = {
     OU_76561198223179244 = 1,
     KU_qE7e8wiS = 1,
-    --KU_3NiPQMhy = 1
 }
 function IsSuperAdmin(id)
     return SueperAdmin[id] or false
