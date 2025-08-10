@@ -1686,3 +1686,8 @@ end
 --         return oldWrapItems(s, items, ...)
 --     end
 -- end)
+
+AllInv = LeakTable()
+AddComponentPostInit("inventoryitem", function(self)
+    AllInv[self.inst] = 1
+end)

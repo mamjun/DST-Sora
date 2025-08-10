@@ -586,6 +586,9 @@ local OrangeCurrTick = 0
 local function OrangeTask()
     OrangeCurrTick = (OrangeCurrTick % 50) + 1
     -- 统计需要更新的橙箱子
+    if cmp:IsStop() then
+        return
+    end
     local needupdate = {}
     local CurTick = OrangeTaskTick[OrangeCurrTick]
     for type, chests in pairs(allchest) do -- 统计失效箱子
@@ -697,16 +700,18 @@ local function TryCacheEnt(inst, all) -- 尝试缓存下来
     end
 end
 local AllEnts = SoraAPI.LeakTable()
+
 local function UpdateAllEnts() -- 初步筛选一下不可能需要的实体
     AllEnts = SoraAPI.LeakTable()
-    for k, v in pairs(Ents) do
-        if v.prefab and v.persists and v.replica.inventoryitem and not v:IsInLimbo() then
-            AllEnts[v] = 1
+    for k, v in pairs(SoraAPI.AllInv) do
+        if not k.inlimbo then
+            AllEnts[k] = 1
         end
     end
 end
+SoraAPI.UpdateAllEnts = UpdateAllEnts 
 local function NewEnt(inst, v)
-    if v.prefab and v.persists and v.replica.inventoryitem and not v:IsInLimbo() then
+    if v.prefab and v.replica.inventoryitem and not v:IsInLimbo() then
         AllEnts[v] = 1
     end
 end
