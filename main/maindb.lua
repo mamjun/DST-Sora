@@ -324,7 +324,7 @@ end
 local dbhandles = {}
 local sid = TheShard:GetShardId() -- 自身ID
 local mid = sid == "0" and "0" or SHARDID.MASTER -- 主世界ID
-if GetModConfigData("mid") ~= "1" then
+if tostring( GetModConfigData("mid")) ~= "1" then
     mid = GetModConfigData("mid")
 end
 local ismaster = TheShard:IsMaster() or mid == "0"
