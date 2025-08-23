@@ -507,13 +507,13 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     end
     m.OnRawKey = s.OnRawKey or m.nullfn
     s.OnRawKey = function(self, key, down, ...)
-        if s.focus and key == KEY_SPACE and not down and not m.cd() then
-            s:SetPosition(m.dpos:Get())
-            if name ~= "test" then
-                Config:Set("ui_" .. m.name, {m.dpos:Get()})
-            end
-            return false
-        end
+        -- if s.focus and key == KEY_SPACE and not down and not m.cd() then
+        --     s:SetPosition(m.dpos:Get())
+        --     if name ~= "test" then
+        --         Config:Set("ui_" .. m.name, {m.dpos:Get()})
+        --     end
+        --     return false
+        -- end
         return m.OnRawKey(self, key, down, ...)
     end
 
