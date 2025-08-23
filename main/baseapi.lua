@@ -90,3 +90,52 @@ function TimeRecordCall(fn, fnname)
         return unpack(ret)
     end
 end
+
+SoraConfigClass = Class(function(self, name)
+    self.name = "SoraConfig" .. (name or "")
+    self.config = {}
+    self.baseconfig = {}
+    self:Load()
+end)
+-- function SoraConfigClass:Make(key,default)
+--     self.baseconfig[key] = 1
+--     self.config[key] = default
+-- end
+
+function SoraConfigClass:Get(key, default)
+    if self.config[key] == nil then return default end
+    return self.config[key] 
+end
+
+function SoraConfigClass:Set(key, value)
+    -- if not self.baseconfig[key] and not key:match("^ui_") then
+    --     return
+    -- end
+    self.config[key] = value
+    self:Save()
+end
+
+function SoraConfigClass:Show()
+    for k,v in pairs(self.config) do
+        print(k, type(v) == "table" and fastdump(v) or tostring(v))
+    end
+end
+
+function SoraConfigClass:Save()
+    local save = DataDumper(self.config)
+    TheSim:SetPersistentString(self.name, save, false)
+end
+
+function SoraConfigClass:Load()
+    TheSim:GetPersistentString(self.name, function(load_success, str)
+        if load_success then
+            local loadconfig = loadstring(str)
+            if loadconfig then loadconfig = loadconfig() else TheSim:SetPersistentString(self.name, "", false)  return end
+            for k,v in pairs(loadconfig) do 
+                self:Set(k,v)
+            end
+        end
+    end)
+end
+
+Config = SoraConfigClass()

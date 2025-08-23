@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.20" -- 版本
+version = "13.21" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -152,19 +152,6 @@ configuration_options = {{
         hover = "不允许,更安全,需要专服启用SoraProxy"
     }},
     default = "0"
-}, {
-    name = "reset_ui",
-    label = "启动时重置UI位置(玩家自己在mod设置里设置)\n也可以使用sora_reset_ui()命令",
-    options = {{
-        description = "重置所有UI",
-        data = true,
-        hover = "重置所有UI"
-    }, {
-        description = "无影响",
-        data = false,
-        hover = "无影响"
-    }},
-    default = false
 }, maketitle("jichu", "基础设置"), {
     name = "mode",
     label = "难度",
@@ -243,19 +230,6 @@ configuration_options = {{
     }},
     default = true
 }, {
-    name = "disableui_multab",
-    label = "禁用物品栏相关扩展",
-    options = {{
-        description = "不禁用",
-        data = false,
-        hover = "不禁用,使用物品栏相关扩展"
-    }, {
-        description = "禁用,不物品栏相关扩展",
-        data = true,
-        hover = "禁用,不物品栏相关扩展"
-    }},
-    default = false
-}, {
     name = "disableui_globalbuild",
     label = "禁用全局制作",
     options = {{
@@ -279,45 +253,6 @@ configuration_options = {{
         description = "不允许",
         data = false,
         hover = "不允许打包新物品(原有的打包好的仍然有效)"
-    }},
-    default = true
-}, {
-    name = "wiki",
-    label = "是否默认显示wiki图标(需要玩家自己在mod设置里设置)",
-    options = {{
-        description = "默认显示",
-        data = true,
-        hover = "可以长按等级按钮隐藏"
-    }, {
-        description = "默认不显示",
-        data = false,
-        hover = "可以长按等级按钮显示"
-    }},
-    default = true
-}, {
-    name = "time",
-    label = "是否默认显示时间图标(需要玩家自己在mod设置里设置)",
-    options = {{
-        description = "默认显示",
-        data = true,
-        hover = "显示"
-    }, {
-        description = "不显示",
-        data = false,
-        hover = "不显示"
-    }},
-    default = false
-}, {
-    name = "chestui",
-    label = "是否显示强迫症箱子介绍(需要玩家自己在mod设置里设置)",
-    options = {{
-        description = "显示",
-        data = true,
-        hover = "显示强迫症箱子介绍"
-    }, {
-        description = "隐藏",
-        data = false,
-        hover = "隐藏强迫症箱子介绍"
     }},
     default = true
 }, {
@@ -541,7 +476,7 @@ configuration_options = {{
     default = 0
 }, {
     name = "chest",
-    label = "强迫症箱子范围",
+    label = "强迫症箱子范围 推荐全图性能最好",
     options = {{
         description = "30",
         data = 30,
@@ -571,7 +506,7 @@ configuration_options = {{
         data = 3000,
         hover = "3000"
     }},
-    default = 60
+    default = 3000
 }, maketitle("tongyong", "通用装备设置"), maketitle("sora3sword", "银白の锋"),
                          makeconfig("att", "攻击力", "%s", 59.5, 17, 8.5, 10),
                          makeconfig("spe", "移速", "%s%%", 1.1, 0.8, 0.05, 14, 1),

@@ -178,12 +178,12 @@ local function getextendtrace(start)
 end
 if logtopath and not path then
     if ismodmain then
-        path = "./unsafedata/" .. modname .. "_log_"
+        path = "unsafedata/" .. modname .. "_log_"
     else
         local info = debug.getinfo(getextendinfo).source
         local modname = info and info:match("%.%./mods/([^/]+)/")
         if modname then
-            path = "./unsafedata/" .. modname .. "_log_"
+            path = "unsafedata/" .. modname .. "_log_"
         end
     end
 end

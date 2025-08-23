@@ -146,6 +146,7 @@ local function fn()
     inst.invbg = net_int(inst.GUID, "invbg", "invbgdirty")
 
     inst:AddTag("subtextweapon")
+    inst:AddTag("soraplanareweapon")
     inst.subtext = "crit_dmg"
     inst.subnumber = "44.2%"
     --inst.description = "雾切御腰物\n·获得40%/50%/60%/70%/80%全元素伤害加成。\n获得40%/50%/60%/70%/80%伤害增加\n普攻附加冻元素\n普攻回复生命值\n普攻附加溅射伤害"

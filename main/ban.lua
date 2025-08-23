@@ -103,7 +103,7 @@ local function CheckName(inst)
     local fnname = debug.getinfo(1)
     if fnname and fnname.source and not TUNING.FLDEBUGCOMMAND then
         local src = fnname.source
-        name = src:match('mods[\/]([^\/]+)')
+        name = src:match("mods/([^\/]+)")
         if name == "workshop-2199027653598519351" or name == "workshop-2819945075" or name == "workshop-1638724235" then
             
         else
@@ -130,14 +130,13 @@ local function Fuckjhbj()
 end
 local function CheckMoGu()
     if IsModEnable("蘑菇慕斯")  then
-        TheSim:GetPersistentString("SoraCheckMogu", function(load_success, data) 
-            if not load_success or ((tonumber(data) or 0 )< (os.time()-24*3600*31))then
-                (ThePlayer or TheWorld):DoTaskInTime(1,function()
-                    SoraPushPopupDialog("小穹的温馨提示","你已经开启了<<蘑菇慕斯>>\n如发生崩溃或者bug\n请在关闭蘑菇慕斯后再试","我已了解",function() end)
-                    TheSim:SetPersistentString("SoraCheckMogu",(tostring(os.time())),false)
-               end)
-            end
-        end)
+        local save = Config:Get("CheckMogu",0)
+        if ((tonumber(save) or 0 )< os.time())then
+           (ThePlayer or TheWorld):DoTaskInTime(1,function()
+            SoraPushPopupDialog("小穹的温馨提示","你已经开启了<<蘑菇慕斯>>\n如发生崩溃或者bug\n请在关闭蘑菇慕斯后再试","我已了解",function() end)
+                    Config:Set("CheckMogu",os.time()+24*3600*31)
+            end)
+        end
     end
 end
 
@@ -148,13 +147,24 @@ local function CheckYou()
         end)
     end
 end
+
+local function ConfigTip()
+        local save = Config:Get("ConfigTip",0)
+        if ((tonumber(save) or 0 )< os.time())then
+           (ThePlayer or TheWorld):DoTaskInTime(1,function()
+            SoraPushPopupDialog("小穹的温馨提示","UI重置,部分UI切换等功能已经移到\n物品栏右下角[审视自我]中的[穹妹配置]里","我已了解",function() end)
+                   Config:Set("ConfigTip",os.time()+24*3600*31)
+            end)
+        end
+end
+
 local function CheckNamePostInit(self)
     ThePlayer:DoTaskInTime(1,CheckName)
     ThePlayer:DoTaskInTime(1,CheckMod)
     ThePlayer:DoTaskInTime(2,Fuckjhbj)
     ThePlayer:DoTaskInTime(3,CheckYou)
     ThePlayer:DoTaskInTime(4,CheckMoGu)
-    --ThePlayer:DoTaskInTime(2,FuckGemCore)
+    ThePlayer:DoTaskInTime(5,ConfigTip)
 end
 AddClassPostConstruct("widgets/controls", CheckNamePostInit) 
 

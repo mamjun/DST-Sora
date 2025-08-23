@@ -59,7 +59,9 @@ local com = Class(function(self) -- 自动更新组件
     }
     self:Redata()
     self.updatefn = scheduler:ExecutePeriodic(u.d and 5 or 60, function()
-        self:TryToUpdate()
+        if TheWorld then 
+            self:TryToUpdate()
+        end
     end)
     --self:TryFixUrl()
     self:TryToUpdate()

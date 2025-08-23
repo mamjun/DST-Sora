@@ -28,111 +28,87 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
-]]
---资源
+]] -- 资源
+-- 资源列表
+Assets = {Asset("IMAGE", "images/ui/soraextendslot.tex"), Asset("ATLAS", "images/ui/soraextendslot.xml"),
 
-    --资源列表
-    Assets = {
-        Asset( "IMAGE", "images/ui/soraextendslot.tex" ),
-        Asset( "ATLAS", "images/ui/soraextendslot.xml" ),
+          Asset("IMAGE", "images/ui/sora_ui_skinicon.tex"), Asset("ATLAS", "images/ui/sora_ui_skinicon.xml"),
+          Asset("IMAGE", "images/ui/sora_ui_itemicon.tex"), Asset("ATLAS", "images/ui/sora_ui_itemicon.xml"),
+          Asset("IMAGE", "images/ui/sora_std_ui.tex"), Asset("ATLAS", "images/ui/sora_std_ui.xml"),
+          Asset("IMAGE", "images/saveslot_portraits/sora.tex"), -- 存档图标
+Asset("ATLAS", "images/saveslot_portraits/sora.xml"), --
+Asset("IMAGE", "images/selectscreen_portraits/sora.tex"), -- 选择界面图标
+Asset("ATLAS", "images/selectscreen_portraits/sora.xml"), Asset("IMAGE", "bigportraits/sora.tex"), -- 人物背景大图
+          Asset("ATLAS", "bigportraits/sora.xml"), Asset("IMAGE", "images/map_icons/sora.tex"), -- 小地图图标
+Asset("ATLAS", "images/map_icons/sora.xml"), Asset("IMAGE", "images/avatars/avatar_sora.tex"), --
+Asset("ATLAS", "images/avatars/avatar_sora.xml"), Asset("IMAGE", "images/avatars/self_inspect_sora.tex"), --
+Asset("ATLAS", "images/avatars/self_inspect_sora.xml"), Asset("IMAGE", "images/avatars/avatar_ghost_sora.tex"),
+          Asset("ATLAS", "images/avatars/avatar_ghost_sora.xml"), Asset("IMAGE", "images/inventoryimages/soratab.tex"),
+          Asset("ATLAS", "images/inventoryimages/soratab.xml"),
+          Asset("IMAGE", "images/inventoryimages/soramakertab.tex"),
+          Asset("ATLAS", "images/inventoryimages/soramakertab.xml"), Asset("SOUNDPACKAGE", "sound/sora.fev"),
+          Asset("SOUND", "sound/sora.fsb"), Asset("IMAGE", "images/names_sora.tex"), -- 人物名字
+Asset("ATLAS", "images/names_sora.xml"), Asset("IMAGE", "bigportraits/sora.tex"), -- 人物大图（椭圆的那个）
+Asset("ATLAS", "bigportraits/sora.xml"), Asset("ANIM", "anim/pockygame.zip"), Asset("ANIM", "anim/pockybuild.zip"),
+          Asset("ANIM", "anim/sorawiki.zip"), -- Asset("ANIM", "anim/shanxing.zip"),  
+Asset("ANIM", "anim/skin_progressbar.zip"), Asset("IMAGE", "images/inventoryimages/mk_cloudfxsora.tex"),
+          Asset("ATLAS", "images/inventoryimages/mk_cloudfxsora.xml"), Asset("ANIM", "anim/mk_cloudfxsora.zip"),
 
-        Asset( "IMAGE", "images/ui/sora_ui_skinicon.tex" ),
-        Asset( "ATLAS", "images/ui/sora_ui_skinicon.xml" ),
-        Asset( "IMAGE", "images/ui/sora_ui_itemicon.tex" ),
-        Asset( "ATLAS", "images/ui/sora_ui_itemicon.xml" ),
-        Asset( "IMAGE", "images/ui/sora_std_ui.tex" ),
-        Asset( "ATLAS", "images/ui/sora_std_ui.xml" ),
-        Asset( "IMAGE", "images/saveslot_portraits/sora.tex" ),     --存档图标
-        Asset( "ATLAS", "images/saveslot_portraits/sora.xml" ),     --
-        Asset( "IMAGE", "images/selectscreen_portraits/sora.tex" ), --选择界面图标
-        Asset( "ATLAS", "images/selectscreen_portraits/sora.xml" ),
-        Asset( "IMAGE", "bigportraits/sora.tex" ),                  --人物背景大图
-        Asset( "ATLAS", "bigportraits/sora.xml" ),
-        Asset( "IMAGE", "images/map_icons/sora.tex" ),              --小地图图标
-        Asset( "ATLAS", "images/map_icons/sora.xml" ),
-        Asset( "IMAGE", "images/avatars/avatar_sora.tex" ),         --
-        Asset( "ATLAS", "images/avatars/avatar_sora.xml" ),
-        Asset( "IMAGE", "images/avatars/self_inspect_sora.tex" ),         --
-        Asset( "ATLAS", "images/avatars/self_inspect_sora.xml" ),
-        Asset( "IMAGE", "images/avatars/avatar_ghost_sora.tex" ),
-        Asset( "ATLAS", "images/avatars/avatar_ghost_sora.xml" ),
-        Asset( "IMAGE", "images/inventoryimages/soratab.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/soratab.xml" ),
-        Asset( "IMAGE", "images/inventoryimages/soramakertab.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/soramakertab.xml" ),
-        Asset("SOUNDPACKAGE", "sound/sora.fev"),
-        Asset("SOUND", "sound/sora.fsb"),
-        Asset( "IMAGE", "images/names_sora.tex" ),  --人物名字
-        Asset( "ATLAS", "images/names_sora.xml" ),
-        Asset( "IMAGE", "bigportraits/sora.tex" ),  --人物大图（椭圆的那个）
-        Asset( "ATLAS", "bigportraits/sora.xml" ),
-		Asset("ANIM", "anim/pockygame.zip"),
-		Asset("ANIM", "anim/pockybuild.zip"),
-        Asset("ANIM", "anim/sorawiki.zip"),   
-        --Asset("ANIM", "anim/shanxing.zip"),  
-        Asset("ANIM", "anim/skin_progressbar.zip"),  
-        Asset( "IMAGE", "images/inventoryimages/mk_cloudfxsora.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/mk_cloudfxsora.xml" ),
-        Asset("ANIM", "anim/mk_cloudfxsora.zip"),  
-        
-        Asset( "IMAGE", "images/inventoryimages/sora_tab_items.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/sora_tab_items.xml" ),
-        
-        Asset( "IMAGE", "images/inventoryimages/sora_tab_tools.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/sora_tab_tools.xml" ),
-        
-        Asset( "IMAGE", "images/inventoryimages/sora_tab_build.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/sora_tab_build.xml" ),
-        
-        Asset( "IMAGE", "images/inventoryimages/sora_tab_knows.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/sora_tab_knows.xml" ),
-        
-        Asset( "IMAGE", "images/inventoryimages/sora_tab_knows2.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/sora_tab_knows2.xml" ),
-        
-        Asset( "IMAGE", "images/inventoryimages/sora_tab_zwq.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/sora_tab_zwq.xml" ),
+          Asset("IMAGE", "images/inventoryimages/sora_tab_items.tex"),
+          Asset("ATLAS", "images/inventoryimages/sora_tab_items.xml"),
 
-        Asset( "IMAGE", "images/inventoryimages/sora_fl.tex" ),
-        Asset( "ATLAS", "images/inventoryimages/sora_fl.xml" ),
-        
-    }
-    
-    if softresolvefilepath("anim/sora_test.zip") then 
-        table.insert( Assets,Asset("ANIM", "anim/sora_test.zip") )
-    end
-        -- 小地图
-    AddMinimapAtlas("images/map_icons/sora.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2armor.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2bag.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2fire.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2birdchest.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2chest.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2hat.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2ice.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2sword.xml")
-    AddMinimapAtlas("images/inventoryimages/sora3sword.xml")
-    AddMinimapAtlas("images/inventoryimages/sorabag.xml")
-    AddMinimapAtlas("images/inventoryimages/sorabowknot.xml")
-    AddMinimapAtlas("images/inventoryimages/soraclothes.xml")
-    AddMinimapAtlas("images/inventoryimages/sorahat.xml")
-    AddMinimapAtlas("images/inventoryimages/sorahealing.xml")
-    AddMinimapAtlas("images/inventoryimages/soramagic.xml")
-    AddMinimapAtlas("images/inventoryimages/sorapick.xml")
-    AddMinimapAtlas("images/inventoryimages/sorapocky.xml")
-    AddMinimapAtlas("images/inventoryimages/sorarepairer.xml")
-    AddMinimapAtlas("images/inventoryimages/soratab.xml")
-    AddMinimapAtlas("images/inventoryimages/soratele.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2amulet.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2base.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2stone.xml")
-    AddMinimapAtlas("images/inventoryimages/sora2tree.xml")
-    AddMinimapAtlas("images/inventoryimages/sora_fl.xml")
-    AddMinimapAtlas("images/inventoryimages/sora_flh.xml")
-    AddMinimapAtlas("images/inventoryimages/sora_wq.xml")
-    --声音
-    RemapSoundEvent( "dontstarve/characters/sora/hurt", "sora/characters/hurt" )
+          Asset("IMAGE", "images/inventoryimages/sora_tab_tools.tex"),
+          Asset("ATLAS", "images/inventoryimages/sora_tab_tools.xml"),
 
-    RegisterInventoryItemAtlas("images/ui/sora_ui_skinicon.xml", "sora_ui_skinicon.tex")
-    RegisterInventoryItemAtlas("images/ui/sora_ui_itemicon.xml",  "sora_ui_itemicon.tex")
+          Asset("IMAGE", "images/inventoryimages/sora_tab_build.tex"),
+          Asset("ATLAS", "images/inventoryimages/sora_tab_build.xml"),
+
+          Asset("IMAGE", "images/inventoryimages/sora_tab_knows.tex"),
+          Asset("ATLAS", "images/inventoryimages/sora_tab_knows.xml"),
+
+          Asset("IMAGE", "images/inventoryimages/sora_tab_knows2.tex"),
+          Asset("ATLAS", "images/inventoryimages/sora_tab_knows2.xml"),
+
+          Asset("IMAGE", "images/inventoryimages/sora_tab_zwq.tex"),
+          Asset("ATLAS", "images/inventoryimages/sora_tab_zwq.xml"),
+
+          Asset("IMAGE", "images/inventoryimages/sora_fl.tex"), Asset("ATLAS", "images/inventoryimages/sora_fl.xml")}
+
+if softresolvefilepath("anim/sora_test.zip") then
+    table.insert(Assets, Asset("ANIM", "anim/sora_test.zip"))
+end
+-- 小地图
+AddMinimapAtlas("images/map_icons/sora.xml")
+AddMinimapAtlas("images/inventoryimages/sora2armor.xml")
+AddMinimapAtlas("images/inventoryimages/sora2bag.xml")
+AddMinimapAtlas("images/inventoryimages/sora2fire.xml")
+AddMinimapAtlas("images/inventoryimages/sora2birdchest.xml")
+AddMinimapAtlas("images/inventoryimages/sora2chest.xml")
+AddMinimapAtlas("images/inventoryimages/sora2hat.xml")
+AddMinimapAtlas("images/inventoryimages/sora2ice.xml")
+AddMinimapAtlas("images/inventoryimages/sora2sword.xml")
+AddMinimapAtlas("images/inventoryimages/sora3sword.xml")
+AddMinimapAtlas("images/inventoryimages/sorabag.xml")
+AddMinimapAtlas("images/inventoryimages/sorabowknot.xml")
+AddMinimapAtlas("images/inventoryimages/soraclothes.xml")
+AddMinimapAtlas("images/inventoryimages/sorahat.xml")
+AddMinimapAtlas("images/inventoryimages/sorahealing.xml")
+AddMinimapAtlas("images/inventoryimages/soramagic.xml")
+AddMinimapAtlas("images/inventoryimages/sorapick.xml")
+AddMinimapAtlas("images/inventoryimages/sorapocky.xml")
+AddMinimapAtlas("images/inventoryimages/sorarepairer.xml")
+AddMinimapAtlas("images/inventoryimages/soratab.xml")
+AddMinimapAtlas("images/inventoryimages/soratele.xml")
+AddMinimapAtlas("images/inventoryimages/sora2amulet.xml")
+AddMinimapAtlas("images/inventoryimages/sora2base.xml")
+AddMinimapAtlas("images/inventoryimages/sora2stone.xml")
+AddMinimapAtlas("images/inventoryimages/sora2tree.xml")
+AddMinimapAtlas("images/inventoryimages/sora_fl.xml")
+AddMinimapAtlas("images/inventoryimages/sora_flh.xml")
+AddMinimapAtlas("images/inventoryimages/sora_wq.xml")
+-- 声音
+RemapSoundEvent("dontstarve/characters/sora/hurt", "sora/characters/hurt")
+
+RegisterInventoryItemAtlas("images/ui/sora_ui_skinicon.xml", "sora_ui_skinicon.tex")
+RegisterInventoryItemAtlas("images/ui/sora_ui_itemicon.xml", "sora_ui_itemicon.tex")
 

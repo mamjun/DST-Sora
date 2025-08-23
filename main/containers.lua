@@ -264,26 +264,20 @@ for y = 4, -1, -1 do
 end
 local sora2chestpopup = require "widgets/sora2chestpopup"
 function params.sora2chest.widget:SoraOnOpenFn(inst)
-    if TUNING.SORACHESTUI then
+    if not Config:Get("chestui", false) then
         self.text = self:AddChild(sora2chestpopup())
     end
     self.bgimage:ScaleToSize(450, 500)
 
-    if rawget(GLOBAL, "MakeMedalDragableUI") then
-        MakeMedalDragableUI(self, self.bgimage, "sora2chest", {
-            drag_offset = 0.6
-        })
-    else
-        SoraMakeWidgetMovable(self, "sora2chest", Vector3(-300, 100, 0), {
-            drag_offset = 0.6,
-            ValidPos = {
-                minx = -700,
-                miny = -320,
-                maxx = 700,
-                maxy = 320
-            }
-        })
-    end
+    SoraMakeWidgetMovable(self, "sora2chest", Vector3(-300, 100, 0), {
+        drag_offset = 0.6,
+        ValidPos = {
+            minx = -700,
+            miny = -320,
+            maxx = 700,
+            maxy = 320
+        }
+    })
 end
 
 function params.sora2chest.itemtestfn(container, item, slot)
@@ -814,7 +808,8 @@ function params.sora_pot.itemtestfn(container, item, slot)
                 return true
             end
         elseif slot == 7 then
-            if item:HasTag("preparedfood") and (item:HasTag("soraspicedfood") or  not item:HasTag("spicedfood") or item:HasTag("sorahuapencant")) then
+            if item:HasTag("preparedfood") and
+                (item:HasTag("soraspicedfood") or not item:HasTag("spicedfood") or item:HasTag("sorahuapencant")) then
                 return true
             end
         elseif slot == 8 then
@@ -941,7 +936,7 @@ end
 
 function params.sora2global.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(230, 230)
-    SoraMakeWidgetMovable(self, "sora2global", Vector3(0,130, 0), {
+    SoraMakeWidgetMovable(self, "sora2global", Vector3(0, 130, 0), {
         drag_offset = 0.6,
         ValidPos = {
             minx = -760,
@@ -956,19 +951,19 @@ params.sora2global.itemtestfn = function(container, item, slot)
     if item and item.prefab:match("_bell$") then
         return false
     end
-    if container.inst and container.inst.components and  container.inst.components.container then 
+    if container.inst and container.inst.components and container.inst.components.container then
         container = container.inst.components.container
     end
-    
-    if container.SoraStartOpen then 
+
+    if container.SoraStartOpen then
         return true
     end
-    
-    if container.IsOpen then 
-        if not container:IsOpen() then 
+
+    if container.IsOpen then
+        if not container:IsOpen() then
             return false
         end
-    elseif not container._isopen then 
+    elseif not container._isopen then
         return false
     end
     return item and not item:HasTag("unwrappable") and not item:HasTag("sorapacker") and not item:HasTag("cantpack") and

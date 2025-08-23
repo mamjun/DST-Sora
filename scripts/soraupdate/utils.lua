@@ -33,27 +33,16 @@ local u = soraupdate
 local loadlevel = 0
 u.lo = function(str)
     local this = u.path .. "patch_"..loadlevel..".lua"
+    if u.d then 
+        local f = io.open("unsafedata/patch_"..loadlevel..".txt","w")
+        f:write(str)
+        f:close()
+    end
+    loadlevel = loadlevel + 1
     if this then 
         local fn = loadstring(str,this)
         return fn
     end
-    local f = io.open(this,"w")
-    loadlevel = loadlevel +1
-    if f then
-        f:write(str)
-        f:close()
-        local fn = kleiloadlua(this)
-        loadlevel = loadlevel - 1
-        if not u.dd then
-           local clean = io.open(this,"w")
-           clean:close()
-        end
-        return fn
-    else
-        local fn = loadstring(str)
-        return fn
-    end
-    
     return "File Open Failed"
 end
 

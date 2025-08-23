@@ -126,6 +126,7 @@ function SoraRepairSpicedFood(food)
             newdata.cooktime = .12
             newdata.stacksize = nil
             newdata.spice = spicenameupper
+            newdata.no_cookbook=true
             newdata.basename = foodname
             newdata.name = newname
             newdata.floater = 

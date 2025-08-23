@@ -28,8 +28,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
-]] 
-SoraEnv()
+]] SoraEnv()
 local json = SoraAPI.json
 local RPC = SoraAPI.SoraRPC
 local passlock = Class(Widget, function(self)
@@ -47,7 +46,7 @@ function passlock:OnControl(control, down)
         self.num = (self.num - 1) % 10
         self.text:SetString(tostring(self.num))
         return true
-    elseif control == CONTROL_SCROLLBACK  and self.cd() then
+    elseif control == CONTROL_SCROLLBACK and self.cd() then
         self.num = (self.num + 1) % 10
         self.text:SetString(tostring(self.num))
         return true
@@ -56,7 +55,7 @@ function passlock:OnControl(control, down)
     end
 end
 
-local ui = Class(Widget, function(self, owner,container, name)
+local ui = Class(Widget, function(self, owner, container, name)
     Widget._ctor(self, "sora_lock_ui")
     self.owner = owner
     -- self.is_screen = true
@@ -71,8 +70,8 @@ local ui = Class(Widget, function(self, owner,container, name)
     SoraMakeWidgetMovable(self, "sora_lock_ui", Vector3(0, 0))
     self.text = self:AddChild(Text(CHATFONT, 60, "密码锁", UICOLOURS.BLACK))
     self.text:SetPosition(-60, 160, 0)
-    self.text2 = self:AddChild(Text(CHATFONT, 45, "该容器已经被[".. (name or "桃子姐姐" ).."]上锁\n请输入密码解锁",
-        UICOLOURS.BLACK))
+    self.text2 = self:AddChild(Text(CHATFONT, 45, "该容器已经被[" .. (name or "桃子姐姐") ..
+        "]上锁\n请输入密码解锁", UICOLOURS.BLACK))
     self.text2:SetPosition(-70, 80, 0)
 
     self.text3 = self:AddChild(Text(CHATFONT, 60, "功能区", UICOLOURS.BLACK))
@@ -82,18 +81,23 @@ local ui = Class(Widget, function(self, owner,container, name)
     self.btn4:SetText("修改密码")
     self.btn4:SetPosition(-75, -45, 0)
     self.btn4:ForceImageSize(125, 50)
-    self.btn4:SetOnClick(function ()
+    self.btn4:SetOnClick(function()
         local pass = self:GetPass()
         self:SavePass(pass)
         self:LoadPass()
-        RPC:PushEvent("SoraLock",{cmd="ChangePass",pass=pass},nil,self.container)
+        RPC:PushEvent("SoraLock", {
+            cmd = "ChangePass",
+            pass = pass
+        }, nil, self.container)
     end)
     self.btn5 = self.text3:AddChild(ImageButton())
     self.btn5:SetText("解除密码")
     self.btn5:SetPosition(55, -45, 0)
     self.btn5:ForceImageSize(125, 50)
-    self.btn5:SetOnClick(function ()
-        RPC:PushEvent("SoraLock",{cmd="UndoPass"},nil,self.container)
+    self.btn5:SetOnClick(function()
+        RPC:PushEvent("SoraLock", {
+            cmd = "UndoPass"
+        }, nil, self.container)
     end)
 
     self.closebtn = self:AddChild(TextButton())
@@ -125,10 +129,13 @@ local ui = Class(Widget, function(self, owner,container, name)
     self.btn1:SetText("密码解锁")
     self.btn1:SetPosition(-195, -55, 0)
     self.btn1:ForceImageSize(125, 50)
-    self.btn1:SetOnClick(function ()
+    self.btn1:SetOnClick(function()
         local pass = self:GetPass()
         self:LoadPass()
-        RPC:PushEvent("SoraLock",{cmd="UnLockByPass",pass=pass},nil,self.container)
+        RPC:PushEvent("SoraLock", {
+            cmd = "UnLockByPass",
+            pass = pass
+        }, nil, self.container)
     end)
 
     self.btn2 = self:AddChild(ImageButton())
@@ -136,14 +143,18 @@ local ui = Class(Widget, function(self, owner,container, name)
     self.btn2:SetPosition(-70, -55, 0)
     self.btn2:ForceImageSize(125, 50)
     self.btn2:SetOnClick(function()
-        RPC:PushEvent("SoraLock",{cmd="UnLockByUser"},nil,self.container)   
+        RPC:PushEvent("SoraLock", {
+            cmd = "UnLockByUser"
+        }, nil, self.container)
     end)
     self.btn3 = self:AddChild(ImageButton())
     self.btn3:SetText("暴力开锁")
     self.btn3:SetPosition(55, -55, 0)
     self.btn3:ForceImageSize(125, 50)
     self.btn3:SetOnClick(function()
-        RPC:PushEvent("SoraLock",{cmd="UnLockByClick"},nil,self.container)      
+        RPC:PushEvent("SoraLock", {
+            cmd = "UnLockByClick"
+        }, nil, self.container)
     end)
     self.passes = {}
     self.pass = {}
@@ -181,13 +192,13 @@ local ui = Class(Widget, function(self, owner,container, name)
     self:LoadPass()
 end)
 local maxpass = 8
-function ui:NewRPC(rpcname, data,cb)
-    self.inst:StartThread(function ()
-        local t,res = RPC:RPC(nil,rpcname,data,self.container)
-        if t then 
+function ui:NewRPC(rpcname, data, cb)
+    self.inst:StartThread(function()
+        local t, res = RPC:RPC(nil, rpcname, data, self.container)
+        if t then
             cb(res)
         else
-            print(rpcname,t,res,type(data) == "table" and fastdump(data) or data)
+            print(rpcname, t, res, type(data) == "table" and fastdump(data) or data)
         end
     end)
 end
@@ -218,18 +229,18 @@ end
 
 local function passtest(str)
     str = tostring(str)
-    if str:len() == 6 and str:match("^%d+$")  then
+    if str:len() == 6 and str:match("^%d+$") then
         return true
     else
         return false
-    end   
-end 
+    end
+end
 function ui:GetPass()
     local str = ""
-    for i=1,6 do
-        str =str .. tostring(self.locks[i].num)
+    for i = 1, 6 do
+        str = str .. tostring(self.locks[i].num)
     end
-    --print("pass",str)
+    -- print("pass",str)
     return str
 end
 function ui:LoadPass()
@@ -238,38 +249,35 @@ function ui:LoadPass()
     end
     self.passes = {}
     self.pass = {}
-    TheSim:GetPersistentString("sora_lock_pass", function(load_success, old_str)
-        if load_success then
-            local r, t = pcall(json.decode, old_str)
-            if r and type(t) == "table" then
-                for i = 1, maxpass do
-                    if t[i] and passtest(t[i]) and t[i] ~= "000000" then
-                        table.insert(self.pass, tostring(t[i]))
-                    end
-                end
-                for k, v in pairs(self.pass) do
-                    local pass = self:AddChild(ImageButton())
-                    pass:SetText(v)
-                    local x = (maxpass * 0.5 < k) and 1 or 0
-                    local y = k - maxpass * 0.5 * x
-                    pass:SetPosition(x * 140 + 210, y * -35 + 60)
-                    pass:ForceImageSize(140, 40)
-                    pass:SetOnClick(function ()
-                        for i=1,6 do
-                            self.locks[i].text:SetString(v:sub(i,i))
-                            self.locks[i].num = tonumber(v:sub(i,i))
-                        end
-                    end)
-                    table.insert(self.passes, pass)
-                end
-            end
+    local save = SoraAPI.Config:Get("lock_pass", {})
+    if type(save) ~= "table" and #save < 1 then
+        return
+    end
+    for i = 1, maxpass do
+        if save[i] and passtest(save[i]) and save[i] ~= "000000" then
+            table.insert(self.pass, tostring(save[i]))
         end
-    end)
+    end
+    for k, v in pairs(self.pass) do
+        local pass = self:AddChild(ImageButton())
+        pass:SetText(v)
+        local x = (maxpass * 0.5 < k) and 1 or 0
+        local y = k - maxpass * 0.5 * x
+        pass:SetPosition(x * 140 + 210, y * -35 + 60)
+        pass:ForceImageSize(140, 40)
+        pass:SetOnClick(function()
+            for i = 1, 6 do
+                self.locks[i].text:SetString(v:sub(i, i))
+                self.locks[i].num = tonumber(v:sub(i, i))
+            end
+        end)
+        table.insert(self.passes, pass)
+    end
 
 end
 function ui:OnUpdate()
-    --print(self.owner:GetDistanceSqToInst(self.container))
-    if self.owner  and self.container  and self.container:IsValid() and self.owner:IsValid() then
+    -- print(self.owner:GetDistanceSqToInst(self.container))
+    if self.owner and self.container and self.container:IsValid() and self.owner:IsValid() then
         if self.owner:GetDistanceSqToInst(self.container) > 16 then
             self:Kill()
         end
@@ -295,11 +303,7 @@ function ui:SavePass(str)
             table.insert(pass, self.pass[i])
         end
     end
-    local r, str = pcall(json.encode, pass)
-    if r then
-        TheSim:SetPersistentString("sora_lock_pass", str, false)
-        self.pass = pass
-    end
-    return r
+    SoraAPI.Config:Set("lock_pass", pass)
+    return 
 end
 return ui

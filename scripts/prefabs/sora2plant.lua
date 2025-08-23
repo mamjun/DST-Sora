@@ -732,6 +732,8 @@ local function FeiFn(inst, doer, pos)
         local x, y = TheWorld.Map:GetTileCoordsAtPoint(pos.x, pos.y, pos.z)
         TheWorld.components.farming_manager:AddTileNutrients(x, y, 100, 100, 100) -- 加满 蟹蟹
         TheWorld.components.farming_manager:AddSoilMoistureAtPoint(pos.x, pos.y, pos.z, 200)
+        TheWorld.components.farming_manager:SoraMakeNutrientsAndSoilMax(x,y)
+
         if doer and doer:HasTag("sora") and doer.GetExp then
             doer:GetExp(5, "pour_water", 30)
             doer:GetExp(5, "tendto", 30)

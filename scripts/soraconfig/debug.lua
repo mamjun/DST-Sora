@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]]
-local path = "../mods/"..TUNING.SORAMODNAME..'/temp/debugout'..TheShard:GetShardId().."_"..GetTimeRealSeconds()..'.log'
+local path = "unsafedata/"..TUNING.SORAMODNAME..'_'..TheShard:GetShardId().."_"..GetTimeRealSeconds()..'.txt'
 local first = true
 local f
 local tmpstr = ""

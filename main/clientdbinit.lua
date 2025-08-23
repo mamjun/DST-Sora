@@ -41,6 +41,34 @@ temp.clientfn = function(ns, db, userid)
     CKDB = db -- 用于客户端取数据
     SoraClientDB.SoraClientCKDB = CKDB
 end
+local temp = CreateClientDBTemple("info", 300, 1)
+temp:InitRoot("cook")
+temp.serverfn = function(ns, db, userid)
+    db.inst = TheWorld
+    local getfn = function(s, r, k, v)
+        if k == 'use' then 
+            if db.player and db.player.components.sorafoodrec then 
+                return db.player.components.sorafoodrec.hasuse
+            end
+            return {}
+        end
+        return {}
+    end
+
+    local setfn = function(s, r, k, v)
+        return nil
+    end
+
+    local getrootfn = function(s, r)
+        return {use= db.player and db.player.components.sorafoodrec and db.player.components.sorafoodrec.hasuse or {}}
+    end
+    local bind = db:BindRootFn("cook", getfn, setfn, getrootfn)
+end
+temp.clientfn = function(ns, db, userid)
+    InfoDB = db -- 用于客户端取数据
+    db.inst = TheWorld
+    SoraClientDB.InfoDB = InfoDB
+end
 
 local temp = CreateClientDBTemple("seed", 300, 1)
 temp:InitRoot("seeds")

@@ -42,6 +42,7 @@ end
 
 function InitSoraEnv()
     SoraEnv()
+    Screen = require "widgets/screen"
     Widget = require "widgets/widget"
     Image = require "widgets/image"
     Text = require "widgets/text"

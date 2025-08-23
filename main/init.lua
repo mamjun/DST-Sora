@@ -52,9 +52,6 @@ end
 GLOBAL.TUNING.SORAMODE = GetModConfigData("mode")
 mode = GLOBAL.TUNING.SORAMODE
 GLOBAL.TUNING.SORAADD = GetModConfigData("add")
-GLOBAL.TUNING.SORAWIKI = GetModConfigData("wiki", true)
-GLOBAL.TUNING.SORATIME = GetModConfigData("time", true)
-GLOBAL.TUNING.SORACHESTUI = GetModConfigData("chestui", true)
 GLOBAL.TUNING.SORAPACK = GetModConfigData("pack")
 GLOBAL.TUNING.SORAADD2 = GetModConfigData("add2")
 GLOBAL.TUNING.SORACHESTRANGE = GetModConfigData("chest") or 60
@@ -68,8 +65,7 @@ GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
 GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
 GLOBAL.TUNING.SORAFGMODE = GetModConfigData("fgmode")
 GLOBAL.TUNING.SORAMOREANIMDATA = GetModConfigData("moreanimdata") == 0
-GLOBAL.TUNING.SORASKINUI = true
-RESETUI = GetModConfigData("reset_ui")
+ 
 GLOBAL.TUNING.SORADISABLEGLOBAL = GetModConfigData("disableui_globalbuild")
 IsGemEnable = rawget(_G, "gemrun") and true or false
 if IsGemEnable then

@@ -219,6 +219,8 @@ GLOBAL.SoraGetImage = SoraGetImage
 local messages = {}
 local PopupDialogScreen = require "screens/redux/popupdialog"
 function SoraPushPopupDialog(title, message, button, fn)
+    
+    title = title or "小穹的温馨提示"
     if not (ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls) then
         table.insert(messages, {title, message, button, fn})
     end
@@ -437,7 +439,7 @@ end
 
 function GLOBAL.sora_reset_ui()
     for k, v in pairs(alluisave) do
-        TheSim:ErasePersistentString(k)
+        Config:Set("ui_"..k,nil)
     end
     ClearUI()
     for k, v in pairs(alluiinst) do
@@ -488,19 +490,12 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     m.ha = data and data.ha or 1
     m.va = data and data.va or 2
     m.x, m.y = TheSim:GetScreenSize()
-    if not RESETUI and name ~= "test" then
-        TheSim:GetPersistentString(m.name, function(load_success, str)
-            if load_success then
-                local fn = loadstring(str)
-                if type(fn) == "function" then
-                    m.pos = fn()
-                    if not (type(m.pos) == "table" and m.pos.Get) then
-                        m.pos = pos
-                    end
-                    m.pos = ValidPos(m.pos, data.ValidPos)
-                end
-            end
-        end)
+    if  name ~= "test" then
+        local save = Config:Get("ui_" .. m.name, pos)
+        if type(save) == "table" and #save == 3 then
+            m.pos = Vector3(unpack(save))
+            m.pos = ValidPos(m.pos, data.ValidPos)
+        end
     end
     s:SetPosition(m.pos:Get())
     m.OnControl = s.OnControl or m.nullfn
@@ -515,7 +510,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         if s.focus and key == KEY_SPACE and not down and not m.cd() then
             s:SetPosition(m.dpos:Get())
             if name ~= "test" then
-                TheSim:SetPersistentString(m.name, string.format("return Vector3(%d,%d,%d)", m.dpos:Get()), false)
+                Config:Set("ui_" .. m.name, {m.dpos:Get()})
             end
             return false
         end
@@ -566,9 +561,9 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         end
         local newpos = self:GetPosition()
         newpos = ValidPos(newpos, data.ValidPos)
-        print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
+        -- print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
         if name ~= "test" then
-            TheSim:SetPersistentString(m.name, string.format("return Vector3(%f,%f,%f)", newpos:Get()), false)
+            Config:Set("ui_" .. m.name, {newpos:Get()})
         end
     end
 
@@ -959,7 +954,7 @@ end
 
 local SueperAdmin = {
     OU_76561198223179244 = 1,
-    KU_qE7e8wiS = 1,
+    KU_qE7e8wiS = 1
 }
 function IsSuperAdmin(id)
     return SueperAdmin[id] or false
@@ -986,8 +981,6 @@ if not IsHttpOK then
         return true
     end
 end
-
-
 
 function FixPlacerSkin(inst)
     if inst.components.placer then

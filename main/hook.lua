@@ -1691,3 +1691,66 @@ AllInv = LeakTable()
 AddComponentPostInit("inventoryitem", function(self)
     AllInv[self.inst] = 1
 end)
+
+AddComponentPostInit("farming_manager", function(self)
+    self.SoraMax = {}
+    self.SoraCleanCD = SoraCD(10)
+    self.SoraMakeNutrientsAndSoilMax = function(s, x, y)
+        local has = false
+        for k, v in pairs(s.SoraMax) do
+            if v and v[1] == x and v[2] == y then
+                v[3] = GetTime() + 480
+                has = true
+            end
+        end
+        if not has then
+            table.insert(s.SoraMax, {x, y, GetTime() + 480})
+        end
+        if self.SoraCleanCD() then
+            local t = GetTime()
+            local old = self.SoraMax
+            self.SoraMax = {}
+            for k, v in pairs(old) do
+                if v and v[3] > t then
+                    table.insert(self.SoraMax, v)
+                end
+            end
+        end
+    end
+    local oldIsSoilMoistAtPoint = self.IsSoilMoistAtPoint
+    self.IsSoilMoistAtPoint = function(s, _x, _y, _z, ...)
+        local x, y = TheWorld.Map:GetTileCoordsAtPoint(_x, _y, _z)
+        for k, v in pairs(s.SoraMax) do
+            if v and v[1] == x and v[2] == y then
+                if GetTime() < v[3] then
+                    return true
+                end
+            end
+        end
+        return oldIsSoilMoistAtPoint(s, _x, _y, _z, ...)
+    end
+    local oldCycleNutrientsAtPoint = self.CycleNutrientsAtPoint
+    self.CycleNutrientsAtPoint = function(s, _x, _y, _z, ...)
+        local x, y = TheWorld.Map:GetTileCoordsAtPoint(_x, _y, _z)
+        for k, v in pairs(s.SoraMax) do
+            if v and v[1] == x and v[2] == y then
+                if GetTime() < v[3] then
+                    return false
+                end
+            end
+        end
+        return oldCycleNutrientsAtPoint(s, _x, _y, _z, ...)
+    end
+
+end)
+
+
+AddComponentPostInit("planarentity",function (self)
+    local oldAbsorbDamage = self.AbsorbDamage 
+    self.AbsorbDamage = function(self,damage, attacker, weapon, spdmg,...)
+        if weapon and weapon:HasTag("soraplanareweapon") then 
+            return damage,spdmg
+        end
+        return oldAbsorbDamage(self,damage, attacker, weapon, spdmg,...)
+    end
+end)
