@@ -127,26 +127,26 @@ function u.NewAssetLoad(tb,save)
 end
 
 function u.LoadConfig(name)
-    if not name then return end
-    local fn = kleiloadlua(u.path..name..".config")
-    if fn then
-        local _,ret = pcall(fn)
-        return ret
-    end
+    -- if not name then return end
+    -- local fn = kleiloadlua(u.path..name..".config")
+    -- if fn then
+    --     local _,ret = pcall(fn)
+    --     return ret
+    -- end
 end
 
 function u.SaveConfig(name,tb)
-    if name and tb then
-        local _,data = pcall(DataDumper,tb)
-        if data then
-            local f = io.open(u.path..name..".config","w")
-            if f then
-                f:write(data)
-                f:close()
-                return true
-            end
-        end
-    end
+    -- if name and tb then
+    --     local _,data = pcall(DataDumper,tb)
+    --     if data then
+    --         local f = io.open(u.path..name..".config","w")
+    --         if f then
+    --             f:write(data)
+    --             f:close()
+    --             return true
+    --         end
+    --     end
+    -- end
     return false
 end
 

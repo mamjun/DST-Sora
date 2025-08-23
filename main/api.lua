@@ -219,7 +219,7 @@ GLOBAL.SoraGetImage = SoraGetImage
 local messages = {}
 local PopupDialogScreen = require "screens/redux/popupdialog"
 function SoraPushPopupDialog(title, message, button, fn)
-    
+
     title = title or "小穹的温馨提示"
     if not (ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls) then
         table.insert(messages, {title, message, button, fn})
@@ -439,7 +439,7 @@ end
 
 function GLOBAL.sora_reset_ui()
     for k, v in pairs(alluisave) do
-        Config:Set("ui_"..k,nil)
+        Config:Set("ui_" .. k, nil)
     end
     ClearUI()
     for k, v in pairs(alluiinst) do
@@ -448,13 +448,13 @@ function GLOBAL.sora_reset_ui()
         end
     end
 end
-
+local scrx, scry = TheSim:GetScreenSize()
 local function ValidPos(pos, data)
     data = data or {}
-    pos.x = data.fnx and data.fnx(pos.x) or
-                math.clamp(pos.x, data.minx or 30, data.maxx or (data.minx and (data.minx + 1870)) or 1900)
-    pos.y = data.fny and data.fny(pos.y) or
-                math.clamp(pos.y, data.miny or 30, data.maxy or (data.miny and (data.miny + 1020)) or 1050)
+    pos.x = data.fnx and data.fnx(pos.x) or math.clamp(pos.x, (data.minx or 30) / 1920 * scrx, ((data.maxx or
+        (data.minx and (data.minx + 1870)) or 1900)) / 1920 * scrx)
+    pos.y = data.fny and data.fny(pos.y) or math.clamp(pos.y, (data.miny or 30) / 1080 * scry, (data.maxy or
+        (data.miny and (data.miny + 1020)) or 1050) / 1080 * scry)
     return pos
 end
 function NextFrame(fn)
@@ -490,7 +490,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
     m.ha = data and data.ha or 1
     m.va = data and data.va or 2
     m.x, m.y = TheSim:GetScreenSize()
-    if  name ~= "test" then
+    if name ~= "test" then
         local save = Config:Get("ui_" .. m.name, pos)
         if type(save) == "table" and #save == 3 then
             m.pos = Vector3(unpack(save))
@@ -561,7 +561,9 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         end
         local newpos = self:GetPosition()
         newpos = ValidPos(newpos, data.ValidPos)
-        -- print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
+        if SoraUpdate.d then 
+            print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
+        end
         if name ~= "test" then
             Config:Set("ui_" .. m.name, {newpos:Get()})
         end

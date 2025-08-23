@@ -129,7 +129,7 @@ end
 
 function com:Save(name, version)
     self.savepatch[name] = version
-    u.SaveConfig("savepatch", self.savepatch)
+    --u.SaveConfig("savepatch", self.savepatch)
 end
 
 function com:Redata() -- 刷新元数据
@@ -198,7 +198,7 @@ function com:TryToPatch(name, version, fn) -- 尝试打补丁
     self.ddata.patch[name] = version
     self.data.patch[name] = version
     if save then
-        self:Save(name, version)
+        --self:Save(name, version)
     end
     return save, ret
 end
@@ -233,7 +233,7 @@ function com.filecallback(name, ishex, patch, version, file, result, code) -- �
             if u.d then 
                 print("PatchSuccess", name, ishex, patch, version)
             end
-            U:Save(patch, version + 1)
+            --U:Save(patch, version + 1)
             U.ddata.patch[patch] = version + 1
             U.data.patch[patch] = version + 1
             U:TryToUpdate()
