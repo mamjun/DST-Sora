@@ -738,7 +738,7 @@ AddStategraphState("wilson_client", State {
 -- end)
 
 local act = MakeAndAddAction("SORAOPENUI", function(act)
-    if act.invobject and act.invobject.components.soraopenui then 
+    if act.invobject and act.invobject.components.soraopenui then
         return act.invobject.components.soraopenui:GetStr(act.doer)
     end
     return "施法"
@@ -760,3 +760,48 @@ AddComponentAction("INVENTORY", "soraopenui", function(inst, doer, actions, righ
         table.insert(actions, ACTIONS.SORAOPENUI)
     end
 end)
+
+local SORA_TQYWORK = GLOBAL.Action({
+    priority = 999,
+    distance = 15
+})
+SORA_TQYWORK.id = "SORA_TQYWORK"
+SORA_TQYWORK.stroverridefn = function(act)
+    return act.target and (act.target:HasTag("CHOP_workable") and "砍" or act.target:HasTag("MINE_workable") and "敲" )or
+               "工作"
+end
+SORA_TQYWORK.fn = function(act)
+    local target = act.target
+    local doer = act.doer
+    local inst = act.invobject
+    if doer and target and inst then
+        if (inst:HasTag("sora_tqy") or inst:HasTag("sora_tqy_box")) then
+            if (target:HasTag("MINE_workable") or target:HasTag("CHOP_workable")) then
+                if inst:HasTag("sora_tqy") then 
+                    doer.components.inventory:RemoveItem(inst)
+                    inst.Transform:SetPosition(doer:GetPosition():Get())
+                    inst.owner = inst.owner
+                    inst.components.projectile:Throw(doer, target, doer)
+                    inst.canhitwork = true
+                else
+                    inst.canhitwork = true
+                    inst.components.weapon:LaunchProjectile(doer, target)
+                    inst.canhitwork = false
+                end
+            end
+        end
+    end
+    return true
+end
+
+AddAction(SORA_TQYWORK)
+AddComponentAction("EQUIPPED", "soraaction", function(inst, doer, target, actions, right)
+    if right and inst and doer and (inst:HasTag("sora_tqy") or inst:HasTag("sora_tqy_box")) and
+        (target:HasTag("MINE_workable") or target:HasTag("CHOP_workable")) then
+        table.insert(actions, ACTIONS.SORA_TQYWORK)
+    end
+end)
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORA_TQYWORK, "veryquickcastspell"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORA_TQYWORK, "veryquickcastspell"))
+

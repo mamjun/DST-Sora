@@ -3,9 +3,9 @@ local name = "sora_tqy"
 local boxname = "sora_tqy_box"
 SoraAPI.MakeAssetTable(name, assets)
 SoraAPI.MakeAssetTable(boxname, assets)
-local function  ForceReturnToOwner(inst,catcher)
-    if not (catcher and catcher.components.inventory )then 
-        return 
+local function ForceReturnToOwner(inst, catcher)
+    if not (catcher and catcher.components.inventory) then
+        return
     end
     local data = inst:GetSaveRecord()
     local instb = SpawnSaveRecord(data)
@@ -18,14 +18,21 @@ local function  ForceReturnToOwner(inst,catcher)
         elseif equip and equip:HasTag("sora_tqy_box") and not equip.components.container:IsFull() then
             equip.components.container:GiveItem(instb)
         else
-            catcher.components.inventory:GiveItem(instb)
+            local box = catcher.components.inventory:FindItem(function(i)
+                return i:HasTag("sora_tqy_box") and not i.components.container:IsFull()
+            end)
+            if box then
+                box.components.container:GiveItem(instb)
+            else
+                catcher.components.inventory:GiveItem(instb)
+            end
         end
         catcher:PushEvent("catch")
     end
 end
 local function OnEquip(inst, owner)
-    if inst.skinEquipFn then 
-        return 
+    if inst.skinEquipFn then
+        return
     end
     local skin = inst.skinname
     if skin ~= nil then
@@ -38,8 +45,8 @@ local function OnEquip(inst, owner)
     owner.AnimState:Hide("ARM_normal")
 end
 local function OnUnequip(inst, owner)
-    if inst.skinEquipFn then 
-        return 
+    if inst.skinEquipFn then
+        return
     end
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
@@ -90,13 +97,15 @@ local function OnThrown(inst, owner, target)
     inst.components.inventoryitem.pushlandedevents = false
 end
 local function onPickUP(inst, data)
-    if data and data.owner and inst.delayowner and data.owner ~= inst.delayowner  then
+    inst.canhitwork = false
+    if data and data.owner and inst.delayowner and data.owner ~= inst.delayowner then
         TryGiveSelfToOwner(inst)
-    elseif data and data.owner and inst.delayowner and data.owner == inst.delayowner  then
-        ApplyCheckFn(inst,true)
+    elseif data and data.owner and inst.delayowner and data.owner == inst.delayowner then
+        ApplyCheckFn(inst, true)
     end
 end
 local function OnCaught(inst, catcher)
+    inst.canhitwork = false
     ApplyCheckFn(inst, true)
     inst.components.inventoryitem.canbepickedup = true
     inst.components.inventoryitem:RemoveFromOwner()
@@ -109,7 +118,14 @@ local function OnCaught(inst, catcher)
         elseif equip and equip:HasTag("sora_tqy_box") and not equip.components.container:IsFull() then
             equip.components.container:GiveItem(inst)
         else
-            catcher.components.inventory:GiveItem(inst)
+            local box = catcher.components.inventory:FindItem(function(i)
+                return i:HasTag("sora_tqy_box") and not i.components.container:IsFull()
+            end)
+            if box then
+                box.components.container:GiveItem(inst)
+            else
+                catcher.components.inventory:GiveItem(inst)
+            end
         end
         catcher:PushEvent("catch")
     end
@@ -126,6 +142,7 @@ local function ReturnToOwner(inst, owner)
         if owner.SoundEmitter then
             owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_return")
         end
+        inst.canhitwork = false
         inst.components.projectile:Throw(owner, owner)
     end
 end
@@ -168,6 +185,7 @@ local function GetNextTarget(inst, target, try)
     inst.delayowner.soratqys[inst] = 1
     if inst:GetDistanceSqToInst(inst.delayowner) > 1600 then
         -- 太远了 回去
+        inst.canhitwork = false
         inst.components.projectile:Throw(inst.delayowner, inst.delayowner)
         return
     end
@@ -187,7 +205,6 @@ local function GetNextTarget(inst, target, try)
         inst.over = false
         inst.index = 0
         inst.alltarget = {}
-
         local x, y, z = inst:GetPosition():Get()
         local ents = TheSim:FindEntities(x, y, z, 15, MUST_TAGS, CANT_TAGS)
         for k, v in pairs(ents) do
@@ -196,16 +213,25 @@ local function GetNextTarget(inst, target, try)
                 table.insert(inst.alltarget, v)
             end
         end
+        if inst.canhitwork then
+            local ents = TheSim:FindEntities(x, y, z, 15, nil, CANT_TAGS, {"CHOP_workable", "MINE_workable"})
+            for k, v in pairs(ents) do
+                if v ~= target and v:IsValid() and v.components.workable:CanBeWorked() then
+                    table.insert(inst.alltarget, v)
+                end
+            end
+        end
         shuffleArray(inst.alltarget)
     end
     local all = #inst.alltarget
-
     while inst.index < all do
         inst.index = inst.index + 1
         local can = inst.alltarget[inst.index]
         if can then
-            if can:IsValid() and can.components.health and not can.components.health:IsDead() and can.components.combat and
-                can.components.combat:CanBeAttacked(inst.delayowner) then
+            if can:IsValid() and
+                ((can.components.health and not can.components.health:IsDead() and can.components.combat and
+                    can.components.combat:CanBeAttacked(inst.delayowner)) or
+                    (inst.canhitwork and can.components.workable and can.components.workable:CanBeWorked())) then
                 -- 有不重复模板就丢出去
                 inst.components.projectile:Throw(inst.delayowner, can)
                 return true
@@ -236,22 +262,31 @@ local function OnHit(inst, owner, target)
     GetNextTarget(inst, target)
     if target and not target:HasTag("player") and inst.delayowner ~= target and target:IsValid() and
         target.components.combat then
-        local impactfx = SpawnPrefab("impact")
-        if impactfx ~= nil then
-            local follower = impactfx.entity:AddFollower()
-            follower:FollowSymbol(target.GUID, target.components.combat.hiteffectsymbol, 0, 0, 0)
-            impactfx:FacePoint(inst.Transform:GetWorldPosition())
+        if not target:HasTag("smallcreature") then
+            local impactfx = SpawnPrefab("impact")
+            if impactfx ~= nil then
+                local follower = impactfx.entity:AddFollower()
+                follower:FollowSymbol(target.GUID, target.components.combat.hiteffectsymbol, 0, 0, 0)
+                impactfx:FacePoint(inst.Transform:GetWorldPosition())
+            end
         end
-
         local x, y, z = inst:GetPosition():Get()
-        local ents = TheSim:FindEntities(x, y, z, 2, MUST_TAGS, CANT_TAGS)
+        local ents = TheSim:FindEntities(x, y, z, 4, MUST_TAGS, CANT_TAGS)
         for k, v in pairs(ents) do
             if v ~= target and v:IsValid() and not v.components.health:IsDead() and v.components.combat and
                 v.components.combat:CanBeAttacked(inst.delayowner) then
                 inst.delayowner.components.combat:DoAttack(v, inst, inst, inst.components.projectile.stimuli)
             end
         end
-
+        return
+    end
+    if inst.canhitwork and target and target.components.workable and target.components.workable:CanBeWorked() then
+        if target:HasTag("MINE_workable") then
+            target.components.workable:WorkedBy(inst.delayowner, 3)
+        end
+        if target:HasTag("CHOP_workable") then
+            target.components.workable:WorkedBy(inst.delayowner, 3)
+        end
     end
 end
 
@@ -295,9 +330,10 @@ local function fn()
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(10)
     inst.components.weapon:SetRange(14, 16)
-
+    inst:AddComponent("soraaction")
     inst:AddComponent("inspectable")
-
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(0)
     inst:AddComponent("projectile")
     inst.components.projectile:SetSpeed(15)
     inst.components.projectile:SetCanCatch(true)
@@ -349,21 +385,21 @@ local function BoxUpdateAnim(inst)
         end
     end
 end
-local function TryEquipTQY(item,owner)
-    if not item.components.equippable.onequipfn then 
-        return 
+local function TryEquipTQY(item, owner)
+    if not item.components.equippable.onequipfn then
+        return
     end
-    item.skinEquipFn = true 
-    item.components.equippable.onequipfn(item,owner,false)
+    item.skinEquipFn = true
+    item.components.equippable.onequipfn(item, owner, false)
     item.skinEquipFn = false
 end
 
-local function TryUnEquipTQY(item,owner)
-    if not item.components.equippable.onunequipfn then 
-        return 
+local function TryUnEquipTQY(item, owner)
+    if not item.components.equippable.onunequipfn then
+        return
     end
-    item.skinEquipFn = true 
-    item.components.equippable.onunequipfn(item,owner,false)
+    item.skinEquipFn = true
+    item.components.equippable.onunequipfn(item, owner, false)
     item.skinEquipFn = false
 end
 
@@ -371,9 +407,24 @@ local function OnBoxEquip(inst, owner)
     inst.components.container:Open(owner)
     inst.last = {}
     inst.owner = owner
+    if not inst.components.container:IsFull() then
+        local items = owner.components.inventory:FindItems(function(i)
+            return i:HasTag("sora_tqy")
+        end)
+        local pos = owner:GetPosition()
+        if next(items) then
+            for k, v in pairs(items) do
+                if not inst.components.container:IsFull() then
+                    local it = owner.components.inventory:RemoveItem(v)
+                    inst.components.container:GiveItem(it, nil, pos, true)
+                end
+            end
+        end
+    end
     BoxUpdateAnim(inst, owner)
     inst:ListenForEvent("itemget", BoxUpdateAnim)
     inst:ListenForEvent("itemlose", BoxUpdateAnim)
+
     -- for i=1,5 do 
     --     local item = inst.components.container:GetItemInSlot(i)
     --     if item and item:HasTag("sora_tqy") then 
@@ -399,25 +450,24 @@ local function OnBoxUnequip(inst, owner)
 end
 local function OnItemGet(inst, data)
     local owner = inst.components.inventoryitem:GetGrandOwner()
-    if not (owner and owner:HasTag("player")) then 
-        return 
+    if not (owner and owner:HasTag("player")) then
+        return
     end
-    if not (data and data.item and data.item:HasTag("sora_tqy")) then 
-        return 
+    if not (data and data.item and data.item:HasTag("sora_tqy")) then
+        return
     end
-    TryEquipTQY(data.item,owner)
+    TryEquipTQY(data.item, owner)
 end
 local function OnItemLose(inst, data)
     local owner = inst.components.inventoryitem:GetGrandOwner()
-    if not (owner and owner:HasTag("player")) then 
-        return 
+    if not (owner and owner:HasTag("player")) then
+        return
     end
-    if not (data and data.prev_item and data.prev_item:HasTag("sora_tqy")) then 
-        return 
+    if not (data and data.prev_item and data.prev_item:HasTag("sora_tqy")) then
+        return
     end
-    TryUnEquipTQY(data.prev_item,owner)
+    TryUnEquipTQY(data.prev_item, owner)
 end
-
 
 local function boxfn()
     local inst = CreateEntity()
@@ -431,17 +481,20 @@ local function boxfn()
 
     inst.AnimState:SetBank(boxname)
     inst.AnimState:SetBuild(boxname)
-    inst.AnimState:PlayAnimation("idle_item",true)
+    inst.AnimState:PlayAnimation("idle_item", true)
     -- inst.AnimState:SetRayTestOnBB(true)
     inst:AddTag("sora_tqy_box")
     inst:AddComponent("soratwoface")
- 
+
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then
         return inst
     end
     inst.CheckGoToTask = nil
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(0)
+    inst:AddComponent("soraaction")
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(10)
     inst.components.weapon:SetRange(14, 16)
@@ -474,6 +527,9 @@ local function boxfn()
             item.Transform:SetPosition(inst.owner:GetPosition():Get())
             item.owner = inst.owner
             item.components.projectile:Throw(inst.owner, target, attacker)
+            if inst.canhitwork then 
+                item.canhitwork = true
+            end
         end
     end
 
@@ -493,10 +549,9 @@ local function boxfn()
 end
 SoraAPI.MakeItemSkinDefaultImage(name, "images/inventoryimages/" .. name .. ".xml", name)
 SoraAPI.MakeItemSkinDefaultImage(boxname, "images/inventoryimages/" .. boxname .. ".xml", boxname)
-SoraAPI.MakeItemSkinDefaultData(name, {"images/inventoryimages/"..name..".xml", name},
-    {name, name,'idle',true})
-SoraAPI.MakeItemSkinDefaultData(boxname, {"images/inventoryimages/"..boxname..".xml", boxname},
-    {boxname, boxname,'idle_item',true})
+SoraAPI.MakeItemSkinDefaultData(name, {"images/inventoryimages/" .. name .. ".xml", name}, {name, name, 'idle', true})
+SoraAPI.MakeItemSkinDefaultData(boxname, {"images/inventoryimages/" .. boxname .. ".xml", boxname},
+    {boxname, boxname, 'idle_item', true})
 local function MakeSkin(skinskin, skinname, free)
     local skin = name .. "_" .. skinskin
     SoraAPI.MakeAssetTable(skin, assets)
