@@ -303,7 +303,7 @@ local changelist = {
     ccs_sakura1 = "ccs_sakura2",
     ccs_sakura2 = "ccs_sakura3",
     ccs_sakura3 = "ccs_sakura1",
-    --纯粹辉煌 纯粹恐惧
+    -- 纯粹辉煌 纯粹恐惧
     horrorfuel = 'purebrilliance',
     purebrilliance = 'horrorfuel'
 
@@ -379,6 +379,9 @@ local function trychange(inst)
         local newprefabs = changelist[inst.prefab]
         local newprefab = newprefabs
         local item = SpawnPrefab(newprefab)
+        if item.OnStartRegrowth then
+            RemoveFromRegrowthManager(item)
+        end
         if not item then
             return
         end
@@ -391,11 +394,17 @@ local function trychange(inst)
                 for i = 1, num, 1 do
                     local a = SpawnPrefab(changelist[inst.prefab])
                     a.Transform:SetPosition(x, y, z)
+                    if a.OnStartRegrowth then
+                        RemoveFromRegrowthManager(a)
+                    end
                 end
             end
         end
         item.Transform:SetPosition(x, y, z)
         fix = item
+        if inst.OnStartRegrowth then
+            RemoveFromRegrowthManager(inst)
+        end
         inst:Remove()
     end
     -- 需要施肥的变成不需要施肥
@@ -429,7 +438,7 @@ local function trychange(inst)
         cmp.nutrientsick = 999 -- 当前肥量（预防疾病）
         cmp.sickness = 0 -- 当前病害程度
         cmp.infested = 0 -- 被骚扰次数
-        cmp.nosick = true   --无虫害
+        cmp.nosick = true -- 无虫害
         cmp.moisture_max = 999 -- 最大蓄水量
         cmp.nutrient_max = 999 -- 最大蓄肥量（生长必需）
         cmp.nutrientgrow_max = 999 -- 最大蓄肥量（生长加速）

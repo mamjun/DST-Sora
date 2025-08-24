@@ -1754,3 +1754,13 @@ AddComponentPostInit("planarentity",function (self)
         return oldAbsorbDamage(self,damage, attacker, weapon, spdmg,...)
     end
 end)
+
+
+if GLOBAL.TUNING.SORADISABLE_REGROW then 
+    GLOBAL.AddToRegrowthManager = function(i,...)
+        i.OnStartRegrowth = NilFn
+    end
+    AddComponentPostInit("regrowthmanager",function (self)
+        self.LongUpdate = NilFn
+    end)
+end

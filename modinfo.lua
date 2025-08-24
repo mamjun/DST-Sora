@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.24" -- 版本
+version = "13.25" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -242,6 +242,19 @@ configuration_options = {{
         hover = "禁用,禁止使用全局制作"
     }},
     default = false
+},{
+    name = "disable_regrow",
+    label = "禁止一些没什么卵用的世界再生,比如草,树苗,花",
+    options = {{
+        description = "不禁止,后期可能会卡",
+        data = false,
+        hover = "不禁止,后期可能会卡"
+    }, {
+        description = "禁止再生一些没什么卵用的东西",
+        data = true,
+        hover = "禁止再生一些没什么卵用的东西"
+    }},
+    default = true
 }, {
     name = "pack",
     label = "允许使用打包纸相关吗",

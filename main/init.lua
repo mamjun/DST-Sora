@@ -48,7 +48,7 @@ DebugPrint = function(...)
         print(unpack(args))
     end
 end
-
+GLOBAL.TUNING.SORADISABLE_REGROW = GetModConfigData("disable_regrow")
 GLOBAL.TUNING.SORAMODE = GetModConfigData("mode")
 mode = GLOBAL.TUNING.SORAMODE
 GLOBAL.TUNING.SORAADD = GetModConfigData("add")

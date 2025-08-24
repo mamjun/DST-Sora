@@ -40,7 +40,7 @@ function com.OnInstRemove(inst)
 end
 function com:Track(inst,prefab)
     local p = prefab or inst.prefab 
-    if not self.ents[p] then self.ents[p] = {} end
+    if not self.ents[p] then self.ents[p] = SoraAPI.LeakTable() end
     inst:ListenForEvent("onremove", self.OnInstRemove)
     self.ents[p][inst] = 1
 end
@@ -60,6 +60,26 @@ function com:FindWith(prefab,fn)
     for k,v in pairs(self.ents[prefab] or {}) do 
         if fn(k) then 
             find[k]=1
+        end
+    end
+    return find
+end
+
+function com:GetCountWith(prefab,fn)
+    local find = {}
+    for k,v in pairs(self.ents[prefab] or {}) do 
+        if not fn or fn(k) then 
+            find[k]=1
+        end
+    end
+    return GetTableSize(find),find
+end
+
+function com:DoWith(prefab,Checkfn,Dofn)
+    local find = {}
+    for k,v in pairs(self.ents[prefab] or {}) do 
+        if Checkfn(k) then 
+            Dofn(self,k)
         end
     end
     return find
