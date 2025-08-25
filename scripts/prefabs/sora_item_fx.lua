@@ -28,7 +28,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
-]] local Assets = {Asset("ANIM", "anim/sora_item_fx.zip"),Asset("ANIM", "anim/sora_wsqt_fx.zip")}
+]] local Assets = {Asset("ANIM", "anim/sora_item_fx.zip"), Asset("ANIM", "anim/sora_wsqt_fx.zip"),
+                   Asset("ANIM", "anim/sora_shield_fx.zip")}
 local function Bind(inst, target, time)
     inst.entity:SetParent(target.entity)
     inst:DoTaskInTime(time, inst.Remove)
@@ -129,61 +130,61 @@ local function footsbyfn(Sim)
     end
     return inst
 end
-local function wsqt_fxbind(inst,owner,pos)
-	inst.entity:SetParent(owner.entity)
-	inst.owner = owner
-	owner:SoraLockSymbol("headbase","sora_wsqt","sora_wsqt_fx","swap_headbase")
-	owner:SoraLockSymbol("headbase_hat","sora_wsqt","sora_wsqt_fx","swap_headbase")
-	owner:SoraLockSymbol("hair","sora_wsqt","sora_wsqt_fx","swap_hair")
-	owner:SoraLockSymbol("hair_hat","sora_wsqt","sora_wsqt_fx","swap_hair")
-	owner:SoraLockSymbolShow("face","sora_wsqt",false)
-	owner:SoraLockSymbolShow("swap_face","sora_wsqt",false)
-	owner:SoraLockSymbolShow("swap_hat","sora_wsqt",false)
-	owner:SoraLockSymbolShow("beard","sora_wsqt",false)
-	owner:SoraLockSymbolShow("cheeks","sora_wsqt",false)
-	owner:SoraLockSymbolShow("hairfront","sora_wsqt",false)
-	owner:SoraLockSymbolShow("hairpigtails","sora_wsqt",false)
-	owner:SoraLockLayerShow("HAT","sora_wsqt",false)
-	owner:SoraLockLayerShow("HAIR_HAT","sora_wsqt",false)
-	owner:SoraLockLayerShow("HAIR_NOHAT","sora_wsqt",false)
-	owner:SoraLockLayerShow("HAIR","sora_wsqt",true)
+local function wsqt_fxbind(inst, owner, pos)
+    inst.entity:SetParent(owner.entity)
+    inst.owner = owner
+    owner:SoraLockSymbol("headbase", "sora_wsqt", "sora_wsqt_fx", "swap_headbase")
+    owner:SoraLockSymbol("headbase_hat", "sora_wsqt", "sora_wsqt_fx", "swap_headbase")
+    owner:SoraLockSymbol("hair", "sora_wsqt", "sora_wsqt_fx", "swap_hair")
+    owner:SoraLockSymbol("hair_hat", "sora_wsqt", "sora_wsqt_fx", "swap_hair")
+    owner:SoraLockSymbolShow("face", "sora_wsqt", false)
+    owner:SoraLockSymbolShow("swap_face", "sora_wsqt", false)
+    owner:SoraLockSymbolShow("swap_hat", "sora_wsqt", false)
+    owner:SoraLockSymbolShow("beard", "sora_wsqt", false)
+    owner:SoraLockSymbolShow("cheeks", "sora_wsqt", false)
+    owner:SoraLockSymbolShow("hairfront", "sora_wsqt", false)
+    owner:SoraLockSymbolShow("hairpigtails", "sora_wsqt", false)
+    owner:SoraLockLayerShow("HAT", "sora_wsqt", false)
+    owner:SoraLockLayerShow("HAIR_HAT", "sora_wsqt", false)
+    owner:SoraLockLayerShow("HAIR_NOHAT", "sora_wsqt", false)
+    owner:SoraLockLayerShow("HAIR", "sora_wsqt", true)
 
-	owner:SoraLockLayerShow("HEAD","sora_wsqt",true)
-	owner:SoraLockLayerShow("HEAD_HAT_NOHELM","sora_wsqt",false)
-	owner:SoraLockLayerShow("HEAD_HAT_HELM","sora_wsqt",false)
-	owner:SoraLockLayerShow("HAIR_NOHAT","sora_wsqt",false)
+    owner:SoraLockLayerShow("HEAD", "sora_wsqt", true)
+    owner:SoraLockLayerShow("HEAD_HAT_NOHELM", "sora_wsqt", false)
+    owner:SoraLockLayerShow("HEAD_HAT_HELM", "sora_wsqt", false)
+    owner:SoraLockLayerShow("HAIR_NOHAT", "sora_wsqt", false)
 end
 local function wsqt_unfxbind(inst)
-	local owner = inst.owner 
-	if not owner then 
-		return 
-	end
-	owner:SoraUnlockSymbol("headbase","sora_wsqt")
-	owner:SoraUnlockSymbol("headbase_hat","sora_wsqt")
-	owner:SoraUnlockSymbol("hair","sora_wsqt")
-	owner:SoraUnlockSymbol("hair_hat","sora_wsqt")
-	owner:SoraUnlockSymbolShow("face","sora_wsqt")
-	owner:SoraUnlockSymbolShow("swap_face","sora_wsqt")
-	owner:SoraUnlockSymbolShow("swap_hat","sora_wsqt")
-	owner:SoraUnlockSymbolShow("beard","sora_wsqt")
-	owner:SoraUnlockSymbolShow("cheeks","sora_wsqt")
-	owner:SoraUnlockSymbolShow("hairfront","sora_wsqt")
-	owner:SoraUnlockSymbolShow("hairpigtails","sora_wsqt")
-	owner:SoraUnlockLayerShow("HAT","sora_wsqt")
-	owner:SoraUnlockLayerShow("HAIR_HAT","sora_wsqt")
-	owner:SoraUnlockLayerShow("HAIR_NOHAT","sora_wsqt")
-	owner:SoraUnlockLayerShow("HAIR","sora_wsqt")
+    local owner = inst.owner
+    if not owner then
+        return
+    end
+    owner:SoraUnlockSymbol("headbase", "sora_wsqt")
+    owner:SoraUnlockSymbol("headbase_hat", "sora_wsqt")
+    owner:SoraUnlockSymbol("hair", "sora_wsqt")
+    owner:SoraUnlockSymbol("hair_hat", "sora_wsqt")
+    owner:SoraUnlockSymbolShow("face", "sora_wsqt")
+    owner:SoraUnlockSymbolShow("swap_face", "sora_wsqt")
+    owner:SoraUnlockSymbolShow("swap_hat", "sora_wsqt")
+    owner:SoraUnlockSymbolShow("beard", "sora_wsqt")
+    owner:SoraUnlockSymbolShow("cheeks", "sora_wsqt")
+    owner:SoraUnlockSymbolShow("hairfront", "sora_wsqt")
+    owner:SoraUnlockSymbolShow("hairpigtails", "sora_wsqt")
+    owner:SoraUnlockLayerShow("HAT", "sora_wsqt")
+    owner:SoraUnlockLayerShow("HAIR_HAT", "sora_wsqt")
+    owner:SoraUnlockLayerShow("HAIR_NOHAT", "sora_wsqt")
+    owner:SoraUnlockLayerShow("HAIR", "sora_wsqt")
 
-	owner:SoraUnlockLayerShow("HEAD","sora_wsqt")
-	owner:SoraUnlockLayerShow("HEAD_HAT_NOHELM","sora_wsqt")
-	owner:SoraUnlockLayerShow("HEAD_HAT_HELM","sora_wsqt")
-	owner:SoraUnlockLayerShow("HAIR_NOHAT","sora_wsqt")
+    owner:SoraUnlockLayerShow("HEAD", "sora_wsqt")
+    owner:SoraUnlockLayerShow("HEAD_HAT_NOHELM", "sora_wsqt")
+    owner:SoraUnlockLayerShow("HEAD_HAT_HELM", "sora_wsqt")
+    owner:SoraUnlockLayerShow("HAIR_NOHAT", "sora_wsqt")
 end
 local function ResetTime(inst)
-    if inst.killtask then 
+    if inst.killtask then
         inst.killtask:Cancel()
     end
-    inst.killtask = inst:DoTaskInTime(inst.time,inst.Remove)
+    inst.killtask = inst:DoTaskInTime(inst.time, inst.Remove)
 end
 local function wsqt_fxfn(Sim)
     -- print("footsbyfncc0")
@@ -191,21 +192,98 @@ local function wsqt_fxfn(Sim)
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
 
-	--inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
-	inst.bind= wsqt_fxbind
+    -- inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
+    inst.bind = wsqt_fxbind
     inst:AddTag("FX")
     inst:AddTag("NOCLICK")
     inst:AddTag("NOBLOCK")
     inst.entity:SetPristine()
     inst.persists = false
     inst.time = 480
-	if not TheWorld.soraismastersim then 
-		return true 
-	end
-    inst.ResetTime = ResetTime 
-    inst.killtask = inst:DoTaskInTime(inst.time,inst.Remove)
-	inst:ListenForEvent("onremove",wsqt_unfxbind)
+    if not TheWorld.soraismastersim then
+        return true
+    end
+    inst.ResetTime = ResetTime
+    inst.killtask = inst:DoTaskInTime(inst.time, inst.Remove)
+    inst:ListenForEvent("onremove", wsqt_unfxbind)
     return inst
 end
+local function UpdateFx(inst)
+    if not inst.doer then
+        return
+    end
+
+    local doer = inst.doer
+    local time = GetTime() - (doer.components.combat.lastdoattacktime or -100) 
+    local time2 = GetTime() - (doer.components.combat.lastwasattackedtime > 0 and doer.components.combat.lastwasattackedtime  or -100 )
+    --print(time,time2)
+    if (time > 60 ) and (time2 > 60 ) then 
+        inst:Hide()
+    else
+        inst:Show()
+    end
+    local allshield = 0
+    local body = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
+    local hat = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+    if body and body.sora_sheild then
+        allshield = allshield + body.sora_sheild
+    end
+    if hat and hat.sora_sheild then
+        allshield = allshield + hat.sora_sheild
+    end
+    allshield = math.clamp(allshield, 0, 6)
+    for i=1,6 do
+        if i > allshield then 
+            inst.AnimState:Hide("f"..i)
+        else
+            inst.AnimState:Show("f"..i)
+        end
+
+    end
+end
+
+local function shield_bind(inst, owner)
+    inst.doer = owner
+    inst.entity:SetParent(owner.entity)
+    inst.Transform:SetPosition(0,-0.1,0)
+    inst:ListenForEvent("onremove", function(i)
+        i:DoTaskInTime(0, i.Remove)
+    end, owner)
+    inst:ListenForEvent("blocked",function ()
+        UpdateFx(inst)
+    end,owner)
+    inst.UpdateFxTask=inst:DoPeriodicTask(1,UpdateFx)
+end
+
+local function shield_fxfn(Sim)
+    -- print("footsbyfncc0")
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+    -- inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
+    inst.bind = shield_bind
+    --inst.AnimState:SetSortWorldOffset(0,0.1,0)
+    --inst.AnimState:SetLayer(LAYER_BACKGROUND)
+    --inst.AnimState:SetSortOrder(3)
+    inst:AddTag("FX")
+    inst.AnimState:SetBank("sora_shield_fx")
+    inst.AnimState:SetBuild("sora_shield_fx")
+    inst.AnimState:PlayAnimation("idle", true)
+    inst.AnimState:SetScale(1.5,1.5,1.5)
+    inst.AnimState:SetMultColour(0.8,0.8,0.8,1)
+    inst:AddTag("NOCLICK")
+    inst:AddTag("NOBLOCK")
+    inst.entity:SetPristine()
+    inst.persists = false
+    if not TheWorld.soraismastersim then
+        return inst
+    end
+    -- inst:ListenForEvent("onremove", shield_unbind)
+    return inst
+end
+
 return Prefab("sora_item_fx", fn, Assets), Prefab("sora_tmp_fx", tmpfn, tmpAssets),
-    Prefab("sora_foot_fx_sby", footsbyfn), Prefab("sora_foot_fx_sby_c", footsbycfn), Prefab("sora_wsqt_fx", wsqt_fxfn)
+    Prefab("sora_foot_fx_sby", footsbyfn), Prefab("sora_foot_fx_sby_c", footsbycfn), Prefab("sora_wsqt_fx", wsqt_fxfn),
+    Prefab("sora_shield_fx", shield_fxfn)
+

@@ -727,6 +727,19 @@ function params.sora_pot.widget:SoraOnOpenFn(inst)
     anim:SetClickable(false)
     self:SoraAutoClose(anim)
     self.cookfire = anim
+    self.disbtn = SoraAPI.soraenv.AddButton(self.bgimage, inst:HasTag("disablesorarec") and "启用专属料理" or
+        "禁用专属料理", function()
+        self.disbtn:SetText((not inst:HasTag("disablesorarec")) and "启用专属料理" or "禁用专属料理")
+        r_event(nil, "SoraDisableRec", {
+            dis = not inst:HasTag("disablesorarec")
+        }, inst)
+
+    end, {
+        size = {280, 100},
+        pos = {-160, -90}
+    })
+    self.disbtn:SetTextSize(50)
+    self.disbtn:MoveToFront()
     self.CookRopeTask = function()
         if self.isopen and self.container and self.container.sorapotper then
             self:SetCookRope(self.container.sorapotper:value() / 100)

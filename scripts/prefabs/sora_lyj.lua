@@ -235,6 +235,7 @@ local function photofn()
     inst:AddTag("sora_photo")
     inst:AddTag("cantphoto")
     inst:AddTag("walkableperipheral")
+    inst:AddTag("meteor_protection")
     if not TheWorld.ismastersim then
         return inst
     end

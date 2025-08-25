@@ -155,7 +155,7 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
-
+   
     inst:AddComponent("inspectable")
 	inst.components.inspectable:SetDescription([[
 	银白骑士团の制式盔甲，

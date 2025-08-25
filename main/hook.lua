@@ -306,7 +306,7 @@ local canlevelup = {"petals", -- 花瓣
 "wormlight_lesser", -- 微光浆果
 "wormlight", -- 发光浆果
 "nightmarefuel", -- 发光浆果
-"houndstooth", "manrabbit_tail", "stinger"}
+"houndstooth", "manrabbit_tail", "stinger", "horrorfuel", "security_pulse_cage_full"}
 for k, v in pairs(canlevelup) do
     AddPrefabPostInit(v, function(inst)
         if GLOBAL.TheWorld.ismastersim and not inst.components.tradable then
@@ -1026,7 +1026,7 @@ AddComponentPostInit("combat", function(self)
     self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
         if damage > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
             if not s.sora_wsqt_fxCD then
-                s.sora_wsqt_fxCD = SoraCD(2)
+                s.sora_wsqt_fxCD = SoraCD(3)
             end
             if s.sora_wsqt_fxCD() then
                 local fx = SpawnPrefab("shadow_shield" .. tostring(math.random(1, 6)))
@@ -1034,6 +1034,7 @@ AddComponentPostInit("combat", function(self)
                 s.inst:PushEvent("blocked", {
                     attacker = attacker
                 })
+                s.lastwasattackedtime = GetTime()
                 return false
             end
         end
@@ -1066,7 +1067,40 @@ AddComponentPostInit("combat", function(self)
         return DoAttack(self, targ, weapon, ...)
     end
 end)
+AddPrefabPostInit("sora", function(inst)
+    if not TheWorld.ismastersim then
+        return
+    end
+    inst:DoTaskInTime(0, function()
+        inst.sora_shield_fx = SpawnPrefab("sora_shield_fx")
+        inst.sora_shield_fx:bind(inst)
+        inst.sora_shield_fx:Hide()
+        
+    end)
 
+    local oldGetAttacked = inst.components.combat.GetAttacked
+    inst.components.combat.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
+        if damage > 20 then
+            local body = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
+            local hat = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+            if (body and body.sora_sheild and body.sora_sheild > 0) or (hat and hat.sora_sheild and hat.sora_sheild > 0) then
+                if (body and body.sora_sheild and body.sora_sheild > 0) then
+                    body.sora_sheild = math.max(body.sora_sheild - 1, 0)
+                else
+                    hat.sora_sheild = math.max(hat.sora_sheild - 1, 0)
+                end
+                local fx = SpawnPrefab("shadow_shield" .. tostring(math.random(1, 6)))
+                fx.entity:SetParent(s.inst.entity)
+                s.inst:PushEvent("blocked", {
+                    attacker = attacker
+                })
+                s.lastwasattackedtime = GetTime()
+                return false
+            end
+        end
+        return oldGetAttacked(s, attacker, damage, weapon, stimuli, ...)
+    end
+end)
 AddComponentPostInit("locomotor", function(self)
     local oldGoToEntity = self.GoToEntity
     self.GoToEntity = function(s, target, ...)
@@ -1744,23 +1778,21 @@ AddComponentPostInit("farming_manager", function(self)
 
 end)
 
-
-AddComponentPostInit("planarentity",function (self)
-    local oldAbsorbDamage = self.AbsorbDamage 
-    self.AbsorbDamage = function(self,damage, attacker, weapon, spdmg,...)
-        if weapon and weapon:HasTag("soraplanareweapon") then 
-            return damage,spdmg
+AddComponentPostInit("planarentity", function(self)
+    local oldAbsorbDamage = self.AbsorbDamage
+    self.AbsorbDamage = function(self, damage, attacker, weapon, spdmg, ...)
+        if weapon and weapon:HasTag("soraplanareweapon") then
+            return damage, spdmg
         end
-        return oldAbsorbDamage(self,damage, attacker, weapon, spdmg,...)
+        return oldAbsorbDamage(self, damage, attacker, weapon, spdmg, ...)
     end
 end)
 
-
-if GLOBAL.TUNING.SORADISABLE_REGROW then 
-    GLOBAL.AddToRegrowthManager = function(i,...)
+if GLOBAL.TUNING.SORADISABLE_REGROW then
+    GLOBAL.AddToRegrowthManager = function(i, ...)
         i.OnStartRegrowth = NilFn
     end
-    AddComponentPostInit("regrowthmanager",function (self)
+    AddComponentPostInit("regrowthmanager", function(self)
         self.LongUpdate = NilFn
     end)
 end

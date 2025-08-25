@@ -203,6 +203,7 @@ function makelightflier()
         inst.AnimState:SetBank("lightflier")
         inst.AnimState:PlayAnimation("sleep_loop", true)
         inst:AddComponent("soratwoface")
+        inst:AddTag("meteor_protection")
         inst.entity:SetPristine()
         MakeInventoryPhysics(inst)
         if not TheWorld.ismastersim then

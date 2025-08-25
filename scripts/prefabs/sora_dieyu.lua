@@ -120,6 +120,7 @@ local function fn()
     anim:SetBuild(name)
     anim:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
+    inst:AddTag("meteor_protection")
     if not TheWorld.ismastersim then
         return inst
     end

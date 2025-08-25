@@ -201,6 +201,7 @@ local function fn()
     inst:AddTag("structure")
     inst:AddTag("flower")
     inst:AddTag("nosteal")
+    inst:AddTag("meteor_protection")
     inst:AddComponent("soratwoface")
     anim:PlayAnimation("idle", true)
     if not TheWorld.ismastersim then

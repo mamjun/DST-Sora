@@ -226,6 +226,7 @@ local function fn()
     inst:AddTag("nopunch")
 	inst:AddTag("rechargeable")
     inst:AddTag("allow_action_on_impassable")
+	inst:AddTag("meteor_protection")
 	inst:AddComponent("reticule")
     inst.components.reticule.targetfn = blinkstaff_reticuletargetfn
     inst.components.reticule.ease = true

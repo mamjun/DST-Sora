@@ -28,15 +28,10 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
-]]
-local assets =
-{
-    Asset("ANIM", "anim/soraclothes.zip"),
-	Asset("ATLAS", "images/inventoryimages/soraclothes.xml"),
-	Asset("IMAGE", "images/inventoryimages/soraclothes.tex"),
-	Asset("ATLAS_BUILD", "images/inventoryimages/soraclothes.xml", 256),
-}
-local arm1 = getsora("soraclothesarmor1")/100
+]] local assets = {Asset("ANIM", "anim/soraclothes.zip"), Asset("ATLAS", "images/inventoryimages/soraclothes.xml"),
+                   Asset("IMAGE", "images/inventoryimages/soraclothes.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/soraclothes.xml", 256)}
+local arm1 = getsora("soraclothesarmor1") / 100
 local arm2 = getsora("soraclothesarmor2")
 local arm3 = getsora("soraclothesarmor3")
 local arm4 = getsora("soraclothesarmor4")
@@ -45,103 +40,155 @@ local arm5 = getsora("soraclothesarmor5")
 local hot1 = getsora("soraclotheshot1")
 local hot2 = getsora("soraclotheshot2")
 local function upgrade(inst)
-	inst.mplevel = math.min(math.floor(inst.mpnum / inst.need),inst.maxlevel)
-	--inst.yqlevel = math.min(math.floor(inst.yqnum / inst.need),inst.maxlevel)
-	inst.lllevel = math.min(math.floor(inst.llnum / inst.need),inst.maxlevel)
-	--保暖
-	 inst.components.insulator:SetInsulation(hot1 + hot2*inst.mplevel)
-	--防水
-   -- inst.components.waterproofer:SetEffectiveness(0.1*inst.yqlevel)
-	--if inst.yqlevel > 9 then
-	--inst.components.equippable.insulated = true
-	--else
-	--inst.components.equippable.insulated = false
-	--end
-	--护甲
-	inst.abs = arm1+arm2*inst.lllevel
-	local old = inst.components.armor:GetPercent()
-	inst.components.armor.maxcondition = arm3+arm4*inst.lllevel
-    inst.components.armor:SetAbsorption(math.min(inst.abs,0.99))
-	inst.components.armor:SetPercent(old)
+    inst.mplevel = math.min(math.floor(inst.mpnum / inst.need), inst.maxlevel)
+    -- inst.yqlevel = math.min(math.floor(inst.yqnum / inst.need),inst.maxlevel)
+    inst.lllevel = math.min(math.floor(inst.llnum / inst.need), inst.maxlevel)
+
+    inst.jwslevel = (inst.unlock_wsqt and 1 or 0) + (inst.unlock_cckj and 1 or 0) + (inst.unlock_wzhh and 1 or 0)
+
+    -- 保暖
+    inst.components.insulator:SetInsulation(hot1 + hot2 * inst.mplevel)
+    -- 防水
+    -- inst.components.waterproofer:SetEffectiveness(0.1*inst.yqlevel)
+    -- if inst.yqlevel > 9 then
+    -- inst.components.equippable.insulated = true
+    -- else
+    -- inst.components.equippable.insulated = false
+    -- end
+    -- 护甲
+    inst.abs = arm1 + arm2 * inst.lllevel
+    local old = inst.components.armor:GetPercent()
+    inst.components.armor.maxcondition = arm3 + arm4 * inst.lllevel
+    inst.components.armor:SetAbsorption(math.min(inst.abs, 0.99))
+    inst.components.armor:SetPercent(old)
 end
 
 local function OnRefuseItem(inst, giver, item)
-	if item then
-	local refusesay = "\t\t穹の护\n物\t数\t级\t属"
-			refusesay = refusesay..string.format("\n暖(皮):\t%d/"..inst.need * inst.maxlevel.."\t%d\t%d",inst.mpnum,inst.mplevel,hot1+hot2*inst.mplevel)
-			refusesay = refusesay..string.format("\n甲(鳞):\t%d/"..inst.need * inst.maxlevel.."\t%d\t%d%%",inst.llnum,inst.lllevel,(arm1+arm2*inst.lllevel) *100)
-		giver.components.talker:Say(refusesay)
-	end
+    if item then
+        local refusesay = "\t\t穹の护\n物\t数\t级\t属"
+        refusesay = refusesay ..
+                        string.format("\n暖(皮):\t%d/" .. inst.need * inst.maxlevel .. "\t%d\t%d", inst.mpnum,
+                inst.mplevel, hot1 + hot2 * inst.mplevel)
+        refusesay = refusesay ..
+                        string.format("\n甲(鳞):\t%d/" .. inst.need * inst.maxlevel .. "\t%d\t%d%%", inst.llnum,
+                inst.lllevel, (arm1 + arm2 * inst.lllevel) * 100)
+        refusesay = refusesay ..
+                        string.format("\n盾:\t%d 万圣奇谭:%s 纯粹恐惧:%s 充能火花柜:%s", inst.jwslevel,
+                inst.unlock_wsqt and "Y" or "N", inst.unlock_cckj and "Y" or "N", inst.unlock_wzhh and "Y" or "N")
+        giver.components.talker:Say(refusesay)
+    end
 end
 local l = SoraAPI.sorarepairer
 local function AcceptTest(inst, item)
-	if l[item.prefab] then
-	return inst.components.armor:GetPercent()<1
-	elseif (item.prefab == "bearger_fur" ) then
-		return 	inst.mpnum < inst.need * inst.maxlevel ,"GENERIC"
-	elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") then
-		return 	inst.llnum < inst.need * inst.maxlevel,"GENERIC"
-	end
-	return false,"WRONGTYPE" 
+    if l[item.prefab] then
+        return inst.components.armor:GetPercent() < 1
+    elseif (item.prefab == "bearger_fur") then
+        return inst.mpnum < inst.need * inst.maxlevel, "GENERIC"
+    elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") then
+        return inst.llnum < inst.need * inst.maxlevel, "GENERIC"
+    elseif item.prefab == "horrorfuel" then
+        return not inst.unlock_cckj, "GENERIC"
+    elseif item.prefab == "sora_wsqt" then
+        return not inst.unlock_wsqt, "GENERIC"
+    elseif item.prefab == "security_pulse_cage_full" then
+        return not inst.unlock_wzhh, "GENERIC"
+    end
+    return false, "WRONGTYPE"
 end
-local function TraderCount(inst,giver,item)
-	local arm = 1-inst.components.armor:GetPercent()
-	if l[item.prefab]  then
-		return math.floor(arm/l[item.prefab])
-	elseif (item.prefab == "bearger_fur" ) then
-		return  inst.need * inst.maxlevel  - inst.mpnum 
-	elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") then
-		return  inst.need * inst.maxlevel - inst.llnum 
-	end
-	return 1
+local function TraderCount(inst, giver, item)
+    local arm = 1 - inst.components.armor:GetPercent()
+    if l[item.prefab] then
+        return math.floor(arm / l[item.prefab])
+    elseif (item.prefab == "bearger_fur") then
+        return inst.need * inst.maxlevel - inst.mpnum
+    elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") then
+        return inst.need * inst.maxlevel - inst.llnum
+      elseif item.prefab == "horrorfuel" then
+        return not inst.unlock_cckj and 1 or 0
+    elseif item.prefab == "sora_wsqt" then
+        return not inst.unlock_wsqt and 1 or 0
+    elseif item.prefab == "security_pulse_cage_full" then
+        return not inst.unlock_wzhh and 1 or 0
+    end
+    return 1
 end
 local function OnGetItemFromPlayer(inst, giver, item)
-		local num = 1
-		if item.components.stackable then
-		num = item.components.stackable.stacksize
-		end
-		if l[item.prefab]  then
-		inst.components.armor:SetPercent(inst.components.armor:GetPercent()+l[item.prefab]*num)
-		elseif (item.prefab == "bearger_fur")then
-			inst.mpnum = inst.mpnum + num
-			inst.mplevel = math.min(math.floor(inst.mpnum / inst.need),inst.maxlevel)
-			if inst.mplevel < inst.maxlevel then 
-				giver.components.talker:Say("毛皮数量:"..inst.mpnum.."/"..inst.need * inst.maxlevel.."\tLV:"..inst.mplevel .."\n护温："..(hot1+hot2*inst.mplevel))
-				else
-				giver.components.talker:Say("毛皮已满\tLV:10\n护温："..(hot1+hot2*inst.mplevel))
-			end
-		elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") 
-			then
-			inst.llnum = inst.llnum + num
-			inst.lllevel = math.min(math.floor(inst.llnum / inst.need),inst.maxlevel)
-			if inst.lllevel < inst.maxlevel then 
-				giver.components.talker:Say("龙鳞数量:"..inst.llnum.."/"..inst.need * inst.maxlevel.."\tLV:"..inst.lllevel.."\n护甲："..((arm1+arm2*inst.lllevel)*100).."%")
-				else
-				giver.components.talker:Say("龙鳞已满\tLV:10\n护甲："..((arm1+arm2*inst.lllevel)*100).."%")
-			end	
-		end
-	upgrade(inst)
+    local num = 1
+    if item.components.stackable then
+        num = item.components.stackable.stacksize
+    end
+    if l[item.prefab] then
+        inst.components.armor:SetPercent(inst.components.armor:GetPercent() + l[item.prefab] * num)
+    elseif (item.prefab == "bearger_fur") then
+        inst.mpnum = inst.mpnum + num
+        inst.mplevel = math.min(math.floor(inst.mpnum / inst.need), inst.maxlevel)
+        if inst.mplevel < inst.maxlevel then
+            giver.components.talker:Say("毛皮数量:" .. inst.mpnum .. "/" .. inst.need * inst.maxlevel .. "\tLV:" ..
+                                            inst.mplevel .. "\n护温：" .. (hot1 + hot2 * inst.mplevel))
+        else
+            giver.components.talker:Say("毛皮已满\tLV:10\n护温：" .. (hot1 + hot2 * inst.mplevel))
+        end
+    elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") then
+        inst.llnum = inst.llnum + num
+        inst.lllevel = math.min(math.floor(inst.llnum / inst.need), inst.maxlevel)
+        if inst.lllevel < inst.maxlevel then
+            giver.components.talker:Say("龙鳞数量:" .. inst.llnum .. "/" .. inst.need * inst.maxlevel .. "\tLV:" ..
+                                            inst.lllevel .. "\n护甲：" .. ((arm1 + arm2 * inst.lllevel) * 100) .. "%")
+        else
+            giver.components.talker:Say("龙鳞已满\tLV:10\n护甲：" .. ((arm1 + arm2 * inst.lllevel) * 100) .. "%")
+        end
+    elseif item.prefab == "horrorfuel" then
+        if inst.unlock_cckj then
+            giver.components.talker:Say("纯粹恐惧已解锁")
+        else
+            inst.unlock_cckj = true
+            giver.components.talker:Say("纯粹恐惧解锁成功,盾上限+1,恢复加快")
+        end
+    elseif item.prefab == "sora_wsqt" then
+        if inst.unlock_wsqt then
+            giver.components.talker:Say("万圣奇谭已解锁")
+        else
+            inst.unlock_wsqt = true
+            giver.components.talker:Say("万圣奇谭解锁成功,盾上限+1,恢复加快")
+        end
+    elseif item.prefab == "security_pulse_cage_full" then
+        if inst.unlock_wzhh then
+            giver.components.talker:Say("充能火花柜已解锁")
+        else
+            inst.unlock_wzhh = true
+            giver.components.talker:Say("充能火花柜解锁成功,盾上限+1,恢复加快")
+        end
+    end
+    upgrade(inst)
 end
 
 local function onpreload(inst, data)
-	if data then
-		inst.mpnum = data.mpnum or 0
-		inst.llnum = data.llnum or 0
-		upgrade(inst)
-	end
+    if data then
+        inst.mpnum = data.mpnum or 0
+        inst.llnum = data.llnum or 0
+        inst.unlock_cckj = data.unlock_cckj or false
+        inst.unlock_wsqt = data.unlock_wsqt or false
+        inst.unlock_wzhh = data.unlock_wzhh or false
+        upgrade(inst)
+    end
 end
 
 local function onsave(inst, data)
-	data.mpnum = inst.mpnum
-	data.llnum = inst.llnum
+    data.mpnum = inst.mpnum
+    data.llnum = inst.llnum
+    data.unlock_cckj = inst.unlock_cckj
+    data.unlock_wsqt = inst.unlock_wsqt
+    data.unlock_wzhh = inst.unlock_wzhh
 end
 
-local function onSetCondition(self,amount)
+local function onSetCondition(self, amount)
     self.condition = math.min(amount, self.maxcondition)
-    self.inst:PushEvent("percentusedchange", { percent = self:GetPercent() })
+    self.inst:PushEvent("percentusedchange", {
+        percent = self:GetPercent()
+    })
     if self.condition <= 0 then
         self.condition = 0
-        ProfileStatsSet("armor_broke_"..self.inst.prefab, true)
+        ProfileStatsSet("armor_broke_" .. self.inst.prefab, true)
         ProfileStatsSet("armor", self.inst.prefab)
 
         if self.onfinished ~= nil then
@@ -150,36 +197,44 @@ local function onSetCondition(self,amount)
     end
 end
 
-
-local function onequip(inst, owner) 
-	if owner ~= nil and not owner:HasTag("sora") and not owner:HasTag("seele")  then 
-	owner:DoTaskInTime(0, function()
-            if owner.components.inventory  then owner.components.inventory:GiveItem(inst) end
-            if  owner.components.talker then owner.components.talker:Say("这是Sora的衣服") end
-			end)
-	end
-    if owner:HasTag("seele") then owner:AddTag("seele_uniform")  end
+local function onequip(inst, owner)
+    if owner ~= nil and not owner:HasTag("sora") and not owner:HasTag("seele") then
+        owner:DoTaskInTime(0, function()
+            if owner.components.inventory then
+                owner.components.inventory:GiveItem(inst)
+            end
+            if owner.components.talker then
+                owner.components.talker:Say("这是Sora的衣服")
+            end
+        end)
+    end
+    if owner:HasTag("seele") then
+        owner:AddTag("seele_uniform")
+    end
     owner.AnimState:ClearOverrideSymbol("swap_body")
-	if owner.components.health ~= nil then   owner.components.health.externalfiredamagemultipliers:SetModifier(inst, 0)
+    if owner.components.health ~= nil then
+        owner.components.health.externalfiredamagemultipliers:SetModifier(inst, 0)
     end
 end
 
-local function onunequip(inst, owner) 
+local function onunequip(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
-    if owner:HasTag("seele") then owner:RemoveTag("seele_uniform") end
-	if owner.components.health ~= nil then
+    if owner:HasTag("seele") then
+        owner:RemoveTag("seele_uniform")
+    end
+    if owner.components.health ~= nil then
         owner.components.health.externalfiredamagemultipliers:RemoveModifier(inst)
     end
 end
 
-local function onrepair(inst) 
-	if inst.components.armor then 
-		inst.components.armor:SetPercent(inst.components.armor:GetPercent()+0.01)
-	end
+local function onrepair(inst)
+    if inst.components.armor then
+        inst.components.armor:SetPercent(inst.components.armor:GetPercent() + 0.01)
+    end
 end
 
-local function onAbsorption(self) 
-	return  self:GetPercent() > 0 and self.inst.abs or nil
+local function onAbsorption(self)
+    return self:GetPercent() > 0 and self.inst.abs or nil
 end
 
 local function fn()
@@ -188,38 +243,52 @@ local function fn()
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
-
+    inst:AddTag("meteor_protection")
     MakeInventoryPhysics(inst)
-	inst:AddTag("aquatic")
+    inst:AddTag("aquatic")
     inst.AnimState:SetBank("soraclothes")
     inst.AnimState:SetBuild("soraclothes")
     inst.AnimState:PlayAnimation("anim")
-	inst:AddComponent("soratwoface")
-	inst:AddTag("soratrader")
+    inst:AddComponent("soratwoface")
+    inst:AddTag("soratrader")
     inst:AddTag("waterproofer")
     inst.entity:SetPristine()
-	inst.entity:AddMiniMapEntity()
-	inst.MiniMapEntity:SetIcon("soraclothes.tex")
+    inst.entity:AddMiniMapEntity()
+    inst.MiniMapEntity:SetIcon("soraclothes.tex")
     if not TheWorld.ismastersim then
         return inst
     end
 
+    inst.sora_sheild = 0
+    inst.sora_sheild_tick = 0
+    inst:DoPeriodicTask(1, function(i)
+        if inst.jwslevel > 0 then
+            inst.sora_sheild_tick = inst.sora_sheild_tick + 1
+        end
+        if (inst.jwslevel == 3 and inst.sora_sheild_tick > 4) or (inst.jwslevel == 2 and inst.sora_sheild_tick > 9) or
+            (inst.jwslevel == 1 and inst.sora_sheild_tick > 19) then
+            inst.sora_sheild = math.min(inst.sora_sheild + 1, inst.jwslevel)
+            inst.sora_sheild_tick = 0
+        end
+    end)
+
     inst:AddComponent("inspectable")
-	inst.components.inspectable:SetDescription([[
+    inst.components.inspectable:SetDescription([[
 	这是sora的衣服
 	可以通过熊皮升级保暖
 	可以通过龙鳞升级护甲和耐久
 	每10秒回复1%耐久
+	纯粹恐惧开启骨甲
 	]])
     inst:AddComponent("inventoryitem")
-	inst.components.inventoryitem.atlasname="images/inventoryimages/soraclothes.xml"
-	inst.components.inventoryitem.imagename="soraclothes"
-	--保温
-	inst:AddComponent("insulator")
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/soraclothes.xml"
+    inst.components.inventoryitem.imagename = "soraclothes"
+    -- 保温
+    inst:AddComponent("insulator")
     inst.components.insulator:SetInsulation(0)
-	--防水
+    -- 防水
 
-	inst:DoPeriodicTask(1, function()
+    inst:DoPeriodicTask(1, function()
         local owner = inst.components.inventoryitem:GetGrandOwner()
         if not owner then
             return
@@ -227,9 +296,9 @@ local function fn()
         if owner.components.temperature then
             local temp = owner.components.temperature.current
             local wtemp = TheWorld.state.temperature or 0
-            if wtemp > 50 then 
+            if wtemp > 50 then
                 inst.components.insulator:SetSummer()
-            elseif wtemp < 20 then 
+            elseif wtemp < 20 then
                 inst.components.insulator:SetWinter()
             elseif (temp - wtemp > 5) then
                 inst.components.insulator:SetSummer()
@@ -241,44 +310,47 @@ local function fn()
         end
     end)
 
-	inst:AddComponent("waterproofer")
+    inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(0)
-	--护甲
-	inst:AddComponent("planardefense")
-	inst.components.planardefense:SetBaseDefense(5)
+    -- 护甲
+    inst:AddComponent("planardefense")
+    inst.components.planardefense:SetBaseDefense(5)
     inst:AddComponent("armor")
-	--inst:AddTag("hide_percentage")
-	inst.abs=arm1
-    inst.components.armor:InitCondition(arm3,inst.abs)
-	inst.components.armor.GetAbsorption = onAbsorption 
-	inst:DoPeriodicTask(arm5,onrepair)
-	inst.components.armor.SetCondition = onSetCondition
-	
+    -- inst:AddTag("hide_percentage")
+    inst.abs = arm1
+    inst.components.armor:InitCondition(arm3, inst.abs)
+    inst.components.armor.GetAbsorption = onAbsorption
+    inst:DoPeriodicTask(arm5, onrepair)
+    inst.components.armor.SetCondition = onSetCondition
+
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.BODY
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)
-	--回脑残
-	inst.components.equippable.dapperness = getsora("soraclothessan")/60
-	--移速
-	inst.components.equippable.walkspeedmult = math.min(getsora("soraclothesspe"),2.5)
-	
-	inst.need = TUNING.SORAMODE/2
-	inst.maxlevel = 10
-	inst.mpnum = 0
-	inst.llnum = 0
-	inst.mplevel = 0
-	inst.lllevel = 0
-	
-	inst:AddComponent("trader")
-	inst.cantrader = TraderCount
-	inst.components.trader:SetAcceptTest(AcceptTest)
-	inst.components.trader.onaccept = OnGetItemFromPlayer
-	inst.components.trader.onrefuse = OnRefuseItem
+    -- 回脑残
+    inst.components.equippable.dapperness = getsora("soraclothessan") / 60
+    -- 移速
+    inst.components.equippable.walkspeedmult = math.min(getsora("soraclothesspe"), 2.5)
+
+    inst.need = TUNING.SORAMODE / 2
+    inst.maxlevel = 10
+    inst.mpnum = 0
+    inst.llnum = 0
+    inst.unlock_cckj = false
+    inst.unlock_wzhh = false
+    inst.unlock_wsqt = false
+    inst.mplevel = 0
+    inst.lllevel = 0
+    inst.jwslevel = 0
+    inst:AddComponent("trader")
+    inst.cantrader = TraderCount
+    inst.components.trader:SetAcceptTest(AcceptTest)
+    inst.components.trader.onaccept = OnGetItemFromPlayer
+    inst.components.trader.onrefuse = OnRefuseItem
     inst:AddComponent("soraitem")
-	inst.OnSave = onsave
-	inst.OnPreLoad = onpreload
-	--MakeHauntableLaunch(inst)
+    inst.OnSave = onsave
+    inst.OnPreLoad = onpreload
+    -- MakeHauntableLaunch(inst)
 
     return inst
 end

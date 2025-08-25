@@ -267,7 +267,7 @@ local function fn()
     inst:AddTag("trader")
     inst:AddTag("soratrader")
     inst:AddTag("waterproofer")
-
+    inst:AddTag("meteor_protection")
     -- waterproofer (from waterproofer component) added to pristine state for optimization
 
     inst.entity:SetPristine()

@@ -44,6 +44,7 @@ local function fn()
     anim:SetBuild("sora_lock")
     anim:PlayAnimation("idle",true)
     inst:AddTag("soracontainlock")
+    inst:AddTag("meteor_protection")
     inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
         return inst

@@ -263,7 +263,7 @@ local function fn()
     inst.AnimState:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
     inst:AddTag("light")
-
+    inst:AddTag("meteor_protection")
     MakeInventoryFloatable(inst, "med", nil, {0.775, 0.5, 0.775})
 
     inst.entity:SetPristine()

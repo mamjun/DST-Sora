@@ -43,6 +43,8 @@ local com = Class(function(self, inst)
     self.updatetask = {}
     self.taskid = 0
     self.expsave = {}
+    self.disbaleSoraRec = false
+    self.nextrepot = false
     self.tick = 0
     self.con = inst.components.container
     self.ticktask = inst:DoPeriodicTask(0.1, function()
@@ -61,7 +63,15 @@ local com = Class(function(self, inst)
     end
 
 end)
-
+function com:DisbaleSoraRec(dis)
+    self.disbaleSoraRec = dis 
+    self.nextrepot = true
+    if dis then 
+        self.inst:AddTag("disablesorarec")
+    else
+        self.inst:RemoveTag("disablesorarec")
+    end
+end
 function com:RegSlot(type, inslot, outslot, powerneed)
     local slot = self.cookslot[type] or {}
     self.cookslot[type] = slot
@@ -216,7 +226,8 @@ function com:UpdateSubSoraPot(k, data)
         }
     end
     local d = data[4]
-    local needrepot = false
+    local needrepot = self.nextrepot or  false
+    self.nextrepot = false
     -- 检测物品是否有变化
 
     for ik, slot in pairs(data[1]) do
@@ -670,6 +681,9 @@ end
 local WList = require("util/weighted_list")
 
 function com:GetSoraPotRec(slots)
+    if self.disbaleSoraRec then 
+        return nil
+    end
     local data = {
         cooker = self.inst,
         doer = self:GetDoer(),

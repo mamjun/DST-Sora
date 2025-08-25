@@ -273,7 +273,7 @@ local function fn()
     inst.entity:AddNetwork()
     inst.entity:AddSoundEmitter()
     MakeInventoryPhysics(inst)
-
+    inst:AddTag("meteor_protection")
     inst.MiniMapEntity:SetIcon("sorabowknot.tex")
 
     inst.AnimState:SetBank("sorabowknot")

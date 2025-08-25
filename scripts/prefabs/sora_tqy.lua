@@ -317,6 +317,7 @@ local function fn()
     inst:AddTag("thrown")
     inst:AddTag("weapon")
     inst:AddTag("projectile")
+    inst:AddTag("meteor_protection")
     local swap_data = {
         sym_build = "base"
     }
@@ -485,7 +486,7 @@ local function boxfn()
     -- inst.AnimState:SetRayTestOnBB(true)
     inst:AddTag("sora_tqy_box")
     inst:AddComponent("soratwoface")
-
+    inst:AddTag("meteor_protection")
     inst.entity:SetPristine()
 
     if not TheWorld.ismastersim then

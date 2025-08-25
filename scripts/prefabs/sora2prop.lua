@@ -59,7 +59,7 @@ local function fn()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
-
+    inst:AddTag("meteor_protection")
     inst.AnimState:SetBank("sora2prop")
     inst.AnimState:SetBuild("sora2prop")
     inst.AnimState:PlayAnimation("anim")

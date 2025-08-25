@@ -328,6 +328,14 @@ temp.serverfn = function(ns, db, userid)
         end
         TheWorld.components.sorachestmanager:GetStopTime(doer)
     end)
+    db:ListenForEvent("SoraDisableRec", function(id, data, event, ent)
+        if not (type(data) == "table" and type(data.dis) =="boolean" and ent) then
+            return
+        end
+        if ent and ent.components.sorapot then 
+            ent.components.sorapot:DisbaleSoraRec(data.dis)
+        end
+    end)
     db:ListenForEvent("SoraBuild", function(id, data, event, ent)
         if not (data and type(data) == "table" and data.cmd) then
             return
@@ -343,10 +351,10 @@ temp.serverfn = function(ns, db, userid)
             doer.sorabuildcd = SoraCD(0.1)
         end
         if not (ent and ent.prefab == "sora_build") then
-            print(222)
+            --print(222)
             return
         end
-        print(id,data,event,ent)
+        --print(id,data,event,ent)
         if cmd == "Reset" then
             ent:ResetBuild(doer)
         elseif cmd == "Set" then

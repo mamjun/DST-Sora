@@ -48,6 +48,7 @@ local function upgrade(inst)
     -- inst.yqlevel = math.min(math.floor(inst.yqnum / inst.need),inst.maxlevel)
     inst.yqlevel = math.min(math.floor(inst.yqnum * 2 / inst.need), inst.maxlevel)
     inst.lllevel = math.min(math.floor(inst.llnum / inst.need), inst.maxlevel)
+    inst.jwslevel = (inst.unlock_wsqt and 1 or 0) + (inst.unlock_cckj and 1 or 0) +(inst.unlock_wzhh and 1 or 0)
     -- 保暖
     -- inst.components.insulator:SetInsulation(24*inst.yqlevel)
     -- 防水
@@ -74,6 +75,10 @@ local function OnRefuseItem(inst, giver, item)
         refusesay = refusesay ..
                         string.format("\n甲(鳞):\t%d/" .. inst.need * inst.maxlevel .. "\t%d\t%d%%", inst.llnum,
                 inst.lllevel, math.min(arm1 + arm2 * inst.lllevel, 0.99) * 100)
+        refusesay = refusesay ..
+                        string.format("\n盾:\t%d 万圣奇谭:%s 纯粹恐惧:%s 充能火花柜:%s",
+                 inst.jwslevel,inst.unlock_wsqt and "Y" or "N",inst.unlock_cckj and "Y" or "N",inst.unlock_wzhh and "Y" or "N")
+
         giver.components.talker:Say(refusesay)
     end
 end
@@ -85,6 +90,12 @@ local function AcceptTest(inst, item)
         return inst.yqnum * 2 < inst.need * inst.maxlevel, "GENERIC"
     elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") then
         return inst.llnum < inst.need * inst.maxlevel, "GENERIC"
+    elseif item.prefab == "horrorfuel" then
+        return not inst.unlock_cckj, "GENERIC"
+    elseif item.prefab == "sora_wsqt" then
+        return not inst.unlock_wsqt, "GENERIC"
+    elseif item.prefab == "security_pulse_cage_full" then
+        return not inst.unlock_wzhh, "GENERIC"
     end
     return false, "WRONGTYPE"
 end
@@ -97,6 +108,12 @@ local function TraderCount(inst, giver, item)
         return math.floor((inst.need * inst.maxlevel - inst.yqnum * 2) / 2)
     elseif (item.prefab == "dragon_scales" or item.prefab == "shark_gills") then
         return inst.need * inst.maxlevel - inst.llnum
+    elseif item.prefab == "horrorfuel" then
+        return not inst.unlock_cckj and 1 or 0
+    elseif item.prefab == "sora_wsqt" then
+        return not inst.unlock_wsqt and 1 or 0
+    elseif item.prefab == "security_pulse_cage_full" then
+        return not inst.unlock_wzhh and 1 or 0
     end
     return 1
 end
@@ -129,6 +146,27 @@ local function OnGetItemFromPlayer(inst, giver, item)
             giver.components.talker:Say("龙鳞已满\tLV:10\n护甲：" ..
                                             (math.min(arm1 + arm2 * inst.lllevel, 0.99) * 100) .. "%")
         end
+    elseif item.prefab == "horrorfuel" then
+        if inst.unlock_cckj then 
+            giver.components.talker:Say("纯粹恐惧已解锁")
+        else
+            inst.unlock_cckj = true
+            giver.components.talker:Say("纯粹恐惧解锁成功,盾上限+1,恢复加快")
+        end
+    elseif item.prefab == "sora_wsqt" then
+        if inst.unlock_wsqt then 
+            giver.components.talker:Say("万圣奇谭已解锁")
+        else
+            inst.unlock_wsqt = true
+            giver.components.talker:Say("万圣奇谭解锁成功,盾上限+1,恢复加快")
+        end
+    elseif item.prefab == "security_pulse_cage_full" then
+        if inst.unlock_wzhh then 
+            giver.components.talker:Say("充能火花柜已解锁")
+        else
+            inst.unlock_wzhh = true
+            giver.components.talker:Say("充能火花柜解锁成功,盾上限+1,恢复加快")
+        end
     end
     upgrade(inst)
 end
@@ -137,6 +175,9 @@ local function onpreload(inst, data)
     if data then
         inst.yqnum = data.yqnum or 0
         inst.llnum = data.llnum or 0
+         inst.unlock_cckj = data.unlock_cckj or false
+        inst.unlock_wsqt = data.unlock_wsqt or false
+        inst.unlock_wzhh = data.unlock_wzhh or false
         upgrade(inst)
     end
 end
@@ -144,6 +185,9 @@ end
 local function onsave(inst, data)
     data.yqnum = inst.yqnum
     data.llnum = inst.llnum
+      data.unlock_cckj  = inst.unlock_cckj
+    data.unlock_wsqt  = inst.unlock_wsqt
+    data.unlock_wzhh  = inst.unlock_wzhh
 end
 
 local function onSetCondition(self, amount)
@@ -186,7 +230,7 @@ local function onequip(inst, owner)
         owner.AnimState:Hide("HAIR_NOHAT")
         owner.AnimState:Hide("HAIR")
     end
-   
+
     -- owner.AnimState:ClearOverrideSymbol("swap_body")
 end
 
@@ -214,7 +258,7 @@ local function fn()
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
-
+    inst:AddTag("meteor_protection")
     MakeInventoryPhysics(inst)
     inst:AddTag("aquatic")
     inst.AnimState:SetBank("sorahat")
@@ -234,13 +278,25 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
-
+    inst.sora_sheild = 0
+    inst.sora_sheild_tick = 0
+    inst:DoPeriodicTask(1, function(i)
+        if inst.jwslevel > 0 then
+            inst.sora_sheild_tick = inst.sora_sheild_tick + 1
+        end
+        if (inst.jwslevel == 3 and inst.sora_sheild_tick > 4) or (inst.jwslevel == 2 and inst.sora_sheild_tick > 9) or
+            (inst.jwslevel == 1 and inst.sora_sheild_tick > 19) then
+            inst.sora_sheild = math.min(inst.sora_sheild + 1, inst.jwslevel)
+            inst.sora_sheild_tick = 0
+        end
+    end)
     inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription([[
 	这是sora的帽子
 	通过眼球升级防水
 	通过龙鳞升级护甲和耐久
 	每10秒回复1%耐久
+    纯粹恐惧开启骨甲
 	]])
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.atlasname = "images/inventoryimages/sorahat.xml"
@@ -275,9 +331,12 @@ local function fn()
     inst.maxlevel = 10
     inst.yqnum = 0
     inst.llnum = 0
+    inst.unlock_cckj = false
+    inst.unlock_wzhh = false
+    inst.unlock_wsqt = false
     inst.yqlevel = 0
     inst.lllevel = 0
-
+    inst.jwslevel = 0
     inst:AddComponent("trader")
     inst.cantrader = TraderCount
     inst.components.trader:SetAcceptTest(AcceptTest)

@@ -194,7 +194,7 @@ Rec("sorarepairer", "穹の星星杖", "哪里坏了点哪里", item, "sora", {{
 Rec("sora2pokeball", "穹の精灵球", "你才到球里去", item, "sora", {
     goldnugget = 10,
     telestaff = 1,
-    sora_flh = 1
+    sora_quqi = 1
 })
 Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
     goose_feather = 5,
@@ -212,15 +212,15 @@ Rec("sorabag", "穹の包", "小穹的四次元背包", equip, "soraself", {{
 }})
 
 Rec("sora_pot", "穹の料理锅", "炖出好吃的", equip, "sora", {{
-    sora_flh = 1,
+    bonesoup = 1,
     goldnugget = 10,
     nightmare_timepiece = 3
 }, {
-    sora_flh = 1,
+    bonesoup = 1,
     goldnugget = 40,
     nightmare_timepiece = 5
 }, {
-    sora_flh = 2,
+    bonesoup = 2,
     goldnugget = 100,
     nightmare_timepiece = 10
 }}).placer = "no"
