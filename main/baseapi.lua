@@ -130,7 +130,8 @@ function SoraConfigClass:Load()
     TheSim:GetPersistentString(self.name, function(load_success, str)
         if load_success then
             local loadconfig = loadstring(str)
-            if loadconfig then loadconfig = loadconfig() else TheSim:SetPersistentString(self.name, "", false)  return end
+            if loadconfig then loadconfig = loadconfig() else TheSim:SetPersistentString(self.name, "reutrn {}", false)  return end
+            if  type(loadconfig) ~= "table" then loadconfig = {} end 
             for k,v in pairs(loadconfig) do 
                 self:Set(k,v)
             end

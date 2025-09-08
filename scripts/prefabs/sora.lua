@@ -706,7 +706,7 @@ local common_postinit = function(inst)
         set = function(a, b, v)
             inst.soraexplocal = b
         end,
-        setlocal = function()
+        setlocal = function(a,b,v)
             inst.soraexplocal = b
         end
     }
