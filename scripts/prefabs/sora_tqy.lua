@@ -258,7 +258,7 @@ local function GetNextTarget(inst, target, try)
 end
 local function OnHit(inst, owner, target)
     inst.components.inventoryitem.canbepickedup = true
-    inst.components.projectile:SetSpeed(12 + math.random() * 6)
+    inst.components.projectile:SetSpeed(8 + math.random() * 10)
     GetNextTarget(inst, target)
     if target and not target:HasTag("player") and inst.delayowner ~= target and target:IsValid() and
         target.components.combat then

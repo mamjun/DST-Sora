@@ -1024,7 +1024,7 @@ end)
 AddComponentPostInit("combat", function(self)
     local oldGetAttacked = self.GetAttacked
     self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
-        if damage > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
+        if (damage or 0)> 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
             if not s.sora_wsqt_fxCD then
                 s.sora_wsqt_fxCD = SoraCD(3)
             end
@@ -1054,13 +1054,18 @@ AddComponentPostInit("combat", function(self)
     local DoAttack = self.DoAttack
     self.DoAttack = function(self, targ, weapon, ...)
         if weapon and weapon:HasTag("sora_tqy") then
+            
             if weapon.delayowner == targ then
                 return
             end
             if not targ.sora_tqyattackcd then
-                targ.sora_tqyattackcd = SoraCD(0.1)
+                targ.sora_tqyattackcd = LeakTable()
             end
-            if not targ.sora_tqyattackcd() then
+            local doer = self.inst
+            if not targ.sora_tqyattackcd[doer] then
+                targ.sora_tqyattackcd[doer] = SoraCD(0.1)
+            end
+            if not targ.sora_tqyattackcd[doer]() then
                 return
             end
         end
@@ -1080,7 +1085,7 @@ AddPrefabPostInit("sora", function(inst)
 
     local oldGetAttacked = inst.components.combat.GetAttacked
     inst.components.combat.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
-        if damage > 20 then
+        if (damage  or 0)> 20 then
             local body = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
             local hat = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
             if (body and body.sora_sheild and body.sora_sheild > 0) or (hat and hat.sora_sheild and hat.sora_sheild > 0) then

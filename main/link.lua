@@ -354,7 +354,7 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
         if TheWorld.ismastersim then
             local oldGetAttacked = inst.components.combat.GetAttacked
             inst.components.combat.GetAttacked = function(self, doer, dam, cause, ...)
-                if dam > 2000 and
+                if (dam or 0 ) > 2000 and
                     (not doer or doer:HasTag("elaina") or not doer:HasTag("epic") or not doer:HasTag("monster")) then
                     -- 收到超过2000点 非boss 非怪物的伤害 伊蕾娜 你看着办吧 
                     if doer then
