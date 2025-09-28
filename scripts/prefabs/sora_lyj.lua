@@ -1,9 +1,9 @@
 local Say = SoraAPI.Say
 local assets = {}
 
-function SoraAPI.TryPhoto(inst, doer,lyj, must)
+function SoraAPI.TryPhoto(inst, doer, lyj, must)
     local srcinst = inst
-    if inst.highlightforward  then 
+    if inst.highlightforward then
         inst = inst.highlightforward
     end
     if not inst.AnimState then
@@ -32,12 +32,12 @@ function SoraAPI.TryPhoto(inst, doer,lyj, must)
         end
     end
     if inst == doer and SoraAPI.IsSuperAdmin(doer.userid) and not must then
-        if lyj.components.rechargeable then 
+        if lyj and lyj.components.rechargeable then
             lyj.components.rechargeable:Discharge(3)
         end
         inst:StartThread(function()
             Sleep(3)
-            local data = SoraAPI.TryPhoto(inst, doer,lyj, true)
+            local data = SoraAPI.TryPhoto(inst, doer, lyj, true)
             if not data then
                 Say(doer, "拍照失败咯", true)
                 return true
@@ -49,7 +49,7 @@ function SoraAPI.TryPhoto(inst, doer,lyj, must)
             item:SetData(data)
             doer.components.inventory:GiveItem(item, nil, doer:GetPosition())
         end)
-        return 
+        return
     end
     local skinbuild = inst.AnimState:GetSkinBuild()
     if skinbuild and skinbuild ~= "" then
@@ -65,12 +65,12 @@ function SoraAPI.TryPhoto(inst, doer,lyj, must)
     local debugstring = inst.entity:GetDebugString()
 
     local dbank, dbuild, anim = debugstring:match("bank: (.+) build: (.+) anim: .+:(.+) Frame")
-    --print(bank,build,dbank, dbuild, anim)
+    -- print(bank,build,dbank, dbuild, anim)
     if not (bank and build and anim) then
         Say(doer, "这个暂时不能留影")
         return
     end
-    
+
     local name = srcinst:GetDisplayName()
     local swaps = {}
     for k, v in pairs(SoraAPI.AllSwap) do
@@ -85,7 +85,7 @@ function SoraAPI.TryPhoto(inst, doer,lyj, must)
         bank = bank,
         build = build,
         anim = anim,
-        loop = true,
+        animloop = false,
         scale = {xs, ys, zs},
         swaps = swaps,
         name = name,
@@ -138,7 +138,7 @@ local function SetData(inst, data)
     if data and data.prefab and Prefabs[data.prefab] then
         inst.AnimState:SetBank(data.bank)
         inst.AnimState:SetBuild(data.build)
-        inst.AnimState:PlayAnimation(data.anim or "", data.loop)
+        inst.AnimState:PlayAnimation(data.anim or "", data.animloop)
         for k, v in pairs(data.swaps) do
             inst.AnimState:OverrideSymbol(k, v[1], v[2])
         end
@@ -184,7 +184,7 @@ local function SetData(inst, data)
         else
             inst.AnimState:Hide("snow")
         end
-        if data.overbuild then 
+        if data.overbuild then
             for k, v in pairs(data.overbuild) do
                 if v then
                     inst.AnimState:AddOverrideBuild(k)
@@ -225,6 +225,32 @@ local function onhammered(inst, worker)
     inst:Remove()
 end
 
+local PhotoFn = {
+    goldnugget = function(inst,doer)
+        inst.data.animloop = not inst.data.animloop
+        inst:SetData(inst.data)
+        SoraAPI.Say(doer,"留影"..(inst.data.animloop and "循环" or "单次").."播放")
+    end
+}
+local function PhotoOnGet(inst, item,doer)
+    if not item then
+        return true
+    end
+    if not (doer and doer:HasTag("player")) then
+        return true
+    end
+    local prefab = item.prefab
+    if PhotoFn[prefab] then
+        PhotoFn[prefab](inst,doer)
+    elseif PhotoFn.Default then 
+        PhotoFn.Default(inst,doer)
+    end
+
+    return true
+end
+
+
+
 local function photofn()
     local inst = CreateEntity()
     local trans = inst.entity:AddTransform()
@@ -257,6 +283,9 @@ local function photofn()
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(4)
     inst.components.workable:SetOnFinishCallback(onhammered)
+    inst:AddComponent("trader")
+    inst.components.trader:SetAbleToAcceptTest(PhotoOnGet)
+    inst.components.trader.AcceptGift = SoraAPI.NilFn
 
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(1)
@@ -280,6 +309,8 @@ local function OnDeploy(inst, pt, deployer)
         inst:Remove()
     end
 end
+local lyjname = "sora_lyj"
+SoraAPI.MakeAssetTable(lyjname, assets)
 
 local function photo_itemfn()
     local inst = CreateEntity()
@@ -302,6 +333,7 @@ local function photo_itemfn()
     end
     inst:AddComponent("sorasavecmp")
     inst.components.sorasavecmp:AddSave("data", function(i, data)
+
         return inst.data
     end)
     inst.components.sorasavecmp:AddLoad("data", function(i, data)
@@ -323,10 +355,9 @@ local function photo_itemfn()
     inst.components.deployable.ondeploy = OnDeploy
     inst.components.deployable.spacing = DEPLOYSPACING.NONE
     inst.components.deployable:SetDeployMode(DEPLOYMODE.CUSTOM)
+    
     return inst
 end
-local lyjname = "sora_lyj"
-SoraAPI.MakeAssetTable(lyjname, assets)
 
 local function fn()
     local inst = CreateEntity()
