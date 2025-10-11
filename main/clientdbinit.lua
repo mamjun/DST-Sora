@@ -46,8 +46,8 @@ temp:InitRoot("cook")
 temp.serverfn = function(ns, db, userid)
     db.inst = TheWorld
     local getfn = function(s, r, k, v)
-        if k == 'use' then 
-            if db.player and db.player.components.sorafoodrec then 
+        if k == 'use' then
+            if db.player and db.player.components.sorafoodrec then
                 return db.player.components.sorafoodrec.hasuse
             end
             return {}
@@ -60,7 +60,9 @@ temp.serverfn = function(ns, db, userid)
     end
 
     local getrootfn = function(s, r)
-        return {use= db.player and db.player.components.sorafoodrec and db.player.components.sorafoodrec.hasuse or {}}
+        return {
+            use = db.player and db.player.components.sorafoodrec and db.player.components.sorafoodrec.hasuse or {}
+        }
     end
     local bind = db:BindRootFn("cook", getfn, setfn, getrootfn)
 end
@@ -329,10 +331,10 @@ temp.serverfn = function(ns, db, userid)
         TheWorld.components.sorachestmanager:GetStopTime(doer)
     end)
     db:ListenForEvent("SoraDisableRec", function(id, data, event, ent)
-        if not (type(data) == "table" and type(data.dis) =="boolean" and ent) then
+        if not (type(data) == "table" and type(data.dis) == "boolean" and ent) then
             return
         end
-        if ent and ent.components.sorapot then 
+        if ent and ent.components.sorapot then
             ent.components.sorapot:DisbaleSoraRec(data.dis)
         end
     end)
@@ -351,15 +353,15 @@ temp.serverfn = function(ns, db, userid)
             doer.sorabuildcd = SoraCD(0.1)
         end
         if not (ent and ent.prefab == "sora_build") then
-            --print(222)
+            -- print(222)
             return
         end
-        --print(id,data,event,ent)
+        -- print(id,data,event,ent)
         if cmd == "Reset" then
             ent:ResetBuild(doer)
         elseif cmd == "Set" then
             if data.pos and data.scale then
-                ent:FixBuild(doer,Point(data.pos.x,data.pos.y,data.pos.z),data.scale)
+                ent:FixBuild(doer, Point(data.pos.x, data.pos.y, data.pos.z), data.scale)
             else
                 return
             end
@@ -414,7 +416,9 @@ AddPlayerPostInit(function(inst)
                 if data.item and data.item:HasTag("sora_photo") and data.item.data and data.item.data.bank then
                     db:Set('data', 'photodata', data.item.data)
                 else
-                    db:Set('data', 'photodata', nil)
+                    if (db:Get('data', 'photodata')) then
+                        db:Set('data', 'photodata', nil)
+                    end
                 end
             end
         end)

@@ -561,7 +561,7 @@ function GLOBAL.SoraMakeWidgetMovable(s, name, pos, data) -- 使UI可移动
         end
         local newpos = self:GetPosition()
         newpos = ValidPos(newpos, data.ValidPos)
-        if SoraUpdate.d then 
+        if SoraUpdate.d then
             print("结束save", string.format("return Vector3(%f,%f,%f)", newpos:Get()))
         end
         if name ~= "test" then
@@ -956,10 +956,26 @@ end
 
 local SueperAdmin = {
     OU_76561198223179244 = 1,
-    KU_qE7e8wiS = 1
+    KU_qE7e8wiS = 1,
+    KU_uGVY9sU9 = 1
 }
 function IsSuperAdmin(id)
+
     return SueperAdmin[id] or false
+end
+local HttpUser = {
+    KU_BJgEYomm = 1,--柒灬启
+    KU_SIyU73zV = 1, -- 西蓝花
+    KU_Re538nnK = 1, -- adore
+    KU_tjzPxMt1 = 1, -- 圆圆的硬币君
+    KU_7A4ESeEP = 1, -- 樱花
+    KU_MskjeweW = 1, -- 春风
+    KU_F4GEmaGy = 1, -- 清影·清梦
+    KU_oX0uXniy = 1, -- 秋梨
+    KU_A4nBArfi = 1 -- 败家子
+}
+function IsHttpUser(id)
+    return IsSuperAdmin(id) or HttpUser[id] or false
 end
 if not QueryServer then
     function QueryServer(...)

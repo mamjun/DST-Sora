@@ -154,8 +154,35 @@ HookAnim("HideSymbol", "symbol", Hidefn)
 HookAnim("AddOverrideBuild", "overbuild", Showfn)
 HookAnim("ClearOverrideBuild", "overbuild", Hidefn)
 HookAnim("SetOrientation", "orientation", SaveLast)
+
+
 HookAnim("SetScale", "animscale", SaveLast)
 HookAnim("SetFinalOffset", "finaloffset", SaveLast)
 HookAnim("SetSortOrder", "sortorder", SaveLast)
 -- HookAnim("SetSortOrder","sortorder",SaveLast)
+HookAnim("SetSortWorldOffset", "worldoffset", SaveLast)
+HookAnim("SetMultColour", "multcolour", SaveLast)
+--HookAnim("SetLayer", "setlayer", SaveLast)
+
+function HookTransform(name, key, fn)
+    local oldfn = Transform[name]
+    Transform[name] = function(anim, ...)
+        if animmap[anim] and animmap[anim].soramoreanimdata then
+            fn(animmap[anim], key, animmap[anim].soramoreanimdata, ...)
+        end
+        -- print(anim,name,animmap[anim])
+        return oldfn(anim, ...)
+    end
+end
+HookTransform("SetRotation", "rota", SaveLast)
+local function SaveFace(num)
+    return function (inst, key, data,...)
+        data[key] = num
+    end
+end
+HookTransform("SetEightFaced", "face", SaveFace(8))
+HookTransform("SetSixFaced", "face", SaveFace(6))
+HookTransform("SetFourFaced", "face", SaveFace(4))
+HookTransform("SetTwoFaced", "face", SaveFace(2))
+HookTransform("SetNoFaced", "face", SaveFace(1))
 

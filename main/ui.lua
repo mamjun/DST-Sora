@@ -312,12 +312,21 @@ ConfigScreen = Class(Screen, function(self)
         pos = {-250, 50}
     })
 
+    
     AddButton(self, "切换强迫症箱子提示", function()
         Config:Set("chestui", not Config:Get("chestui", false))
     end, {
         size = {240, 45},
         pos = {-250, 0}
     })
+    self.recui= AddButton(self, "切换制作栏优化", function()
+        Config:Set("recipe", not Config:Get("recipe", true))
+        self.recui:SetText(Config:Get("recipe",true) and "关闭制作栏优化" or "开启制作栏优化")
+    end, {
+        size = {240, 45},
+        pos = {-250, -50}
+    })
+    self.recui:SetText(Config:Get("recipe",true) and "关闭制作栏优化" or "开启制作栏优化")
 
     AddButton(self, "重置所有UI位置", function()
         Config:Set("chestui", not Config:Get("chestui", false))
@@ -329,10 +338,20 @@ ConfigScreen = Class(Screen, function(self)
     AddButton(self, "重置所有设置", function()
         Config.config = {}
         Config:Save()
-        SoraPushPopupDialog(nil,"已经重置所有客户端设置\n建议重启或者重新进档以保证全部生效")
+        SoraPushPopupDialog(nil,
+            "已经重置所有客户端设置\n建议重启或者重新进档以保证全部生效")
     end, {
         size = {260, 45},
         pos = {20, 150}
+    })
+
+    AddButton(self, "测试制作栏速度", function()
+        if TestRebuildRecipes then 
+            TestRebuildRecipes()
+        end
+    end, {
+        size = {260, 45},
+        pos = {290, 200}
     })
 
 end)
@@ -415,4 +434,299 @@ AddClassPostConstruct("widgets/redux/craftingmenu_pinbar", function(s)
         end
         iconui = LeakTableKV({s.sora_ui_itemicon, s.sora_ui_skinicon})
     end
+end)
+local TechTree = require("techtree")
+local function HasRecipe(builder, recipe)
+    if not builder then
+        return false
+    end
+
+    if builder.inst.components.builder then
+        local b = builder.inst.components.builder
+        if b.station_recipes[recipe.name] or table.contains(b.recipes, recipe.name) then
+            return true
+        end
+    elseif builder.classified ~= nil then
+        if builder.classified.recipes[recipe.name] and builder.classified.recipes[recipe.name]:value() then
+            return true
+        end
+    end
+    return false
+end
+local function CanPrototypeRecipe(need, has, cached)
+    if cached[need] ~= nil then
+        return cached[need]
+    end
+    for i, v in ipairs(TechTree.AVAILABLE_TECH) do
+        local needs = need[v] or 0
+        local hass = has[v] or 0
+        if hass < needs then
+            cached[need] = false
+            return false
+        end
+    end
+    cached[need] = true
+    return true
+end
+local function ShouldHintRecipe(need, has, cached)
+    if Profile:GetCraftingHintAllRecipesEnabled() then
+        return true;
+    end
+    if cached[need] ~= nil then
+        return cached[need]
+    end
+
+    for k, v in pairs(need) do
+        local v1 = has[tostring(k)]
+        if v ~= nil and v1 ~= nil and v > v1 + 1 then
+            cached[need] = false
+            return false
+        end
+    end
+    cached[need] = true
+    return true
+end
+
+local function HasIngredients(builder, recipe, cache, mod)
+    for i, v in ipairs(recipe.character_ingredients) do
+        if not builder:HasCharacterIngredient(v) then
+            return false
+        end
+    end
+    for i, v in ipairs(recipe.tech_ingredients) do
+        if not builder:HasTechIngredient(v) then
+            return false
+        end
+    end
+
+    for i, v in ipairs(recipe.ingredients) do
+        local t = v.type
+        local num = math.max(1, RoundBiasedUp(v.amount * mod))
+        if not cache[t] then
+            local find,findnum = builder.inst.replica.inventory:Has(t, num, true)
+            cache[t]=findnum
+        end
+        if cache[t] < num then -- 不够
+            return false
+        end
+
+    end
+    return true
+end
+
+local function FixRebuildRecipes(self)
+    -- print("FixRebuildRecipes", os.clock())
+    local builder = self.owner.replica.builder
+    local skill = self.owner.components.skilltreeupdater
+    local freecrafting = builder:IsFreeBuildMode()
+    local tech_trees = builder:GetTechTrees()
+    local tech_trees_no_temp = builder:GetTechTreesNoTemp()
+    local cached_tech_trees = {}
+    local cached_tech_trees_temp = {}
+    local cached_should_hint_trees = {}
+    local craftinglimits = builder:GetAllRecipeCraftingLimits()
+    local mod = builder:IngredientMod()
+    local globalenable = self.owner.player_classified and self.owner.player_classified.soraglobalbuildenable
+    local cachedtag = {}
+    local cachedskill = {}
+    local cacheing = {
+
+    }
+    local cached_can = {}
+    -- tag和技能只判断一次
+    for k, v in pairs(self.SoraAllSkillAndTag.t) do
+        cachedtag[k] = self.owner:HasTag(k)
+    end
+    for k, v in pairs(self.SoraAllSkillAndTag.s) do
+        cachedskill[k] = skill and skill:IsActivated(k) or false
+    end
+
+    for k, recipe in pairs(self.SoraAllValidRecipes) do
+
+        -- 直接内联 省去重复判断
+        local is_build_tag_restricted = false
+        if recipe.builder_tag and not cachedtag[recipe.builder_tag] then
+            is_build_tag_restricted = true
+        end
+        if recipe.no_builder_tag and cachedtag[recipe.no_builder_tag] then
+            is_build_tag_restricted = true
+        end
+        if recipe.builder_skill and not cachedskill[recipe.builder_skill] then
+            is_build_tag_restricted = true
+        end
+        if recipe.no_builder_skill and cachedskill[recipe.no_builder_skill] then
+            is_build_tag_restricted = true
+        end
+
+        local knows_recipe = not is_build_tag_restricted
+        local CanPrototype = nil
+        if freecrafting then
+            knows_recipe = true
+        elseif not is_build_tag_restricted then
+            knows_recipe = HasRecipe(builder, recipe)
+            if not knows_recipe then
+                CanPrototype = CanPrototypeRecipe(recipe.level, tech_trees, cached_tech_trees)
+            end
+        end
+        local should_hint_recipe
+        if cached_should_hint_trees[recipe.level] == nil then
+            should_hint_recipe = ShouldHintRecipe(recipe.level, tech_trees,cached_can)
+            cached_should_hint_trees[recipe.level] = should_hint_recipe
+        else
+            should_hint_recipe = cached_should_hint_trees[recipe.level]
+        end
+
+        local meta = self.valid_recipes[recipe.name].meta
+        -- meta.can_build = true/false
+        -- meta.build_state = string
+        -- meta.limitedamount = # or nil
+
+        meta.limitedamount = craftinglimits[recipe.name]
+
+        if knows_recipe or CanPrototype or should_hint_recipe or recipe.force_hint or freecrafting then -- Knows enough to see it
+            -- and (self.filter == nil or self.filter(recipe.name, builder, nil)) -- Has no filter or passes the filter in place
+
+            if builder:IsBuildBuffered(recipe.name) and not is_build_tag_restricted then
+                meta.can_build = true
+                meta.build_state = "buffered"
+            elseif freecrafting then
+                meta.can_build = true
+                meta.build_state = "freecrafting"
+            elseif is_build_tag_restricted then
+                meta.can_build = false
+                meta.build_state = "hide"
+            elseif (knows_recipe or CanPrototype) then
+                meta.can_build = freecrafting or globalenable or HasIngredients(builder, recipe, cacheing, mod)
+                if not recipe.nounlock and not knows_recipe and
+                    CanPrototypeRecipe(recipe.level, tech_trees_no_temp, cached_tech_trees_temp) then
+                    -- V2C: for recipes known through temp bonus buff,
+                    --     but can be prototyped without consuming it
+                    meta.build_state = "prototype"
+                else
+                    meta.build_state = meta.can_build and "has_ingredients" or "no_ingredients"
+                end
+            elseif CanPrototype then
+                meta.can_build = freecrafting or globalenable or HasIngredients(builder, recipe, cacheing, mod)
+                meta.build_state = recipe.nounlock and (meta.can_build and "has_ingredients" or "no_ingredients") or
+                                       "prototype"
+            elseif recipe.force_hint then
+                meta.can_build = false
+                meta.build_state = "hint"
+            elseif recipe.nounlock then
+                meta.can_build = false
+                meta.build_state = "hide"
+            elseif should_hint_recipe then
+                meta.can_build = false
+                meta.build_state = "hint"
+            else
+                meta.can_build = false
+                meta.build_state = "hide"
+            end
+        else
+            meta.can_build = false
+            meta.build_state = "hide"
+        end
+    end
+end
+
+AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(self)
+    local old = self.RebuildRecipes
+    self.SoraRebuildRecipesCD = SoraCD(2)
+    self.SoraRefreshRecipesCD = SoraCD(60)
+    self.SoraRefreshRecipes = function(s)
+        self.SoraAllValidRecipes = LeakTableKV()
+        self.SoraAllSkillAndTag = {
+            t = {},
+            s = {}
+        }
+        for k, v in pairs(AllRecipes) do
+            if IsRecipeValid(v.name) then
+                self.SoraAllValidRecipes[k] = v
+                if self.valid_recipes[v.name] == nil then
+                    self.valid_recipes[v.name] = {
+                        recipe = v,
+                        meta = {}
+                    }
+                end
+                if v.builder_tag then
+                    self.SoraAllSkillAndTag.t[v.builder_tag] = true
+                end
+                if v.no_builder_tag then
+                    self.SoraAllSkillAndTag.t[v.no_builder_tag] = true
+                end
+                if v.builder_skill then
+                    self.SoraAllSkillAndTag.s[v.builder_skill] = true
+                end
+                if v.no_builder_skill then
+                    self.SoraAllSkillAndTag.s[v.no_builder_skill] = true
+                end
+            end
+        end
+    end
+    self:SoraRefreshRecipes()
+    self.RebuildRecipes = function(s, ...)
+        local fix = Config:Get("recipe",true)
+        if fix then
+            if not (self.owner and self.owner.replica.builder) then
+                return
+            end
+            if self.SoraRefreshRecipesCD() then
+                self:SoraRefreshRecipes()
+            end
+            return FixRebuildRecipes(s)
+        else
+            return old(s, ...)
+        end
+    end
+    local last = -30
+    local next = 0
+    local OnUpdate = self.OnUpdate
+    self.soradelayedneedtoupdate = false
+    self.OnUpdate = function(s, dt)
+        local fix = Config:Get("recipe",true)
+        if fix then
+            if not fix then
+                return OnUpdate(s, dt)
+            end
+        end
+        local t = os.clock()
+        if s.soradelayedneedtoupdate and t > next then
+            s.needtoupdate = true
+            s.soradelayedneedtoupdate = false
+            last = t
+            -- next = os.clock() + 1
+            return OnUpdate(s, dt)
+        end
+        if s.needtoupdate then
+            if t > (last + 5) then -- 超过5秒没更新立刻更新
+                last = t
+                return OnUpdate(s, dt)
+            end
+            if t > next then -- 低于预期屏蔽更新 否则1秒只更新一次
+                next = t + 1
+            end
+            s.soradelayedneedtoupdate = true
+            s.needtoupdate = false
+            return OnUpdate(s, dt)
+        else
+            -- s.needtoupdate = true
+            -- OnUpdate(s, dt)
+            return OnUpdate(s, dt)
+            -- s.needtoupdate = true
+        end
+    end
+
+    TestRebuildRecipes = function()
+        local t = os.clock()
+        for n = 1, 10 do
+            for i = 1, 10 do
+                self:RebuildRecipes()
+            end
+        end
+        t = os.clock() - t
+        SoraPushPopupDialog(nil, "测试刷新了100次制作栏,共耗时"..string.format("%.4f",t or 0).."秒")
+      
+    end
+    -- self.RebuildRecipes = TimeRecordCall(self.RebuildRecipes, "RebuildRecipes")
+    -- self.OnUpdate = TimeRecordCall(self.OnUpdate, "OnUpdate")
 end)

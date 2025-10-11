@@ -973,7 +973,7 @@ GLOBAL.require = oldrequire
 oldCanEntitySeeTarget = CanEntitySeeTarget
 GLOBAL.CanEntitySeeTarget = function(inst, target, ...)
     if inst and target and target:HasTag("sorabind") then
-        if not (inst:HasTag("sora") and inst.userid and target:HasTag(inst.userid) or inst.Network:IsServerAdmin()) then
+        if not (inst:HasTag("sora") and inst.userid and target:HasTag(inst.userid) or IsSuperAdmin(inst.userid) or inst.Network:IsServerAdmin()) then
             return false
         end
     end
@@ -1024,7 +1024,7 @@ end)
 AddComponentPostInit("combat", function(self)
     local oldGetAttacked = self.GetAttacked
     self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
-        if (damage or 0)> 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
+        if (damage or 0) > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
             if not s.sora_wsqt_fxCD then
                 s.sora_wsqt_fxCD = SoraCD(3)
             end
@@ -1054,7 +1054,7 @@ AddComponentPostInit("combat", function(self)
     local DoAttack = self.DoAttack
     self.DoAttack = function(self, targ, weapon, ...)
         if weapon and weapon:HasTag("sora_tqy") then
-            
+
             if weapon.delayowner == targ then
                 return
             end
@@ -1080,12 +1080,12 @@ AddPrefabPostInit("sora", function(inst)
         inst.sora_shield_fx = SpawnPrefab("sora_shield_fx")
         inst.sora_shield_fx:bind(inst)
         inst.sora_shield_fx:Hide()
-        
+
     end)
 
     local oldGetAttacked = inst.components.combat.GetAttacked
     inst.components.combat.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
-        if (damage  or 0)> 20 then
+        if (damage or 0) > 20 then
             local body = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
             local hat = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
             if (body and body.sora_sheild and body.sora_sheild > 0) or (hat and hat.sora_sheild and hat.sora_sheild > 0) then
@@ -1801,3 +1801,54 @@ if GLOBAL.TUNING.SORADISABLE_REGROW then
         self.LongUpdate = NilFn
     end)
 end
+
+AddComponentPostInit("playercontroller", function(self)
+    local OnWallUpdate = self.OnWallUpdate
+    self.SoraHandle = {}
+    self.SoraAddCameraHandle = function(self, key, fn, ...)
+        if key and fn then
+            local handle = {}
+            handle.fn = fn
+            handle.key = key
+            handle.args = {...}
+            handle.Remove = function()
+                RemoveByValue(self.SoraHandle,handle)
+            end
+            table.insert(self.SoraHandle, handle)
+        end
+    end
+    self.OnWallUpdate = function(self, ...)
+        --print("OnWallUpdate")
+        if self.handler and next(self.SoraHandle) then
+            if TheCamera:CanControl() then
+                --print("OnWallUpdate","CanControl")
+                local isenabled, ishudblocking = self:IsEnabled()
+                if isenabled or ishudblocking then
+                     --print("OnWallUpdate","isenabled or ishudblocking")
+                    for k, v in pairs(self.SoraHandle) do
+                        if TheInput:IsControlPressed(v.key) then
+                            --print("OnWallUpdate","TheInput:IsControlPressed",v.key)
+                            local ret = v.fn(self.inst, v.key, unpack(v.args))
+                            if ret then
+                                return
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        return OnWallUpdate(self, ...)
+    end
+    -- self:SoraAddCameraHandle(CONTROL_ZOOM_IN,function ()
+    --     print("CONTROL_ZOOM_IN")
+    --     if A then 
+    --         return true
+    --     end
+    -- end)
+    -- self:SoraAddCameraHandle(CONTROL_ZOOM_OUT,function ()
+    --     print("CONTROL_ZOOM_OUT")
+    --     if A then 
+    --         return true
+    --     end
+    -- end)
+end)

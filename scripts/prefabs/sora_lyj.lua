@@ -184,6 +184,29 @@ local function SetData(inst, data)
         else
             inst.AnimState:Hide("snow")
         end
+        if data.worldoffset then
+            inst.AnimState:SetSortWorldOffset(unpack(data.worldoffset))
+        end
+
+        if data.multcolour then
+            inst.AnimState:SetMultColour(unpack(data.multcolour))
+        end
+        if data.face then
+            if data.face == 1 then
+                inst.Transform:SetNoFaced()
+            elseif data.face == 2 then
+                inst.Transform:SetTwoFaced()
+            elseif data.face == 4 then
+                inst.Transform:SetFourFaced()
+            elseif data.face == 6 then
+                inst.Transform:SetSixFaced()
+            elseif data.face == 8 then
+                inst.Transform:SetEightFaced()
+            end
+        end
+        if data.rota then
+            inst.Transform:SetRotation(data.rota)
+        end
         if data.overbuild then
             for k, v in pairs(data.overbuild) do
                 if v then
@@ -226,13 +249,13 @@ local function onhammered(inst, worker)
 end
 
 local PhotoFn = {
-    goldnugget = function(inst,doer)
+    goldnugget = function(inst, doer)
         inst.data.animloop = not inst.data.animloop
         inst:SetData(inst.data)
-        SoraAPI.Say(doer,"留影"..(inst.data.animloop and "循环" or "单次").."播放")
+        SoraAPI.Say(doer, "留影" .. (inst.data.animloop and "循环" or "单次") .. "播放")
     end
 }
-local function PhotoOnGet(inst, item,doer)
+local function PhotoOnGet(inst, item, doer)
     if not item then
         return true
     end
@@ -241,15 +264,13 @@ local function PhotoOnGet(inst, item,doer)
     end
     local prefab = item.prefab
     if PhotoFn[prefab] then
-        PhotoFn[prefab](inst,doer)
-    elseif PhotoFn.Default then 
-        PhotoFn.Default(inst,doer)
+        PhotoFn[prefab](inst, doer)
+    elseif PhotoFn.Default then
+        PhotoFn.Default(inst, doer)
     end
 
     return true
 end
-
-
 
 local function photofn()
     local inst = CreateEntity()
@@ -355,7 +376,7 @@ local function photo_itemfn()
     inst.components.deployable.ondeploy = OnDeploy
     inst.components.deployable.spacing = DEPLOYSPACING.NONE
     inst.components.deployable:SetDeployMode(DEPLOYMODE.CUSTOM)
-    
+
     return inst
 end
 

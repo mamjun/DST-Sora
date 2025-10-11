@@ -357,7 +357,7 @@ local function UnBind(inst, doer, target, actions, ...)
             return
         end
         if inst and doer and
-            not (doer.userid and inst:HasTag(doer.userid) or doer and doer.Network and doer.Network:IsServerAdmin()) then
+            not (doer.userid and inst:HasTag(doer.userid) or SoraAPI.IsSuperAdmin(doer.userid)) then
             table.insert(act, ACTIONS.SORABIND)
         end
         if inst and doer and doer:HasTag("sora") and inst:HasTag("soranotlink") and doer.userid and
