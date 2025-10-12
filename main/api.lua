@@ -831,6 +831,9 @@ function Gift(gifts, data, doer)
             if v.components.soraitem and v.components.soraitem.bind then
                 v.components.soraitem.user = doer.userid
             end
+            if v.components.sorabind and not v.components.sorabind.name then 
+                v.components.sorabind:Bind(doer.userid, doer.name)
+            end
         end
     end
     if data.itemfn then

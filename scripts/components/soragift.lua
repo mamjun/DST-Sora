@@ -114,6 +114,8 @@ function soragift:GetItem()
 end
 
 function soragift:GiveGift(doer)
+    if not doer then return end
+
     local user = doer.userid
     if user == "" then
         user = "offline"
@@ -128,11 +130,28 @@ function soragift:GiveGift(doer)
     end
     self.giftplayer[user] = user
     local ran = math.random()
-    if ran > 0.33 then
+    if ran > 0.67 then
         self.giftexp = self.giftexp + math.random(100, 300)
         self.inst.components.talker:Say("今天没有礼物哦！明天再来吧!")
         return true
     end
+    if not doer.soragiftcd then 
+        doer.soragiftcd = {0,0,0}
+    end
+    local day = TheWorld.state.cycles
+    local has = false
+    for i=1,3 do 
+        if doer.soragiftcd[i] < day then 
+            has = true
+            doer.soragiftcd[i] = day
+            break
+        end
+    end
+    if not has then 
+        self.inst.components.talker:Say("今天领取太多礼物了！明天再来吧!")
+        return true
+    end
+
     local big = ran > 0.03 -- 大货还是小货  小货常用资源 大货是珍惜资源
     -- 开始抽取礼物
     local giftpool = WList()

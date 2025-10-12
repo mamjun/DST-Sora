@@ -192,6 +192,9 @@ local function SetData(inst, data)
             inst.AnimState:SetMultColour(unpack(data.multcolour))
         end
         if data.face then
+            if inst.components.soratwoface then 
+                inst.components.soratwoface:SetFaced(data.face)
+            else
             if data.face == 1 then
                 inst.Transform:SetNoFaced()
             elseif data.face == 2 then
@@ -204,8 +207,9 @@ local function SetData(inst, data)
                 inst.Transform:SetEightFaced()
             end
         end
+        end
         if data.rota then
-            inst.Transform:SetRotation(data.rota)
+            inst.Transform:SetRotation(unpack(data.rota))
         end
         if data.overbuild then
             for k, v in pairs(data.overbuild) do

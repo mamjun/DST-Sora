@@ -983,6 +983,16 @@ Rec("sora_sign_item", "拟造-木牌", "为什么看了就像打他?", DST, "sor
     nightmarefuel = 20,
     [san] = 100
 }).placer = "no"
+
+
+AddInvImg2("sora_gemsign_item", GetInventoryItemAtlas("minisign_drawn.tex"), "minisign_drawn.tex")
+Rec("sora_gemsign", "拟造-宝石牌", "你已经是个成熟的宝石牌了", NoRec)
+Rec("sora_gemsign_item", "拟造-宝石牌", "你已经是个成熟的宝石牌了", DST, "sora", {
+    boards = 20,
+    ancienttree_gem_sapling_item = 1,
+}).placer = "no"
+
+
 AddInvImg2("sora_pearl", GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl.tex")
 Rec("sora_pearl", "拟造-珍珠", "咦,好温暖,还有一种清醒的感觉", DST, "sora", {
     opalpreciousgem = 3,
@@ -990,6 +1000,7 @@ Rec("sora_pearl", "拟造-珍珠", "咦,好温暖,还有一种清醒的感觉", 
 })
 AddRecipeToFilter("sora_lightflier" .. rec_back, item)
 AddRecipeToFilter("sora_sign_item" .. rec_back, item)
+AddRecipeToFilter("sora_gemsign_item" .. rec_back, item)
 AddRecipeToFilter("sora_pearl" .. rec_back, item)
 if IsModEnable("Legion") or IsModEnable("棱镜") then
 
@@ -1268,6 +1279,14 @@ UnlonkRecipes("beebox_hermit", {
     honeycomb = 1,
     bee = 4
 }, "嗡嗡嗡！")
+
+
+UnlonkRecipes("ancienttree_gem_sapling_item", {
+    opalpreciousgem =3,
+}, "要是不卡就好了")
+
+
+
 AddInvImg2("meatrack_hermit", "minimap/minimap_data.xml", "meatrack_hermit.png")
 UnlonkRecipes("meatrack_hermit", {
     twigs = 3,

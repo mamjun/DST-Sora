@@ -232,6 +232,7 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
             DRESSUP_DATA_LEGION[k] = v
         end
 
+   
     end)
     if TheNet:GetIsServer() then
         local fixdish_farewellcupcake = function(inst)
@@ -354,7 +355,7 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
         if TheWorld.ismastersim then
             local oldGetAttacked = inst.components.combat.GetAttacked
             inst.components.combat.GetAttacked = function(self, doer, dam, cause, ...)
-                if (dam or 0 ) > 2000 and
+                if (dam or 0) > 2000 and
                     (not doer or doer:HasTag("elaina") or not doer:HasTag("epic") or not doer:HasTag("monster")) then
                     -- 收到超过2000点 非boss 非怪物的伤害 伊蕾娜 你看着办吧 
                     if doer then

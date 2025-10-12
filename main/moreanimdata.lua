@@ -100,13 +100,30 @@ AnimState.OverrideSymbol = function(i, swap, ...)
 end
 local animmap = LeakTableKV()
 AnimMap = animmap
+local transmap = LeakTableKV()
+TransMap = transmap
 local Entity_AddAnimState = Entity.AddAnimState
 Entity.AddAnimState = function(entity, ...)
     local guid = entity:GetGUID()
     local x = {Entity_AddAnimState(entity, ...)}
     if x[1] and Ents[guid] then
         animmap[x[1]] = Ents[guid]
-        Ents[guid].soramoreanimdata = {}
+        if not Ents[guid].soramoreanimdata then
+            Ents[guid].soramoreanimdata = {}
+        end
+    end
+    return unpack(x)
+end
+
+local Entity_AddTransform = Entity.AddTransform
+Entity.AddTransform = function(entity, ...)
+    local guid = entity:GetGUID()
+    local x = {Entity_AddTransform(entity, ...)}
+    if x[1] and Ents[guid] then
+        transmap[x[1]] = Ents[guid]
+        if not Ents[guid].soramoreanimdata then
+            Ents[guid].soramoreanimdata = {}
+        end
     end
     return unpack(x)
 end
@@ -155,28 +172,27 @@ HookAnim("AddOverrideBuild", "overbuild", Showfn)
 HookAnim("ClearOverrideBuild", "overbuild", Hidefn)
 HookAnim("SetOrientation", "orientation", SaveLast)
 
-
 HookAnim("SetScale", "animscale", SaveLast)
 HookAnim("SetFinalOffset", "finaloffset", SaveLast)
 HookAnim("SetSortOrder", "sortorder", SaveLast)
 -- HookAnim("SetSortOrder","sortorder",SaveLast)
 HookAnim("SetSortWorldOffset", "worldoffset", SaveLast)
 HookAnim("SetMultColour", "multcolour", SaveLast)
---HookAnim("SetLayer", "setlayer", SaveLast)
+-- HookAnim("SetLayer", "setlayer", SaveLast)
 
 function HookTransform(name, key, fn)
     local oldfn = Transform[name]
     Transform[name] = function(anim, ...)
-        if animmap[anim] and animmap[anim].soramoreanimdata then
-            fn(animmap[anim], key, animmap[anim].soramoreanimdata, ...)
+        if transmap[anim] and transmap[anim].soramoreanimdata then
+            fn(transmap[anim], key, transmap[anim].soramoreanimdata, ...)
         end
-        -- print(anim,name,animmap[anim])
+        --print(anim,name,transmap[anim],unpack({...}))
         return oldfn(anim, ...)
     end
 end
 HookTransform("SetRotation", "rota", SaveLast)
 local function SaveFace(num)
-    return function (inst, key, data,...)
+    return function(inst, key, data, ...)
         data[key] = num
     end
 end

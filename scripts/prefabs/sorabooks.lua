@@ -308,6 +308,21 @@ local changelist = {
     purebrilliance = 'horrorfuel'
 
 }
+
+local laterfn = {
+    beehive = function(inst)
+        if inst.components.childspawner then 
+            inst.components.childspawner.childreninside = 0
+            inst.components.childspawner.mergencychildreninside = 0
+        end
+    end,
+    wasphive = function(inst)
+        if inst.components.childspawner then 
+            inst.components.childspawner.childreninside = 0
+            inst.components.childspawner.mergencychildreninside = 0
+        end
+    end,
+}
 local crops = {
     asparagus = 1,
     garlic = 1,
@@ -385,6 +400,10 @@ local function trychange(inst)
         if not item then
             return
         end
+        if laterfn[item.prefab] then 
+            laterfn[item.prefab](item)
+        end
+
         local x, y, z = inst.Transform:GetWorldPosition()
         if inst.components.stackable then
             if item.components.stackable then
@@ -406,7 +425,8 @@ local function trychange(inst)
             RemoveFromRegrowthManager(inst)
         end
         inst:Remove()
-    end
+    end 
+    
     -- 需要施肥的变成不需要施肥
     if inst.components.pickable and (inst.components.pickable.transplanted or inst.components.pickable:IsBarren()) then
         inst.components.pickable.transplanted = false
