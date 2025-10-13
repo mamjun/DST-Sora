@@ -1283,7 +1283,7 @@ UnlonkRecipes("beebox_hermit", {
 
 UnlonkRecipes("ancienttree_gem_sapling_item", {
     opalpreciousgem =3,
-}, "要是不卡就好了")
+}, "要是不卡就好了").placer = "no"
 
 
 

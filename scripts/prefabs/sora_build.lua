@@ -117,7 +117,7 @@ local function ClearTarget(staff, target)
     end
 end
 local function soramagicfn(staff, target, pos)
-    print(staff, target, pos, staff.targets)
+    --print(staff, target, pos, staff.targets)
     if not staff.targets then
         staff.targets = {}
     end

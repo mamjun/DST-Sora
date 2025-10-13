@@ -51,7 +51,7 @@ function com:OnCook(data)
             self.hasuse[v.prefab] = 1
         end
     end
-    print(fastdump(self.hasuse))
+    --print(fastdump(self.hasuse))
 end
 function com:OnSave()
     return {
