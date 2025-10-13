@@ -79,7 +79,9 @@ local function CanFixBuild(staff, target)
     if target:HasTag("structure") then 
         return true
     end
-    
+    if target:HasTag("fence") then 
+        return true
+    end
     if target:HasTag("CanFixBuild") then 
         return true
     end
@@ -93,10 +95,10 @@ local function CanFixBuild(staff, target)
     if target.entity:GetParent() ~= nil then 
         return false
     end
-    if target.components.combat then 
+    if (target.components.combat and (target.components.combat.defaultdamage or 0 )> 50) then 
         return false
     end
-    if target.components.health then 
+    if (target.components.health and ( target.components.health.maxhealth or 0) > 500)then 
         return false
     end
     
@@ -117,7 +119,7 @@ local function ClearTarget(staff, target)
     end
 end
 local function soramagicfn(staff, target, pos)
-    --print(staff, target, pos, staff.targets)
+    print(staff, target, pos, staff.targets)
     if not staff.targets then
         staff.targets = {}
     end
