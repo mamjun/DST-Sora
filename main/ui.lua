@@ -522,6 +522,7 @@ local function FixRebuildRecipes(self)
     local tech_trees = builder:GetTechTrees()
     local tech_trees_no_temp = builder:GetTechTreesNoTemp()
     local cached_tech_trees = {}
+    local cached_tech_trees2 = {}
     local cached_tech_trees_temp = {}
     local cached_should_hint_trees = {}
     local craftinglimits = builder:GetAllRecipeCraftingLimits()
@@ -565,7 +566,12 @@ local function FixRebuildRecipes(self)
         elseif not is_build_tag_restricted then
             knows_recipe = HasRecipe(builder, recipe)
             if not knows_recipe then
-                CanPrototype = CanPrototypeRecipe(recipe.level, tech_trees, cached_tech_trees)
+                if CanPrototypeRecipe(recipe.level, tech_trees_no_temp, cached_tech_trees) then 
+                    knows_recipe = true
+                else
+                    CanPrototype = CanPrototypeRecipe(recipe.level, tech_trees, cached_tech_trees2)
+                end
+
             end
         end
         local should_hint_recipe
@@ -698,12 +704,12 @@ AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(self)
             return OnUpdate(s, dt)
         end
         if s.needtoupdate then
-            if t > (last + 5) then -- 超过5秒没更新立刻更新
+            if t > (last + 2) then -- 超过2秒没更新立刻更新
                 last = t
                 return OnUpdate(s, dt)
             end
-            if t > next then -- 低于预期屏蔽更新 否则1秒只更新一次
-                next = t + 1
+            if t > next then -- 低于预期屏蔽更新 否则0.5秒只更新一次
+                next = t + 0.5
             end
             s.soradelayedneedtoupdate = true
             s.needtoupdate = false
