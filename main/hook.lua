@@ -1105,6 +1105,11 @@ AddPrefabPostInit("sora", function(inst)
         end
         return oldGetAttacked(s, attacker, damage, weapon, stimuli, ...)
     end
+    local OnNewSpawn = inst.OnNewSpawn
+    inst.OnNewSpawn = function(item,skins)
+        inst.start_invskins = skins
+        OnNewSpawn(item,skins)
+    end
 end)
 AddComponentPostInit("locomotor", function(self)
     local oldGoToEntity = self.GoToEntity

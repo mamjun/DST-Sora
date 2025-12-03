@@ -113,7 +113,7 @@ for k, v in pairs(foods) do
         table.insert(sorafoods, v.name)
     end
 end
-local function OnSoraSpawn(inst)
+local function OnSoraSpawn(inst,skins)
 
     local first = true
     if TheWorld.components.soraexpsave then
@@ -137,8 +137,9 @@ local function OnSoraSpawn(inst)
         if gift then
             local gifts = {}
             -- 给背包
+            print(inst.start_invskins ,inst.start_invskins and inst.start_invskins.sorabag)
             if TheNet:GetServerGameMode() ~= "quagmire" then
-                table.insert(gifts, SpawnPrefab("sorabag"))
+                table.insert(gifts, SpawnPrefab("sorabag",inst.start_invskins and inst.start_invskins.sorabag or nil,nil, inst.userid))
             end
 
             local cane = 0

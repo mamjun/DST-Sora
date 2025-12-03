@@ -103,8 +103,10 @@ end)
 -- end
 
 function SoraConfigClass:Get(key, default)
-    if self.config[key] == nil then return default end
-    return self.config[key] 
+    if self.config[key] == nil then
+        return default
+    end
+    return self.config[key]
 end
 
 function SoraConfigClass:Set(key, value)
@@ -116,7 +118,7 @@ function SoraConfigClass:Set(key, value)
 end
 
 function SoraConfigClass:Show()
-    for k,v in pairs(self.config) do
+    for k, v in pairs(self.config) do
         print(k, type(v) == "table" and fastdump(v) or tostring(v))
     end
 end
@@ -130,10 +132,21 @@ function SoraConfigClass:Load()
     TheSim:GetPersistentString(self.name, function(load_success, str)
         if load_success then
             local loadconfig = loadstring(str)
-            if loadconfig then loadconfig = loadconfig() else TheSim:SetPersistentString(self.name, "reutrn {}", false)  return end
-            if  type(loadconfig) ~= "table" then loadconfig = {} end 
-            for k,v in pairs(loadconfig) do 
-                self:Set(k,v)
+            if loadconfig then
+                local ok, loadconfig = pcall(loadconfig)
+                if not ok then
+                    loadconfig = {}
+                    TheSim:ErasePersistentString(self.name)
+                end
+            else
+                TheSim:ErasePersistentString(self.name)
+                return
+            end
+            if type(loadconfig) ~= "table" then
+                loadconfig = {}
+            end
+            for k, v in pairs(loadconfig) do
+                self:Set(k, v)
             end
         end
     end)
