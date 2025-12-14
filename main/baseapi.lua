@@ -138,9 +138,6 @@ function SoraConfigClass:Load()
                     loadconfig = {}
                     TheSim:ErasePersistentString(self.name)
                 end
-            else
-                TheSim:ErasePersistentString(self.name)
-                return
             end
             if type(loadconfig) ~= "table" then
                 loadconfig = {}
