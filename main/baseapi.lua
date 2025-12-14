@@ -132,15 +132,13 @@ function SoraConfigClass:Load()
     TheSim:GetPersistentString(self.name, function(load_success, str)
         if load_success then
             local loadconfig = loadstring(str)
+            local ok
             if loadconfig then
-                local ok, loadconfig = pcall(loadconfig)
+                ok, loadconfig = pcall(loadconfig)
                 if not ok then
                     loadconfig = {}
                     TheSim:ErasePersistentString(self.name)
                 end
-            else
-                TheSim:ErasePersistentString(self.name)
-                return
             end
             if type(loadconfig) ~= "table" then
                 loadconfig = {}
