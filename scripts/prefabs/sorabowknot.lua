@@ -688,10 +688,15 @@ local function full3fn()
     inst:AddComponent("unwrappable")
     inst.components.unwrappable:SetOnWrappedFn(OnWrapped)
     inst.components.unwrappable:SetOnUnwrappedFn(OnUnwrapped)
-    inst.super = function(i, data)
+    inst.super = function(i, data,just_super)
         if i.components.unwrappable.itemdata then
             i.superdata = i.components.unwrappable.itemdata
-            i.components.unwrappable.itemdata = data
+            i.components.unwrappable.itemdata = data or {}
+            if not just_super then
+                for ind=1,10 do 
+                    i.components.unwrappable.itemdata[ind] = i.superdata[ind]
+                end
+            end
         end
     end
     local oldUnwrap = inst.components.unwrappable.Unwrap

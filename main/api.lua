@@ -847,8 +847,8 @@ function Gift(gifts, data, doer)
     if #items > 0 then
         local packer = SpawnPrefab("sora3packer")
         packer.components.unwrappable:WrapItems(items)
-        if data.super and packer.super then
-            packer:super(data.super)
+        if data.super and packer.super or #items > 10 then
+            packer:super(data.super, data.super and true or false)
         end
         if data.name then
             packer.components.named:SetName(data.name)
