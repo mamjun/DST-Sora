@@ -326,13 +326,16 @@ local function PickPickFn(inst, doer, pos)
         end
     end
 end
+local NewSpawnLootPrefab = function(self,item)
+    self.soraallgifts[item] = (self.soraallgifts[item] or 0)+1
+end
 local function PickFn(inst, doer, pos)
     -- 大作物 
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled","INLIMBO"},
         {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
     local prefabs = {}
     local items = {}
-
+    local allgifts = {}
     for k, v in pairs(ents) do
         if isNear(v, pos) then
             if crops[v.prefab] then
@@ -351,10 +354,22 @@ local function PickFn(inst, doer, pos)
                 prefabs[v.prefab].num = prefabs[v.prefab].num + 1
                 v:Remove()
             elseif v.prefab == "medal_gift_fruit_oversized" then
-                if v.components.workable then
-                    v.components.workable:WorkedBy_Internal(doer, 10)
+                --进入快速处理流程
+                if v.DropGift then 
+                    v.components.lootdropper.soraallgifts = allgifts
+                    v.components.lootdropper.SpawnLootPrefab = NewSpawnLootPrefab
+                    v:DropGift(doer)
+                    v:Remove()
+                else
+                    if v.components.workable then
+                        v.components.workable:WorkedBy_Internal(doer, 10)
+                    end
                 end
             elseif v.components.workable then
+                if v.components.lootdropper then 
+                    v.components.lootdropper.soraallgifts = allgifts
+                    v.components.lootdropper.SpawnLootPrefab = NewSpawnLootPrefab
+                end
                 v.components.workable:WorkedBy_Internal(doer, 10)
             end
         end
@@ -371,6 +386,9 @@ local function PickFn(inst, doer, pos)
         for ik, iv in pairs(v.items) do
             items[ik] = (items[ik] or 0) + iv * v.num
         end
+    end
+    for k,v in pairs(allgifts) do
+        items[k] = (items[k] or 0) + v
     end
     return items
 end

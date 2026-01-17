@@ -68,6 +68,7 @@ map['thulecite_pieces'] = 'thulecite'
 map['marblebean'] = 'marble'
 
 map['moonrocknugget'] = 'moonglass'
+map['siving_rocks'] = 'moonglass'
 
 map['bluegem'] = 'redgem'
 map['purplegem'] = 'redgem'
@@ -85,6 +86,9 @@ map['feather_crow'] = "feather"
 map['feather_robin'] = "feather"
 map['feather_robin_winter'] = "feather"
 map['feather_canary'] = "feather"
+map['goose_feather'] = "feather"
+map['malbatross_feathered_weave'] = "feather"
+map['malbatross_feather'] = "feather"
 
 map['killerbee'] = "bee"
 map['trunk_summer'] = "trunk_winter"
@@ -93,6 +97,150 @@ map['blue_cap'] = "cap"
 map['moon_cap'] = "cap"
 map['red_cap'] = "cap"
 map['green_cap'] = "cap"
+map['albicans_cap'] = "cap"
+
+map['steelwool'] = 'beefalowool'
+map['goose_feather'] = 'beefalowool'
+
+map['walrus_tusk'] = 'lightninggoathorn'
+map['minotaurhorn'] = 'lightninggoathorn'
+
+map['dreadstone'] = 'horrorfuel'
+map['voidcloth'] = 'horrorfuel'
+
+map['lunarplant_husk'] = 'purebrilliance'
+
+map['bearger_fur'] = 'furtuft'
+
+map['moonstorm_spark'] = 'moonglass_charged'
+
+map['spidergland'] = 'silk'
+map['spidereggsack'] = 'silk'
+
+map['hh_remove_stone'] = 'hh_effect_tally'
+map['hh_essence'] = 'hh_effect_tally'
+
+map['snowball_item'] = 'ice'
+
+map['houndstooth'] = 'boneshard'
+map['stinger'] = 'boneshard'
+
+map['royal_jelly'] = 'honey'
+map['medal_withered_royaljelly'] = 'honey'
+
+map['moon_tree_blossom'] = 'petals'
+map['petals_evil'] = 'petals'
+
+map['petals_orchid'] = 'petals_rose'
+map['petals_lily'] = 'petals_rose'
+
+map['dragon_scales'] = 'shroom_skin'
+map['deerclops_eyeball'] = 'shroom_skin'
+
+map['moonbutterflywings'] = 'butterflywings'
+
+map['cactus_meat'] = 'cactus_flower'
+
+map['tallbirdegg'] = 'bird_egg'
+
+map['smallmeat'] = 'meat'
+
+map['plantmeat'] = 'monstermeat'
+map['batwing'] = 'monstermeat'
+
+map['fishmeat_small'] = 'fishmeat'
+map['barnacle'] = 'fishmeat'
+
+map['froglegs'] = 'drumstick'
+
+map['merm_scales'] = 'pigskin'
+map['slurper_pelt'] = 'pigskin'
+
+map['beeswax'] = 'honeycomb'
+
+map['spider_warrior'] = 'spider'
+map['spider_healer'] = 'spider'
+map['spider_moon'] = 'spider'
+map['spider_hider'] = 'spider'
+map['spider_spitter'] = 'spider'
+map['spider_water'] = 'spider'
+map['spider_dropper'] = 'spider'
+
+map['robin_winter'] = 'crow'
+map['robin'] = 'crow'
+map['canary'] = 'crow'
+map['puffin'] = 'crow'
+
+map['wobster_moonglass_land'] = 'wobster_sheller_land'
+
+map['bird_mutant_spitter'] = 'bird_mutant'
+
+map['eggplant'] = 'vegetables'
+map['corn'] = 'vegetables'
+map['onion'] = 'vegetables'
+map['tomato'] = 'vegetables'
+map['pepper'] = 'vegetables'
+map['garlic'] = 'vegetables'
+map['potato'] = 'vegetables'
+map['carrot'] = 'vegetables'
+map['asparagus'] = 'vegetables'
+map['pumpkin'] = 'vegetables'
+map['rock_avocado_fruit_ripe'] = 'vegetables'
+map['kelp'] = 'vegetables'
+
+map['berries'] = 'fruit'
+map['watermelon'] = 'fruit'
+map['dragonfruit'] = 'fruit'
+map['pomegranate'] = 'fruit'
+map['durian'] = 'fruit'
+map['pineananas'] = 'fruit'
+map['fig'] = 'fruit'
+map['cave_banana'] = 'fruit'
+map['berries_juicy'] = 'fruit'
+map['wormlight_lesser'] = 'ancientfruit_nightvision'
+map['wormlight'] = 'ancientfruit_nightvision'
+
+map['medal_glommer_essence'] = 'glommerfuel'
+map['glommerwings'] = 'glommerfuel'
+
+map['medal_time_slider'] = 'medal_space_gem'
+
+map['goatmilk'] = 'butter'
+map['milkywhites'] = 'butter'
+
+map['cutlichen'] = 'foliage'
+map['succulent_picked'] = 'foliage'
+
+map['slurtleslime'] = 'phlegm'
+
+map['dug_lilybush'] = "cutted_lilybush"
+map['dug_orchidbush'] = "cutted_orchidbush"
+map['dug_rosebush'] = "cutted_rosebush"
+
+map['ahandfulofwings'] = 'insectshell_l'
+
+map['cookiecuttershell'] = 'slurtle_shellpieces'
+
+map['medal_obsidian'] = 'medal_blue_obsidian'
+
+map['dug_berrybush2'] = 'dug_berrybush'
+map['dug_berrybush_juicy'] = 'dug_berrybush'
+
+map['tillweed'] = 'forgetmelots'
+map['firenettles'] = 'forgetmelots'
+
+map['immortal_essence'] = 'immortal_fruit'
+map['immortal_gem'] = 'immortal_fruit'
+
+map['medal_space'] = 'medal_time_slider'
+
+map['medal_spacetime_runes'] = 'medal_spacetime_potion'
+
+map['medal_spacetime_snacks'] = 'medal_spacetime_lingshi'
+map['medal_spacetime_snacks_packet'] = 'medal_spacetime_lingshi'
+
+map['spore_small'] = 'spore_medium'
+map['spore_tall'] = 'spore_medium'
 
 for i = 1, 31 do
     map['trinket_' .. tostring(i)] = 'trinket'

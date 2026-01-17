@@ -141,7 +141,7 @@ local function CheckMoGu()
 end
 
 local function CheckYou()
-    if IsModEnable("3283650699") or IsModEnable("2199027653598545827") then
+    if IsModEnable("32836506999") or IsModEnable("21990276535985458279") then
         (ThePlayer or TheWorld):DoTaskInTime(1,function()
              SoraPushPopupDialog("小穹的温馨提示","您使用的\"悠\"MOD和本mod存在已知冲突,请关闭任一mod后游玩\n","退出游戏",function() DoRestart(true) end)
         end)

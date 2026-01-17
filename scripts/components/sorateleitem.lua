@@ -55,7 +55,8 @@ local prefabmaps = {
 local function toprefab(prefab)
     return prefabmaps[prefab] or prefab or "unprefab"
 end
-local itemfn = {
+local itemfn 
+itemfn = {
     flxunbao = function(inst, doer, target)
         if target.data and target.data.pos and target.data.worldid ~= "-1" then
             return true,target.data.pos
@@ -63,6 +64,14 @@ local itemfn = {
         return false, "预言失败\n无法传送"
     end,
     medal_treasure_map = function(inst, doer, target)
+        if target.UsingTrasureMap then
+            target = target:UsingTrasureMap()
+            local x,y =itemfn.medal_treasure_map_used(inst, doer, target)
+            return x,y,target
+        end
+        return false, "预言失败\n无法传送"
+    end,
+    medal_treasure_map_used = function(inst, doer, target)
         if target.getTreasurePoint then
             local data = target:getTreasurePoint()
             if data then
@@ -113,7 +122,7 @@ local itemfn = {
     end
 }
 local postfn = {
-    medal_treasure_map = function(inst, doer, target, pos)
+    medal_treasure_map_used = function(inst, doer, target, pos)
         if target.spawnTreasure then
             local resonator = SpawnPrefab("medal_resonator")
             resonator.Transform:SetPosition(pos.x, 0, pos.z)
@@ -124,10 +133,12 @@ local postfn = {
     end
 }
 itemfn.medal_loss_treasure_map = itemfn.medal_treasure_map
-postfn.medal_loss_treasure_map = postfn.medal_treasure_map
+itemfn.medal_loss_treasure_map_used = itemfn.medal_treasure_map_used
+postfn.medal_loss_treasure_map_used = postfn.medal_treasure_map_used
+
 function com:TryTele(doer, target)
     if itemfn[target.prefab] then
-        local res, pos = itemfn[target.prefab](self.inst, doer, target)
+        local res, pos,newtarget = itemfn[target.prefab](self.inst, doer, target)
         if res then
             if not TheWorld.Map:IsAboveGroundAtPoint(pos.x, 0, pos.z, false) then
                 return Say(doer, "目标地点不是陆地\n不支持传送")
@@ -135,8 +146,8 @@ function com:TryTele(doer, target)
             doer.components.locomotor:Stop()
             local pp = doer:GetPosition()
             doer.Physics:Teleport(pos.x, pp.y, pos.z)
-            if postfn[target.prefab] then
-                postfn[target.prefab](self.inst, doer, target, pos)
+            if postfn[(newtarget or target).prefab] then
+                postfn[(newtarget or target).prefab](self.inst, doer, newtarget or  target, pos)
             end
             self.inst.components.stackable:Get():Remove()
         else

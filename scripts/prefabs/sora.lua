@@ -430,7 +430,17 @@ local function onpick(inst, data)
     if not getsora("sbcj") then
         if inst.soralevel:value() > 14 and data.object and data.object.components.pickable and
             not data.object.components.trader then
-            if data.object.plant_def and data.object.components.plantresearchable and
+            if data.object.components.perennialcrop or data.object.components.perennialcrop2 then
+                local loot = data.loot 
+                if not loot then return end
+                for k, v in pairs(loot) do
+                    local item = SpawnPrefab(v.prefab)
+                    if v.components.stackable and v.components.stackable.stacksize > 1 then
+                        item.components.stackable:SetStackSize(v.components.stackable.stacksize)
+                    end
+                    inst.components.inventory:GiveItem(item, nil, inst:GetPosition())
+                end
+            elseif data.object.plant_def and data.object.components.plantresearchable and
                 data.object.components.pickable.use_lootdropper_for_product then
                 local loot = {}
                 for _, prefab in ipairs(data.object.components.lootdropper:GenerateLoot()) do

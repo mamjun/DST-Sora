@@ -75,7 +75,7 @@ end)
 
 if getsora("fixyzhou") then
     function GLOBAL.distsq(v1, v2, v3, v4)
-        if v4 and v3 and v2 and v1 then
+        if v3 then
             local dx = v1 - v3
             local dy = v2 - v4
             return dx * dx + dy * dy

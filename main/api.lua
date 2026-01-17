@@ -127,7 +127,9 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
         return imagecache[name].atlas, imagecache[name].image
     end
     local atlas = GetInventoryItemAtlas(t, true)
-    if atlas and not atlas:find("/cookbookimages/") and TheSim:AtlasContains(softresolvefilepath(atlas), t) then
+    
+    local softtrueatlas = atlas and softresolvefilepath(atlas) or nil
+    if atlas and softtrueatlas and not atlas:find("/cookbookimages/") and TheSim:AtlasContains(softtrueatlas, t) then
         imagecache[name] = {
             atlas = atlas,
             image = t
@@ -186,7 +188,8 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
                 end
             end
         end
-        if trueatlas and TheSim:AtlasContains(softresolvefilepath(trueatlas), t) then
+        local soft_trueatlas = trueatlas and  softresolvefilepath(trueatlas) or nil
+        if trueatlas and soft_trueatlas and TheSim:AtlasContains(soft_trueatlas, t) then
             imagecache[name] = {
                 atlas = trueatlas,
                 image = t

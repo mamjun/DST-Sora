@@ -29,7 +29,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.17
+-- verion = 1.18
+-- v1.18 感谢老王修复的bug
 -- v1.17 感谢Jerusalem的建议,优化了一处hook的处理,优化了性能
 -- v1.15 优化DefaultImage的处理
 -- v1.14 优化MakeItemSkin 
@@ -254,7 +255,7 @@ function MakeItemSkinDefaultData(base, itemimg, itemanim, data) -- 创建默认�
         end
     end
     if data then
-        itembasedata.data = data
+        itembasedata[base].data = data
     end
 end
 function GetItemSkinDefaultData(base) -- 获取基础数据   Get the defaultdata for a skin 
