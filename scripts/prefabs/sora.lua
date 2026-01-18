@@ -38,12 +38,12 @@ Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), A
                 Asset("ANIM", "anim/sora_amly.zip"), Asset("ANIM", "anim/sora_gete.zip"),
                 Asset("ANIM", "anim/sora_llan.zip"), Asset("ANIM", "anim/sora_sby.zip"),
                 Asset("ANIM", "anim/sora_mysora.zip"), Asset("ANIM", "anim/sora_mysora_r.zip"),
-                Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"), Asset("ANIM", "anim/sora_wsqy.zip"),
-                Asset("ANIM", "anim/sora_sdsz_r.zip"),Asset("ANIM", "anim/sora_yhjd.zip"), Asset("ANIM", "anim/sorahair.zip"),
+                Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"),
+                Asset("ANIM", "anim/sora_wsqy.zip"), Asset("ANIM", "anim/sora_sdsz_r.zip"),
+                Asset("ANIM", "anim/sora_yhjd.zip"), Asset("ANIM", "anim/sorahair.zip"),
                 Asset("ANIM", "anim/sorahair2.zip"), Asset("ANIM", "anim/sorahair3.zip"),
                 Asset("ANIM", "anim/sorahair4.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
-                Asset("ANIM", "anim/ghost_sora_build.zip"),
-                Asset("ANIM", "anim/ghost_sora_r_build.zip")}
+                Asset("ANIM", "anim/ghost_sora_build.zip"), Asset("ANIM", "anim/ghost_sora_r_build.zip")}
 -- 追加新版本选人提示
 if TUNING.GAMEMODE_STARTING_ITEMS then
     if TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT then
@@ -113,7 +113,7 @@ for k, v in pairs(foods) do
         table.insert(sorafoods, v.name)
     end
 end
-local function OnSoraSpawn(inst,skins)
+local function OnSoraSpawn(inst, skins)
 
     local first = true
     if TheWorld.components.soraexpsave then
@@ -122,7 +122,7 @@ local function OnSoraSpawn(inst,skins)
         first = saveexp == -1
         if saveexp > 0 then
             inst:GetExp(saveexp)
-            for k,v in pairs(saveext) do
+            for k, v in pairs(saveext) do
                 if inst.components[k] and inst.components[k].OnSoraLoad then
                     inst.components[k]:OnSoraLoad(v)
                 end
@@ -137,9 +137,10 @@ local function OnSoraSpawn(inst,skins)
         if gift then
             local gifts = {}
             -- 给背包
-            print(inst.start_invskins ,inst.start_invskins and inst.start_invskins.sorabag)
+            print(inst.start_invskins, inst.start_invskins and inst.start_invskins.sorabag)
             if TheNet:GetServerGameMode() ~= "quagmire" then
-                table.insert(gifts, SpawnPrefab("sorabag",inst.start_invskins and inst.start_invskins.sorabag or nil,nil, inst.userid))
+                table.insert(gifts, SpawnPrefab("sorabag", inst.start_invskins and inst.start_invskins.sorabag or nil,
+                    nil, inst.userid))
             end
 
             local cane = 0
@@ -358,7 +359,7 @@ local function GetExp(inst, num, code, dmaxexp, once)
         applyupgrades(inst, true)
         ReFreshExp(inst)
     end
-    --TheWorld.components.soraexpsave:SetExp(inst.userid, inst.soraexp:value())
+    -- TheWorld.components.soraexpsave:SetExp(inst.userid, inst.soraexp:value())
 end
 
 local function onbecamehuman(inst)
@@ -413,6 +414,40 @@ local notpick = {
     plant_certificate = 1,
     medal_wormwood_flower = 1
 }
+--消除大作物碰撞并锁定
+local function CheckCollides(inst, Collides,Collides2,Collides3,Collides4)
+    if not Collides then
+        return false
+    end
+    for k,v in pairs({Collides,Collides2,Collides3,Collides4}) do 
+        if v == COLLISION.CHARACTERS or v==COLLISION.GIANTS then
+            return true
+        end
+    end
+    return false
+end
+local function CheckCollidesGroup(inst, Collides)
+    if not Collides then
+        return false
+    end
+    if Collides == COLLISION.OBSTACLES then
+        return true
+    end
+    return false
+end
+local lockCollides = SoraAPI.userdata.MakeHook("Physics", 'CollidesWith', CheckCollides)
+local lockCollidesGroup = SoraAPI.userdata.MakeHook("Physics", 'SetCollisionGroup', CheckCollidesGroup)
+
+local function ClearPhysics(item)
+    if item.Physics then 
+        item.Physics:SetCollisionGroup(COLLISION.SMALLOBSTACLES)
+        item.Physics:ClearCollidesWith(COLLISION.CHARACTERS)
+        item.Physics:ClearCollidesWith(COLLISION.GIANTS)
+        SoraAPI.userdata.Hook(item, lockCollides)
+        SoraAPI.userdata.Hook(item, lockCollidesGroup)
+    end
+end
+
 -- 双倍采集
 local function onpick(inst, data)
     GetExp(inst, 2, "pick")
@@ -425,23 +460,30 @@ local function onpick(inst, data)
             inst:GetExp(10, data.object.plant_def.product, nil, true)
             inst:GetExp(10, "crop")
         end
-
     end
     if not getsora("sbcj") then
         if inst.soralevel:value() > 14 and data.object and data.object.components.pickable and
             not data.object.components.trader then
             if data.object.components.perennialcrop or data.object.components.perennialcrop2 then
-                local loot = data.loot 
-                if not loot then return end
+                local loot = data.loot
+                if not loot then
+                    return
+                end
                 for k, v in pairs(loot) do
                     local item = SpawnPrefab(v.prefab)
                     if v.components.stackable and v.components.stackable.stacksize > 1 then
                         item.components.stackable:SetStackSize(v.components.stackable.stacksize)
                     end
+                    ClearPhysics(item)
+                    ClearPhysics(v)
                     inst.components.inventory:GiveItem(item, nil, inst:GetPosition())
                 end
             elseif data.object.plant_def and data.object.components.plantresearchable and
+
                 data.object.components.pickable.use_lootdropper_for_product then
+                for i, item in pairs(data.loot or {}) do
+                    ClearPhysics(item)
+                end
                 local loot = {}
                 for _, prefab in ipairs(data.object.components.lootdropper:GenerateLoot()) do
                     table.insert(loot, data.object.components.lootdropper:SpawnLootPrefab(prefab))
@@ -454,6 +496,7 @@ local function onpick(inst, data)
                     end
                 end
                 for i, item in ipairs(loot) do
+                    ClearPhysics(item)
                     if item.components.inventoryitem ~= nil then
                         inst.components.inventory:GiveItem(item, nil, inst:GetPosition())
                     end
@@ -717,7 +760,7 @@ local common_postinit = function(inst)
         set = function(a, b, v)
             inst.soraexplocal = b
         end,
-        setlocal = function(a,b,v)
+        setlocal = function(a, b, v)
             inst.soraexplocal = b
         end
     }
@@ -962,7 +1005,7 @@ local function MakeSkin(name, data, notemp)
     for k, v in pairs(data) do
         d[k] = v
     end
-    if d.is_longhair then 
+    if d.is_longhair then
         d.skins.ghost_skin = "ghost_sora_r_build"
     end
     SoraAPI.MakeCharacterSkin("sora", name, d)
@@ -1001,7 +1044,7 @@ MakeSkin("sora_gete", {
 MakeSkin("sora_llan", {
     name = "llan",
     is_longhair = true,
-    des = "世间美好，不过松花酿酒，春水煎茶",
+    des = "世间美好，不过松花酿酒，春水煎茶"
 })
 
 MakeSkin("sora_zhizheng", {

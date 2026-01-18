@@ -1857,3 +1857,32 @@ AddComponentPostInit("playercontroller", function(self)
     --     end
     -- end)
 end)
+local scaleping = nil
+AddComponentPostInit("reticule", function(self)
+    local oldCreateReticule = self.CreateReticule
+    self.CreateReticule = function(s, ...)
+        local x,y,z= oldCreateReticule(s, ...)
+        if self.reticule and self.sorareticulescale and self.reticule.AnimState then
+            self.reticule.AnimState:SetScale(self.sorareticulescale, self.sorareticulescale, self.sorareticulescale)
+        end
+        return x,y,z
+    end
+    local oldPingReticuleAt = self.PingReticuleAt
+    self.PingReticuleAt = function(s, ...)
+
+        if self.sorareticulescale  then
+            scaleping = self.sorareticulescale
+        end
+        local x,y,z= oldPingReticuleAt(s, ...)
+        if self.sorareticulescale  then
+            scaleping = nil
+        end
+        return x,y,z
+    end
+end)
+
+AddPrefabPostInit("reticuleaoeping_1_6", function(inst)
+    if scaleping and inst.AnimState then
+        inst.AnimState:SetScale(scaleping, scaleping, scaleping)
+    end
+end)

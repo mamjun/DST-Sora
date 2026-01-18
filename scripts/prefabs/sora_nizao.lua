@@ -280,7 +280,7 @@ function makelightflier_cat()
         inst.Light:Enable(true)
 
         inst.entity:SetPristine()
-
+        inst:AddTag("electricdamageimmune")
         if not TheWorld.ismastersim then
             return inst
         end

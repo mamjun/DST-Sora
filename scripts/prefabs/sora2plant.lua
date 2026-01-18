@@ -40,21 +40,24 @@ local Setreticule
 local function onequip(inst, owner)
     inst.owner = owner
     inst:AddTag("sora2plantequiped")
-    owner.AnimState:OverrideSymbol("swap_object",inst.skinname or  "sora2plant", "swap_weapon")
+    owner.AnimState:OverrideSymbol("swap_object", inst.skinname or "sora2plant", "swap_weapon")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
     if not owner:HasTag("sora") then
-        inst.isbig:set(false)
+        inst.isbig:set(0)
+    end
+    if inst.isbig:value() == 2 and owner:HasTag("sora") and owner.soralevel:value() < 20 then
+        inst.isbig:set(1)
     end
     if inst.followerfx then
         inst.followerfx:Remove()
-        inst.followerfx =nil
+        inst.followerfx = nil
     end
     if inst.skinname == "sora2plant_xm" then
         inst.followerfx = SpawnPrefab("sora2plant_xm_fx")
         inst.followerfx.entity:SetParent(owner.entity)
         inst.followerfx.entity:AddFollower()
-        inst.followerfx.AnimState:SetScale(2,2,2)
+        inst.followerfx.AnimState:SetScale(2, 2, 2)
         inst.followerfx.Follower:FollowSymbol(owner.GUID, "swap_object", 0, -175, 0) -- "swap_hat"
     end
 end
@@ -65,9 +68,9 @@ local function onunequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
     Setreticule(inst)
-     if inst.followerfx then
+    if inst.followerfx then
         inst.followerfx:Remove()
-        inst.followerfx =nil
+        inst.followerfx = nil
     end
 end
 local function StartAOETargeting(inst)
@@ -92,12 +95,15 @@ local function ReticuleTargetAllowWaterFn()
 end
 function Setreticule(inst)
     -- body
-    local re, ping = "reticuleaoesmall", "reticuleaoesmallping"
-    if inst.isbig:value() then
-        re, ping = "reticuleaoe_1_6", "reticuleaoeping_1_6"
+    local re, ping, scale = "reticuleaoesmall", "reticuleaoesmallping", nil
+    if inst.isbig:value() == 1 then
+        re, ping, scale = "reticuleaoe_1_6", "reticuleaoeping_1_6", nil
+    elseif inst.isbig:value() == 2 then
+        re, ping, scale = "reticuleaoe_1_6", "reticuleaoeping_1_6", 2.5
     end
     inst.components.aoetargeting.reticule.reticuleprefab = re
     inst.components.aoetargeting.reticule.pingprefab = ping
+    inst.components.aoetargeting.reticule.sorareticulescale = scale
 end
 local function GetTileCenter(inst, pos)
     if pos then
@@ -231,7 +237,7 @@ local function DoBig(fn, inst, doer, pos, ...)
 
     local rr = {}
     local tosay
-    if inst.isbig:value() and doer:HasTag("sora") then
+    if inst.isbig:value() == 1 and doer:HasTag("sora") then
         for x = 0, 2, 1 do
             for y = 0, 2, 1 do
                 local newpos = Point(pos.x + 4 * x - 4, 0, pos.z + 4 * y - 4)
@@ -240,6 +246,21 @@ local function DoBig(fn, inst, doer, pos, ...)
                 table.insert(rr, msg)
                 if not r and type(msg) == "string" then
                     tosay = (tosay or "") .. (x * 3 + y + 1) .. "号位" .. msg .. "\n"
+                end
+            end
+        end
+        if tosay then
+            Say(doer, tosay)
+        end
+    elseif inst.isbig:value() == 2 and doer:HasTag("sora") and doer.soralevel:value() >= 20 then
+        for x = 0, 4, 1 do
+            for y = 0, 4, 1 do
+                local newpos = Point(pos.x + 4 * x - 8, 0, pos.z + 4 * y - 8)
+                local r, msg = fn(inst, doer, newpos, ...)
+                table.insert(rr, r)
+                table.insert(rr, msg)
+                if not r and type(msg) == "string" then
+                    tosay = (tosay or "") .. (x * 5 + y + 1) .. "号位" .. msg .. "\n"
                 end
             end
         end
@@ -410,6 +431,7 @@ end
 local function makepacker(inst, doer, items)
     return SoraAPI.Gift(items)
 end
+local sora2plantseed
 local function OnPickFn(inst, doer, pos)
     if incd(inst, doer) then
         return
@@ -418,13 +440,20 @@ local function OnPickFn(inst, doer, pos)
     TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST = 0
     DoBig(PickPickFn, inst, doer, pos)
     inst.components.soraseedcontainer:HandleCollectAllSeeds(doer)
+    if not sora2plantseed then 
+        local allseeds = inst.components.soraseedcontainer:GetAllName()
+        sora2plantseed = {}
+        for k, v in pairs(allseeds) do
+            sora2plantseed[k] = 1
+        end
+    end
     local rr = DoBig(PickFn, inst, doer, pos)
     TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST = old
     local items = {}
     local seeditems = {}
     for k, v in pairs(rr) do
         for ik, iv in pairs(v) do
-            local t = ik:match("seeds$") and seeditems or items
+            local t = sora2plantseed[ik] and seeditems or items
             t[ik] = (t[ik] or 0) + iv
         end
     end
@@ -441,7 +470,7 @@ local function OnPickFn(inst, doer, pos)
 end
 local allseeds = nil
 -- OnPickFn = SoraAPI.Pfn(OnPickFn, true)
-local function planttoseed(prefab)
+local function planttoseed(prefab, doer)
     if not allseeds then
         return
     end
@@ -462,8 +491,14 @@ local function planttoseed(prefab)
     if allseeds[name] then
         return name
     end
+    if doer and doer.components.inventory:Has(name, 1, true) then
+        return name
+    end
     name = prefab .. "_seed"
     if allseeds[name] then
+        return name
+    end
+    if doer and doer.components.inventory:Has(name, 1, true) then
         return name
     end
     return
@@ -492,13 +527,21 @@ end
 local tempseedold = {}
 local seedneed = {}
 local needonce = {}
-local function loadseed(inst)
+local has_inventory = {}
+local has_all = {}
+local function loadseed(inst, doer)
     tempseedold = {}
     seedneed = {}
     needonce = {}
-
+    has_inventory = {}
+    has_all = {}
     for k, v in pairs(inst.seeds) do
         needonce[v[3]] = (needonce[v[3]] or 0) + 1
+    end
+
+    for k, v in pairs(inst.seeds) do
+        local _, seedfind = doer.components.inventory:Has(v[3], 1, true)
+        has_inventory[v[3]] = seedfind
     end
 
     local allseedsinfo = inst.components.soraseedcontainer:GetAllSeeds()
@@ -507,12 +550,16 @@ local function loadseed(inst)
             tempseedold[v.name] = v.num
         end
     end
+    for k, v in pairs(inst.seeds) do
+        has_all[v[3]] = (has_inventory[v[3]] or 0) + (tempseedold[v[3]] or 0)
+    end
+
     -- body
 end
-local function needseed(inst)
+local function needseed(inst, doer)
     local req = true
     for k, v in pairs(needonce) do
-        if ((seedneed[k] or 0) + v) > tempseedold[k] then
+        if ((seedneed[k] or 0) + v) > has_all[k] then
             req = false
         end
     end
@@ -526,13 +573,27 @@ local function needseed(inst)
     end
     -- body
 end
-local function saveseed(inst)
+local function saveseed(inst, doer)
     for k, v in pairs(seedneed) do
-        inst.components.soraseedcontainer:AddSeed(k, -v)
+        if has_inventory[k] and has_inventory[k] > 0 then
+            --身上足够直接消耗身上的
+            if has_inventory[k] > v then 
+                doer.components.inventory:ConsumeByName(k, v)
+                seedneed[k] = 0 
+            else
+                seedneed[k]= seedneed[k] - has_inventory[k]
+                doer.components.inventory:ConsumeByName(k, has_inventory[k])
+            end
+        end
+        if seedneed[k] and seedneed[k] > 0 then
+            inst.components.soraseedcontainer:AddSeed(k, -seedneed[k])
+        end
     end
     tempseedold = {}
     seedneed = {}
     needonce = {}
+    has_inventory = {}
+    has_all = {}
 end
 local function CanDeployAnyWhere()
     return true
@@ -553,7 +614,7 @@ local function SeedFn(inst, doer, pos)
     if #newents ~= #inst.seeds then
         return false, "农田数量与模板不匹配"
     end
-    if not needseed(inst) then
+    if not needseed(inst, doer) then
         return false, "种子数量不足"
     end
     for k, v in pairs(newents) do -- 数量对了就OK 坑不坑的无所谓
@@ -632,7 +693,7 @@ local function OnSeedFn(inst, doer, pos)
             if isNear(v, pos) then
                 local x, y, z = v:GetPosition():Get()
                 -- allseeds = {}
-                local name = planttoseed(v.prefab)
+                local name = planttoseed(v.prefab, doer)
                 if not name then
                     if STRINGS.NAMES[v.prefab:upper()] then
                         Say(doer, "暂不支持[" .. STRINGS.NAMES[v.prefab:upper()] .. "],请铲除后再试")
@@ -680,9 +741,9 @@ local function OnSeedFn(inst, doer, pos)
             "请先选择一块农田作为模板\n当前农田植物无法识别\n请使用扶光附带的刨坑进行刨坑\n然后种满种子")
         return
     end
-    loadseed(inst)
+    loadseed(inst, doer)
     DoBig(SeedFn, inst, doer, pos)
-    saveseed(inst)
+    saveseed(inst, doer)
 end
 local function fixCostController(self)
     self.donemoisture = true
@@ -813,7 +874,8 @@ end
 local function OnDefaultFn(inst, doer, pos)
     local str = ""
     if inst and doer and doer:HasTag("sora") then
-        str = "当前范围:" .. (inst.isbig:value() and "大" or "小") .. "\n"
+        str = "当前范围:" .. (inst.isbig:value() == 2 and "特大" or inst.isbig:value() == 1 and "大" or "小") ..
+                  "\n"
     end
     inst.seeds = nil
     Say(doer, str .. "种子模板已清空\n请选择功能")
@@ -822,14 +884,21 @@ end
 
 local function OnRangeFn(inst, doer, pos)
     if doer and doer:HasTag("sora") then
-        if inst.isbig:value() then
-            inst.isbig:set(false)
+        local int = inst.isbig:value()
+        if int == 0 then
+            inst.isbig:set(1)
+        elseif int == 1 then
+            if doer.soralevel:value() >= 20 then
+                inst.isbig:set(2)
+            else
+                inst.isbig:set(0)
+            end
         else
-            inst.isbig:set(true)
+            inst.isbig:set(0)
         end
 
     elseif inst.owner then
-        inst.isbig:set(false)
+        inst.isbig:set(0)
     end
     inst.seeds = nil
     OnDefaultFn(inst, doer, pos)
@@ -980,7 +1049,7 @@ local function fn()
     inst:AddTag("allow_action_on_impassable")
     inst:AddTag("rechargeable")
     inst.entity:AddMiniMapEntity()
-    inst.isbig = net_bool(inst.GUID, "sora2plant.isbig", "sora2plant.isbig")
+    inst.isbig = net_int(inst.GUID, "sora2plant.isbig", "sora2plant.isbig")
     inst.MiniMapEntity:SetIcon("sora2plant.tex")
     inst:ListenForEvent("sora2plant.isbig", Setreticule)
     inst:AddTag("soraveryquickcast")
@@ -1164,9 +1233,9 @@ local function xmfxfn(Sim)
     inst.entity:AddNetwork()
     inst.AnimState:SetBank("sora2plant_xm_fx")
     inst.AnimState:SetBuild("sora2plant_xm_fx")
-    inst.AnimState:PlayAnimation("idle",true)
-    inst.AnimState:SetScale(3,3,3)
-    inst.AnimState:SetFinalOffset( -1)
+    inst.AnimState:PlayAnimation("idle", true)
+    inst.AnimState:SetScale(3, 3, 3)
+    inst.AnimState:SetFinalOffset(-1)
     inst:AddTag("FX")
     inst:AddTag("NOCLICK")
     inst:AddTag("NOBLOCK")
@@ -1204,6 +1273,7 @@ SoraAPI.MakeItemSkin("sora2plant", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeAssetTable(tname, assets)
 
-return Prefab("sora2plant", fn, assets, prefabs), Prefab("sora2plant_fx", fxfn, assets, prefabs), Prefab("sora2plant_xm_fx", xmfxfn, assets, prefabs)
+return Prefab("sora2plant", fn, assets, prefabs), Prefab("sora2plant_fx", fxfn, assets, prefabs),
+    Prefab("sora2plant_xm_fx", xmfxfn, assets, prefabs)
