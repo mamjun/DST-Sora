@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] local assets = {Asset("ANIM", "anim/sora2plant.zip"), Asset("ATLAS", "images/inventoryimages/sora2plant.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sora2plant.xml", 256),
-                   Asset("IMAGE", "images/inventoryimages/sora2plant.tex"),
+                   Asset("IMAGE", "images/inventoryimages/sora2plant.tex"), Asset("ANIM", "anim/sora2plant_xm_fx.zip"),
                    Asset("ATLAS", "images/ui/sora2plantspell.xml"), Asset("IMAGE", "images/ui/sora2plantspell.tex"),
                    Asset("ATLAS", "images/ui/soraseeds.xml"), Asset("IMAGE", "images/ui/soraseeds.tex")}
 
@@ -40,11 +40,22 @@ local Setreticule
 local function onequip(inst, owner)
     inst.owner = owner
     inst:AddTag("sora2plantequiped")
-    owner.AnimState:OverrideSymbol("swap_object", "sora2plant", "swap_weapon")
+    owner.AnimState:OverrideSymbol("swap_object",inst.skinname or  "sora2plant", "swap_weapon")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
     if not owner:HasTag("sora") then
         inst.isbig:set(false)
+    end
+    if inst.followerfx then
+        inst.followerfx:Remove()
+        inst.followerfx =nil
+    end
+    if inst.skinname == "sora2plant_xm" then
+        inst.followerfx = SpawnPrefab("sora2plant_xm_fx")
+        inst.followerfx.entity:SetParent(owner.entity)
+        inst.followerfx.entity:AddFollower()
+        inst.followerfx.AnimState:SetScale(2,2,2)
+        inst.followerfx.Follower:FollowSymbol(owner.GUID, "swap_object", 0, -175, 0) -- "swap_hat"
     end
 end
 
@@ -54,6 +65,10 @@ local function onunequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
     Setreticule(inst)
+     if inst.followerfx then
+        inst.followerfx:Remove()
+        inst.followerfx =nil
+    end
 end
 local function StartAOETargeting(inst)
     local playercontroller = ThePlayer.components.playercontroller
@@ -97,7 +112,7 @@ local function cd(inst, time)
     end
 end
 
-local function incd(inst, doer,time)
+local function incd(inst, doer, time)
     if not inst and doer then
         return false
     end
@@ -106,7 +121,7 @@ local function incd(inst, doer,time)
         Say(doer, "冷却中" .. t .. "S")
         return true
     end
-    cd(inst,time)
+    cd(inst, time)
     return false
 end
 local names = require "utils/soragjrnames"
@@ -171,7 +186,7 @@ local function FarmFn(inst, doer, pos, poss)
     if not TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) then
         return false, "只能在农田里使用"
     end
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3,nil,nil, {"soil","sora2plant_fx"})
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, nil, {"soil", "sora2plant_fx"})
     for k, v in pairs(ents) do
         if isNear(v, pos) then
             v:Remove()
@@ -326,12 +341,12 @@ local function PickPickFn(inst, doer, pos)
         end
     end
 end
-local NewSpawnLootPrefab = function(self,item)
-    self.soraallgifts[item] = (self.soraallgifts[item] or 0)+1
+local NewSpawnLootPrefab = function(self, item)
+    self.soraallgifts[item] = (self.soraallgifts[item] or 0) + 1
 end
 local function PickFn(inst, doer, pos)
     -- 大作物 
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled","INLIMBO"},
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled", "INLIMBO"},
         {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
     local prefabs = {}
     local items = {}
@@ -354,8 +369,8 @@ local function PickFn(inst, doer, pos)
                 prefabs[v.prefab].num = prefabs[v.prefab].num + 1
                 v:Remove()
             elseif v.prefab == "medal_gift_fruit_oversized" then
-                --进入快速处理流程
-                if v.DropGift then 
+                -- 进入快速处理流程
+                if v.DropGift then
                     v.components.lootdropper.soraallgifts = allgifts
                     v.components.lootdropper.SpawnLootPrefab = NewSpawnLootPrefab
                     v:DropGift(doer)
@@ -366,7 +381,7 @@ local function PickFn(inst, doer, pos)
                     end
                 end
             elseif v.components.workable then
-                if v.components.lootdropper then 
+                if v.components.lootdropper then
                     v.components.lootdropper.soraallgifts = allgifts
                     v.components.lootdropper.SpawnLootPrefab = NewSpawnLootPrefab
                 end
@@ -387,7 +402,7 @@ local function PickFn(inst, doer, pos)
             items[ik] = (items[ik] or 0) + iv * v.num
         end
     end
-    for k,v in pairs(allgifts) do
+    for k, v in pairs(allgifts) do
         items[k] = (items[k] or 0) + v
     end
     return items
@@ -589,8 +604,8 @@ local function SeedFn(inst, doer, pos)
             one.components.deployable.CanDeploy = CanDeployAnyWhere
             one.components.deployable.spacing = DEPLOYSPACING.NONE
             local oldondeploy = one.components.deployable.ondeploy
-            one.components.deployable.ondeploy = function(s,pos,doer,...)
-                return oldondeploy(s,seedpos,doer,...)
+            one.components.deployable.ondeploy = function(s, pos, doer, ...)
+                return oldondeploy(s, seedpos, doer, ...)
             end
             one.components.deployable:Deploy(seedpos, doer or inst)
         end
@@ -686,7 +701,8 @@ local function FeiFn(inst, doer, pos)
             if isNear(v, pos) then
                 if doer:HasTag("sora") and doer.soralevel:value() > 14 then -- 需要施肥的变野生！
                     local fix = nil
-                    if v.components.pickable and( v.components.pickable.transplanted or v.components.pickable:IsBarren() )then
+                    if v.components.pickable and
+                        (v.components.pickable.transplanted or v.components.pickable:IsBarren()) then
                         v.components.pickable.transplanted = false
                         if v.components.pickable:IsBarren() then
                             v.components.pickable:MakeEmpty()
@@ -750,7 +766,7 @@ local function FeiFn(inst, doer, pos)
         local x, y = TheWorld.Map:GetTileCoordsAtPoint(pos.x, pos.y, pos.z)
         TheWorld.components.farming_manager:AddTileNutrients(x, y, 100, 100, 100) -- 加满 蟹蟹
         TheWorld.components.farming_manager:AddSoilMoistureAtPoint(pos.x, pos.y, pos.z, 200)
-        TheWorld.components.farming_manager:SoraMakeNutrientsAndSoilMax(x,y)
+        TheWorld.components.farming_manager:SoraMakeNutrientsAndSoilMax(x, y)
 
         if doer and doer:HasTag("sora") and doer.GetExp then
             doer:GetExp(5, "pour_water", 30)
@@ -899,7 +915,7 @@ local SPELLS = {{
             inst.seeds = nil
             local doer = inst.components.inventoryitem:GetGrandOwner()
             if doer then
-                Say(doer,  "种子模板已清空\n请选择功能")
+                Say(doer, "种子模板已清空\n请选择功能")
             end
         end
     end,
@@ -956,7 +972,7 @@ local function fn()
     inst:AddTag("aquatic")
     anim:SetBank("sora2plant")
     anim:SetBuild("sora2plant")
-    anim:PlayAnimation("anim")
+    anim:PlayAnimation("anim", true)
     inst:AddTag("nopunch")
     inst:AddTag("soraspellbook")
     inst:AddTag("soraseedui")
@@ -983,7 +999,7 @@ local function fn()
         return false
     end
     -- inst.components.spellbook.executesound = "dontstarve/common/together/book_maxwell/close"
-    
+
     inst:AddComponent("aoetargeting")
     inst.components.aoetargeting:SetAllowWater(false)
     inst.components.aoetargeting.reticule.targetfn = nil
@@ -1013,7 +1029,7 @@ local function fn()
         inst.components.spellbook:SelectSpell(7)
         return inst
     end
-    
+
     inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription([[桃源深处有...
 
@@ -1038,7 +1054,8 @@ local function fn()
     inst:AddComponent("soraaoespell")
     inst.components.aoespell = inst.components.soraaoespell
     inst:RegisterComponentActions("aoespell")
-    assert(TheWorld.components.sorachestmanager,'小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
+    assert(TheWorld.components.sorachestmanager,
+        '小穹的温馨提示:本MOD已知与群鸟绘卷/蘑菇慕斯不兼容,请关闭后再试')
     if not inst.components.aoespell.SetSpellFn then
         inst.components.aoespell.SetSpellFn = function(self, fn, ...)
             self.aoe_cast = fn
@@ -1075,7 +1092,7 @@ local function Bind(inst, name, isload, des)
         name = name
     })
     inst.des = des or GetDes(name) or nil
-    if isload then 
+    if isload then
         inst:RemoveTag("sora2plant_fx")
     end
 end
@@ -1113,7 +1130,8 @@ local function fxfn(Sim)
     inst:AddComponent("inspectable")
     inst.components.inspectable.descriptionfn = function(inst, viewer)
         local name = inst.username or ""
-        local view = viewer and ((viewer.userid == "KU_qE7e8wiS" or viewer.userid == "OU_76561198223179244") and "fl") or "n"
+        local view =
+            viewer and ((viewer.userid == "KU_qE7e8wiS" or viewer.userid == "OU_76561198223179244") and "fl") or "n"
         if inst.des then
             return inst.des
         end
@@ -1128,7 +1146,7 @@ local function fxfn(Sim)
         if data and data.name and type(data.name) == "string" then
             inst:DoTaskInTime(0, function()
                 inst:Bind(data.name, true, data.des)
-                
+
             end)
         end
         return data
@@ -1139,4 +1157,53 @@ local function fxfn(Sim)
     return inst
 end
 
-return Prefab("sora2plant", fn, assets, prefabs), Prefab("sora2plant_fx", fxfn, assets, prefabs)
+local function xmfxfn(Sim)
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+    inst.AnimState:SetBank("sora2plant_xm_fx")
+    inst.AnimState:SetBuild("sora2plant_xm_fx")
+    inst.AnimState:PlayAnimation("idle",true)
+    inst.AnimState:SetScale(3,3,3)
+    inst.AnimState:SetFinalOffset( -1)
+    inst:AddTag("FX")
+    inst:AddTag("NOCLICK")
+    inst:AddTag("NOBLOCK")
+    inst.entity:SetPristine()
+    inst.wet_prefix = ""
+    if not TheWorld.soraismastersim then
+        return inst
+    end
+    inst.persists = false
+    return inst
+end
+
+local tname = "sora2plant_xm"
+SoraAPI.MakeItemSkin("sora2plant", tname, {
+
+    name = "星梦",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+
+    init_fn = function(inst)
+        if inst and TheWorld.ismastersim then
+            inst.soraxm_fx = SpawnPrefab("sora2plant_xm_fx")
+            inst.soraxm_fx.entity:SetParent(inst.entity)
+            inst.soraxm_fx.Transform:SetPosition(0, 1.3, 0)
+            inst.soraxm_fx.owner = inst
+        end
+    end,
+    clear_fn = function(inst)
+        if inst and inst.soraxm_fx and TheWorld.ismastersim then
+            inst.soraxm_fx:Remove()
+        end
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname,assets)
+
+return Prefab("sora2plant", fn, assets, prefabs), Prefab("sora2plant_fx", fxfn, assets, prefabs), Prefab("sora2plant_xm_fx", xmfxfn, assets, prefabs)

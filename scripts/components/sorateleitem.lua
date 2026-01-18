@@ -50,24 +50,26 @@ local prefabmaps = {
     kitcoon_rocky = "kitcoon",
     kitcoon_desert = "kitcoon",
     kitcoon_moon = "kitcoon",
-    kitcoon_yot = "kitcoon"
+    kitcoon_yot = "kitcoon",
+    hh_treasure_tally = "hh_treasure_build"
 }
+-- a=c_findnext("sora2stone") b=SoraAPI.up.Get(a.components.sorateleitem.TryTele,'prefabmaps') b.hh_treasure_tally="hh_treasure_build"
 local function toprefab(prefab)
     return prefabmaps[prefab] or prefab or "unprefab"
 end
-local itemfn 
+local itemfn
 itemfn = {
     flxunbao = function(inst, doer, target)
         if target.data and target.data.pos and target.data.worldid ~= "-1" then
-            return true,target.data.pos
+            return true, target.data.pos
         end
         return false, "预言失败\n无法传送"
     end,
     medal_treasure_map = function(inst, doer, target)
         if target.UsingTrasureMap then
             target = target:UsingTrasureMap()
-            local x,y =itemfn.medal_treasure_map_used(inst, doer, target)
-            return x,y,target
+            local x, y = itemfn.medal_treasure_map_used(inst, doer, target)
+            return x, y, target
         end
         return false, "预言失败\n无法传送"
     end,
@@ -121,6 +123,7 @@ itemfn = {
         return false, "未找到宝藏\n无法传送"
     end
 }
+
 local postfn = {
     medal_treasure_map_used = function(inst, doer, target, pos)
         if target.spawnTreasure then
@@ -130,6 +133,11 @@ local postfn = {
             resonator:Remove()
             target:Remove()
         end
+    end,
+    hh_treasure_build = function(inst, doer, target, pos)
+        if target and target.components.workable then
+            target.components.workable:WorkedBy_Internal(doer, 10)
+        end
     end
 }
 itemfn.medal_loss_treasure_map = itemfn.medal_treasure_map
@@ -138,7 +146,7 @@ postfn.medal_loss_treasure_map_used = postfn.medal_treasure_map_used
 
 function com:TryTele(doer, target)
     if itemfn[target.prefab] then
-        local res, pos,newtarget = itemfn[target.prefab](self.inst, doer, target)
+        local res, pos, newtarget = itemfn[target.prefab](self.inst, doer, target)
         if res then
             if not TheWorld.Map:IsAboveGroundAtPoint(pos.x, 0, pos.z, false) then
                 return Say(doer, "目标地点不是陆地\n不支持传送")
@@ -147,7 +155,7 @@ function com:TryTele(doer, target)
             local pp = doer:GetPosition()
             doer.Physics:Teleport(pos.x, pp.y, pos.z)
             if postfn[(newtarget or target).prefab] then
-                postfn[(newtarget or target).prefab](self.inst, doer, newtarget or  target, pos)
+                postfn[(newtarget or target).prefab](self.inst, doer, newtarget or target, pos)
             end
             self.inst.components.stackable:Get():Remove()
         else
@@ -182,6 +190,9 @@ function com:TryTele(doer, target)
                 doer.components.locomotor:Stop()
                 if doer:GetDistanceSqToInst(item) > 4 then
                     self.inst.components.stackable:Get():Remove()
+                end
+                if postfn[tofind] then
+                    postfn[tofind](self.inst, doer, item, pos)
                 end
                 local pp = doer:GetPosition()
                 doer.Physics:Teleport(pos.x, pp.y, pos.z)
