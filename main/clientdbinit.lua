@@ -346,7 +346,6 @@ temp.serverfn = function(ns, db, userid)
         local doer = UserToPlayer(id)
         -- print(doer.userid,cmd,data.pass or "0")
         if not (doer) then
-            print(111)
             return
         end
         if not doer.sorabuildcd then
@@ -370,6 +369,48 @@ temp.serverfn = function(ns, db, userid)
         end
         return
     end)
+
+    db:ListenForEvent("SoraList", function(id, data, event, ent)
+        if not (data and type(data) == "table" and data.cmd) then
+            return
+        end
+        local cmd = data.cmd
+        local doer = UserToPlayer(id)
+        if not (doer) then
+            return
+        end
+        if not (ent and ent.components.soralistcontainer) then
+            return
+        end
+        
+        if cmd == "GetOne" then
+            if not (data.data and type(data.data.slot) == "number") then
+                return
+            end
+            ent.components.soralistcontainer:GetOne(doer, data.data.slot)
+            return
+        elseif cmd == "GetData" then
+            ent.components.soralistcontainer:GetData(doer,db)
+            return
+        elseif cmd == "CollectSelf" then
+            ent.components.soralistcontainer:CollectSelf(doer)
+            return
+        elseif cmd == "CollectAll" then
+            ent.components.soralistcontainer:CollectAll(doer)
+            return
+        elseif cmd == "Refresh" then
+            ent.components.soralistcontainer:GetData(doer,db)
+            return
+        elseif cmd == "DropAll" then
+            ent.components.soralistcontainer:DropAll(doer)
+            return
+        -- elseif cmd == "ClearAll" then
+        --     ent.components.soralistcontainer:DropAll(doer)
+        --     return
+        end
+        return
+    end)
+
     db.inst = TheWorld
 
 end

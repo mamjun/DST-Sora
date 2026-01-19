@@ -127,7 +127,7 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
         return imagecache[name].atlas, imagecache[name].image
     end
     local atlas = GetInventoryItemAtlas(t, true)
-    
+
     local softtrueatlas = atlas and softresolvefilepath(atlas) or nil
     if atlas and softtrueatlas and not atlas:find("/cookbookimages/") and TheSim:AtlasContains(softtrueatlas, t) then
         imagecache[name] = {
@@ -188,7 +188,7 @@ function SoraGetImage(na) -- mod加载加载过程中请勿调用 不准确
                 end
             end
         end
-        local soft_trueatlas = trueatlas and  softresolvefilepath(trueatlas) or nil
+        local soft_trueatlas = trueatlas and softresolvefilepath(trueatlas) or nil
         if trueatlas and soft_trueatlas and TheSim:AtlasContains(soft_trueatlas, t) then
             imagecache[name] = {
                 atlas = trueatlas,
@@ -834,7 +834,7 @@ function Gift(gifts, data, doer)
             if v.components.soraitem and v.components.soraitem.bind then
                 v.components.soraitem.user = doer.userid
             end
-            if v.components.sorabind and not v.components.sorabind.name then 
+            if v.components.sorabind and not v.components.sorabind.name then
                 v.components.sorabind:Bind(doer.userid, doer.name)
             end
         end
@@ -970,7 +970,7 @@ function IsSuperAdmin(id)
     return SueperAdmin[id] or false
 end
 local HttpUser = {
-    KU_BJgEYomm = 1,--柒灬启
+    KU_BJgEYomm = 1, -- 柒灬启
     KU_SIyU73zV = 1, -- 西蓝花
     KU_Re538nnK = 1, -- adore
     KU_tjzPxMt1 = 1, -- 圆圆的硬币君
@@ -1033,4 +1033,22 @@ function FixPlacerSkin(inst)
             return old(self, builder, recipe, invobject, ...)
         end
     end
+end
+
+function DeepEqual(data1, data2)
+    if data1 == data2 then
+        return true
+    end
+    if not (type(data1) == "table" and type(data1) == type(data2)) then
+        return false
+    end
+    if GetTableSize(data1) ~= GetTableSize(data2) then
+        return false
+    end
+    for k, v in pairs(data1) do
+        if not DeepEqual(v, data2[k]) then
+            return false
+        end
+    end
+    return true
 end

@@ -191,11 +191,11 @@ function com:TryTele(doer, target)
                 if doer:GetDistanceSqToInst(item) > 4 then
                     self.inst.components.stackable:Get():Remove()
                 end
+                local pp = doer:GetPosition()
+                doer.Physics:Teleport(pos.x, pp.y, pos.z)
                 if postfn[tofind] then
                     postfn[tofind](self.inst, doer, item, pos)
                 end
-                local pp = doer:GetPosition()
-                doer.Physics:Teleport(pos.x, pp.y, pos.z)
             else
                 return Say(doer, "没有找到目标地点\n请稍后传送")
             end

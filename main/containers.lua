@@ -984,6 +984,74 @@ params.sora2global.itemtestfn = function(container, item, slot)
                not item.replica.container and not item:HasTag("boxopener_l") and not item.components.container_proxy
 end
 
+params.sora2list = {
+    widget = {
+        slotpos = {},
+        slotbg = {},
+        bgatlas = "images/quagmire_recipebook.xml",
+        bgimage = "quagmire_recipe_menu_bg.tex",
+        pos = Vector3(200, 0, 0),
+        side_align_tip = 100
+    },
+    acceptsstacks = false,
+    usespecificslotsforitems = true,
+    openlimit = 1,
+    type = "sora2list"
+}
+for y = 1, 3 do
+    for x = 1, 3 do
+        table.insert(params.sora2list.widget.slotpos, GLOBAL.Vector3(85 * x - 250, y * -120 + 260, 0))
+        table.insert(params.sora2list.widget.slotbg, {
+            atlas = "images/hud.xml",
+            image = "inv_slot.tex"
+        })
+    end
+end
+local ui = require "widgets/soralistcontainer"
+function params.sora2list.widget:SoraOnOpenFn(inst)
+    local base = 80
+    self.bgimage:ScaleToSize(6 * base, 5 * base)
+    self.bgimage:MoveToBack()
+    ui:Init(self)
+end
+
+function params.sora2list.itemtestfn(container, item, slot)
+    if not item then
+        return false
+    end
+    if item and item.prefab:match("_bell$") then
+        return false
+    end
+    if item.replica.stackable then
+        return false
+    end
+    if item.replica.container then
+        return false
+    end
+    if item.replica.combat then
+        return false
+    end
+    if item.replica.health then
+        return false
+    end
+    if item:HasTag("irreplaceable") then
+        return false
+    end
+    if item.components.container_proxy then
+        return false
+    end
+    local slotitem = container:GetItemInSlot(slot)
+    if not slotitem then
+        return true
+    end
+
+    if slotitem.prefab == item.prefab then
+        return true
+    end
+    return false
+end
+params.sora3list = params.sora2list
+
 if needhelp then
     print("????")
     local old_widgetsetup = containers.widgetsetup

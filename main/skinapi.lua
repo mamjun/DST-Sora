@@ -660,7 +660,6 @@ Sim.ReskinEntity = function(sim, guid, oldskin, newskin, skinid, userid, ...)
     end
     local r = oldReskinEntity(sim, guid, oldskin, newskin, skinid, userid, ...)
     if newskin and itemskins[newskin] then
-
         itemskins[newskin].init_fn(inst)
         inst.skinname = newskin
         inst.skin_id = 0

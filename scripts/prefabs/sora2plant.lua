@@ -1247,7 +1247,7 @@ local function xmfxfn(Sim)
     inst.persists = false
     return inst
 end
-
+SoraAPI.MakeItemSkinDefaultData("sora2plant", {}, {})
 local tname = "sora2plant_xm"
 SoraAPI.MakeItemSkin("sora2plant", tname, {
 
