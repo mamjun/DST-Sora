@@ -320,7 +320,22 @@ AddPlayerPostInit(function(inst)
         inst.AnimState:AddOverrideBuild("pockybuild")
     end
 end)
-
+AddComponentPostInit("playeractionpicker", function(self)
+    local oldGetSceneActions = self.GetSceneActions
+    self.GetSceneActions = function(s, useitem, right, ...)
+        local x, y, z = oldGetSceneActions(s, useitem, right, ...)
+        print(s, useitem, right, ...)        
+        if useitem and useitem:HasTag("soranoprototyper") then
+            for k,v in pairs(x) do 
+                if v.action == ACTIONS.OPEN_CRAFTING then 
+                    table.remove(x,k)
+                    break
+                end
+            end
+        end
+        return x, y, z
+    end
+end)
 AddLaterFn(function()
     local old = up.Get(EntityScript.CollectActions, 'COMPONENT_ACTIONS', "componentactions.lua")
     if not old then
@@ -973,7 +988,8 @@ GLOBAL.require = oldrequire
 oldCanEntitySeeTarget = CanEntitySeeTarget
 GLOBAL.CanEntitySeeTarget = function(inst, target, ...)
     if inst and target and target:HasTag("sorabind") then
-        if not (inst:HasTag("sora") and inst.userid and target:HasTag(inst.userid) or IsSuperAdmin(inst.userid) or inst.Network:IsServerAdmin()) then
+        if not (inst:HasTag("sora") and inst.userid and target:HasTag(inst.userid) or IsSuperAdmin(inst.userid) or
+            inst.Network:IsServerAdmin()) then
             return false
         end
     end
@@ -1106,9 +1122,9 @@ AddPrefabPostInit("sora", function(inst)
         return oldGetAttacked(s, attacker, damage, weapon, stimuli, ...)
     end
     local OnNewSpawn = inst.OnNewSpawn
-    inst.OnNewSpawn = function(item,skins)
+    inst.OnNewSpawn = function(item, skins)
         inst.start_invskins = skins
-        OnNewSpawn(item,skins)
+        OnNewSpawn(item, skins)
     end
 end)
 AddComponentPostInit("locomotor", function(self)
@@ -1817,22 +1833,22 @@ AddComponentPostInit("playercontroller", function(self)
             handle.key = key
             handle.args = {...}
             handle.Remove = function()
-                RemoveByValue(self.SoraHandle,handle)
+                RemoveByValue(self.SoraHandle, handle)
             end
             table.insert(self.SoraHandle, handle)
         end
     end
     self.OnWallUpdate = function(self, ...)
-        --print("OnWallUpdate")
+        -- print("OnWallUpdate")
         if self.handler and next(self.SoraHandle) then
             if TheCamera:CanControl() then
-                --print("OnWallUpdate","CanControl")
+                -- print("OnWallUpdate","CanControl")
                 local isenabled, ishudblocking = self:IsEnabled()
                 if isenabled or ishudblocking then
-                     --print("OnWallUpdate","isenabled or ishudblocking")
+                    -- print("OnWallUpdate","isenabled or ishudblocking")
                     for k, v in pairs(self.SoraHandle) do
                         if TheInput:IsControlPressed(v.key) then
-                            --print("OnWallUpdate","TheInput:IsControlPressed",v.key)
+                            -- print("OnWallUpdate","TheInput:IsControlPressed",v.key)
                             local ret = v.fn(self.inst, v.key, unpack(v.args))
                             if ret then
                                 return
@@ -1861,23 +1877,23 @@ local scaleping = nil
 AddComponentPostInit("reticule", function(self)
     local oldCreateReticule = self.CreateReticule
     self.CreateReticule = function(s, ...)
-        local x,y,z= oldCreateReticule(s, ...)
+        local x, y, z = oldCreateReticule(s, ...)
         if self.reticule and self.sorareticulescale and self.reticule.AnimState then
             self.reticule.AnimState:SetScale(self.sorareticulescale, self.sorareticulescale, self.sorareticulescale)
         end
-        return x,y,z
+        return x, y, z
     end
     local oldPingReticuleAt = self.PingReticuleAt
     self.PingReticuleAt = function(s, ...)
 
-        if self.sorareticulescale  then
+        if self.sorareticulescale then
             scaleping = self.sorareticulescale
         end
-        local x,y,z= oldPingReticuleAt(s, ...)
-        if self.sorareticulescale  then
+        local x, y, z = oldPingReticuleAt(s, ...)
+        if self.sorareticulescale then
             scaleping = nil
         end
-        return x,y,z
+        return x, y, z
     end
 end)
 

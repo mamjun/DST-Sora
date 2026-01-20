@@ -93,7 +93,9 @@ function com:Init()
 end
 -- 前台收到物品
 function com:GetNewItem(slot)
-    if self.isloading then return end
+    if self.isloading then
+        return
+    end
     local item = self.container:GetItemInSlot(slot)
     if not item then
         return
@@ -164,8 +166,8 @@ function com:GetItemInSlot(slot)
     end
 end
 function com:GetAllItemInSlot()
-    if self.isloading then 
-        return 
+    if self.isloading then
+        return
     end
     local doer = self.inst.components.inventoryitem and self.inst.components.inventoryitem:GetGrandOwner()
     if not doer then
@@ -269,6 +271,8 @@ function com:GetData(doer, db)
 end
 function com:TryToEquipOrGive(doer, item, isback)
     local pos = doer:GetPosition()
+    item.prevslot = nil
+    item.prevcontainer = nil
     if item.components.equippable then
         local eslot = item.components.equippable.equipslot
         -- 不能装备则直接给与玩家
@@ -533,7 +537,7 @@ function com:CollectAll(doer)
     for k, v in pairs(ents) do
         if v.components.inventoryitem and v.components.inventoryitem.canbepickedup and
             v.components.inventoryitem.cangoincontainer then
-                self:GiveItem(doer,v)
+            self:GiveItem(doer, v)
         end
     end
     self:GetAllItemInSlot(doer)
@@ -555,7 +559,7 @@ function com:OnLoad(data)
     self.slots = data.slots or {}
     self.slotslast = data.slotslast or {}
     self.isloading = true
-    self.inst:DoTaskInTime(0,function ()
+    self.inst:DoTaskInTime(0, function()
         self.isloading = false
     end)
 end

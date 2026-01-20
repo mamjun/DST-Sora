@@ -95,12 +95,16 @@ local function fn()
                 end
             end
 
-            local ents = TheSim:FindEntities(x, y, z, range + 2, {"murderable"},nil,{"weighable_fish","pondfish"})
+            local ents = TheSim:FindEntities(x, y, z, range + 2, {"murderable"}, nil, {"weighable_fish", "pondfish"})
             for _, ent in ipairs(ents) do
                 if inst.attacker ~= nil and ent ~= inst.attacker and ent.entity:IsValid() and ent.entity:IsVisible() and
                     ent.components.lootdropper then
-                    ent.components.lootdropper:DropLoot()
-                    ent:DoTaskInTime(0,ent.Remove)
+                    local loots = ent.components.lootdropper:GenerateLoot()
+                    local pos = ent:GetPosition()
+                    for k, v in pairs(loots) do
+                        ent.components.lootdropper:SpawnLootPrefab(v, pos)
+                    end
+                    ent:DoTaskInTime(0, ent.Remove)
                 end
             end
 
