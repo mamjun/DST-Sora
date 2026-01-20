@@ -93,6 +93,7 @@ function com:Init()
 end
 -- 前台收到物品
 function com:GetNewItem(slot)
+    if self.isloading then return end
     local item = self.container:GetItemInSlot(slot)
     if not item then
         return
@@ -163,6 +164,9 @@ function com:GetItemInSlot(slot)
     end
 end
 function com:GetAllItemInSlot()
+    if self.isloading then 
+        return 
+    end
     local doer = self.inst.components.inventoryitem and self.inst.components.inventoryitem:GetGrandOwner()
     if not doer then
         doer = self.container:GetOpeners()[1]
@@ -550,6 +554,10 @@ function com:OnLoad(data)
     end
     self.slots = data.slots or {}
     self.slotslast = data.slotslast or {}
+    self.isloading = true
+    self.inst:DoTaskInTime(0,function ()
+        self.isloading = false
+    end)
 end
 
 function com:GetDebugString()

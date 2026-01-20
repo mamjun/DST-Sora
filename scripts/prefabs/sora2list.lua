@@ -65,6 +65,7 @@ local function fn()
     inst:AddTag("nosteal")
     inst:AddTag("sora2list")
     inst:AddTag("soracontainerfix")
+    inst:AddTag("meteor_protection")
     inst.AnimState:SetBank("sora2list")
     inst.AnimState:SetBuild("sora2list")
     inst.AnimState:PlayAnimation("idle", true)
@@ -79,6 +80,7 @@ local function fn()
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2list.xml"
     inst.components.inventoryitem.imagename = "sora2list"
+    inst.components.inventoryitem.canonlygoinpocket = true
     inst:AddComponent("soraonlyone")
     inst.components.soraonlyone.tag = "sora2list"
     inst:AddComponent("container")
