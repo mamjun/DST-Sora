@@ -65,7 +65,7 @@ GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
 GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
 GLOBAL.TUNING.SORAFGMODE = GetModConfigData("fgmode")
 GLOBAL.TUNING.SORAMOREANIMDATA = GetModConfigData("moreanimdata") == 0
- 
+GLOBAL.TUNING.SORAFIXCONTAINER = GetModConfigData("FixContainer") == "0"
 GLOBAL.TUNING.SORADISABLEGLOBAL = GetModConfigData("disableui_globalbuild")
 IsGemEnable = rawget(_G, "gemrun") and true or false
 if IsGemEnable then

@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.45" -- 版本
+version = "13.46" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -150,6 +150,19 @@ configuration_options = {{
         description = "不允许,更安全,需要专服启用SoraProxy",
         data = "0",
         hover = "不允许,更安全,需要专服启用SoraProxy"
+    }},
+    default = "0"
+},{
+    name = "FixContainer",
+    label = "修复klei的几个容器可能导致的崩档问题",
+    options = {{
+        description = "别修复，让他崩",
+        data = "1",
+        hover = "别修复，让他崩"
+    }, {
+        description = "修复就行，不用告诉我",
+        data = "0",
+        hover = "修复就行，不用告诉我"
     }},
     default = "0"
 }, maketitle("jichu", "基础设置"), {

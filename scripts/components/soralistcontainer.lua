@@ -397,8 +397,9 @@ function com:GiveItem(doer, item, slot)
         self:GetData(doer)
         return
     end
-    if find and slot then
-        local iteminslot = self.container:GetItemInSlot(slot)
+    
+    if find then
+        local iteminslot = self.container:GetItemInSlot(find)
         if not iteminslot then
             self.giving = true
             self.container:RemoveItem(item)

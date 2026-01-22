@@ -1750,7 +1750,14 @@ AllInv = LeakTable()
 AddComponentPostInit("inventoryitem", function(self)
     AllInv[self.inst] = 1
 end)
-
+AllBurnable  = LeakTable()
+AddComponentPostInit("burnable", function(self)
+    AllBurnable[self.inst] = 1
+end)
+AllWitherable = LeakTable()
+AddComponentPostInit("witherable", function(self)
+    AllWitherable[self.inst] = 1
+end)
 AddComponentPostInit("farming_manager", function(self)
     self.SoraMax = {}
     self.SoraCleanCD = SoraCD(10)

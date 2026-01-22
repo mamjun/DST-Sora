@@ -501,6 +501,12 @@ local cantarget = {
     teenbird = 1,
     tallbird = 1
 }
+local HivesMap = {
+    beehive = "killerbee",
+    wasphive = "killerbee",
+    spiderden = "spider"
+
+}
 local soracrazy = require "brains/soracrazybrain"
 local function fn()
     local inst = CreateEntity()
@@ -536,7 +542,7 @@ local function fn()
     inst.components.health.Kill = function()
         return 0
     end
-    inst:DoPeriodicTask(2, function(inst)
+    inst:DoPeriodicTask(1, function(inst)
         if inst:IsAsleep() then
             return
         end
@@ -559,6 +565,15 @@ local function fn()
                         v.components.combat:SetKeepTargetFunction(nil)
                     end
                     v.components.combat:SetTarget(inst)
+                end
+            end
+        end
+        local MUST_TAGS = {"_combat", "_health","hive"}
+        local ents = TheSim:FindEntities(x, y, z, 20, MUST_TAGS);
+        for k, v in ipairs(ents) do
+            if IsValid(v) and not v:IsAsleep() and v.components.childspawner then
+                if HivesMap[v.prefab] then 
+                    v.components.childspawner:ReleaseAllChildren(inst,HivesMap[v.prefab])
                 end
             end
         end

@@ -66,13 +66,61 @@ AddComponentPostInit("inventoryitem", function(self, inst)
     inst:ListenForEvent("onremove", function(i)
         if i.components.inventoryitem and i.components.inventoryitem.owner then
             local owner = i.components.inventoryitem.owner
-            if owner.components.container and owner.components.container:GetItemSlot(i) then
-                owner.components.container:RemoveItem(owner, true)
+            if owner.components.container then
+                owner.components.container:RemoveItem(i, true, true, true, true)
             end
         end
     end)
 end)
-
+if TUNING.SORAFIXCONTAINER then
+    AddComponentPostInit("container", function(self, inst)
+        local oldGiveItem = self.GiveItem
+        function self.GiveItem(s, item, ...)
+            -- 给与箱子无效物品
+            if not (item and item:IsValid()) then
+                return false
+            end
+            -- 箱子放入自己
+            if item == self.inst then 
+                return false
+            end
+            -- 给与箱子在其他箱子的物品
+            if item.components.inventoryitem then
+                local owner = item.components.inventoryitem.owner
+                if owner and owner.components.container then
+                    owner.components.container:RemoveItem(item, true, true, true)
+                end
+            end
+            
+            return oldGiveItem(s, item, ...)
+        end
+    end)
+else
+    AddComponentPostInit("container", function(self, inst)
+        local oldGiveItem = self.GiveItem
+        function self.GiveItem(s, item, ...)
+            -- 给与箱子无效物品
+            if not (item and item:IsValid()) then
+                assert(false,"触发容器崩溃:物品无效\n请收集日志然后反馈")
+                return false
+            end
+            -- 箱子放入自己
+            if item == self.inst then 
+                assert(false,"触发容器崩溃:容纳自身\n请收集日志然后反馈")
+                return false
+            end
+            -- 给与箱子在其他箱子的物品
+            if item.components.inventoryitem then
+                assert(false,"触发容器崩溃:多重归属\n请收集日志然后反馈")
+                local owner = item.components.inventoryitem.owner
+                if owner and owner.components.container then
+                    owner.components.container:RemoveItem(item, true, true, true)
+                end
+            end
+            return oldGiveItem(s, item, ...)
+        end
+    end)
+end
 if getsora("fixyzhou") then
     function GLOBAL.distsq(v1, v2, v3, v4)
         if v3 then
@@ -129,8 +177,8 @@ cmp.GetSpecificSlotForItem = function(self, item, ...)
     if self.inst and self.inst:HasTag("soracontainerfix") then
         for k = 1, self.numslots do
             local other_item = self.slots[k]
-            if other_item and other_item.components.stackable and other_item.prefab == item.prefab and other_item.skinname == item.skinname and
-                not other_item.components.stackable:IsFull() then
+            if other_item and other_item.components.stackable and other_item.prefab == item.prefab and
+                other_item.skinname == item.skinname and not other_item.components.stackable:IsFull() then
                 return k
             end
         end
@@ -144,17 +192,17 @@ cmp_rep.GetSpecificSlotForItem = function(self, item, ...)
     if self.inst and self.inst:HasTag("soracontainerfix") then
         for k = 1, self._numslots do
             local other_item = self:GetItemInSlot(k)
-            if other_item and  other_item.replica.stackable and other_item.prefab == item.prefab and other_item:StackableSkinHack(item)  and
-                not other_item.replica.stackable:IsFull() then
+            if other_item and other_item.replica.stackable and other_item.prefab == item.prefab and
+                other_item:StackableSkinHack(item) and not other_item.replica.stackable:IsFull() then
                 return k
             end
         end
     end
     return GetSpecificSlotForItem(self, item, ...)
 end
---继续干牛牛
-AddPrefabPostInit("babybeefalo",function (inst)
-    if not inst.ShouldKeepCorpse then 
+-- 继续干牛牛
+AddPrefabPostInit("babybeefalo", function(inst)
+    if not inst.ShouldKeepCorpse then
         inst.ShouldKeepCorpse = function()
             return false
         end

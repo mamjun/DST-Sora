@@ -1028,6 +1028,10 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
 
 end
 
+Rec("leif_idol", nil, "树站起来了", maker, "sora", {
+        livinglog = 99
+    }).numtogive = 5
+
 -- Rec("sora_butter", "拟造-黄油", "一份黄油蟹蟹!", DST, "sora", {
 --     moonrocknugget = 3,
 --     fireflies = 3,
