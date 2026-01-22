@@ -156,7 +156,7 @@ local stafftask = {
             book_myth = 1,
             leif_idol = 1
         }
-        for k, v in pairs(SoraAPI.AllBurnable) do
+        for v, k in pairs(SoraAPI.AllBurnable) do
             if v and v:IsValid() and v.components.burnable and v:GetDistanceSqToInst(inst) < 14400 then
                 if not black[v.prefab] then
                     v.components.burnable:Extinguish()
@@ -164,7 +164,7 @@ local stafftask = {
             end
         end
 
-        for k, v in pairs(SoraAPI.AllWitherable) do
+        for v, k in pairs(SoraAPI.AllWitherable) do
             if v and v:IsValid() and v.components.witherable and v:GetDistanceSqToInst(inst) < 14400 then
                 if not black[v.prefab] then
                     v.components.witherable:Protect(60)
