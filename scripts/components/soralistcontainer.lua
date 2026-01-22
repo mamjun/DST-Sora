@@ -353,9 +353,14 @@ function com:GetOne(doer, slot)
 end
 -- 存入物品
 function com:GiveItem(doer, item, slot)
-    if not item then
+    if not (item and item:IsValid()) then
         return
     end
+    if not (item.components.inventoryitem and item.components.inventoryitem.canbepickedup and
+        item.components.inventoryitem.cangoincontainer) then
+        return self.container:DropItem(item)
+    end
+
     local prefab = item.prefab
     local iteminslot = self.container:GetItemInSlot(slot)
     if iteminslot == item then
@@ -397,7 +402,7 @@ function com:GiveItem(doer, item, slot)
         self:GetData(doer)
         return
     end
-    
+
     if find then
         local iteminslot = self.container:GetItemInSlot(find)
         if not iteminslot then
@@ -545,7 +550,7 @@ function com:CollectSelf(doer)
             local items = doer.components.inventory:GetItemByName(v.prefab, 999, true)
             for item, _ in pairs(items) do
                 local owner = item.components.inventoryitem and item.components.inventoryitem.owner
-                if not (owner == self.container.inst) and not item.components.stackable and
+                if item:IsValid() and not (owner == self.container.inst) and not item.components.stackable and
                     not item.components.container then
                     doer.components.inventory:RemoveItem(item, true, true, true)
                     self:GiveItem(doer, item, k)
@@ -565,10 +570,7 @@ function com:CollectAll(doer)
     local ents = TheSim:FindEntities(x, 0, z, 30, {"_inventoryitem"},
         {"_container", "INLIMBO", "_stackable", "_combat", "_health", "irreplaceable"})
     for k, v in pairs(ents) do
-        if v.components.inventoryitem and v.components.inventoryitem.canbepickedup and
-            v.components.inventoryitem.cangoincontainer then
-            self:GiveItem(doer, v)
-        end
+        self:GiveItem(doer, v)
     end
     self:GetAllItemInSlot(doer)
     self.delay_send = 0
