@@ -64,12 +64,14 @@ local function TryGiveSelfToOwner(inst)
         local owner = inst.components.inventoryitem:GetGrandOwner()
         local powner = inst.entity:GetParent()
         if not owner and powner then
+            inst.components.projectile.cancatch = true
             inst.components.projectile:Catch(inst.delayowner)
             return true
         elseif owner == inst.delayowner then
             ApplyCheckFn(inst, true)
             return true
         elseif owner ~= inst.delayowner then
+            inst.components.projectile.cancatch = true
             inst.components.projectile:Catch(inst.delayowner)
             return true
         end
@@ -95,6 +97,7 @@ local function OnThrown(inst, owner, target)
     inst.delayowner = owner
     inst.AnimState:PlayAnimation("spin_loop", true)
     inst.components.inventoryitem.pushlandedevents = false
+    inst.components.projectile.cancatch = false
 end
 local function onPickUP(inst, data)
     inst.canhitwork = false
@@ -133,6 +136,7 @@ end
 local function OnEntitySleep(inst)
     if not TryGiveSelfToOwner(inst) then
         if inst.components.projectile.target and inst.delayowner and inst.delayowner:IsValid() then
+            inst.components.projectile.cancatch = true
             inst.components.projectile:Catch(inst.delayowner)
         end
     end
@@ -149,6 +153,15 @@ end
 
 local MUST_TAGS = {"_combat", "_health"}
 local CANT_TAGS = {"player", "INLIMBO", "structure", "wall", "companion"}
+local AttackBlack = {
+    ["crow"] = 1,
+    ["robin"] = 2,
+    ["lureplant"] = 2,
+    ["robin_winter"] = 2,
+    ["canary"] = 2,
+    ["butterfly"] = 1,
+    ["moonbutterfly"] = 1,
+}
 local function GetNextTarget(inst, target, try)
     if not (inst.delayowner and inst.delayowner:IsValid()) then
         -- 没有主人 掉落地上
@@ -176,6 +189,7 @@ local function GetNextTarget(inst, target, try)
     if allwork > 4 then
         inst.delayowner.soratqys[inst] = nil
         if target == inst.delayowner then
+            inst.components.projectile.cancatch = true
             inst.components.projectile:Catch(inst.delayowner)
         else
             inst.components.projectile:Throw(inst.delayowner, inst.delayowner)
@@ -208,8 +222,8 @@ local function GetNextTarget(inst, target, try)
         local x, y, z = inst:GetPosition():Get()
         local ents = TheSim:FindEntities(x, y, z, 15, MUST_TAGS, CANT_TAGS)
         for k, v in pairs(ents) do
-            if v ~= target and v:IsValid() and not v.components.health:IsDead() and v.components.combat and
-                v.components.combat:CanBeAttacked(inst.delayowner) then
+            if v ~= target and not AttackBlack[v.prefab] and v:IsValid() and not v.components.health:IsDead() and
+                v.components.combat and v.components.combat:CanBeAttacked(inst.delayowner) then
                 table.insert(inst.alltarget, v)
             end
         end
@@ -250,6 +264,7 @@ local function GetNextTarget(inst, target, try)
     inst.over = true
     if all == 0 and target == inst.delayowner then
         -- 没目标了 且弹回自己了 
+        inst.components.projectile.cancatch = true
         inst.components.projectile:Catch(inst.delayowner)
         return true
     end
@@ -528,7 +543,7 @@ local function boxfn()
             item.Transform:SetPosition(inst.owner:GetPosition():Get())
             item.owner = inst.owner
             item.components.projectile:Throw(inst.owner, target, attacker)
-            if inst.canhitwork then 
+            if inst.canhitwork then
                 item.canhitwork = true
             end
         end

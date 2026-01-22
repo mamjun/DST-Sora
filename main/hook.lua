@@ -324,11 +324,10 @@ AddComponentPostInit("playeractionpicker", function(self)
     local oldGetSceneActions = self.GetSceneActions
     self.GetSceneActions = function(s, useitem, right, ...)
         local x, y, z = oldGetSceneActions(s, useitem, right, ...)
-        print(s, useitem, right, ...)        
         if useitem and useitem:HasTag("soranoprototyper") then
-            for k,v in pairs(x) do 
-                if v.action == ACTIONS.OPEN_CRAFTING then 
-                    table.remove(x,k)
+            for k, v in pairs(x) do
+                if v.action == ACTIONS.OPEN_CRAFTING then
+                    table.remove(x, k)
                     break
                 end
             end
@@ -1902,3 +1901,70 @@ AddPrefabPostInit("reticuleaoeping_1_6", function(inst)
         inst.AnimState:SetScale(scaleping, scaleping, scaleping)
     end
 end)
+
+local TradeItemTemp
+AddClassPostConstruct("widgets/invslot", function(inst)
+    local oldTradeItem = inst.TradeItem
+    inst.TradeItem = function(s, ...)
+        TradeItemTemp = {}
+        local slot_number = s.num
+        local character = ThePlayer
+        local inventory = character and character.replica.inventory or nil
+        local container = s.container
+        local container_item = container and
+                                   (container.IsReadOnlyContainer == nil or not container:IsReadOnlyContainer()) and
+                                   container:GetItemInSlot(slot_number) or nil
+        if not container_item then
+            TradeItemTemp = nil
+        else
+            TradeItemTemp.item = container_item and container_item.prefab
+        end
+
+        local x, y, z = oldTradeItem(s, ...)
+        TradeItemTemp = nil
+        return x, y, z
+    end
+end)
+AddClassPostConstruct("components/inventory_replica", function(inst)
+    local oldGetOpenContainers = inst.GetOpenContainers
+    function inst:GetOpenContainers(...)
+        local all, y, z = oldGetOpenContainers(self, ...)
+        if TradeItemTemp then
+            local new = {}
+            local new_sort = {}
+            for k, v in pairs(all) do
+                if not (SoraAPI.container_params[k.prefab] and SoraAPI.container_params[k.prefab].sora_pri) then
+                    new[k] = true
+                else
+                    new_sort[k] = SoraAPI.container_params[k.prefab].sora_pri or 5000
+                    if k.replica.container:Has(TradeItemTemp.item, 1) then
+                        new_sort[k] = new_sort[k] + 100000
+                    end
+                    if new_sort[k] < 0 then 
+                        new_sort[k] = nil
+                    end
+                end
+            end
+            local maxpri, maxinst = -100000, nil
+            for k, v in pairs(new_sort) do
+                if v > maxpri then
+                    maxpri = v
+                    maxinst = k
+                end
+            end
+            if maxinst then
+                new[maxinst] = true
+            end
+            return new, y, z
+        else
+            return all, y, z
+        end
+    end
+end)
+
+-- AddClassPostConstruct("components/container_replica", function(inst)
+--     local oldIsReadOnlyContainer = inst.IsReadOnlyContainer
+--     inst.IsReadOnlyContainer = function(s, ...)
+--         return oldIsReadOnlyContainer(s, ...)
+--     end
+-- end)

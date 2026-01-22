@@ -157,7 +157,7 @@ local function fn()
 
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
-            inst.replica.container:WidgetSetup("sorafire")
+            inst.replica.container:WidgetSetup("sora2fire")
         end
         return inst
     end
@@ -165,7 +165,7 @@ local function fn()
     inst:AddComponent("inspectable")
 	inst.components.inspectable:SetDescription("烧光他们！")
     inst:AddComponent("container")
-    inst.components.container:WidgetSetup("sorafire")
+    inst.components.container:WidgetSetup("sora2fire")
     inst.components.container.onopenfn = onopen
     inst.components.container.onclosefn = onclose
 

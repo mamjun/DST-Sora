@@ -363,6 +363,7 @@ local function TryPutToContainer(chest, ents, container, fn)
     for k, v in pairs(ents) do
         i[k.prefab] = 1
     end
+    con.soragiving = true
     for k, v in pairs(ents) do
         local over = false
         while catch(k) and i[k.prefab] <= #container and not over and (not fn or fn and fn(chest, k)) do
@@ -399,6 +400,7 @@ local function TryPutToContainer(chest, ents, container, fn)
     for k, v in pairs(puted) do
         ents[k] = nil
     end
+    con.soragiving = false
     if not next(ents) then
         return true
     end
@@ -857,7 +859,7 @@ local function UpdateAllEnts() -- 初步筛选一下不可能需要的实体
         end
     end
 end
-SoraAPI.UpdateAllEnts = UpdateAllEnts 
+SoraAPI.UpdateAllEnts = UpdateAllEnts
 local function NewEnt(inst, v)
     if v.prefab and v.replica.inventoryitem and not v:IsInLimbo() then
         AllEnts[v] = 1
@@ -911,7 +913,6 @@ local function ResetChestData(inst, doer)
             end
         elseif item then
             container:DropItemBySlot(v)
-
         end
     end
     if inst.components.preserver then
@@ -1011,7 +1012,6 @@ end
 FindPrefab()
 
 local function HitProtect(inst, data)
-    print("HitProtect")
     if not inst.components.workable then
         return
     end
@@ -1233,7 +1233,41 @@ function com:RegType(type, data)
         return a[2] > b[2]
     end)
 end
-
+function com:FindBestSlot(con, data, item)
+    local p = toprefab(item.prefab)
+    local find = nil
+    local findnil = nil
+    for k, v in pairs(data.containers) do
+        if not findnil and not data.c[k] then
+            findnil = k
+        end
+        if data.c[k] == p then
+            for _, slotnew in pairs(data.containers[k]) do
+                local it = con:GetItemInSlot(slotnew)
+                if it then
+                    if it.prefab == item.prefab and it.components.stackable and item.components.stackable then
+                        return slotnew
+                    end
+                end
+            end
+            for _, slotnew in pairs(data.containers[k]) do
+                local it = con:GetItemInSlot(slotnew)
+                if not it then
+                    return slotnew
+                end
+            end
+        end
+    end
+    if findnil then
+        for _, slotnew in pairs(data.containers[findnil]) do
+            local it = con:GetItemInSlot(slotnew)
+            if not it then
+                data.c[findnil] = p
+                return slotnew
+            end
+        end
+    end
+end
 function com:RegByType(chest, type)
     if not chest.components.container then
         return
@@ -1253,6 +1287,20 @@ function com:RegByType(chest, type)
         chest:ListenForEvent("itemget", OnItemGet)
         chest:ListenForEvent("itemlose", OnItemLose)
         chest:AddTag("sorasmartchest")
+        if type == "sora_light" then
+            if not chest.components.container.SoraOldGiveItem then
+                chest.components.container.SoraOldGiveItem = chest.components.container.GiveItem
+                chest.components.container.GiveItem = function(s, item, slot, src_pos, drop_on_fail)
+                    if not s.soragiving and not slot and item then
+                        local newslot = self:FindBestSlot(s, chest.sorachestdata, item)
+                        if newslot then 
+                            slot = newslot
+                        end
+                    end
+                    return chest.components.container.SoraOldGiveItem(s, item, slot, src_pos, drop_on_fail)
+                end
+            end
+        end
         local oldfn = chest.components.container.OnRemoveFromEntity
         chest.components.container.OnRemoveFromEntity = function(...)
             self:UnReg(chest)

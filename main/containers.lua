@@ -210,7 +210,7 @@ function params.sora2tree.widget.buttoninfo.validfn(inst)
     return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
 end
 
-params.sorafire = {
+params.sora2fire = {
     widget = {
         slotpos = {},
         animbank = "ui_chest_3x3",
@@ -223,7 +223,7 @@ params.sorafire = {
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do
-        table.insert(params.sorafire.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
+        table.insert(params.sora2fire.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
 
@@ -309,7 +309,7 @@ function params.sora2chest.widget.buttoninfo.fn(inst)
     }, inst)
 end
 
-params.sorabase = {
+params.sora2base = {
     widget = {
         slotpos = {},
         animbank = "ui_chest_3x3",
@@ -321,11 +321,11 @@ params.sorabase = {
 }
 for y = 4, 0, -1 do
     for x = 0, 4 do
-        table.insert(params.sorabase.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
+        table.insert(params.sora2base.widget.slotpos, GLOBAL.Vector3(80 * x - 80 * 1, 70 * y - 70 * 3 - 15, 0))
     end
 end
 local soratreepopup = require "widgets/soratreepopup"
-function params.sorabase.widget:SoraOnOpenFn(inst)
+function params.sora2base.widget:SoraOnOpenFn(inst)
     self.text = self:AddChild(soratreepopup())
     self:SoraAutoClose(self.text)
 end
@@ -1051,7 +1051,23 @@ function params.sora2list.itemtestfn(container, item, slot)
     return false
 end
 params.sora3list = params.sora2list
-
+params.sora2global.sora_pri = 10000
+params.sora_pot.sora_pri = 4000
+params.sora3chest.sora_pri = -1000
+params.sora3list.sora_pri = -2000
+params.sora_pickhat.sora_pri = -3000
+params.sora_light.sora_pri = 7000
+params.sora2chest.sora_pri = 7000
+params.sorapack_container.sora_pri = 9000
+params.sora2fire.sora_pri = 7000
+params.sora2tree.sora_pri = 7000
+params.sora2base.sora_pri = 7000
+params.sora_sign.sora_pri = 7000
+params.sora_huapen.sora_pri = 7000
+params.sora_lightflier_cat.sora_pri = 9500
+params.sora2birdchest = params.sora2fire
+params.sora2ice= params.sora2fire
+SoraAPI.container_params = params
 if needhelp then
     print("????")
     local old_widgetsetup = containers.widgetsetup

@@ -491,14 +491,14 @@ local function planttoseed(prefab, doer)
     if allseeds[name] then
         return name
     end
-    if doer and doer.components.inventory:Has(name, 1, true) then
+    if doer and doer.components.inventory:Has(name, 1, false) then
         return name
     end
     name = prefab .. "_seed"
     if allseeds[name] then
         return name
     end
-    if doer and doer.components.inventory:Has(name, 1, true) then
+    if doer and doer.components.inventory:Has(name, 1, false) then
         return name
     end
     return
@@ -540,7 +540,7 @@ local function loadseed(inst, doer)
     end
 
     for k, v in pairs(inst.seeds) do
-        local _, seedfind = doer.components.inventory:Has(v[3], 1, true)
+        local _, seedfind = doer.components.inventory:Has(v[3], 1, false)
         has_inventory[v[3]] = seedfind
     end
 

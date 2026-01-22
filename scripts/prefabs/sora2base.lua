@@ -341,7 +341,7 @@ local function fn()
 
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
-            inst.replica.container:WidgetSetup("sorabase")
+            inst.replica.container:WidgetSetup("sora2base")
         end
         return inst
     end
@@ -357,7 +357,7 @@ local function fn()
     
     
     inst:AddComponent("container")
-    inst.components.container:WidgetSetup("sorabase")
+    inst.components.container:WidgetSetup("sora2base")
     inst.components.container.onclosefn = onclose
     inst:AddComponent("workable")
     --avoid pick & mine action priority conflict

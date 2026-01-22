@@ -399,6 +399,7 @@ temp.serverfn = function(ns, db, userid)
             ent.components.soralistcontainer:CollectAll(doer)
             return
         elseif cmd == "Refresh" then
+            ent.components.soralistcontainer.delay_send = 0
             ent.components.soralistcontainer:GetData(doer,db)
             return
         elseif cmd == "DropAll" then

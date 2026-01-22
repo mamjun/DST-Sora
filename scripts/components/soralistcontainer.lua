@@ -58,6 +58,9 @@ function com:Init()
     self.container = container
     self.maxslot = container:GetNumSlots()
     self.inst:ListenForEvent("itemlose", function(inst, data)
+        if self.giving then
+            return
+        end
         self:GetAllItemInSlot()
     end)
     self.inst:ListenForEvent("itemget", function(inst, data)
@@ -96,10 +99,12 @@ function com:GetNewItem(slot)
     if self.isloading then
         return
     end
+
     local item = self.container:GetItemInSlot(slot)
+    -- 前台没物品
     if not item then
         return
-    end -- ???
+    end
     local doer = self.inst.components.inventoryitem:GetGrandOwner()
     if not (doer and doer:HasTag("player")) then
         doer = nil
@@ -129,7 +134,8 @@ function com:GetNewItem(slot)
             self.container:DropItem(item)
         end
     end
-
+    self:GetData(doer)
+    return
 end
 -- 前台失去物品 且无物品 则后台自动补货
 function com:GetItemInSlot(slot)
@@ -302,16 +308,19 @@ function com:TryToEquipOrGive(doer, item, isback)
 end
 -- 按键取出物品
 function com:GetOne(doer, slot)
-    local itemdata = self.slots[slot]
-    if not (itemdata and next(itemdata)) then
-        local item = self.container:GetItemInSlot(slot)
-        if item then
-            self.container:RemoveItem(item, true, true, true)
-            self:TryToEquipOrGive(doer, item)
-        end
-        self:GetAllItemInSlot()
+    local item = self.container:GetItemInSlot(slot)
+    if item then
+        self.container:RemoveItem(item, true, true, true)
+        self:TryToEquipOrGive(doer, item)
         self.delay_send = 0
         self:GetData(doer)
+        return
+    end
+
+    local itemdata = self.slots[slot]
+    if not (itemdata and next(itemdata)) then
+        self.delay_send = 0
+        self:GetAllItemInSlot()
         return
     end
 
@@ -347,8 +356,16 @@ function com:GiveItem(doer, item, slot)
     if not item then
         return
     end
-    local pos = (doer or self.inst):GetPosition()
     local prefab = item.prefab
+    local iteminslot = self.container:GetItemInSlot(slot)
+    if iteminslot == item then
+        local v = self.slotslast[slot]
+        if v and v.prefab == prefab then
+            self:GetData(doer)
+            return false
+        end
+    end
+    local pos = (doer or self.inst):GetPosition()
     local find = false
     local findnil = false
     if slot then
@@ -380,6 +397,18 @@ function com:GiveItem(doer, item, slot)
         self:GetData(doer)
         return
     end
+    if find and slot then
+        local iteminslot = self.container:GetItemInSlot(slot)
+        if not iteminslot then
+            self.giving = true
+            self.container:RemoveItem(item)
+            self.container:GiveItem(item, find, pos)
+            self.giving = false
+            self:GetData(doer)
+            return
+        end
+    end
+
     local slotid = find or findnil
     local data = item:GetSaveRecord()
     local srcdata = self.slots[slotid]
