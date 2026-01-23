@@ -61,17 +61,17 @@ AddSimPostInit(TryToFixAllRecipes)
 --     self.inst.replica.inventoryitem:SetOwner(owner)
 -- end
 
-AddComponentPostInit("inventoryitem", function(self, inst)
-    -- addsetter(self, "owner", onowner)
-    inst:ListenForEvent("onremove", function(i)
-        if i.components.inventoryitem and i.components.inventoryitem.owner then
-            local owner = i.components.inventoryitem.owner
-            if owner.components.container then
-                owner.components.container:RemoveItem(i, true, true, true, true)
-            end
-        end
-    end)
-end)
+-- AddComponentPostInit("inventoryitem", function(self, inst)
+--     -- addsetter(self, "owner", onowner)
+--     inst:ListenForEvent("onremove", function(i)
+--         if i.components.inventoryitem and i.components.inventoryitem.owner then
+--             local owner = i.components.inventoryitem.owner
+--             if owner.components.container then
+--                 owner.components.container:RemoveItem(i, true, true, true, true)
+--             end
+--         end
+--     end)
+-- end)
 if TUNING.SORAFIXCONTAINER then
     AddComponentPostInit("container", function(self, inst)
         local oldGiveItem = self.GiveItem

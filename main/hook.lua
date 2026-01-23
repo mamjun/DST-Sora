@@ -1016,6 +1016,7 @@ AddPrefabPostInit("sora2bag", ContainerPreseverFix)
 AddPrefabPostInit("sorabag", ContainerPreseverFix)
 local initrecipe
 AddSimPostInit(function()
+    local a = SpawnPrefab("sora_mod_assets")
     for k, v in pairs(TUNING.SORAUNLOCKRECIPES) do
         if AllRecipes[v] then
             local xml = AllRecipes[v].atlas
@@ -1975,3 +1976,4 @@ end)
 --         return oldIsReadOnlyContainer(s, ...)
 --     end
 -- end)
+

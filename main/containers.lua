@@ -931,25 +931,25 @@ params.sora_tqy_box.itemtestfn = function(container, item, slot)
     return item and item:HasTag("sora_tqy")
 end
 
-params.sora2global = {
+params.sora2vchest = {
     widget = {
         slotpos = {},
         bgatlas = "images/quagmire_recipebook.xml",
         bgimage = "quagmire_recipe_menu_bg.tex",
         pos = Vector3(0, 130, 0)
     },
-    type = "sora2global",
+    type = "sora2vchest",
     openlimit = 1
 }
 for y = 4, 2, -1 do
     for x = -1, 1 do
-        table.insert(params.sora2global.widget.slotpos, Vector3(70 * x - 0, 70 * y - 210, 0))
+        table.insert(params.sora2vchest.widget.slotpos, Vector3(70 * x - 0, 70 * y - 210, 0))
     end
 end
 
-function params.sora2global.widget:SoraOnOpenFn(inst)
+function params.sora2vchest.widget:SoraOnOpenFn(inst)
     self.bgimage:ScaleToSize(230, 230)
-    SoraMakeWidgetMovable(self, "sora2global", Vector3(0, 130, 0), {
+    SoraMakeWidgetMovable(self, "sora2vchest", Vector3(0, 130, 0), {
         drag_offset = 0.6,
         ValidPos = {
             minx = -760,
@@ -960,7 +960,7 @@ function params.sora2global.widget:SoraOnOpenFn(inst)
     })
 
 end
-params.sora2global.itemtestfn = function(container, item, slot)
+params.sora2vchest.itemtestfn = function(container, item, slot)
     if item and item.prefab:match("_bell$") then
         return false
     end
@@ -1051,7 +1051,7 @@ function params.sora2list.itemtestfn(container, item, slot)
     return false
 end
 params.sora3list = params.sora2list
-params.sora2global.sora_pri = 10000
+params.sora2vchest.sora_pri = 10000
 params.sora_pot.sora_pri = 4000
 params.sora3chest.sora_pri = -1000
 params.sora3list.sora_pri = -2000

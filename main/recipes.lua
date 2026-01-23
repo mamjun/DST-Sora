@@ -420,7 +420,7 @@ Rec("sora_pickhat", "咸鱼咸鱼咸", "一群咸鱼罢了", equip2, "sora", {
     seeds = 5,
     [san] = 50
 })
-Rec("sora2global", "穹の末影箱", "妈妈我要去旅行~", equip2, "sora", {
+Rec("sora2vchest", "穹の末影箱", "妈妈我要去旅行~", equip2, "sora", {
     cane = 1,
     cookbook = 1,
     lantern = 1,

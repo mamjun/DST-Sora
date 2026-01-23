@@ -133,6 +133,8 @@ mi("kleibugfix")
 -- 自动更新
 modimport("scripts/soraupdate/main")
 
+SoraAssets = Assets
+Assets= {}
 -- 添加角色
 AddModCharacter("sora", "FEMALE")
 

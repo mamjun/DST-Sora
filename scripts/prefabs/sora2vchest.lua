@@ -31,7 +31,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] require "prefabutil"
 
 local assets = {}
-SoraAPI.MakeAssetTable("sora2global", assets)
+SoraAPI.MakeAssetTable("sora2vchest", assets)
 local prefabs = {"collapse_small"}
 
 local function onopen(inst)
@@ -79,8 +79,8 @@ local function fn()
     inst:AddTag('soranorummage')
     inst:AddComponent("soracantpack")
     inst:AddComponent("soratwoface")
-    inst.AnimState:SetBank("sora2global")
-    inst.AnimState:SetBuild("sora2global")
+    inst.AnimState:SetBank("sora2vchest")
+    inst.AnimState:SetBuild("sora2vchest")
     inst.AnimState:PlayAnimation("idle", true)
     -- MakeSnowCoveredPristine(inst)
     MakeInventoryPhysics(inst)
@@ -88,14 +88,14 @@ local function fn()
 
     if not TheWorld.soraismastersim then
         inst.OnEntityReplicated = function(inst)
-            inst.replica.container:WidgetSetup("sora2global")
+            inst.replica.container:WidgetSetup("sora2vchest")
         end
         return inst
     end
-    TheWorld.components.soraenttrack:Track(inst, "sora2global")
+    TheWorld.components.soraenttrack:Track(inst, "sora2vchest")
     inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2global.xml"
-    inst.components.inventoryitem.imagename = "sora2global"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2vchest.xml"
+    inst.components.inventoryitem.imagename = "sora2vchest"
 
     inst:AddComponent("inspectable")
     inst.components.inspectable:SetDescription("妈妈我要去旅行~")
@@ -123,7 +123,7 @@ local function fn()
         inst.components.rechargeable:Discharge(0)
     end
     inst:AddComponent("container")
-    inst.components.container:WidgetSetup("sora2global")
+    inst.components.container:WidgetSetup("sora2vchest")
     inst.components.container:EnableInfiniteStackSize(true)
     inst.components.container.canbeopened = false
     inst.components.inventoryitem.canonlygoinpocket = true
@@ -193,5 +193,15 @@ local function fn()
 
     return inst
 end
+local function gloablfn()
+    local inst = fn()
+    if TheWorld.soraismastersim then
+        inst:DoTaskInTime(0,function ()
+            inst.prefab = "sora2vchest"
+        end)
+    end
 
-return Prefab("sora2global", fn, assets, prefabs)
+    return inst
+end
+
+return Prefab("sora2vchest", fn, assets, prefabs),Prefab("sora2global", gloablfn)

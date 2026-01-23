@@ -206,7 +206,7 @@ MailDB:ListenForEvent("ChestOpenBy", function(id, data)
     if not (data and data.Key) then
         return
     end
-    local chest = TheWorld.components.soraenttrack:FindWith("sora2global", function(inst)
+    local chest = TheWorld.components.soraenttrack:FindWith("sora2vchest", function(inst)
         if inst and inst.OwnerKey == data.Key then
             if data.open then
                 inst.components.named:SetName("穹の末影箱(被" .. data.name .. "打开)")
