@@ -1040,6 +1040,7 @@ local function OnItemGet(inst, data)
         if table.contains(controls, data.slot) and data.item:HasTag("gem") then
             data.item:AddTag("nocrafting")
         end
+
     end
 end
 local function OnItemLose(inst, data)
@@ -1233,6 +1234,32 @@ function com:RegType(type, data)
         return a[2] > b[2]
     end)
 end
+function com:TryFixSlotData(con, data, item,slot)
+    local p = toprefab(item.prefab)
+    for k, v in pairs(data.containers) do
+        for _, slotnew in pairs(data.containers[k]) do
+            if slotnew == slot then 
+                --找到归宿格子了 
+                if data.c[k] == p then 
+                    --一致 不需要更新
+                    return 
+                end
+                --不一致 看看是不是空的 是空的就更新
+                local IsEmpty = true
+                for __, slottest in pairs(data.containers[k]) do
+                    local it = con:GetItemInSlot(slottest)
+                    if  it and toprefab(it.prefab) ~= p  then 
+                        IsEmpty = false
+                    end
+                end
+                if IsEmpty then 
+                    data.c[k] = p
+                end
+                return
+            end
+        end 
+    end
+end
 function com:FindBestSlot(con, data, item)
     local p = toprefab(item.prefab)
     local find = nil
@@ -1287,18 +1314,18 @@ function com:RegByType(chest, type)
         chest:ListenForEvent("itemget", OnItemGet)
         chest:ListenForEvent("itemlose", OnItemLose)
         chest:AddTag("sorasmartchest")
-        if type == "sora_light" then
-            if not chest.components.container.SoraOldGiveItem then
-                chest.components.container.SoraOldGiveItem = chest.components.container.GiveItem
-                chest.components.container.GiveItem = function(s, item, slot, src_pos, drop_on_fail)
-                    if not s.soragiving and not slot and item then
-                        local newslot = self:FindBestSlot(s, chest.sorachestdata, item)
-                        if newslot then 
-                            slot = newslot
-                        end
+        if not chest.components.container.SoraOldGiveItem then
+            chest.components.container.SoraOldGiveItem = chest.components.container.GiveItem
+            chest.components.container.GiveItem = function(s, item, slot, src_pos, drop_on_fail)
+                if not s.soragiving and slot and item then
+                    self:TryFixSlotData(s, chest.sorachestdata, item,slot)
+                elseif not s.soragiving and not slot and item then
+                    local newslot = self:FindBestSlot(s, chest.sorachestdata, item)
+                    if newslot then
+                        slot = newslot
                     end
-                    return chest.components.container.SoraOldGiveItem(s, item, slot, src_pos, drop_on_fail)
                 end
+                return chest.components.container.SoraOldGiveItem(s, item, slot, src_pos, drop_on_fail)
             end
         end
         local oldfn = chest.components.container.OnRemoveFromEntity
@@ -1309,6 +1336,10 @@ function com:RegByType(chest, type)
 end
 function com:UnReg(chest)
     if chest.sorachesttype and allchest[chest.sorachesttype] then
+        if chest.components.container.SoraOldGiveItem then
+            chest.components.container.GiveItem = chest.components.container.SoraOldGiveItem
+            chest.components.container.SoraOldGiveItem  = nil
+        end
         chest:RemoveEventCallback("onopen", OnOpen)
         chest:RemoveEventCallback("onclose", OnClose)
         chest:RemoveEventCallback("worked", HitProtect)
