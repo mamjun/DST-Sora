@@ -318,7 +318,7 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
                 return
             end
             inst.components.container.ignoreoverstacked = true
-            item = inst.components.container:RemoveItem(item, true)
+            item = inst.components.container:RemoveItem(item, true,true,true)
             inst.components.container.ignoreoverstacked = false
             if item.components.stackable then
                 for i = 1, item.components.stackable.stacksize do
@@ -346,6 +346,7 @@ end
 local function catch(inst)
     if not inst:IsInLimbo() and not inst:HasTag("decorationitem") and not inst:HasTag("outofreach") and
         inst.components.inventoryitem and not inst.components.inventoryitem.owner and
+        inst.components.inventoryitem.cangoincontainer and not inst.components.inventoryitem.canonlygoinpocket and
         not (inst.components.health and inst.components.health:IsDead()) and inst:IsValid() then
         return true
     end
@@ -1234,30 +1235,30 @@ function com:RegType(type, data)
         return a[2] > b[2]
     end)
 end
-function com:TryFixSlotData(con, data, item,slot)
+function com:TryFixSlotData(con, data, item, slot)
     local p = toprefab(item.prefab)
     for k, v in pairs(data.containers) do
         for _, slotnew in pairs(data.containers[k]) do
-            if slotnew == slot then 
-                --找到归宿格子了 
-                if data.c[k] == p then 
-                    --一致 不需要更新
-                    return 
+            if slotnew == slot then
+                -- 找到归宿格子了 
+                if data.c[k] == p then
+                    -- 一致 不需要更新
+                    return
                 end
-                --不一致 看看是不是空的 是空的就更新
+                -- 不一致 看看是不是空的 是空的就更新
                 local IsEmpty = true
                 for __, slottest in pairs(data.containers[k]) do
                     local it = con:GetItemInSlot(slottest)
-                    if  it and toprefab(it.prefab) ~= p  then 
+                    if it and toprefab(it.prefab) ~= p then
                         IsEmpty = false
                     end
                 end
-                if IsEmpty then 
+                if IsEmpty then
                     data.c[k] = p
                 end
                 return
             end
-        end 
+        end
     end
 end
 function com:FindBestSlot(con, data, item)
@@ -1318,7 +1319,7 @@ function com:RegByType(chest, type)
             chest.components.container.SoraOldGiveItem = chest.components.container.GiveItem
             chest.components.container.GiveItem = function(s, item, slot, src_pos, drop_on_fail)
                 if not s.soragiving and slot and item then
-                    self:TryFixSlotData(s, chest.sorachestdata, item,slot)
+                    self:TryFixSlotData(s, chest.sorachestdata, item, slot)
                 elseif not s.soragiving and not slot and item then
                     local newslot = self:FindBestSlot(s, chest.sorachestdata, item)
                     if newslot then
@@ -1338,7 +1339,7 @@ function com:UnReg(chest)
     if chest.sorachesttype and allchest[chest.sorachesttype] then
         if chest.components.container.SoraOldGiveItem then
             chest.components.container.GiveItem = chest.components.container.SoraOldGiveItem
-            chest.components.container.SoraOldGiveItem  = nil
+            chest.components.container.SoraOldGiveItem = nil
         end
         chest:RemoveEventCallback("onopen", OnOpen)
         chest:RemoveEventCallback("onclose", OnClose)

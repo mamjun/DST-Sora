@@ -82,7 +82,7 @@ local function Onisfullmoon(inst, var)
                 stacksize = 1
             end
             inst.components.container.ignoreoverstacked = true
-            inst.components.container:RemoveItemBySlot(1)
+            inst.components.container:RemoveItemBySlot(1,true)
             inst.components.container.ignoreoverstacked = false
             item:Remove()
             local item = SpawnPrefab(prefab)

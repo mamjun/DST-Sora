@@ -86,7 +86,7 @@ local function onrefresh(inst)
                             newprefab.components.stackable:SetStackSize(stacksize)
                         end 
                         container.ignoreoverstacked = true
-                        container:RemoveItemBySlot(i)
+                        container:RemoveItemBySlot(i,true,true,true)
                         container.ignoreoverstacked  = false
                         item:Remove()
                         container:GiveItem(newprefab, i)

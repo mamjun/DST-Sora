@@ -109,7 +109,7 @@ end)
 function c:GetDB()
     if TheWorld.soraismastersim then
         local db = nil
-        if self.inst and self.inst.owner and self.inst.owner.userid then  
+        if self.inst and self.inst.owner and self.inst.owner.userid then
             db = SoraAPI.GetClientDB("seed", self.inst.owner.userid, true)
         end
         return db or SoraAPI.SeedDB
@@ -186,7 +186,7 @@ function c:HandleCollectAllSeeds(player)
             if v and v:IsValid() then
                 all[v.prefab] = (all[v.prefab] or 0) +
                                     (v.components.stackable and v.components.stackable.stacksize or 1)
-                player.components.inventory:RemoveItem(v, true, true)
+                player.components.inventory:RemoveItem(v, true, true,true)
                 v:Remove()
             end
         end
@@ -198,7 +198,7 @@ function c:HandleCollectAllSeeds(player)
                 if v and v:IsValid() then
                     all[v.prefab] = (all[v.prefab] or 0) +
                                         (v.components.stackable and v.components.stackable.stacksize or 1)
-                    container:RemoveItem(v, true, true)
+                    container:RemoveItem(v, true, true,true)
                     v:Remove()
                 end
             end

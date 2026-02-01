@@ -48,7 +48,7 @@ local prefabs = {}
 local function onopen(inst, data)
     if data.doer and data.doer:HasTag("player") then
         inst.components.soralistcontainer:FixSlotLast()
-        inst.components.soralistcontainer:GetData(data.doer)
+        inst.components.soralistcontainer:GetAllItemInSlot()
     end
 end
 

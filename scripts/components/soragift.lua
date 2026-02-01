@@ -93,7 +93,7 @@ function soragift:GetItem()
             if (item:HasTag("irreplaceable") or item.components.unwrappable or (item.components.sorapacker and item.components.sorapacker.item and item.components.sorapacker.item.irreplaceable )) and not self.data.sales[prefab] then
 
             else
-                self.inst.components.container:RemoveItem(item, true) -- 否则会内存泄露
+                self.inst.components.container:RemoveItem(item, true,true,true) -- 否则会内存泄露
                 item:Remove()
                 self.items[prefab] = (self.items[prefab] or 0 ) + ( item.components.stackable and  item.components.stackable.stacksize or 1)
                 local s = 1 

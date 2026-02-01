@@ -40,7 +40,7 @@ PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "s
                "sora2sword", "sora3sword", "sora2ice", "sora2fire", "sora2plant", "soramagic", "sorapick",
                "sorahealing", "soratele", "sorabowknot", "sorabooks", "sorahealingstar", "soraprojectile", "sorameteor",
                "sora2buffer", "sora2prop", "sora2amulet", "sora2base", "sora2chest", "sora2tree", "sorafoods",
-               "sorahair", "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
+                "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
                "sora_nizao","sora_lock","sora_pickhat","sora2pokeball","sora_fx_feather"} --,""
 function  AddPreFile(str)
     table.insert(PrefabFiles,str)

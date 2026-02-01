@@ -113,6 +113,7 @@ function com:GetNewItem(slot)
         local data = self.slotslast[i]
         -- 找到相同的数据 直接合并
         if data and data.prefab == item.prefab then
+            self.container:RemoveItem(item, true, true, true)
             return self:GiveItem(doer, item, i)
         end
     end
@@ -356,8 +357,8 @@ function com:GiveItem(doer, item, slot)
     if not (item and item:IsValid()) then
         return
     end
-    if not (item.components.inventoryitem and item.components.inventoryitem.canbepickedup and
-        item.components.inventoryitem.cangoincontainer) then
+    if not (item.persists and item.components.inventoryitem and item.components.inventoryitem.canbepickedup and
+        item.components.inventoryitem.cangoincontainer and not item.components.inventoryitem.canonlygoinpocket) then
         return self.container:DropItem(item)
     end
 
@@ -382,7 +383,7 @@ function com:GiveItem(doer, item, slot)
     if not find then
         for i = 1, self.maxslot do
             local v = self.slotslast[i]
-            if not v then
+            if not v and not findnil then
                 findnil = i
             end
             if v and v.prefab == prefab then
@@ -407,14 +408,25 @@ function com:GiveItem(doer, item, slot)
         local iteminslot = self.container:GetItemInSlot(find)
         if not iteminslot then
             self.giving = true
-            self.container:RemoveItem(item)
+            self.container:RemoveItem(item,true,true,true)
             self.container:GiveItem(item, find, pos)
             self.giving = false
             self:GetData(doer)
             return
         end
     end
-
+    if findnil and not find then
+        local iteminslot = self.container:GetItemInSlot(findnil)
+        if not iteminslot then
+            self.giving = true
+            self.container:RemoveItem(item,true,true,true)
+            self.container:GiveItem(item, findnil, pos)
+            self.giving = false
+            self:UpdateSlot(findnil, item)
+            self:GetData(doer)
+            return
+        end
+    end
     local slotid = find or findnil
     local data = item:GetSaveRecord()
     local srcdata = self.slots[slotid]
@@ -488,7 +500,7 @@ function com:GiveData(doer, sdata)
     local findnil = false
     for i = 1, self.maxslot do
         local v = self.slotslast[i]
-        if not v then
+        if not v and not findnil then
             findnil = i
         end
         if v and v.prefab == prefab then
@@ -549,10 +561,13 @@ function com:CollectSelf(doer)
         if v and v.prefab then
             local items = doer.components.inventory:GetItemByName(v.prefab, 999, true)
             for item, _ in pairs(items) do
+
                 local owner = item.components.inventoryitem and item.components.inventoryitem.owner
-                if item:IsValid() and not (owner == self.container.inst) and not item.components.stackable and
-                    not item.components.container then
+                -- print(item,owner)
+                if item:IsValid() and item.persists and not (owner == self.container.inst) and
+                    not item.components.stackable and not item.components.container then
                     doer.components.inventory:RemoveItem(item, true, true, true)
+                    -- print('GiveItem',item)
                     self:GiveItem(doer, item, k)
                 end
             end
@@ -569,8 +584,16 @@ function com:CollectAll(doer)
     local x, y, z = doer:GetPosition():Get()
     local ents = TheSim:FindEntities(x, 0, z, 30, {"_inventoryitem"},
         {"_container", "INLIMBO", "_stackable", "_combat", "_health", "irreplaceable"})
+    local toget = {}
+    for k, v in pairs(self.slotslast) do
+        if v and v.prefab then
+            toget[v.prefab] = 1
+        end
+    end
     for k, v in pairs(ents) do
-        self:GiveItem(doer, v)
+        if v and v.persists and toget[v.prefab] then
+            self:GiveItem(doer, v)
+        end
     end
     self:GetAllItemInSlot(doer)
     self.delay_send = 0

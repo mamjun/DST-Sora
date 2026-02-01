@@ -1052,3 +1052,38 @@ function DeepEqual(data1, data2)
     end
     return true
 end
+
+function ExtDmg(source, target, num)
+    if target:HasTag("player") then
+        return
+    end
+    if not target.SoraExtDmgLast then
+        target.SoraExtDmgLast = -100
+    end
+    local t = GetTime()
+    -- 10秒未被攻击 则重置数值
+    if (t - 10) > target.SoraExtDmgLast then
+        target.SoraExtDmg = 0
+    end
+    target.SoraExtDmg = (target.SoraExtDmg or 0) + num
+    target.SoraExtDmgLast = t
+    --print(source, target, num, target.SoraExtDmg, target.SoraExtDmgLast)
+end
+AddComponentPostInit("health", function(self)
+    local oldDoDelta = self.DoDelta
+    self.DoDelta = function(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
+        --print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
+        if amount and amount < -0.5 and s.inst.SoraExtDmg and s.inst.SoraExtDmg > 0 and afflicter and
+            afflicter:HasTag("sora") then
+            local t = GetTime()
+            if (t - 10) > s.inst.SoraExtDmgLast then
+                s.inst.SoraExtDmg = 0
+            end
+            if s.inst.SoraExtDmg > 0 then 
+                amount = amount - s.inst.SoraExtDmg
+            end
+            --print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
+        end
+        return oldDoDelta(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
+    end
+end)

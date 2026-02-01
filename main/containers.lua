@@ -1012,7 +1012,8 @@ function params.sora2list.widget:SoraOnOpenFn(inst)
     local base = 80
     self.bgimage:ScaleToSize(6 * base, 5 * base)
     self.bgimage:MoveToBack()
-    ui:Init(self)
+    self.soralistcontainerui = self:AddChild(ui())
+    self.soralistcontainerui:Init(self)
 end
 
 function params.sora2list.itemtestfn(container, item, slot)
@@ -1032,6 +1033,15 @@ function params.sora2list.itemtestfn(container, item, slot)
         return false
     end
     if item.replica.health then
+        return false
+    end
+    if not item.replica.inventoryitem then 
+        return false
+    end
+    if not item.replica.inventoryitem:CanGoInContainer() then 
+        return false
+    end
+    if item.replica.inventoryitem:CanOnlyGoInPocket() then 
         return false
     end
     if item:HasTag("irreplaceable") then

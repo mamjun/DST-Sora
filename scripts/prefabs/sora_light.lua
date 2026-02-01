@@ -160,7 +160,7 @@ local function CheckChest(inst, doer)
                 end
             end
         elseif item then
-            local itemdrop = inst.components.container:RemoveItem(item, true)
+            local itemdrop = inst.components.container:RemoveItem(item, true,true,true)
             if itemdrop then
                 itemdrop.Transform:SetPosition(pos:Get())
                 if itemdrop.components.inventoryitem then
@@ -177,7 +177,7 @@ local function CheckChest(inst, doer)
     for i = 155, 159 do
         local item = inst.components.container:GetItemInSlot(i)
         if item and item.prefab == "greemgem" then
-            local itemdrop = inst.components.container:RemoveItem(item, true)
+            local itemdrop = inst.components.container:RemoveItem(item, true,true,true)
             if itemdrop then
                 itemdrop.Transform:SetPosition(pos:Get())
                 if itemdrop.components.inventoryitem then

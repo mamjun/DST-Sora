@@ -40,9 +40,7 @@ Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), A
                 Asset("ANIM", "anim/sora_mysora.zip"), Asset("ANIM", "anim/sora_mysora_r.zip"),
                 Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"),
                 Asset("ANIM", "anim/sora_wsqy.zip"), Asset("ANIM", "anim/sora_sdsz_r.zip"),
-                Asset("ANIM", "anim/sora_yhjd.zip"), Asset("ANIM", "anim/sorahair.zip"),
-                Asset("ANIM", "anim/sorahair2.zip"), Asset("ANIM", "anim/sorahair3.zip"),
-                Asset("ANIM", "anim/sorahair4.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
+                Asset("ANIM", "anim/sora_yhjd.zip"),  Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
                 Asset("ANIM", "anim/ghost_sora_build.zip"), Asset("ANIM", "anim/ghost_sora_r_build.zip")}
 -- 追加新版本选人提示
 if TUNING.GAMEMODE_STARTING_ITEMS then

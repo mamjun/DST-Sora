@@ -156,7 +156,7 @@ function com:GetItem()
                 for k, v in pairs(toget) do
                     allitem[k] = (allitem[k] or 0) + v
                 end
-                self.inst.components.container:RemoveItem(item, true)
+                self.inst.components.container:RemoveItem(item, true,true,true)
                 item:Remove()
                 has = true
             end

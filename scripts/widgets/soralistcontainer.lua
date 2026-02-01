@@ -76,9 +76,13 @@ function ui:Init(widget, read_only)
         -- })
     end
     local listener = SoraAPI.SoraRPC:ListenForEvent("Sora2ListData", function(from, data, event)
-        widget:Refresh()
-        self:UpdateData(data)
+        self.lastdata = data
     end)
+    self.UpdateDatafn = function(inst, data) self:UpdateData(data) end
+    self.inst:ListenForEvent("itemlose", self.UpdateDatafn, widget.container)
+    self.inst:ListenForEvent("itemget", self.UpdateDatafn, widget.container)
+    self.inst:ListenForEvent("refresh", self.UpdateDatafn, widget.container)
+    
     local oldClose = widget.Close
     function widget.Close(s)
         SoraAPI.SoraRPC:RemoveEvent(listener)
@@ -92,7 +96,9 @@ function ui:Init(widget, read_only)
     self:Rpc("Refresh")
 end
 function ui:UpdateData(data)
+    local data = data or self.lastdata
     if not (data and data.slots) then return end
+    
     for slot, itemdata in pairs(data.slots or {}) do
         local ext = self.inv_ext[slot]
         if ext then

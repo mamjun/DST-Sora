@@ -64,6 +64,7 @@ local function attackfn(target,player)
         target.components.freezable:AddColdness(player.sorawqattack.ice)
         target.components.freezable:SpawnShatterFX()
     end
+    --SoraAPI.ExtDmg(player,target,player.sorawqattack.ice)
     if  player.components.health then
         player.components.health:DoDelta(player.sorawqattack.heal)
     end

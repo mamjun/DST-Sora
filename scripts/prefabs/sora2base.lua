@@ -157,7 +157,7 @@ local stafftask = {
             leif_idol = 1
         }
         for v, k in pairs(SoraAPI.AllBurnable) do
-            if v and v:IsValid() and v.components.burnable and v:GetDistanceSqToInst(inst) < 14400 then
+            if v and v:IsValid() and v.components.burnable and not v:HasTag("campfire") and v:GetDistanceSqToInst(inst) < 14400 then
                 if not black[v.prefab] then
                     v.components.burnable:Extinguish()
                 end

@@ -39,7 +39,7 @@ function AddInvImg(key, xml, tex)
     InvImg[key] = {"images/" .. xml .. ".xml", (tex or key) .. ".tex"}
 end
 function AddInvImg2(key, xml, tex)
-    InvImg[key] = {xml, tex or (key .. "tex")}
+    InvImg[key] = {xml or GetInventoryItemAtlas(tex or (key .. "tex")), tex or (key .. "tex")}
 end
 local san = CHARACTER_INGREDIENT.SANITY
 
@@ -964,26 +964,26 @@ Rec("yotc_seedpacket", nil, nil, DST, "sora", {
 Rec("yotc_seedpacket_rare", nil, nil, DST, "sora", {
     goldnugget = 5
 })
-AddInvImg2("sora_butterfly", GetInventoryItemAtlas("butterfly.tex"), "butterfly.tex")
+AddInvImg2("sora_butterfly", nil, "butterfly.tex")
 Rec("sora_butterfly", "拟造-蝴蝶", "这也是蝴蝶吗?", DST, "sora", {
     butterfly = 1,
     [san] = 10
 }).placer = "no"
 
-AddInvImg2("sora_moonbutterfly", GetInventoryItemAtlas("moonbutterfly.tex"), "moonbutterfly.tex")
+AddInvImg2("sora_moonbutterfly", nil, "moonbutterfly.tex")
 Rec("sora_moonbutterfly", "拟造-月蛾", "这也是月蛾吗?", DST, "sora", {
     butterfly = 1,
     [san] = 10
 }).placer = "no"
 
-AddInvImg2("sora_lightflier", GetInventoryItemAtlas("lightflier.tex"), "lightflier.tex")
+AddInvImg2("sora_lightflier", nil, "lightflier.tex")
 Rec("sora_lightflier", "拟造-萤火", "这是什么呀?", DST, "sora", {
     moonrocknugget = 3,
     fireflies = 3,
     [san] = 30
 })
 
-AddInvImg2("sora_sign_item", GetInventoryItemAtlas("minisign_item.tex"), "minisign_item.tex")
+AddInvImg2("sora_sign_item", nil, "minisign_item.tex")
 Rec("sora_sign", "拟造-木牌", "为什么看了就像打他?", NoRec)
 Rec("sora_sign_item", "拟造-木牌", "为什么看了就像打他?", DST, "sora", {
     boards = 20,
@@ -993,7 +993,7 @@ Rec("sora_sign_item", "拟造-木牌", "为什么看了就像打他?", DST, "sor
 }).placer = "no"
 
 
-AddInvImg2("sora_gemsign_item", GetInventoryItemAtlas("minisign_drawn.tex"), "minisign_drawn.tex")
+AddInvImg2("sora_gemsign_item", nil, "minisign_drawn.tex")
 Rec("sora_gemsign", "拟造-宝石牌", "你已经是个成熟的宝石牌了", NoRec)
 Rec("sora_gemsign_item", "拟造-宝石牌", "你已经是个成熟的宝石牌了", DST, "sora", {
     boards = 20,
@@ -1001,7 +1001,7 @@ Rec("sora_gemsign_item", "拟造-宝石牌", "你已经是个成熟的宝石牌�
 }).placer = "no"
 
 
-AddInvImg2("sora_pearl", GetInventoryItemAtlas("hermit_pearl.tex"), "hermit_pearl.tex")
+AddInvImg2("sora_pearl", nil, "hermit_pearl.tex")
 Rec("sora_pearl", "拟造-珍珠", "咦,好温暖,还有一种清醒的感觉", DST, "sora", {
     opalpreciousgem = 3,
     heatrock = 10
@@ -1275,7 +1275,7 @@ STRINGS.NAMES["GLASSSPIKE_MED"] = STRINGS.NAMES.GLASSSPIKE .. "_中"
 STRINGS.NAMES["GLASSSPIKE_TALL"] = STRINGS.NAMES.GLASSSPIKE .. "_高"
 for k, v in pairs({"short", "med", "tall"}) do
     local name = "glassspike_" .. v
-    AddInvImg(name, "inventoryimages1", "glassspike")
+    AddInvImg2(name, nil, "glassspike.tex")
     UnlonkRecipesMap("glassspike", name)
     UnlonkRecipes(name, {
         cutstone = 3
@@ -1329,7 +1329,7 @@ UnlonkRecipes("catcoonden", {
 UnlonkRecipes("rock_avocado_fruit_sprout", {
     rocks = 40
 }, "石头也能发芽吗?").placer = "no"
-AddInvImg("stagehand", "inventoryimages1", "endtable")
+AddInvImg2("stagehand", nil, "endtable.tex")
 UnlonkRecipes("stagehand", {
     petals = 40,
     boards = 20
