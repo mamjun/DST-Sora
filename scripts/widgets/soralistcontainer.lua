@@ -77,6 +77,7 @@ function ui:Init(widget, read_only)
     end
     local listener = SoraAPI.SoraRPC:ListenForEvent("Sora2ListData", function(from, data, event)
         self.lastdata = data
+        self:UpdateData(data)
     end)
     self.UpdateDatafn = function(inst, data) self:UpdateData(data) end
     self.inst:ListenForEvent("itemlose", self.UpdateDatafn, widget.container)

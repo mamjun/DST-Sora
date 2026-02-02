@@ -54,7 +54,7 @@ local function serverandclientrpchandle(id, ns, cmd, data, ...)
         for k, temp in pairs(alltemps) do
             if not GetClientDB(temp.namespace, id, true) then -- 找不到就创建
                 CreateClientDB(temp, id, true)
-                rpcprint("rpc 初始化",temp.namespace, id)
+                rpcprint("rpc 初始化 ByRPC",temp.namespace, id)
             end
             
         end
@@ -814,6 +814,7 @@ AddPlayerPostInit(function(inst) -- 绑定玩家
         end
     end)
 end)
+
 function CreateClientDBTemple(namespace, syntime, roottime, roots, comomfn, serverfn, clientfn)
     local temp = {
         namespace = namespace,
@@ -830,7 +831,12 @@ function CreateClientDBTemple(namespace, syntime, roottime, roots, comomfn, serv
     table.insert(alltemps, temp)
     return temp
 end
+local CacheCreateClientDB = {}
 function CreateClientDB(temp, userid, IsServer)
+    if IsServer and not TheWorld then 
+        table.insert(CacheCreateClientDB,{temp, userid, IsServer})
+        return 
+    end
     local db = ClientDB()
     db:Init(temp.namespace, userid, temp.syntime, temp.roottime, IsServer)
     for k, v in pairs(temp.roots) do
@@ -858,6 +864,13 @@ AddSimPostInit(function()   --创建客户端的
         SendModRPCToServer(srpc, nil,"link")
         ClientDBUpdataFn(nil, true)
         ClientDBUpdataTask = TheWorld:DoPeriodicTask(1, ClientDBUpdataFn)
+    else
+        for k,v in pairs(CacheCreateClientDB) do 
+            if not GetClientDB(v[1].namespace, v[2],v[3]) then -- 找不到就创建
+                CreateClientDB(v[1], v[2],v[3])
+                rpcprint("rpc 初始化 ByCacheRPC",v[1], v[2],v[3])
+            end
+        end
     end
 end)
 
