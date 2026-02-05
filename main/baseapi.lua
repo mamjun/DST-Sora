@@ -86,7 +86,7 @@ function TimeRecordCall(fn, fnname)
     return function(...)
         local t = os.clock()
         local ret = {fn(...)}
-        print("TimeRecord", fnname, fn, os.clock() - t)
+        print("TimeRecord", fnname, fn, os.clock() - t,unpack({...}))
         return unpack(ret)
     end
 end

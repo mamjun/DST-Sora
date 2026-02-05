@@ -56,7 +56,9 @@ local function fn()
     inst.AnimState:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
     inst.AnimState:SetScale(1.3, 1.3, 1.3)
+    MakeInventoryPhysics(inst)
     inst.entity:SetPristine()
+   
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
             inst.replica.container:WidgetSetup("sora3chest")

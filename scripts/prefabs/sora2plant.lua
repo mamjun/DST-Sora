@@ -181,8 +181,9 @@ local tillpos = {
     M10B = {{-0.5, -1.6}, {1.5, -1.6}, {-1.5, -0.8}, {0.5, -0.8}, {-0.5, 0}, {1.5, 0}, {-1.5, 0.8}, {0.5, 0.8},
             {-0.5, 1.6}, {1.5, 1.6}}
 }
-local range = 2
-local function isNear(inst, pos)
+
+local function isNear(inst, pos,range)
+    local range = range or 2
     local x, y, z = inst.Transform:GetWorldPosition()
     local ax = pos.x - x
     local az = pos.z - z
@@ -237,11 +238,16 @@ local function DoBig(fn, inst, doer, pos, ...)
 
     local rr = {}
     local tosay
+    local t = os.clock()
     if inst.isbig:value() == 1 and doer:HasTag("sora") then
         for x = 0, 2, 1 do
             for y = 0, 2, 1 do
                 local newpos = Point(pos.x + 4 * x - 4, 0, pos.z + 4 * y - 4)
                 local r, msg = fn(inst, doer, newpos, ...)
+                if os.clock() -t > 0.020 then --一次最多占用20毫秒
+                    Sleep(0)
+                    t = os.clock()
+                end
                 table.insert(rr, r)
                 table.insert(rr, msg)
                 if not r and type(msg) == "string" then
@@ -257,6 +263,10 @@ local function DoBig(fn, inst, doer, pos, ...)
             for y = 0, 4, 1 do
                 local newpos = Point(pos.x + 4 * x - 8, 0, pos.z + 4 * y - 8)
                 local r, msg = fn(inst, doer, newpos, ...)
+                if os.clock() -t > 0.020 then   --一次最多占用20毫秒
+                    Sleep(0)
+                    t = os.clock()
+                end
                 table.insert(rr, r)
                 table.insert(rr, msg)
                 if not r and type(msg) == "string" then
@@ -340,7 +350,6 @@ local function PickPickFn(inst, doer, pos)
             v.components.workable:WorkedBy(doer, 10)
         end
     end
-
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, {"molebait", "MINE_workable"}, {"INLIMBO"})
     for k, v in pairs(ents) do
         if v.prefab == "rock_avocado_fruit" and isNear(v, pos) and v.components.workable and v.components.stackable then
@@ -367,6 +376,7 @@ local NewSpawnLootPrefab = function(self, item)
 end
 local function PickFn(inst, doer, pos)
     -- 大作物 
+
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 3, nil, {"stale", "spoiled", "INLIMBO"},
         {"weighable_OVERSIZEDVEGGIES", "oversized_veggie"})
     local prefabs = {}
@@ -432,13 +442,40 @@ local function makepacker(inst, doer, items)
     return SoraAPI.Gift(items)
 end
 local sora2plantseed
+local function TryPickFn(inst, doer, pos,DoerTileCenter)
+    PickPickFn(inst, doer, pos)
+    local doeritems = {}
+    if DoerTileCenter then
+        doeritems = PickFn(inst, doer, DoerTileCenter)
+    end
+    local tileitems = PickFn(inst, doer, pos)
+    local allitems = {}
+
+    for k,v in pairs(doeritems) do
+        allitems[k] = (allitems[k] or 0) + v
+    end
+
+    for k,v in pairs(tileitems) do
+        allitems[k] = (allitems[k] or 0) + v
+    end
+
+    return allitems
+end
 local function OnPickFn(inst, doer, pos)
     if incd(inst, doer) then
         return
     end
     local old = TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST
     TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST = 0
-    DoBig(PickPickFn, inst, doer, pos)
+    local range = 2
+    if inst.isbig:value() == 2 and doer:HasTag("sora") and doer.soralevel:value() >= 20 then
+        range = 10
+    elseif inst.isbig:value() == 1 and doer:HasTag("sora") then
+        range = 6
+    end
+    local IsDoerNear = isNear(doer, pos, range) 
+    local DoerTileCenter = GetTileCenter(inst, doer:GetPosition())
+    local rr = DoBig(TryPickFn, inst, doer, pos,IsDoerNear and DoerTileCenter or nil)
     inst.components.soraseedcontainer:HandleCollectAllSeeds(doer)
     if not sora2plantseed then 
         local allseeds = inst.components.soraseedcontainer:GetAllName()
@@ -447,7 +484,6 @@ local function OnPickFn(inst, doer, pos)
             sora2plantseed[k] = 1
         end
     end
-    local rr = DoBig(PickFn, inst, doer, pos)
     TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST = old
     local items = {}
     local seeditems = {}
@@ -469,7 +505,7 @@ local function OnPickFn(inst, doer, pos)
     end
 end
 local allseeds = nil
--- OnPickFn = SoraAPI.Pfn(OnPickFn, true)
+
 local function planttoseed(prefab, doer)
     if not allseeds then
         return
@@ -903,7 +939,15 @@ local function OnRangeFn(inst, doer, pos)
     inst.seeds = nil
     OnDefaultFn(inst, doer, pos)
 end
-
+local function MaekFnInThread(fn)
+    return function (inst,...)
+        local args = {...}
+        inst:StartThread(function()
+           fn(inst, unpack(args))
+        end)
+        return true
+    end
+end
 local ICON_SCALE = .5
 local ICON_RADIUS = 55
 local SPELLBOOK_RADIUS = 120
@@ -915,7 +959,7 @@ local SPELLS = {{
         inst.components.spellbook:SetSpellName("收农作物")
         Setreticule(inst)
         if TheWorld.soraismastersim then
-            inst.components.aoespell:SetSpellFn(OnPickFn)
+            inst.components.aoespell:SetSpellFn(MaekFnInThread(OnPickFn))
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",
@@ -926,7 +970,7 @@ local SPELLS = {{
         inst.components.spellbook:SetSpellName("照料植物")
         Setreticule(inst)
         if TheWorld.soraismastersim then
-            inst.components.aoespell:SetSpellFn(OnPlantFn)
+            inst.components.aoespell:SetSpellFn(MaekFnInThread(OnPlantFn))
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",
@@ -937,7 +981,7 @@ local SPELLS = {{
         inst.components.spellbook:SetSpellName("田地施肥")
         Setreticule(inst)
         if TheWorld.soraismastersim then
-            inst.components.aoespell:SetSpellFn(OnFeiFn)
+            inst.components.aoespell:SetSpellFn(MaekFnInThread(OnFeiFn))
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",
@@ -948,7 +992,7 @@ local SPELLS = {{
         inst.components.spellbook:SetSpellName("刨地十格")
         Setreticule(inst)
         if TheWorld.soraismastersim then
-            inst.components.aoespell:SetSpellFn(On10Fn)
+            inst.components.aoespell:SetSpellFn(MaekFnInThread(On10Fn))
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",
@@ -959,7 +1003,7 @@ local SPELLS = {{
         inst.components.spellbook:SetSpellName("刨坑4x4")
         Setreticule(inst)
         if TheWorld.soraismastersim then
-            inst.components.aoespell:SetSpellFn(On4x4Fn)
+            inst.components.aoespell:SetSpellFn(MaekFnInThread(On4x4Fn))
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",
@@ -970,7 +1014,7 @@ local SPELLS = {{
         inst.components.spellbook:SetSpellName("刨地3x3")
         Setreticule(inst)
         if TheWorld.soraismastersim then
-            inst.components.aoespell:SetSpellFn(On3x3Fn)
+            inst.components.aoespell:SetSpellFn(MaekFnInThread(On3x3Fn))
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",
@@ -1001,7 +1045,7 @@ local SPELLS = {{
                 ThePlayer.HUD.controls.containerroot:AddChild(ui(ThePlayer))
         end
         if TheWorld.soraismastersim then
-            inst.components.aoespell:SetSpellFn(OnSeedFn)
+            inst.components.aoespell:SetSpellFn(MaekFnInThread(OnSeedFn))
         end
     end,
     atlas = "images/ui/sora2plantspell.xml",

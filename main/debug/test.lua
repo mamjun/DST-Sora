@@ -5,7 +5,9 @@ function TestPrefab()
     collectgarbage()
     local size = collectgarbage("count")
     for k=1,1000 do 
-        local inst = SpawnPrefab("log")
+        local inst = SpawnPrefab("sora_item_fx")
+        inst:AddComponent("tradable")
+        inst:AddComponent("inventoryitem")
         a[inst] = 1
         inst:Remove()
     end

@@ -29,7 +29,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.18
+-- verion = 1.19
+-- v1.19 弃用对 ThankYouPopup 的兼容 改为提供 SkinAPIThankYouPopup 这个非侵入式的方案
 -- v1.18 感谢老王修复的bug
 -- v1.17 感谢Jerusalem的建议,优化了一处hook的处理,优化了性能
 -- v1.15 优化DefaultImage的处理
@@ -684,8 +685,8 @@ if recipe_help then
         end
     end)
 end
-
-if thank_help then
+-- 默认屏蔽
+if false then
     local ThankYouPopup = require "screens/thankyoupopup"
     local tohook = {
         OpenGift = 1,
@@ -718,7 +719,42 @@ if thank_help then
         end
     end
 end
+local ThankYouPopup = require "screens/thankyoupopup"
+local tohook = {
+    OpenGift = 1,
+    ChangeGift = 1
+}
 
+function SkinAPIThankYouPopup(...)
+    local scr = ThankYouPopup(...)
+    for k, v in pairs(tohook) do
+        tohook[k] = scr[k]
+        scr[k] = function(self, ...)
+
+            local r = tohook[k](self, ...)
+
+            local item = self.current_item and self.items and self.items[self.current_item] and
+                             self.items[self.current_item].item
+            if item then
+                local skin = GetSkin(item)
+                if skin and skin.swap_icon then
+                    if type(skin.swap_icon) == "table" then
+                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.swap_icon.build,
+                            skin.swap_icon.image)
+                    else
+                        self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", skin.build, "SWAP_ICON")
+                    end
+                elseif skin and skin.image and skin.atlas then
+                    self.spawn_portal:GetAnimState():OverrideSkinSymbol("SWAP_ICON", softresolvefilepath(skin.atlas),
+                        skin.image .. ".tex")
+                end
+            end
+
+            return r
+        end
+    end
+    return scr
+end
 local oldCreatePrefabSkin = GLOBAL.CreatePrefabSkin
 local fninfo = debug.getinfo(oldCreatePrefabSkin)
 if fninfo and fninfo.source and not fninfo.source:match("scripts/prefabskin%.lua") then -- 不是官方的就用自己的  if the function has be edited,use my function

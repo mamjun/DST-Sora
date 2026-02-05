@@ -1014,6 +1014,15 @@ function params.sora2list.widget:SoraOnOpenFn(inst)
     self.bgimage:MoveToBack()
     self.soralistcontainerui = self:AddChild(ui())
     self.soralistcontainerui:Init(self)
+    SoraMakeWidgetMovable(self, "sora2list", Vector3(-300, 100, 0), {
+        drag_offset = 0.6,
+        ValidPos = {
+            minx = -700,
+            miny = -320,
+            maxx = 700,
+            maxy = 320
+        }
+    })
 end
 
 function params.sora2list.itemtestfn(container, item, slot)

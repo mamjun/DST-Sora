@@ -41,12 +41,25 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
             return
         end
         local nomagic = nil
+        local OldCanRegenFruits
+        if inst:HasTag("ancienttree") then 
+            OldCanRegenFruits = inst.CanRegenFruits
+            inst.CanRegenFruits = function()
+                return true
+            end
+        end
         if inst.components.pickable.nomagic then
             inst.components.pickable.nomagic = nil
             nomagic = true
         end
         inst.components.pickable:FinishGrowing()
         inst.components.pickable.nomagic = nomagic
+        if inst:HasTag("ancienttree") then 
+            inst.CanRegenFruits = function()
+                return true
+            end
+            inst.CanRegenFruits = OldCanRegenFruits
+        end
     end
 
     if inst.components.crop ~= nil then

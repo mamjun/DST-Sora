@@ -69,7 +69,9 @@ local function fn()
     inst.AnimState:SetBank("sora2list")
     inst.AnimState:SetBuild("sora2list")
     inst.AnimState:PlayAnimation("idle", true)
+    MakeInventoryPhysics(inst)
     inst.entity:SetPristine()
+    
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst)
             inst.replica.container:WidgetSetup("sora2list")
