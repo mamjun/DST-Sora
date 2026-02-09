@@ -1751,7 +1751,7 @@ AllInv = LeakTable()
 AddComponentPostInit("inventoryitem", function(self)
     AllInv[self.inst] = 1
 end)
-AllBurnable  = LeakTable()
+AllBurnable = LeakTable()
 AddComponentPostInit("burnable", function(self)
     AllBurnable[self.inst] = 1
 end)
@@ -1946,15 +1946,16 @@ AddClassPostConstruct("components/inventory_replica", function(inst)
                 else
                     new_sort[k] = SoraAPI.container_params[k.prefab].sora_pri or 5000
                     if k.replica.container:Has(TradeItemTemp.item, 1) then
-                        new_sort[k] = new_sort[k] + 100000
+                        new_sort[k] = new_sort[k] + 10000
                     end
-                    if new_sort[k] < 0 then 
+                    if new_sort[k] < 0 then
                         new_sort[k] = nil
                     end
                 end
             end
             local maxpri, maxinst = -100000, nil
             for k, v in pairs(new_sort) do
+                --print("优先分析", k,v)
                 if v > maxpri then
                     maxpri = v
                     maxinst = k
@@ -1962,6 +1963,7 @@ AddClassPostConstruct("components/inventory_replica", function(inst)
             end
             if maxinst then
                 new[maxinst] = true
+                --print("优先打开", maxinst,maxinst.prefab)
             end
             return new, y, z
         else
@@ -1976,4 +1978,20 @@ end)
 --         return oldIsReadOnlyContainer(s, ...)
 --     end
 -- end)
-
+-- 重定向装备到点击取出
+AddComponentPostInit("inventory", function(self)
+    local oldEquip = self.Equip
+    self.Equip = function(s, item, ...)
+        if item and item.components.inventoryitem and item.components.inventoryitem.owner then
+            if item.components.inventoryitem.owner:HasTag("sora2list") then
+                local owner = item.components.inventoryitem.owner
+                local slot = owner.components.container:GetItemSlot(item)
+                if slot then
+                    owner.components.soralistcontainer:GetOne(self.inst, slot)
+                    return
+                end
+            end
+        end
+        return oldEquip(s, item, ...)
+    end
+end)

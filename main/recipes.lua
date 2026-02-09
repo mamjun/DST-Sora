@@ -465,7 +465,7 @@ Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother
     moonglass = 40,
     gift = 5
 }})
-Rec("sora2list", "祈巧(测试版)", "有bug请及时私聊反馈", equip2, "soraother", {{
+Rec("sora2list", "祈巧", "用它来管理你的物品", equip2, "soraother", {{
     gift = 1
 }, {
     gift = 1

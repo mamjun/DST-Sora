@@ -86,7 +86,7 @@ function TimeRecordCall(fn, fnname)
     return function(...)
         local t = os.clock()
         local ret = {fn(...)}
-        print("TimeRecord", fnname, fn, os.clock() - t,unpack({...}))
+        print("TimeRecord", fnname, fn, os.clock() - t, unpack({...}))
         return unpack(ret)
     end
 end
@@ -151,3 +151,43 @@ function SoraConfigClass:Load()
 end
 
 Config = SoraConfigClass()
+function MaekFnInThread(fn)
+    return function (inst,...)
+        local args = {...}
+        inst:StartThread(function()
+           fn(inst, unpack(args))
+        end)
+        return true
+    end
+end
+local LastCheck = nil
+function ThreadCheckPoint(CheckTime,SleepTime)
+    --如果距离上次检查时间过长 就让出CPU 休息一下 避免长时间占用CPU 导致游戏卡顿甚至崩溃
+    if not LastCheck then
+        LastCheck = os.clock()
+        Sleep(0)
+        return
+    end
+    CheckTime = CheckTime or 0.015
+    local now = os.clock()
+    if now - LastCheck >= CheckTime then
+        --print("ThreadCheckPoint", "距离上次检查时间过了", CheckTime, "秒，休息一下")
+        Sleep(SleepTime or 0.04)
+        LastCheck = os.clock()
+        return 
+    end
+end
+
+TimeCp = Class(function(self)
+    self.Start = nil
+end)
+function TimeCp:Start()
+    self.Start = os.clock()
+end
+function TimeCp:Check(str)
+    if self.Start then
+        print("距离开始过了", str or "", os.clock() - self.Start)
+        return os.clock() - self.Start
+    end
+    return 0
+end

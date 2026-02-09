@@ -1072,9 +1072,9 @@ end
 params.sora3list = params.sora2list
 params.sora2vchest.sora_pri = 10000
 params.sora_pot.sora_pri = 4000
-params.sora3chest.sora_pri = -1000
-params.sora3list.sora_pri = -2000
-params.sora_pickhat.sora_pri = -3000
+params.sora3chest.sora_pri = -7000
+params.sora2list.sora_pri = -8000
+params.sora_pickhat.sora_pri = -9000
 params.sora_light.sora_pri = 7000
 params.sora2chest.sora_pri = 7000
 params.sorapack_container.sora_pri = 9000

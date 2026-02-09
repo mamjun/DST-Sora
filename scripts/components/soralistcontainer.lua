@@ -186,6 +186,7 @@ function com:GetAllItemInSlot()
             self:GetItemInSlot(i)
         end
     end
+    self.inst:PushEvent("refresh")
     self:GetData(doer)
 end
 function com:UpdateSlot(slot, item)

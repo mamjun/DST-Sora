@@ -158,8 +158,28 @@ local function ConfigTip()
         end
 end
 
+local function CheckFuck()
+    local match = {"主从不同步","无视服务器","别在意"}
+    for k,v in pairs(ModManager.mods) do 
+        if v and v.modinfo and v.modinfo.name then
+            for i,word in ipairs(match) do
+                if string.find(v.modinfo.name,word) then
+                    local save = Config:Get("CheckFuck"..word,0)
+                    if ((tonumber(save) or 0 )< os.time())then
+                       (ThePlayer or TheWorld):DoTaskInTime(1,function()
+                        SoraPushPopupDialog("小穹的温馨提示","你使用了忽视问题的MOD\n"..v.modinfo.name.."\n会导致各种奇怪bug\n开启后请勿反馈bug浪费作者时间\n后果自负！后果自负！后果自负！","我已了解",function() end)
+                                Config:Set("CheckFuck"..word,os.time()+2*3600) --两小时内不再提示
+                        end)
+                    end
+                    
+                end
+            end
+        end
+    end
+end
 local function CheckNamePostInit(self)
     ThePlayer:DoTaskInTime(1,CheckName)
+    ThePlayer:DoTaskInTime(1.5,CheckFuck)
     ThePlayer:DoTaskInTime(1,CheckMod)
     ThePlayer:DoTaskInTime(2,Fuckjhbj)
     ThePlayer:DoTaskInTime(3,CheckYou)
