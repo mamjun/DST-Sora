@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.54" -- 版本
+version = "13.55" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -127,12 +127,14 @@ local function makeconfig(name, label, des, default, min, step, num, ispercent)
     t.name = pre_name .. name
     t.label = pre_lable .. label
     t.options = {}
+    local hasdefault = false
     for i = 0, num, 1 do
         local da = min + i * step
         local desc = string.format(des, ispercent and (da - ispercent) * 100 or da)
-        local index = i+2
+        local index = i+ (hasdefault and 1 or 2)
         if string.format("%s", da) == string.format("%s", default) then
             index = 1
+            hasdefault = true
             desc = desc .. " (默认)"
         end
         t.options[index] = {
