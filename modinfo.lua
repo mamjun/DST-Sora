@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.53" -- 版本
+version = "13.54" -- 版本
 name = "小穹 v" .. version
 huaversion = 20220204 -- 花花的版本
 forumthread = ""
@@ -130,9 +130,15 @@ local function makeconfig(name, label, des, default, min, step, num, ispercent)
     for i = 0, num, 1 do
         local da = min + i * step
         local desc = string.format(des, ispercent and (da - ispercent) * 100 or da)
-        t.options[i + 1] = {
+        local index = i+2
+        if string.format("%s", da) == string.format("%s", default) then
+            index = 1
+            desc = desc .. " (默认)"
+        end
+        t.options[index] = {
             description = desc,
-            data = string.format("%s", da)
+            data = string.format("%s", da),
+            hover = desc,
         }
     end
     allnum = allnum + num
@@ -143,39 +149,39 @@ configuration_options = {{
     name = "ClientProxy",
     label = "允许客户端协助服务器连接服务器,需要客户端启用SoraProxy",
     options = {{
-        description = "允许,不安全,但是只需要客户端启用SoraProxy",
-        data = "1",
-        hover = "允许,不安全,但是只需要客户端启用SoraProxy"
-    }, {
         description = "不允许,更安全,需要专服启用SoraProxy",
         data = "0",
         hover = "不允许,更安全,需要专服启用SoraProxy"
+    }, {
+        description = "允许,不安全,但是只需要客户端启用SoraProxy",
+        data = "1",
+        hover = "允许,不安全,但是只需要客户端启用SoraProxy"
     }},
     default = "0"
-},{
+}, {
     name = "FixContainer",
     label = "修复klei的几个容器可能导致的崩档问题",
     options = {{
-        description = "别修复，让他崩",
-        data = "1",
-        hover = "别修复，让他崩"
-    }, {
         description = "修复就行，不用告诉我",
         data = "0",
         hover = "修复就行，不用告诉我"
+    }, {
+        description = "别修复，让他崩",
+        data = "1",
+        hover = "别修复，让他崩"
     }},
     default = "0"
 }, maketitle("jichu", "基础设置"), {
     name = "mode",
     label = "难度",
     options = {{
-        description = "简单",
-        data = 1,
-        hover = "人物容易升级"
-    }, {
         description = "一般",
         data = 2,
         hover = "人物较难升级"
+    }, {
+        description = "简单",
+        data = 1,
+        hover = "人物容易升级"
     }, {
         description = "困难",
         data = 3,
@@ -186,6 +192,10 @@ configuration_options = {{
     name = "recmode",
     label = "配方难度",
     options = {{
+        description = "默认",
+        data = 0,
+        hover = "跟随人物难度"
+    }, {
         description = "简单",
         data = 1,
         hover = "物品和装备容易制作"
@@ -197,10 +207,6 @@ configuration_options = {{
         description = "困难",
         data = 3,
         hover = "物品和装备很难制作"
-    }, {
-        description = "默认",
-        data = 0,
-        hover = "跟随人物难度"
     }},
     default = 0
 }, {
@@ -220,13 +226,13 @@ configuration_options = {{
     name = "moreanimdata",
     label = "留影机兼容模式",
     options = {{
-        description = "兼容",
-        data = 1,
-        hover = "不进行更多尝试"
-    }, {
         description = "激进",
         data = 0,
         hover = "建议打开，如果崩了就关闭试试"
+    }, {
+        description = "兼容",
+        data = 1,
+        hover = "不进行更多尝试"
     }},
     default = 0
 }, {
@@ -255,17 +261,17 @@ configuration_options = {{
         hover = "禁用,禁止使用全局制作"
     }},
     default = false
-},{
+}, {
     name = "disable_regrow",
     label = "禁止一些没什么卵用的世界再生,比如草,树苗,花",
     options = {{
-        description = "不禁止,后期可能会卡",
-        data = false,
-        hover = "不禁止,后期可能会卡"
-    }, {
         description = "禁止再生一些没什么卵用的东西",
         data = true,
         hover = "禁止再生一些没什么卵用的东西"
+    }, {
+        description = "不禁止,后期可能会卡",
+        data = false,
+        hover = "不禁止,后期可能会卡"
     }},
     default = true
 }, {
@@ -285,78 +291,78 @@ configuration_options = {{
     name = "add",
     label = "扩展打包纸，允许打包落水洞等物品，\n但是请不要带这些东西跳世界，会出问题",
     options = {{
-        description = "允许",
-        data = true,
-        hover = "允许打包更多物品"
-    }, {
         description = "不允许",
         data = false,
         hover = "只能打包部分物品"
+    }, {
+        description = "允许",
+        data = true,
+        hover = "允许打包更多物品"
     }},
     default = false
 }, {
     name = "add2",
     label = "扩展打包纸，允许打包怪物、boss等，\n极度影响平衡，仅供娱乐",
     options = {{
-        description = "允许",
-        data = true,
-        hover = "允许打包怪物、boss"
-    }, {
         description = "不允许",
         data = false,
         hover = "只能打包部分生物"
+    }, {
+        description = "允许",
+        data = true,
+        hover = "允许打包怪物、boss"
     }},
     default = false
 }, {
     name = "qbwh",
     label = "禁用空白永不败北",
     options = {{
-        description = "禁用",
-        data = true,
-        hover = "禁用空白永不败北"
-    }, {
         description = "不禁用",
         data = false,
         hover = "不禁用空白永不败北"
+    }, {
+        description = "禁用",
+        data = true,
+        hover = "禁用空白永不败北"
     }},
     default = false
 }, {
     name = "tochest",
     label = "禁止上强迫症(开启此选项会使已上强迫症失效)",
     options = {{
-        description = "禁止",
-        data = true,
-        hover = "不允许上强迫症"
-    }, {
         description = "允许",
         data = false,
         hover = "允许上强迫症"
+    }, {
+        description = "禁止",
+        data = true,
+        hover = "不允许上强迫症"
     }},
     default = false
 }, {
     name = "tochestgem",
     label = "禁止强迫症紫宝石打包",
     options = {{
-        description = "禁止",
-        data = true,
-        hover = "不允许强迫症紫宝石打包"
-    }, {
         description = "允许",
         data = false,
         hover = "允许强迫症紫宝石打包"
+    }, {
+        description = "禁止",
+        data = true,
+        hover = "不允许强迫症紫宝石打包"
     }},
     default = false
 }, {
     name = "chestgreen",
     label = "禁止强迫症绿宝石种植",
     options = {{
-        description = "禁止",
-        data = true,
-        hover = "不允许强迫症绿宝石种植"
-    }, {
         description = "允许",
         data = false,
         hover = "允许强迫症绿宝石种植"
+    }, {
+        description = "禁止",
+        data = true,
+        hover = "不允许强迫症绿宝石种植"
     }},
     default = false
 }, {
@@ -418,52 +424,52 @@ configuration_options = {{
     name = "zzjb",
     label = "禁用25级制作减半",
     options = {{
-        description = "禁用",
-        data = true,
-        hover = "禁用25级制作减半"
-    }, {
         description = "不禁用",
         data = false,
         hover = "不禁用25级制作减半"
+    }, {
+        description = "禁用",
+        data = true,
+        hover = "禁用25级制作减半"
     }},
     default = false
 }, {
     name = "sbdl",
     label = "禁用30级掉落翻倍",
     options = {{
-        description = "禁用",
-        data = true,
-        hover = "禁用30级掉落翻倍"
-    }, {
         description = "不禁用",
         data = false,
         hover = "不禁用30级掉落翻倍"
+    }, {
+        description = "禁用",
+        data = true,
+        hover = "禁用30级掉落翻倍"
     }},
     default = false
 }, {
     name = "sbsg",
     label = "禁用25级双倍收锅",
     options = {{
-        description = "禁用",
-        data = true,
-        hover = "禁用25级双倍收锅"
-    }, {
         description = "不禁用",
         data = false,
         hover = "不禁用25级双倍收锅"
+    }, {
+        description = "禁用",
+        data = true,
+        hover = "禁用25级双倍收锅"
     }},
     default = false
 }, {
     name = "sbcj",
     label = "禁用15级双倍采集",
     options = {{
-        description = "禁用",
-        data = true,
-        hover = "禁用15级双倍采集"
-    }, {
         description = "不禁用",
         data = false,
         hover = "不禁用15级双倍采集"
+    }, {
+        description = "禁用",
+        data = true,
+        hover = "禁用15级双倍采集"
     }},
     default = false
 }, {
@@ -504,6 +510,10 @@ configuration_options = {{
     name = "chest",
     label = "强迫症箱子范围 推荐全图性能最好",
     options = {{
+        description = "3000",
+        data = 3000,
+        hover = "3000"
+    }, {
         description = "30",
         data = 30,
         hover = "30"
@@ -527,10 +537,6 @@ configuration_options = {{
         description = "1000",
         data = 1000,
         hover = "1000"
-    }, {
-        description = "3000",
-        data = 3000,
-        hover = "3000"
     }},
     default = 3000
 }, maketitle("tongyong", "通用装备设置"), maketitle("sora3sword", "银白の锋"),
