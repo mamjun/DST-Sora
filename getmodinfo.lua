@@ -107,7 +107,7 @@ for k, v in ipairs(configuration_options) do
                 elseif type(iv.data) == "string" then
                     toio = toio .. string.format('data = "%s",', iv.data)
                 elseif type(iv.data) == "number" then
-                    toio = toio .. string.format('data = "%.3s",', iv.data)
+                    toio = toio .. string.format('data = "%s",', iv.data)
                 end
             end
             toio = toio .. '}, \n'
@@ -123,7 +123,7 @@ for k, v in ipairs(configuration_options) do
         elseif type(v.default) == "string" then
             toio = toio .. string.format('    default = "%s"},\n', v.default)
         elseif type(v.default) == "number" then
-            toio = toio .. string.format('    default = "%.3s"},\n', v.default)
+            toio = toio .. string.format('    default = "%s"},\n', v.default)
         else
             print(type(v.default))
         end

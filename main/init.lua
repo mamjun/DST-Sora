@@ -49,12 +49,12 @@ DebugPrint = function(...)
     end
 end
 GLOBAL.TUNING.SORADISABLE_REGROW = GetModConfigData("disable_regrow")
-GLOBAL.TUNING.SORAMODE = GetModConfigData("mode")
+GLOBAL.TUNING.SORAMODE = tonumber(GetModConfigData("mode"))
 mode = GLOBAL.TUNING.SORAMODE
 GLOBAL.TUNING.SORAADD = GetModConfigData("add")
 GLOBAL.TUNING.SORAPACK = GetModConfigData("pack")
 GLOBAL.TUNING.SORAADD2 = GetModConfigData("add2")
-GLOBAL.TUNING.SORACHESTRANGE = GetModConfigData("chest") or 60
+GLOBAL.TUNING.SORACHESTRANGE = tonumber(GetModConfigData("chest")) or 60
 GLOBAL.TUNING.SORAMODNAME = modname
 GLOBAL.TUNING.SORAVERSION = modinfo.version
 GLOBAL.TUNING.SORATOCHEST = GetModConfigData("tochest")
@@ -62,8 +62,8 @@ GLOBAL.TUNING.SORATOCHESTGEM = GetModConfigData("tochestgem")
 GLOBAL.TUNING.SORA2CHESTGREEN = GetModConfigData("chestgreen")
 GLOBAL.TUNING.SORALOCK1 = GetModConfigData("lock1")
 GLOBAL.TUNING.SORALOCK2 = GetModConfigData("lock2")
-GLOBAL.TUNING.SORALOCK3 = GetModConfigData("lock3")
-GLOBAL.TUNING.SORAFGMODE = GetModConfigData("fgmode")
+GLOBAL.TUNING.SORALOCK3 = tonumber(GetModConfigData("lock3"))
+GLOBAL.TUNING.SORAFGMODE = tonumber(GetModConfigData("fgmode"))
 GLOBAL.TUNING.SORAMOREANIMDATA = tostring(GetModConfigData("moreanimdata")) == tostring(0)
 GLOBAL.TUNING.SORAFIXCONTAINER = tostring(GetModConfigData("FixContainer")) == "0"
 GLOBAL.TUNING.SORADISABLEGLOBAL = GetModConfigData("disableui_globalbuild")

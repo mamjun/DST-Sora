@@ -30,9 +30,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "13.56"
-name = "小穹 v13.56"
-description = [[当前版本：13.56\n
+version = "13.57"
+name = "小穹 v13.57"
+description = [[当前版本：13.57\n
 恨穹不是妹，恨妹不成穹！
 初始属性很差，但随着等级上升可以获得大量属性。
 交流群号： 777150028
@@ -324,15 +324,15 @@ string = string or ""
     name = "chest",
     label = "强迫症箱子范围 推荐全图性能最好",
     options = { 
-        { hover = "3000",description = "3000",data = "300",}, 
+        { hover = "3000",description = "3000",data = "3000",}, 
         { hover = "30",description = "30",data = "30",}, 
         { hover = "60",description = "60",data = "60",}, 
         { hover = "90",description = "90",data = "90",}, 
         { hover = "120",description = "120",data = "120",}, 
         { hover = "300",description = "300",data = "300",}, 
-        { hover = "1000",description = "1000",data = "100",}, 
+        { hover = "1000",description = "1000",data = "1000",}, 
     }, 
-    default = "300"},
+    default = "3000"},
     {
     name = "tongyong",
     label = "通用装备设置设置",
