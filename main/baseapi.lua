@@ -152,17 +152,17 @@ end
 
 Config = SoraConfigClass()
 function MaekFnInThread(fn)
-    return function (inst,...)
+    return function(inst, ...)
         local args = {...}
         inst:StartThread(function()
-           fn(inst, unpack(args))
+            fn(inst, unpack(args))
         end)
         return true
     end
 end
 local LastCheck = nil
-function ThreadCheckPoint(CheckTime,SleepTime)
-    --如果距离上次检查时间过长 就让出CPU 休息一下 避免长时间占用CPU 导致游戏卡顿甚至崩溃
+function ThreadCheckPoint(CheckTime, SleepTime)
+    -- 如果距离上次检查时间过长 就让出CPU 休息一下 避免长时间占用CPU 导致游戏卡顿甚至崩溃
     if not LastCheck then
         LastCheck = os.clock()
         Sleep(0)
@@ -171,10 +171,10 @@ function ThreadCheckPoint(CheckTime,SleepTime)
     CheckTime = CheckTime or 0.015
     local now = os.clock()
     if now - LastCheck >= CheckTime then
-        --print("ThreadCheckPoint", "距离上次检查时间过了", CheckTime, "秒，休息一下")
+        -- print("ThreadCheckPoint", "距离上次检查时间过了", CheckTime, "秒，休息一下")
         Sleep(SleepTime or 0.04)
         LastCheck = os.clock()
-        return 
+        return
     end
 end
 
@@ -191,3 +191,49 @@ function TimeCp:Check(str)
     end
     return 0
 end
+
+local level = 1
+local printlevel = 0
+local function hooks(type)
+    local fninfo = debug.getinfo(2)
+    if fninfo.func == print then
+        printlevel = printlevel + (type == "call" and 1 or -1)
+
+    end
+    if type == "call" then
+        level = level + 1
+    end
+
+    if fninfo then
+        if printlevel < 1 then
+            print(type, string.rep(">", level), fninfo.name, fninfo.source, fninfo.currentline)
+        end
+
+    end
+    if type == "return" then
+        level = level - 1
+    end
+end
+local oldRemove
+local oldSetParent
+function TrackStart()
+    print("-----start-----")
+    oldRemove = EntityScript.Remove
+    EntityScript.Remove = function(self, ...)
+        print("EntityScript.Remove", self, self and self.prefab, ...)
+        return oldRemove(self, ...)
+    end
+    oldSetParent = Entity.SetParent
+    Entity.SetParent = function(self, parent, ...)
+        print("Entity.SetParent", self, parent, ...)
+        return oldSetParent(self, parent, ...)
+    end
+    debug.sethook(hooks, "cr")
+end
+function TrackStop()
+    debug.sethook()
+    Entity.SetParent = oldSetParent
+    EntityScript.Remove = oldRemove
+    print("-----end-----")
+end
+

@@ -167,7 +167,9 @@ function sorapacker:Pack(target, doer, MustPack)
     if not self.inst.components.named then self.inst:AddComponent("named") end
     self.inst.components.named:SetName(self.item.name)
     self.inst.components.inspectable:SetDescription("这是" .. self.item.name)
+    --SoraAPI.TrackStart()
     target:Remove()
+    --SoraAPI.TrackStop()
     self.inst:AddTag("sorapacker_full")
 
     return true

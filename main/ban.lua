@@ -158,6 +158,16 @@ local function ConfigTip()
         end
 end
 
+local function ConfigTip()
+        local save = Config:Get("ConfigTip2",0)
+        if ((tonumber(save) or 0 )< os.time())then
+           (ThePlayer or TheWorld):DoTaskInTime(1,function()
+            SoraPushPopupDialog("小穹的温馨提示","由于最近更新问题,部分设置数据可能不正确,\n建议在模组设置里恢复默认再重新设置","我已了解",function() end)
+                   Config:Set("ConfigTip2",os.time()+24*3600*31)
+            end)
+        end
+end
+
 local function CheckFuck()
     local match = {"主从不同步","无视服务器","别在意"}
     for k,v in pairs(ModManager.mods) do 
@@ -185,6 +195,7 @@ local function CheckNamePostInit(self)
     ThePlayer:DoTaskInTime(3,CheckYou)
     ThePlayer:DoTaskInTime(4,CheckMoGu)
     ThePlayer:DoTaskInTime(5,ConfigTip)
+    ThePlayer:DoTaskInTime(6,ConfigTip6)
 end
 AddClassPostConstruct("widgets/controls", CheckNamePostInit) 
 

@@ -49,7 +49,10 @@ DebugPrint = function(...)
     end
 end
 GLOBAL.TUNING.SORADISABLE_REGROW = GetModConfigData("disable_regrow")
-GLOBAL.TUNING.SORAMODE = tonumber(GetModConfigData("mode"))
+GLOBAL.TUNING.SORAMODE = math.ceil(tonumber(GetModConfigData("mode")))
+if GLOBAL.TUNING.SORAMODE < 1 or GLOBAL.TUNING.SORAMODE > 3 then
+    GLOBAL.TUNING.SORAMODE = 2
+end
 mode = GLOBAL.TUNING.SORAMODE
 GLOBAL.TUNING.SORAADD = GetModConfigData("add")
 GLOBAL.TUNING.SORAPACK = GetModConfigData("pack")
@@ -133,8 +136,10 @@ mi("kleibugfix")
 -- 自动更新
 modimport("scripts/soraupdate/main")
 
-SoraAssets = Assets
-Assets= {}
+SoraAssets = {}
+
+--Assets= { Asset("SOUNDPACKAGE", "sound/sora.fev"),
+--          Asset("SOUND", "sound/sora.fsb")}
 -- 添加角色
 AddModCharacter("sora", "FEMALE")
 

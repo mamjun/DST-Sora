@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.57" -- 版本
+version = "13.58" -- 版本
 name = "小穹 v" .. version
 forumthread = ""
 priority = -100000
@@ -127,7 +127,7 @@ local function makeconfig(name, label, des, default, min, step, num, ispercent)
         local index = i + 1
         t.options[index] = {
             description = desc,
-            data = string.format("%.3s", da),
+            data = string.format("%s", da),
             hover = desc
         }
         local tmp = default - da
@@ -135,7 +135,7 @@ local function makeconfig(name, label, des, default, min, step, num, ispercent)
             finddefault = index
             t.options[index] = {
                 description = desc .. "(默认)",
-                data = string.format("%.3s", default),
+                data = string.format("%s", default),
                 hover = desc .. "(默认)"
             }
         end
@@ -146,7 +146,7 @@ local function makeconfig(name, label, des, default, min, step, num, ispercent)
         t.options[1] = defaultoption
     end
     allnum = allnum + num
-    t.default = string.format("%.3s", default)
+    t.default = string.format("%s", default)
     return t
 end
 configuration_options = {

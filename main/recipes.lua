@@ -34,7 +34,15 @@ local InvImg = {}
 local NoRec
 rec_back = "_build_sora"
 local AllSoraRec = {}
-local recmode = (tonumber(GetModConfigData("recmode")) or 0) > 0 and tonumber(GetModConfigData("recmode")) or mode
+local recmode = (tonumber(GetModConfigData("recmode")) or 0) > 0 and math.ceil(tonumber(GetModConfigData("recmode"))) or
+                    mode
+if recmode < 1 or recmode > 3 then
+    recmode = mode
+end
+if recmode < 1 or recmode > 3 then
+    recmode = 2
+end
+recmode = math.ceil(recmode)
 function AddInvImg(key, xml, tex)
     InvImg[key] = {"images/" .. xml .. ".xml", (tex or key) .. ".tex"}
 end
@@ -992,14 +1000,12 @@ Rec("sora_sign_item", "拟造-木牌", "为什么看了就像打他?", DST, "sor
     [san] = 100
 }).placer = "no"
 
-
 AddInvImg2("sora_gemsign_item", nil, "minisign_drawn.tex")
 Rec("sora_gemsign", "拟造-宝石牌", "你已经是个成熟的宝石牌了", NoRec)
 Rec("sora_gemsign_item", "拟造-宝石牌", "你已经是个成熟的宝石牌了", DST, "sora", {
     boards = 20,
-    ancienttree_gem_sapling_item = 1,
+    ancienttree_gem_sapling_item = 1
 }).placer = "no"
-
 
 AddInvImg2("sora_pearl", nil, "hermit_pearl.tex")
 Rec("sora_pearl", "拟造-珍珠", "咦,好温暖,还有一种清醒的感觉", DST, "sora", {
@@ -1029,8 +1035,8 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
 end
 
 Rec("leif_idol", nil, "树站起来了", maker, "sora", {
-        livinglog = 99
-    }).numtogive = 5
+    livinglog = 99
+}).numtogive = 5
 
 -- Rec("sora_butter", "拟造-黄油", "一份黄油蟹蟹!", DST, "sora", {
 --     moonrocknugget = 3,
@@ -1292,12 +1298,9 @@ UnlonkRecipes("beebox_hermit", {
     bee = 4
 }, "嗡嗡嗡！")
 
-
 UnlonkRecipes("ancienttree_gem_sapling_item", {
-    opalpreciousgem =3,
+    opalpreciousgem = 3
 }, "要是不卡就好了").placer = "no"
-
-
 
 AddInvImg2("meatrack_hermit", "minimap/minimap_data.xml", "meatrack_hermit.png")
 UnlonkRecipes("meatrack_hermit", {
