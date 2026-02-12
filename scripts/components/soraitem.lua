@@ -56,6 +56,11 @@ local com = Class(function(self,inst)
     self.inst = inst
     self.bind = false
     self.user = ""
+    inst:DoTaskInTime(0,function() 
+         if inst.components.equippable then
+            inst.components.equippable.retrictedtag = "sora"
+         end
+    end)
     inst:ListenForEvent("equipped",checkowner)
     inst:ListenForEvent("onpickup",checkowner)
 end)

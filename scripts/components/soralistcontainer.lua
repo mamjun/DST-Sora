@@ -186,7 +186,15 @@ function com:GetAllItemInSlot()
             self:GetItemInSlot(i)
         end
     end
-    self.inst:PushEvent("refresh")
+    if not self.setrefresh then
+        self.setrefresh = true
+         self.inst:DoTaskInTime(0, function() 
+             self.inst:PushEvent("refresh")
+             self.setrefresh = nil
+        end)
+    end
+
+    
     self:GetData(doer)
 end
 function com:UpdateSlot(slot, item)
@@ -294,7 +302,11 @@ function com:TryToEquipOrGive(doer, item, isback)
         local olditem = doer.components.inventory:Unequip(eslot)
         if olditem then
             self.delay_send = 99
-            self:GiveItem(doer, olditem)
+            if self.container.itemtestfn and not self.container:itemtestfn(item) then 
+                doer.components.inventory:GiveItem(olditem, nil, pos)
+            else
+                self:GiveItem(doer, olditem)
+            end
         end
         local equip = doer.components.inventory:GetEquippedItem(eslot)
         if not olditem and equip then
@@ -356,6 +368,11 @@ end
 -- 存入物品
 function com:GiveItem(doer, item, slot)
     if not (item and item:IsValid()) then
+        return
+    end
+    if self.container.itemtestfn and not self.container:itemtestfn(item,slot) then 
+        self.container:DropItem(item)
+        self:GetData(doer)
         return
     end
     if not (item.persists and item.components.inventoryitem and item.components.inventoryitem.canbepickedup and

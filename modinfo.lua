@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "13.58"
+version = "13.59"
 name = "小穹 v13.58"
 description = [[当前版本：13.58\n
 恨穹不是妹，恨妹不成穹！

@@ -474,11 +474,17 @@ Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother
     gift = 5
 }})
 Rec("sora2list", "祈巧", "用它来管理你的物品", equip2, "soraother", {{
-    gift = 1
+    orangemooneye=1,
+    moonglass = 5,
+    petals = 10
 }, {
-    gift = 1
+    orangemooneye=1,
+    moonglass = 5,
+    petals = 40
 }, {
-    gift = 1
+    orangemooneye=3,
+    moonglass = 400,
+    petals = 400
 }})
 
 Rec("sora_build", "华章", "可以用他来调整建筑", equip2, "soraother", {{
