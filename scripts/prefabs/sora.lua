@@ -32,7 +32,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local soraconfig = require "soraconfig/config"
 local fix = require "utils/soraplayerextend"
 require "debugtools"
-local assets = {Asset("SOUND", "sound/sora.fsb"), -- Asset( "ANIM", "anim/sora.zip" ),
+local assets = {Asset("SOUNDPACKAGE", "sound/sora.fev"),Asset("SOUND", "sound/sora_sfx.fsb"), Asset("SOUND", "sound/sora_bgm.fsb"), -- Asset( "ANIM", "anim/sora.zip" ),
 Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), Asset("ANIM", "anim/sora_sllh.zip"),
                 Asset("ANIM", "anim/sora_zhizheng.zip"), Asset("ANIM", "anim/sora_hf.zip"),
                 Asset("ANIM", "anim/sora_amly.zip"), Asset("ANIM", "anim/sora_gete.zip"),

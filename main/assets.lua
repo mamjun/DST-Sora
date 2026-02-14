@@ -47,7 +47,7 @@ Asset("ATLAS", "images/avatars/self_inspect_sora.xml"), Asset("IMAGE", "images/a
           Asset("ATLAS", "images/inventoryimages/soratab.xml"),
           Asset("IMAGE", "images/inventoryimages/soramakertab.tex"),
           Asset("ATLAS", "images/inventoryimages/soramakertab.xml"), Asset("SOUNDPACKAGE", "sound/sora.fev"),
-          Asset("SOUND", "sound/sora.fsb"), Asset("IMAGE", "images/names_sora.tex"), -- 人物名字
+          Asset("SOUND", "sound/sora_sfx.fsb"), Asset("SOUND", "sound/sora_bgm.fsb"), Asset("IMAGE", "images/names_sora.tex"), -- 人物名字
 Asset("ATLAS", "images/names_sora.xml"), Asset("IMAGE", "bigportraits/sora.tex"), -- 人物大图（椭圆的那个）
 Asset("ATLAS", "bigportraits/sora.xml"), Asset("ANIM", "anim/pockygame.zip"), Asset("ANIM", "anim/pockybuild.zip"),
           Asset("ANIM", "anim/sorawiki.zip"), -- Asset("ANIM", "anim/shanxing.zip"),  
