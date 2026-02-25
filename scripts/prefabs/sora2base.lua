@@ -111,6 +111,66 @@ local function calcdest(inst, dest)
     end
     return 0
 end
+local ThreadCheckPoint = SoraAPI.ThreadCheckPoint
+local IceStaffUpdate = SoraAPI.LeakTable()
+local IceStaffUpdateCD = SoraCD(1.8)
+local function IceStaffUpdateTask()
+    local black = {
+        laozi_sp = 1,
+        book_myth = 1,
+        leif_idol = 1
+    }
+    -- 快速检查一下所有着火的东西，记录一下 下一帧处理
+    local toprotect = {}
+    for v, k in pairs(SoraAPI.AllBurnable) do
+        if v.components.burnable and (v.components.burnable.smoldering or v.components.burnable.burning) then
+            toprotect[v] = 1
+        end
+    end
+    --print("冰杖保护数量", GetTableSize(toprotect))
+    ThreadCheckPoint()
+    local count = 0
+    for v, k in pairs(toprotect) do
+        if v:IsValid() and not v:HasTag("campfire") and not black[v.prefab] then
+            count = count + 1
+            if count > 100 then
+                count = 0
+                ThreadCheckPoint()
+            end
+            for ii, _ in pairs(IceStaffUpdate) do
+                if v:GetDistanceSqToInst(ii) < 14400 then
+                    v.components.burnable:Extinguish()
+                    break
+                end
+            end
+        end
+    end
+    ThreadCheckPoint()
+    toprotect = {}
+    for v, k in pairs(SoraAPI.AllWitherable) do
+        if v.components.witherable and ((v.components.witherable.protect_to_time or 0) < 5) and not v:IsAsleep() then
+            toprotect[v] = 1
+        end
+    end
+    --print("冰杖保护数量2", GetTableSize(toprotect))
+    ThreadCheckPoint()
+    for v, k in pairs(toprotect) do
+        if v:IsValid() then
+            count = count + 1
+            if count > 100 then
+                count = 0
+                ThreadCheckPoint()
+            end
+            for ii, _ in pairs(IceStaffUpdate) do
+                if v:GetDistanceSqToInst(ii) < 14400 then
+                    v.components.witherable:Protect(60)
+                    break
+                end
+            end
+        end
+    end
+    IceStaffUpdate = SoraAPI.LeakTable()
+end
 local stafftask = {
     firestaff = function(inst)
         if inst:IsAsleep() then
@@ -150,26 +210,13 @@ local stafftask = {
 
     end,
     icestaff = function(inst)
-        local pos = inst:GetPosition()
-        local black = {
-            laozi_sp = 1,
-            book_myth = 1,
-            leif_idol = 1
-        }
-        for v, k in pairs(SoraAPI.AllBurnable) do
-            if v and v:IsValid() and v.components.burnable and not v:HasTag("campfire") and v:GetDistanceSqToInst(inst) < 14400 then
-                if not black[v.prefab] then
-                    v.components.burnable:Extinguish()
-                end
-            end
-        end
-
-        for v, k in pairs(SoraAPI.AllWitherable) do
-            if v and v:IsValid() and v.components.witherable and v:GetDistanceSqToInst(inst) < 14400 then
-                if not black[v.prefab] then
-                    v.components.witherable:Protect(60)
-                end
-            end
+        IceStaffUpdate[inst] = 1
+        if not TheWorld.IceStaffUpdateTask and IceStaffUpdateCD() then
+            TheWorld.IceStaffUpdateTask = TheWorld:StartThread(function()
+                Sleep(0.1)
+                IceStaffUpdateTask()
+                TheWorld.IceStaffUpdateTask = nil
+            end)
         end
     end,
     telestaff = function(inst)

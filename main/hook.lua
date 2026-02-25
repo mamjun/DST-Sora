@@ -1746,7 +1746,58 @@ end
 --         return oldWrapItems(s, items, ...)
 --     end
 -- end)
-
+--增加定期回收 防止有其他mod泄漏导致的我无法被回收
+AddSimPostInit(function()
+    TheWorld.SoraUpdateEntsThread = TheWorld:StartThread(function()
+        while true do -- 一分钟回收一次无效的 防止其他的导致的无法回收
+            ThreadCheckPoint()
+            local oldAllInv = AllInv
+            AllInv = LeakTable()
+            local count = 0
+            for k, v in pairs(oldAllInv) do
+                if k and k:IsValid() and k.components.inventoryitem then
+                    AllInv[k] = 1
+                end
+                count = count + 1
+                if count > 1000 then
+                    count = 0
+                    ThreadCheckPoint()
+                end
+            end
+            oldAllInv  = nil
+            ThreadCheckPoint()
+            local oldAllBurnable = AllBurnable
+            AllBurnable = LeakTable()
+            for k, v in pairs(oldAllBurnable) do
+                if k and k:IsValid() and k.components.burnable then
+                    AllBurnable[k] = 1
+                end
+                count = count + 1
+                if count > 1000 then
+                    count = 0
+                    ThreadCheckPoint()
+                end
+            end
+            oldAllBurnable = nil
+            ThreadCheckPoint()
+            local oldAllWitherable = AllWitherable
+            AllWitherable = LeakTable()
+            for k, v in pairs(oldAllWitherable) do
+                if k and k:IsValid() and k.components.witherable then
+                    AllWitherable[k] = 1
+                end
+                count = count + 1
+                if count > 1000 then
+                    count = 0
+                    ThreadCheckPoint()
+                end
+            end
+            oldAllWitherable = nil
+            ThreadCheckPoint()
+            Sleep(60)
+        end
+    end)
+end)
 AllInv = LeakTable()
 AddComponentPostInit("inventoryitem", function(self)
     AllInv[self.inst] = 1
@@ -1759,6 +1810,7 @@ AllWitherable = LeakTable()
 AddComponentPostInit("witherable", function(self)
     AllWitherable[self.inst] = 1
 end)
+
 AddComponentPostInit("farming_manager", function(self)
     self.SoraMax = {}
     self.SoraCleanCD = SoraCD(10)
@@ -1955,7 +2007,7 @@ AddClassPostConstruct("components/inventory_replica", function(inst)
             end
             local maxpri, maxinst = -100000, nil
             for k, v in pairs(new_sort) do
-                --print("优先分析", k,v)
+                -- print("优先分析", k,v)
                 if v > maxpri then
                     maxpri = v
                     maxinst = k
@@ -1963,7 +2015,7 @@ AddClassPostConstruct("components/inventory_replica", function(inst)
             end
             if maxinst then
                 new[maxinst] = true
-                --print("优先打开", maxinst,maxinst.prefab)
+                -- print("优先打开", maxinst,maxinst.prefab)
             end
             return new, y, z
         else

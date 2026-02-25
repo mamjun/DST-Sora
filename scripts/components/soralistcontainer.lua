@@ -188,13 +188,12 @@ function com:GetAllItemInSlot()
     end
     if not self.setrefresh then
         self.setrefresh = true
-         self.inst:DoTaskInTime(0, function() 
-             self.inst:PushEvent("refresh")
-             self.setrefresh = nil
+        self.inst:DoTaskInTime(0, function()
+            self.inst:PushEvent("refresh")
+            self.setrefresh = nil
         end)
     end
 
-    
     self:GetData(doer)
 end
 function com:UpdateSlot(slot, item)
@@ -302,7 +301,7 @@ function com:TryToEquipOrGive(doer, item, isback)
         local olditem = doer.components.inventory:Unequip(eslot)
         if olditem then
             self.delay_send = 99
-            if self.container.itemtestfn and not self.container:itemtestfn(item) then 
+            if self.container.itemtestfn and not self.container:itemtestfn(item) then
                 doer.components.inventory:GiveItem(olditem, nil, pos)
             else
                 self:GiveItem(doer, olditem)
@@ -370,8 +369,41 @@ function com:GiveItem(doer, item, slot)
     if not (item and item:IsValid()) then
         return
     end
-    if self.container.itemtestfn and not self.container:itemtestfn(item,slot) then 
-        self.container:DropItem(item)
+    if self.container.itemtestfn and not self.container:itemtestfn(item, slot) then
+        item.prevslot = nil
+        item.prevcontainer = nil
+        if not doer then
+            if self.inst.components.inventoryitem then
+                local t_doer = self.inst.components.inventoryitem:GetGrandOwner()
+                if t_doer and t_doer:HasTag("player") then
+                    doer = t_doer
+                end
+            end
+        end
+        local slot = nil
+        if doer and item.components.inventoryitem and item.components.inventoryitem.cangoincontainer then
+            for k = 1, doer.components.inventory.maxslots do
+                if doer.components.inventory:GetItemInSlot(k) == nil then
+                    slot = k
+                    break
+                end
+            end
+
+            local overflow = doer.components.inventory:GetOverflowContainer()
+            if not slot and overflow then
+                for k = 1, overflow:GetNumSlots() do
+                    if overflow:CanTakeItemInSlot(item, k) then
+                        slot = k
+                        break
+                    end
+                end
+            end
+        end
+        if doer and slot then
+            doer.components.inventory:GiveItem(item, slot, (doer:GetPosition()))
+        else
+            self.container:DropItem(item)
+        end
         self:GetData(doer)
         return
     end
@@ -426,7 +458,7 @@ function com:GiveItem(doer, item, slot)
         local iteminslot = self.container:GetItemInSlot(find)
         if not iteminslot then
             self.giving = true
-            self.container:RemoveItem(item,true,true,true)
+            self.container:RemoveItem(item, true, true, true)
             self.container:GiveItem(item, find, pos)
             self.giving = false
             self:GetData(doer)
@@ -437,7 +469,7 @@ function com:GiveItem(doer, item, slot)
         local iteminslot = self.container:GetItemInSlot(findnil)
         if not iteminslot then
             self.giving = true
-            self.container:RemoveItem(item,true,true,true)
+            self.container:RemoveItem(item, true, true, true)
             self.container:GiveItem(item, findnil, pos)
             self.giving = false
             self:UpdateSlot(findnil, item)
