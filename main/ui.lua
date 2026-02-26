@@ -67,7 +67,8 @@ local function AddControls(self)
         self.SoraWiki.cd = SoraCD(0.5)
         self.SoraWiki:SetOnClick(function()
             if not self.SoraWiki.cd() then
-                VisitURL("http://wiki.flapi.cn/url.php?id=sora", false)
+                local fix = Config:Get("VisitURL", true)
+                VisitURL("http://wiki.flapi.cn/url.php?id=sora", fix)
             end
         end)
         self.SoraWiki:SetOnDown(function()
@@ -312,21 +313,31 @@ ConfigScreen = Class(Screen, function(self)
         pos = {-250, 50}
     })
 
-    
     AddButton(self, "切换强迫症箱子提示", function()
         Config:Set("chestui", not Config:Get("chestui", false))
     end, {
         size = {240, 45},
         pos = {-250, 0}
     })
-    self.recui= AddButton(self, "切换制作栏优化", function()
+    self.recui = AddButton(self, "切换制作栏优化", function()
         Config:Set("recipe", not Config:Get("recipe", true))
-        self.recui:SetText(Config:Get("recipe",true) and "关闭制作栏优化" or "开启制作栏优化")
+        self.recui:SetText(Config:Get("recipe", true) and "关闭制作栏优化" or "开启制作栏优化")
     end, {
         size = {240, 45},
         pos = {-250, -50}
     })
-    self.recui:SetText(Config:Get("recipe",true) and "关闭制作栏优化" or "开启制作栏优化")
+    self.recui:SetText(Config:Get("recipe", true) and "关闭制作栏优化" or "开启制作栏优化")
+
+    self.visitui = AddButton(self, "wiki使用内置浏览器", function()
+        Config:Set("VisitURL", not Config:Get("VisitURL", true))
+        self.visitui:SetText(Config:Get("VisitURL", true) and "wiki使用内置浏览器" or "wiki使用外置浏览器")
+    end, {
+        size = {240, 45},
+        pos = {-250, -100}
+    })
+    self.visitui:SetText(Config:Get("VisitURL", true) and "wiki使用内置浏览器" or "wiki使用外置浏览器")
+
+
 
     AddButton(self, "重置所有UI位置", function()
         Config:Set("chestui", not Config:Get("chestui", false))
@@ -346,7 +357,7 @@ ConfigScreen = Class(Screen, function(self)
     })
 
     AddButton(self, "测试制作栏速度", function()
-        if TestRebuildRecipes then 
+        if TestRebuildRecipes then
             TestRebuildRecipes()
         end
     end, {
@@ -416,7 +427,7 @@ AddClassPostConstruct("widgets/redux/craftingmenu_pinbar", function(s)
                 scr:SetFilter(IsItem)
             end
         end, {
-            size = {30, 30},
+           
             pos = {80, -32}
         })
         s.sora_ui_skinicon = AddImgButton(s.open_menu_button, "sora_ui_skinicon", function()
@@ -425,7 +436,7 @@ AddClassPostConstruct("widgets/redux/craftingmenu_pinbar", function(s)
                 scr:SetFilter(IsSkin)
             end
         end, {
-            size = {30, 30},
+           
             pos = {80, 32}
         })
         if Config:Get("skinui", false) then
@@ -503,8 +514,8 @@ local function HasIngredients(builder, recipe, cache, mod)
         local t = v.type
         local num = math.max(1, RoundBiasedUp(v.amount * mod))
         if not cache[t] then
-            local find,findnum = builder.inst.replica.inventory:Has(t, num, true)
-            cache[t]=findnum
+            local find, findnum = builder.inst.replica.inventory:Has(t, num, true)
+            cache[t] = findnum
         end
         if cache[t] < num then -- 不够
             return false
@@ -530,9 +541,7 @@ local function FixRebuildRecipes(self)
     local globalenable = self.owner.player_classified and self.owner.player_classified.soraglobalbuildenable
     local cachedtag = {}
     local cachedskill = {}
-    local cacheing = {
-
-    }
+    local cacheing = {}
     local cached_can = {}
     -- tag和技能只判断一次
     for k, v in pairs(self.SoraAllSkillAndTag.t) do
@@ -566,7 +575,7 @@ local function FixRebuildRecipes(self)
         elseif not is_build_tag_restricted then
             knows_recipe = HasRecipe(builder, recipe)
             if not knows_recipe then
-                if CanPrototypeRecipe(recipe.level, tech_trees_no_temp, cached_tech_trees) then 
+                if CanPrototypeRecipe(recipe.level, tech_trees_no_temp, cached_tech_trees) then
                     knows_recipe = true
                 else
                     CanPrototype = CanPrototypeRecipe(recipe.level, tech_trees, cached_tech_trees2)
@@ -576,7 +585,7 @@ local function FixRebuildRecipes(self)
         end
         local should_hint_recipe
         if cached_should_hint_trees[recipe.level] == nil then
-            should_hint_recipe = ShouldHintRecipe(recipe.level, tech_trees,cached_can)
+            should_hint_recipe = ShouldHintRecipe(recipe.level, tech_trees, cached_can)
             cached_should_hint_trees[recipe.level] = should_hint_recipe
         else
             should_hint_recipe = cached_should_hint_trees[recipe.level]
@@ -671,7 +680,14 @@ AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(self)
     end
     self:SoraRefreshRecipes()
     self.RebuildRecipes = function(s, ...)
-        local fix = Config:Get("recipe",true)
+
+                --防止快捷宣告的内存泄漏
+        local hint = s.nav_hint:GetString()
+        if #hint > 10000 then 
+            s.nav_hint:SetString("提示过长，无法显示")
+        end
+
+        local fix = Config:Get("recipe", true)
         if fix then
             if not (self.owner and self.owner.replica.builder) then
                 return
@@ -689,7 +705,7 @@ AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(self)
     local OnUpdate = self.OnUpdate
     self.soradelayedneedtoupdate = false
     self.OnUpdate = function(s, dt)
-        local fix = Config:Get("recipe",true)
+        local fix = Config:Get("recipe", true)
         if fix then
             if not fix then
                 return OnUpdate(s, dt)
@@ -730,9 +746,40 @@ AddClassPostConstruct("widgets/redux/craftingmenu_hud", function(self)
             end
         end
         t = os.clock() - t
-        SoraPushPopupDialog(nil, "测试刷新了100次制作栏,共耗时"..string.format("%.4f",t or 0).."秒")
-      
+        SoraPushPopupDialog(nil, "测试刷新了100次制作栏,共耗时" .. string.format("%.4f", t or 0) .. "秒")
+
     end
     -- self.RebuildRecipes = TimeRecordCall(self.RebuildRecipes, "RebuildRecipes")
     -- self.OnUpdate = TimeRecordCall(self.OnUpdate, "OnUpdate")
+end)
+
+AddClassPostConstruct("widgets/redux/craftingmenu_details", function(self)
+    local oldUpdateNameString = self.UpdateNameString
+    self.UpdateNameString = function(s, ...)
+        local ret = oldUpdateNameString(s, ...)
+        if s.namestring and not s.namestring.sora_show_wiki then
+            s.namestring.sora_show_wiki = AddImgButton(s.namestring, "sora", function()
+                local fix = Config:Get("VisitURL", true)
+                local recipe = s.data and s.data.recipe
+                if recipe  and recipe.sora_show_wiki and recipe.product then 
+                    VisitURL("https://wiki.flapi.cn/rurl.php?mod=sora&id="..recipe.product, fix)
+                end
+                
+            end, {
+                size = {40, 40},
+                pos = {80, 0}
+            })
+        end
+        if not s.namestring then
+            return ret
+        end
+        local recipe = s.data and s.data.recipe
+        if recipe and recipe.sora_show_wiki then
+            s.namestring.sora_show_wiki:Show()
+        else
+            s.namestring.sora_show_wiki:Hide()
+        end 
+
+        return ret
+    end
 end)

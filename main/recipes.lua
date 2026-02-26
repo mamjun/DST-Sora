@@ -109,6 +109,7 @@ function Rec(prefab, name, des, tab, tag, ings, data) -- 添加配方
         rec.image = prefab .. ".tex"
         rec.atlas = softresolvefilepath("images/inventoryimages/" .. prefab .. ".xml")
     end
+    rec.sora_show_wiki = true
     lastrec = build
     -- rec.description = des or STRINGS.RECIPE_DESC[PREFAB]
     AllSoraRec[prefab] = rec
@@ -1074,6 +1075,7 @@ function UnlonkRecipes(name, ings, des)
     end
     local rec = Rec(name, nil, des, maker, "sora", ings or {})
     rec.level = TechTree.Create(TECH.LOST)
+    
     if not ings and AllRecipes[name] then
         rec.ingredients = AllRecipes[name].ingredients
         rec.character_ingredients = AllRecipes[name].character_ingredients

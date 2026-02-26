@@ -89,6 +89,10 @@ function InitSoraEnv()
         btn:SetPosition(data.pos[1],data.pos[2])
         btn:SetOnClick(fn)
         btn:SetText("")
+        if data.size then
+            btn.ignore_standard_scaling = true
+            btn:ForceImageSize(data.size[1], data.size[2])
+        end
         return btn 
     end
     function AddLine(inst,w,h,rot,data)
