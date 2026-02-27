@@ -291,6 +291,54 @@ GLOBAL.SoraCD = function(ti, real) -- 内置CD
     end
 end
 
+local function SoraCDExtMetaFn(self, ...)
+    local ct = self.get()
+    if (ct - self.t) > self.last then
+        self.last = ct
+        return true
+    end
+    return false
+end
+
+local SoraCDExtMeta = {
+    -- 检查并刷新CD
+    __call = function(self, ...)
+        return SoraCDExtMetaFn(self, ...)
+    end,
+    __index = {
+        -- 只检查CD 没有刷新CD的功能
+        HasCD = function(self)
+            local ct = self.get()
+            return (ct - self.t) > self.last
+        end,
+        -- 重置CD
+        Reset = function(self)
+            self.last = self.get()
+        end,
+        -- 获取剩余CD时间
+        GetCD = function(self)
+            local ct = self.get()
+            local cd = self.last - (ct - self.t)
+            return cd > 0 and cd or 0
+        end,
+        -- 修改CD时间
+        SetCD = function(self, newcd)
+            self.t = newcd
+        end
+    }
+
+}
+
+GLOBAL.SoraCDExt = function(ti, real) -- 内置CD
+    local class = {}
+    setmetatable(class, SoraCDExtMeta)
+    class.t = ti
+    class.last = -ti
+    class.get = real and GetTimeRealSeconds or GetTime
+
+    return class
+end
+
 function GLOBAL.SoraGetRandom(tb) -- 抽奖池
     -- 需要的结构
     --[[    {
@@ -1067,22 +1115,22 @@ function ExtDmg(source, target, num)
     end
     target.SoraExtDmg = (target.SoraExtDmg or 0) + num
     target.SoraExtDmgLast = t
-    --print(source, target, num, target.SoraExtDmg, target.SoraExtDmgLast)
+    -- print(source, target, num, target.SoraExtDmg, target.SoraExtDmgLast)
 end
 AddComponentPostInit("health", function(self)
     local oldDoDelta = self.DoDelta
     self.DoDelta = function(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
-        --print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
+        -- print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
         if amount and amount < -0.5 and s.inst.SoraExtDmg and s.inst.SoraExtDmg > 0 and afflicter and
             afflicter:HasTag("sora") then
             local t = GetTime()
             if (t - 10) > s.inst.SoraExtDmgLast then
                 s.inst.SoraExtDmg = 0
             end
-            if s.inst.SoraExtDmg > 0 then 
+            if s.inst.SoraExtDmg > 0 then
                 amount = amount - s.inst.SoraExtDmg
             end
-            --print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
+            -- print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
         end
         return oldDoDelta(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
     end

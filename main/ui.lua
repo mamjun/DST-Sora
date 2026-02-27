@@ -762,7 +762,7 @@ AddClassPostConstruct("widgets/redux/craftingmenu_details", function(self)
                 local fix = Config:Get("VisitURL", true)
                 local recipe = s.data and s.data.recipe
                 if recipe  and recipe.sora_show_wiki and recipe.product then 
-                    VisitURL("https://wiki.flapi.cn/rurl.php?mod=sora&id="..recipe.product, fix)
+                    VisitURL("https://wiki.flapi.cn/rurl.php?mod=sora&id="..recipe.product.."&rand="..math.random(), fix)
                 end
                 
             end, {

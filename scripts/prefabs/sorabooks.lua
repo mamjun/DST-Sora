@@ -401,6 +401,10 @@ local function trychange(inst)
     if not inst or inst:IsInLimbo() then
         return
     end
+    if inst.components.health and inst.components.health:IsDead() then
+        return
+    end
+
     local fix = nil
     -- PrintTable(inst,nil,2)
     if changelist[inst.prefab] then
