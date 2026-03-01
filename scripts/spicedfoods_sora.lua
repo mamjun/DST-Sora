@@ -165,5 +165,6 @@ function SoraRepairSpicedFood(food)
         end
     end
 end
-
+SoraAPI.SoraNoRepairSpicedFood = SoraNoRepairSpicedFood
+SoraAPI.SoraRepairSpicedFood = SoraRepairSpicedFood
 return newspicedfoods

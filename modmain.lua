@@ -28,11 +28,41 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
-]] GLOBAL.setmetatable(env, {
-    __index = function(t, k)
-        return GLOBAL.rawget(GLOBAL, k)
+]] if modname == "sora-dev" then
+    GLOABLcount = {}
+    GLOBAL.setmetatable(env, {
+        __index = function(t, k)
+            GLOABLcount[k] = (GLOABLcount[k] or 0) + 1
+            if GLOABLcount[k] > 99 and GLOABLcount[k] % 100 == 0 then
+                print( modname ,
+                    "访问全局变量过多，可能存在死循环或者频繁访问全局变量的情况，访问的变量名为" ..
+                        k)
+            end
+            return GLOBAL.rawget(GLOBAL, k)
+        end
+    })
+    GetGLOBAL = function(k)
+        local toprint = {}
+        for k, v in pairs(GLOABLcount) do
+            table.insert(toprint, {k, v})
+        end
+        table.sort(toprint, function(a, b)
+            return a[2] > b[2]
+        end)
+        print("全局变量访问统计：")
+        for _, v in ipairs(toprint) do
+            if v[2] > 3 then
+                print(v[1] .. "=" .. v[2])
+            end
+        end
     end
-})
+else
+    GLOBAL.setmetatable(env, {
+        __index = function(t, k)
+            return GLOBAL.rawget(GLOBAL, k)
+        end
+    })
+end
 
 modimport("main/init")
 -- prefab文件列表
@@ -40,12 +70,11 @@ PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "s
                "sora2sword", "sora3sword", "sora2ice", "sora2fire", "sora2plant", "soramagic", "sorapick",
                "sorahealing", "soratele", "sorabowknot", "sorabooks", "sorahealingstar", "soraprojectile", "sorameteor",
                "sora2buffer", "sora2prop", "sora2amulet", "sora2base", "sora2chest", "sora2tree", "sorafoods",
-                "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
-               "sora_nizao","sora_lock","sora_pickhat","sora2pokeball","sora_fx_feather"} --,""
-function  AddPreFile(str)
-    table.insert(PrefabFiles,str)
+               "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
+               "sora_nizao", "sora_lock", "sora_pickhat", "sora2pokeball", "sora_fx_feather"} -- ,""
+function AddPreFile(str)
+    table.insert(PrefabFiles, str)
 end
-
 
 AddPreFile("sora2birdchest")
 AddPreFile("sora3chest")

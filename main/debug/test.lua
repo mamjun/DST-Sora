@@ -4,18 +4,23 @@ function TestPrefab()
     local a = LeakTable()
     collectgarbage()
     local size = collectgarbage("count")
+    local t2 = os.clock()
     for k=1,1000 do 
-        local inst = SpawnPrefab("sora_item_fx")
-        inst:AddComponent("tradable")
-        inst:AddComponent("inventoryitem")
+        local inst = SpawnPrefab("log")
+        --inst:AddComponent("tradable")
+        --inst:AddComponent("inventoryitem")
+        --inst:AddComponent("health")
+        --inst:AddComponent("combat")
         a[inst] = 1
         inst:Remove()
     end
+    print("实体生成耗时",os.clock()-t2)
     local newsize = collectgarbage("count")
     print("申请" ,newsize-size)
     collectgarbage()
     print("收集" ,collectgarbage("count")-newsize)
     print("剩余",GetTableSize(a))
+    print("总耗时",os.clock()-t)
 end
 
 function TestPrefabOut()

@@ -78,6 +78,42 @@ end
 function mi(str)
     modimport("main/" .. str)
 end
+-- 高频全局变量本地化
+
+os = GLOBAL.os
+unpack = GLOBAL.unpack
+Ents = GLOBAL.Ents
+next = GLOBAL.next
+STRINGS = GLOBAL.STRINGS
+getmetatable = GLOBAL.getmetatable
+setmetatable = GLOBAL.setmetatable
+rawget = GLOBAL.rawget
+rawset = GLOBAL.rawset
+math = GLOBAL.math
+PREFAB_SKINS = GLOBAL.PREFAB_SKINS
+PREFAB_SKINS_IDS = GLOBAL.PREFAB_SKINS_IDS
+TUNING = GLOBAL.TUNING
+debug = GLOBAL.debug
+TheNet = GLOBAL.TheNet
+TheSim = GLOBAL.TheSim
+pairs = GLOBAL.pairs
+ipairs = GLOBAL.ipairs
+table = GLOBAL.table
+GetTimeRealSeconds = GLOBAL.GetTimeRealSeconds
+softresolvefilepath = GLOBAL.softresolvefilepath
+GetInventoryItemAtlas = GLOBAL.GetInventoryItemAtlas
+TECH = GLOBAL.TECH
+ACTIONS = GLOBAL.ACTIONS
+pcall = GLOBAL.pcall
+UserToPlayer = GLOBAL.UserToPlayer
+CONTROL_SECONDARY = GLOBAL.CONTROL_SECONDARY
+CONTROL_PRIMARY = GLOBAL.CONTROL_PRIMARY
+tonumber = GLOBAL.tonumber
+FindEntity = GLOBAL.FindEntity
+
+AddPrefabPostInit("world",function()
+    TheWorld = GLOBAL.TheWorld
+end)
 
 mi("baseapi")
 -- 查询代理
@@ -138,7 +174,7 @@ modimport("scripts/soraupdate/main")
 
 SoraAssets = {}
 
---Assets= { Asset("SOUNDPACKAGE", "sound/sora.fev"),
+-- Assets= { Asset("SOUNDPACKAGE", "sound/sora.fev"),
 --          Asset("SOUND", "sound/sora.fsb")}
 -- 添加角色
 AddModCharacter("sora", "FEMALE")

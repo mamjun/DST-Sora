@@ -815,7 +815,7 @@ local master_postinit = function(inst)
         end
     end)
     inst:ListenForEvent("healthdelta", function(inst, data)
-        if data and data.afflicter and data.afflicter:IsValid() and data.afflicter.components.health and
+        if data and data.amount < 0 and data.afflicter and data.afflicter:IsValid() and data.afflicter.components.health and
             not data.afflicter.components.health:IsDead() then
             local killer = data.afflicter.components.follower and data.afflicter.components.follower:GetLeader() or
                                data.afflicter:HasTag("player") and data.afflicter or nil

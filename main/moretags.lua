@@ -31,7 +31,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]] 
 local Tags = {}
 local Tags_hash = {}
+local select = select
 local key = modname .. "fixtag" -- 默认用modname 做key 防止冲突
+TAGSDEBUG = false -- 是否开启tag调试模式 开启后会记录所有未注册tag的添加和移除 以及访问次数 超过63个未注册tag会报警告
 if not TUNING.MoreTagsReg then 
     TUNING.MoreTagsReg = {}
 end

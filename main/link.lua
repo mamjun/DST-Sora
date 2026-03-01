@@ -323,9 +323,9 @@ if IsModEnable("Element Reaction") or IsModEnable("元素反应") then
         end
     end)
     if TheNet:GetIsServer() then
-        AddComponentPostInit("bundler", function(self)
-            local old = self.OnFinishBundling
-            self.OnFinishBundling = function(self, ...)
+        AddComponentHook("bundler", function(cmp)
+            local old = cmp.OnFinishBundling
+            cmp.OnFinishBundling = function(self, ...)
                 if self.wrappedprefab == "sora3packer" and self.bundlinginst and self.bundlinginst.components.container then
                     local items = {}
                     local t = true

@@ -1117,21 +1117,8 @@ function ExtDmg(source, target, num)
     target.SoraExtDmgLast = t
     -- print(source, target, num, target.SoraExtDmg, target.SoraExtDmgLast)
 end
-AddComponentPostInit("health", function(self)
-    local oldDoDelta = self.DoDelta
-    self.DoDelta = function(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
-        -- print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
-        if amount and amount < -0.5 and s.inst.SoraExtDmg and s.inst.SoraExtDmg > 0 and afflicter and
-            afflicter:HasTag("sora") then
-            local t = GetTime()
-            if (t - 10) > s.inst.SoraExtDmgLast then
-                s.inst.SoraExtDmg = 0
-            end
-            if s.inst.SoraExtDmg > 0 then
-                amount = amount - s.inst.SoraExtDmg
-            end
-            -- print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
-        end
-        return oldDoDelta(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
-    end
-end)
+--直接修改基类 不用每次修改实例 节省每次创建组件的性能开销
+function AddComponentHook(cmpname,fn)
+    local cmp = require("components/"..cmpname)
+    fn(cmp)
+end

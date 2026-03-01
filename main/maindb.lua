@@ -890,6 +890,7 @@ end
 local MaindbUpdataTask -- 自动同步用的周期任务
 local MainConnect = false
 local MainWait = 0
+local Shard_IsWorldAvailable = Shard_IsWorldAvailable
 local function MaindbUpdataFn()
 
     local MConnect = Shard_IsWorldAvailable(mid)

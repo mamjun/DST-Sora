@@ -73,7 +73,7 @@ AddSimPostInit(TryToFixAllRecipes)
 --     end)
 -- end)
 if TUNING.SORAFIXCONTAINER then
-    AddComponentPostInit("container", function(self, inst)
+    AddComponentHook("container", function(self, inst)
         local oldGiveItem = self.GiveItem
         function self.GiveItem(s, item, ...)
             -- 给与箱子无效物品
@@ -81,7 +81,7 @@ if TUNING.SORAFIXCONTAINER then
                 return false
             end
             -- 箱子放入自己
-            if item == self.inst then 
+            if item == s.inst then 
                 return false
             end
             -- 给与箱子在其他箱子的物品
@@ -96,7 +96,7 @@ if TUNING.SORAFIXCONTAINER then
         end
     end)
 else
-    AddComponentPostInit("container", function(self, inst)
+    AddComponentHook("container", function(self, inst)
         local oldGiveItem = self.GiveItem
         function self.GiveItem(s, item, ...)
             -- 给与箱子无效物品
@@ -105,7 +105,7 @@ else
                 return false
             end
             -- 箱子放入自己
-            if item == self.inst then 
+            if item == s.inst then 
                 assert(false,"触发容器崩溃:容纳自身\n请收集日志然后反馈")
                 return false
             end
@@ -134,7 +134,7 @@ if getsora("fixyzhou") then
     end
 end
 
-AddComponentPostInit("workable", function(self)
+AddComponentHook("workable", function(self)
     local oldWorkedBy_Internal = self.WorkedBy_Internal
     self.WorkedBy_Internal = function(s, ...)
         return (s.workleft or 0) > 0 and oldWorkedBy_Internal(s, ...) or true
@@ -201,10 +201,30 @@ cmp_rep.GetSpecificSlotForItem = function(self, item, ...)
     return GetSpecificSlotForItem(self, item, ...)
 end
 -- 继续干牛牛
+local function ShouldKeepCorpse()
+    return false
+end
 AddPrefabPostInit("babybeefalo", function(inst)
     if not inst.ShouldKeepCorpse then
-        inst.ShouldKeepCorpse = function()
-            return false
-        end
+        inst.ShouldKeepCorpse = ShouldKeepCorpse()
     end
 end)
+
+--别一次次算了 
+local oldGetServerModsNames = ModManager.GetServerModsNames
+local servermodsnamescache = nil
+ModManager.GetServerModsNames = function(self, ...)
+    if not servermodsnamescache then 
+        servermodsnamescache = oldGetServerModsNames(self, ...)
+    end
+    return servermodsnamescache
+end
+--别一次次算了 
+local GetModCache = {}
+local oldGetMod = ModManager.GetMod
+ModManager.GetMod = function(self, name,...)
+    if not GetModCache[name] then 
+        GetModCache[name] = oldGetMod(self, name,...)
+    end
+    return GetModCache[name]
+end

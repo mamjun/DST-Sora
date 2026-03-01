@@ -195,7 +195,7 @@ local function CheckNamePostInit(self)
     ThePlayer:DoTaskInTime(3,CheckYou)
     ThePlayer:DoTaskInTime(4,CheckMoGu)
     ThePlayer:DoTaskInTime(5,ConfigTip)
-    ThePlayer:DoTaskInTime(6,ConfigTip6)
+    --ThePlayer:DoTaskInTime(6,ConfigTip6)
 end
 AddClassPostConstruct("widgets/controls", CheckNamePostInit) 
 

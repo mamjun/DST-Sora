@@ -79,7 +79,7 @@ AddPrefabPostInit("world", function(inst)
 end)
 
 -- 交易组件相关（穹妹的升级/修复支持一次一组）
-AddComponentPostInit("trader", function(Trader)
+AddComponentHook("trader", function(Trader)
     local oldAcceptGift = Trader.AcceptGift
     function Trader:AcceptGift(giver, item, count)
         if self.inst:HasTag("soratrader") and item.components.stackable and count == nil then
@@ -97,20 +97,20 @@ AddComponentPostInit("trader", function(Trader)
 end)
 
 -- 烹饪经验
-AddComponentPostInit("cooker", function(cooker, inst)
+AddComponentHook("cooker", function(cooker, inst)
     local SoraOldCookItem = cooker.CookItem
-    cooker.CookItem = function(self, item, chef)
-        if self:CanCook(item, chef) and chef then
+    cooker.CookItem = function(s, item, chef)
+        if s:CanCook(item, chef) and chef then
             chef:PushEvent("cookitem", {
                 cookitem = item
             })
-            return SoraOldCookItem(self, item, chef)
+            return SoraOldCookItem(s, item, chef)
         end
     end
 end)
 
 -- 双倍收集蜂箱/蘑菇机
-AddComponentPostInit("harvestable", function(hav, inst)
+AddComponentHook("harvestable", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker)
         if self:CanBeHarvested() then
@@ -144,7 +144,7 @@ AddComponentPostInit("harvestable", function(hav, inst)
 end)
 
 -- 双倍肉干
-AddComponentPostInit("dryer", function(hav, inst)
+AddComponentHook("dryer", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker)
         if not self:IsDone() or picker == nil or picker.components.inventory == nil then
@@ -166,7 +166,7 @@ AddComponentPostInit("dryer", function(hav, inst)
 end)
 
 -- 双倍农作物
-AddComponentPostInit("crop", function(hav, inst)
+AddComponentHook("crop", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker, ...)
         if not picker then
@@ -220,7 +220,7 @@ end)
 
 -- 双倍烹饪锅
 local cooking = require("cooking")
-AddComponentPostInit("stewer", function(hav, inst)
+AddComponentHook("stewer", function(hav, inst)
     local SoraOldHarvest = hav.Harvest
     hav.Harvest = function(self, picker, ...)
         if not picker then
@@ -320,7 +320,7 @@ AddPlayerPostInit(function(inst)
         inst.AnimState:AddOverrideBuild("pockybuild")
     end
 end)
-AddComponentPostInit("playeractionpicker", function(self)
+AddComponentHook("playeractionpicker", function(self)
     local oldGetSceneActions = self.GetSceneActions
     self.GetSceneActions = function(s, useitem, right, ...)
         local x, y, z = oldGetSceneActions(s, useitem, right, ...)
@@ -840,7 +840,7 @@ AddPlayerPostInit(function(inst)
     end)
 end)
 
-AddComponentPostInit("wateryprotection", function(self)
+AddComponentHook("wateryprotection", function(self)
     bhook(self, "SpreadProtectionAtPoint", function(s, ...)
         if s.inst and s.inst.components.inventoryitem then
             local doer = s.inst.components.inventoryitem:GetGrandOwner()
@@ -859,7 +859,7 @@ end)
 --     end)
 -- end)
 
-AddComponentPostInit("farmplanttendable", function(self)
+AddComponentHook("farmplanttendable", function(self)
     bhook(self, "TendTo", function(s, doer, ...)
         if doer and doer.GetExp and doer:HasTag("sora") then
             doer:GetExp(5, "tendto", 30)
@@ -913,7 +913,7 @@ end)
 -- end
 -- end)
 
-AddComponentPostInit("wardrobe", function(self)
+AddComponentHook("wardrobe", function(self)
     local old = self.ApplySkins
     self.ApplySkins = function(s, doer, diff, ...)
         if doer and doer:HasTag("player") then
@@ -1037,7 +1037,7 @@ AddPlayerPostInit(function(inst)
     end)
 
 end)
-AddComponentPostInit("combat", function(self)
+AddComponentHook("combat", function(self)
     local oldGetAttacked = self.GetAttacked
     self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
         if (damage or 0) > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
@@ -1068,7 +1068,7 @@ AddComponentPostInit("combat", function(self)
         return x, y, z
     end
     local DoAttack = self.DoAttack
-    self.DoAttack = function(self, targ, weapon, ...)
+    self.DoAttack = function(s, targ, weapon, ...)
         if weapon and weapon:HasTag("sora_tqy") then
 
             if weapon.delayowner == targ then
@@ -1077,7 +1077,7 @@ AddComponentPostInit("combat", function(self)
             if not targ.sora_tqyattackcd then
                 targ.sora_tqyattackcd = LeakTable()
             end
-            local doer = self.inst
+            local doer = s.inst
             if not targ.sora_tqyattackcd[doer] then
                 targ.sora_tqyattackcd[doer] = SoraCD(0.1)
             end
@@ -1085,7 +1085,7 @@ AddComponentPostInit("combat", function(self)
                 return
             end
         end
-        return DoAttack(self, targ, weapon, ...)
+        return DoAttack(s, targ, weapon, ...)
     end
 end)
 AddPrefabPostInit("sora", function(inst)
@@ -1127,7 +1127,7 @@ AddPrefabPostInit("sora", function(inst)
         OnNewSpawn(item, skins)
     end
 end)
-AddComponentPostInit("locomotor", function(self)
+AddComponentHook("locomotor", function(self)
     local oldGoToEntity = self.GoToEntity
     self.GoToEntity = function(s, target, ...)
         if target and target.components.sorafollewer then
@@ -1163,8 +1163,8 @@ end)
 -- userdata.Hook(inst,hook1)
 -- end)
 
-AddComponentPostInit("thief", function(i)
-    local StealItem = i.StealItem
+AddComponentHook("thief", function(i)
+    local StealItem = i.StealItem   
     i.StealItem = function(s, vim, ...)
         if vim and (vim.components.soracontainlock or vim:HasTag("nosteal")) then
             return false
@@ -1182,7 +1182,7 @@ local fixlunarthrall = function(self, target)
     return false
 end
 
-AddComponentPostInit("lunarthrall_plantspawner", function(i)
+AddComponentHook("lunarthrall_plantspawner", function(i)
     local SpawnGestalt = i.SpawnGestalt
     i.SpawnGestalt = function(s, target, ...)
         if fixlunarthrall(s, target) then
@@ -1239,7 +1239,7 @@ end
 --     end
 -- end)
 
-AddComponentPostInit("freezable", function(self)
+AddComponentHook("freezable", function(self)
     for k, v in pairs({"AddColdness", "Freeze"}) do
         local old = self[v]
         self[v] = function(s, ...)
@@ -1253,7 +1253,7 @@ AddComponentPostInit("freezable", function(self)
     end
 end)
 
-AddComponentPostInit("grogginess", function(self)
+AddComponentHook("grogginess", function(self)
     for k, v in pairs({"AddGrogginess", "GoToSleep"}) do
         local old = self[v]
         self[v] = function(s, ...)
@@ -1310,7 +1310,7 @@ AddClassPostConstruct("screens/playerhud", function(self)
     end
 end)
 
-AddComponentPostInit("inventory", function(self)
+AddComponentHook("inventory", function(self)
     local CloseAllChestContainers = self.CloseAllChestContainers
     function self.CloseAllChestContainers(s, ...)
         if s:EquipHasTag("soraspellbook") then
@@ -1863,7 +1863,7 @@ AddComponentPostInit("farming_manager", function(self)
 
 end)
 
-AddComponentPostInit("planarentity", function(self)
+AddComponentHook("planarentity", function(self)
     local oldAbsorbDamage = self.AbsorbDamage
     self.AbsorbDamage = function(self, damage, attacker, weapon, spdmg, ...)
         if weapon and weapon:HasTag("soraplanareweapon") then
@@ -1933,23 +1933,23 @@ AddComponentPostInit("playercontroller", function(self)
     -- end)
 end)
 local scaleping = nil
-AddComponentPostInit("reticule", function(self)
+AddComponentHook("reticule", function(self)
     local oldCreateReticule = self.CreateReticule
     self.CreateReticule = function(s, ...)
         local x, y, z = oldCreateReticule(s, ...)
-        if self.reticule and self.sorareticulescale and self.reticule.AnimState then
-            self.reticule.AnimState:SetScale(self.sorareticulescale, self.sorareticulescale, self.sorareticulescale)
+        if s.reticule and s.sorareticulescale and s.reticule.AnimState then
+            s.reticule.AnimState:SetScale(s.sorareticulescale, s.sorareticulescale, s.sorareticulescale)
         end
         return x, y, z
     end
     local oldPingReticuleAt = self.PingReticuleAt
     self.PingReticuleAt = function(s, ...)
 
-        if self.sorareticulescale then
-            scaleping = self.sorareticulescale
+        if s .sorareticulescale then
+            scaleping = s.sorareticulescale
         end
         local x, y, z = oldPingReticuleAt(s, ...)
-        if self.sorareticulescale then
+        if s.sorareticulescale then
             scaleping = nil
         end
         return x, y, z
@@ -2031,7 +2031,7 @@ end)
 --     end
 -- end)
 -- 重定向装备到点击取出
-AddComponentPostInit("inventory", function(self)
+AddComponentHook("inventory", function(self)
     local oldEquip = self.Equip
     self.Equip = function(s, item, ...)
         if item and item.components.inventoryitem and item.components.inventoryitem.owner then
@@ -2039,11 +2039,31 @@ AddComponentPostInit("inventory", function(self)
                 local owner = item.components.inventoryitem.owner
                 local slot = owner.components.container:GetItemSlot(item)
                 if slot then
-                    owner.components.soralistcontainer:GetOne(self.inst, slot)
+                    owner.components.soralistcontainer:GetOne(s.inst, slot)
                     return
                 end
             end
         end
         return oldEquip(s, item, ...)
+    end
+end)
+
+
+AddComponentHook("health", function(self)
+    local oldDoDelta = self.DoDelta
+    self.DoDelta = function(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
+        -- print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
+        if amount and amount < -0.5 and s.inst.SoraExtDmg and s.inst.SoraExtDmg > 0 and afflicter and
+            afflicter:HasTag("sora") then
+            local t = GetTime()
+            if (t - 10) > s.inst.SoraExtDmgLast then
+                s.inst.SoraExtDmg = 0
+            end
+            if s.inst.SoraExtDmg > 0 then
+                amount = amount - s.inst.SoraExtDmg
+            end
+             --print(s.inst, amount,afflicter,s.inst.SoraExtDmg)
+        end
+        return oldDoDelta(s, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
     end
 end)
