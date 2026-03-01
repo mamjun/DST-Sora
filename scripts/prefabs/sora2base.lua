@@ -147,8 +147,9 @@ local function IceStaffUpdateTask()
     end
     ThreadCheckPoint()
     toprotect = {}
+    local protect_to_time =GetTime() + 5 
     for v, k in pairs(SoraAPI.AllWitherable) do
-        if v.components.witherable and ((v.components.witherable.protect_to_time or 0) < 5) and not v:IsAsleep() then
+        if v.components.witherable and ((v.components.witherable.protect_to_time or 0) < protect_to_time) and not v:IsAsleep() then
             toprotect[v] = 1
         end
     end

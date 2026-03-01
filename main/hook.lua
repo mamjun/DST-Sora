@@ -1401,7 +1401,7 @@ ModManager.RegisterPrefabs = function(self)
 end
 
 IsTradeIteming = false
-AddClassPostConstruct("widgets/invslot", function(self)
+AddClassHook("widgets/invslot", function(self)
     local old = self.TradeItem
     self.TradeItem = function(...)
         IsTradeIteming = true
@@ -1963,7 +1963,7 @@ AddPrefabPostInit("reticuleaoeping_1_6", function(inst)
 end)
 
 local TradeItemTemp
-AddClassPostConstruct("widgets/invslot", function(inst)
+AddClassHook("widgets/invslot", function(inst)
     local oldTradeItem = inst.TradeItem
     inst.TradeItem = function(s, ...)
         TradeItemTemp = {}

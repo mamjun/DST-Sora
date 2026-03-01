@@ -81,7 +81,7 @@ if TUNING.SORAFIXCONTAINER then
                 return false
             end
             -- 箱子放入自己
-            if item == s.inst then 
+            if item == s.inst then
                 return false
             end
             -- 给与箱子在其他箱子的物品
@@ -91,7 +91,7 @@ if TUNING.SORAFIXCONTAINER then
                     owner.components.container:RemoveItem(item, true, true, true)
                 end
             end
-            
+
             return oldGiveItem(s, item, ...)
         end
     end)
@@ -101,17 +101,17 @@ else
         function self.GiveItem(s, item, ...)
             -- 给与箱子无效物品
             if not (item and item:IsValid()) then
-                assert(false,"触发容器崩溃:物品无效\n请收集日志然后反馈")
+                assert(false, "触发容器崩溃:物品无效\n请收集日志然后反馈")
                 return false
             end
             -- 箱子放入自己
-            if item == s.inst then 
-                assert(false,"触发容器崩溃:容纳自身\n请收集日志然后反馈")
+            if item == s.inst then
+                assert(false, "触发容器崩溃:容纳自身\n请收集日志然后反馈")
                 return false
             end
             -- 给与箱子在其他箱子的物品
             if item.components.inventoryitem then
-                assert(false,"触发容器崩溃:多重归属\n请收集日志然后反馈")
+                assert(false, "触发容器崩溃:多重归属\n请收集日志然后反馈")
                 local owner = item.components.inventoryitem.owner
                 if owner and owner.components.container then
                     owner.components.container:RemoveItem(item, true, true, true)
@@ -210,21 +210,59 @@ AddPrefabPostInit("babybeefalo", function(inst)
     end
 end)
 
---别一次次算了 
+-- 别一次次算了 
 local oldGetServerModsNames = ModManager.GetServerModsNames
 local servermodsnamescache = nil
 ModManager.GetServerModsNames = function(self, ...)
-    if not servermodsnamescache then 
+    if not servermodsnamescache then
         servermodsnamescache = oldGetServerModsNames(self, ...)
     end
     return servermodsnamescache
 end
---别一次次算了 
+-- 别一次次算了 
 local GetModCache = {}
 local oldGetMod = ModManager.GetMod
-ModManager.GetMod = function(self, name,...)
-    if not GetModCache[name] then 
-        GetModCache[name] = oldGetMod(self, name,...)
+ModManager.GetMod = function(self, name, ...)
+    if not GetModCache[name] then
+        GetModCache[name] = oldGetMod(self, name, ...)
     end
     return GetModCache[name]
+end
+
+local GetModCache = {}
+local GetPostInitFns = ModManager.GetPostInitFns
+ModManager.GetPostInitFns = function(self, type, id, ...)
+    if not GetModCache[type] then
+        if id then
+            GetModCache[type] = {}
+        else
+            GetModCache[type] = GetPostInitFns(self, type, id, ...)
+        end
+    end
+    if id then
+        if not GetModCache[type][id] then
+            GetModCache[type][id] = GetPostInitFns(self, type, id, ...)
+        end
+        return GetModCache[type][id]
+    end
+    return GetModCache[type]
+end
+
+local GetModCache = {}
+local GetPostInitData = ModManager.GetPostInitData
+ModManager.GetPostInitData = function(self, type, id, ...)
+    if not GetModCache[type] then
+        if id then
+            GetModCache[type] = {}
+        else
+            GetModCache[type] = GetPostInitData(self, type, id, ...)
+        end
+    end
+    if id then
+        if not GetModCache[type][id] then
+            GetModCache[type][id] = GetPostInitData(self, type, id, ...)
+        end
+        return GetModCache[type][id]
+    end
+    return GetModCache[type]
 end

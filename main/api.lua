@@ -1122,3 +1122,9 @@ function AddComponentHook(cmpname,fn)
     local cmp = require("components/"..cmpname)
     fn(cmp)
 end
+--直接修改基类 不用每次修改实例 节省每次创建组件的性能开销
+function AddClassHook(classname, fn)
+    local classdef = require(classname)
+    assert(type(classdef) == "table", "Class file path '"..classname.."' doesn't seem to return a valid class.")
+    fn(classdef)
+end 
