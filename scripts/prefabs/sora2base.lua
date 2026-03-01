@@ -130,6 +130,12 @@ local function IceStaffUpdateTask()
     --print("冰杖保护数量", GetTableSize(toprotect))
     ThreadCheckPoint()
     local count = 0
+    local tocheck = {}
+    for k,v in pairs (IceStaffUpdate) do 
+        if k:IsValid() then
+            tocheck[k] = 1
+        end
+    end
     for v, k in pairs(toprotect) do
         if v:IsValid() and not v:HasTag("campfire") and not black[v.prefab] then
             count = count + 1
@@ -137,7 +143,7 @@ local function IceStaffUpdateTask()
                 count = 0
                 ThreadCheckPoint()
             end
-            for ii, _ in pairs(IceStaffUpdate) do
+            for ii, _ in pairs(tocheck) do
                 if v:GetDistanceSqToInst(ii) < 14400 then
                     v.components.burnable:Extinguish()
                     break
@@ -155,6 +161,13 @@ local function IceStaffUpdateTask()
     end
     --print("冰杖保护数量2", GetTableSize(toprotect))
     ThreadCheckPoint()
+    tocheck = {}
+    for k,v in pairs (IceStaffUpdate) do 
+        if k:IsValid() then
+            tocheck[k] = 1
+        end
+    end
+
     for v, k in pairs(toprotect) do
         if v:IsValid() then
             count = count + 1
@@ -170,6 +183,7 @@ local function IceStaffUpdateTask()
             end
         end
     end
+    tocheck = {} 
     IceStaffUpdate = SoraAPI.LeakTable()
 end
 local stafftask = {
