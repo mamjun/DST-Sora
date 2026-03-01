@@ -175,7 +175,7 @@ local function IceStaffUpdateTask()
                 count = 0
                 ThreadCheckPoint()
             end
-            for ii, _ in pairs(IceStaffUpdate) do
+            for ii, _ in pairs( tocheck) do
                 if v:GetDistanceSqToInst(ii) < 14400 then
                     v.components.witherable:Protect(60)
                     break
