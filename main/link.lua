@@ -232,7 +232,6 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
             DRESSUP_DATA_LEGION[k] = v
         end
 
-   
     end)
     if TheNet:GetIsServer() then
         local fixdish_farewellcupcake = function(inst)
@@ -526,3 +525,50 @@ AddLaterFn(function()
         AddActionQueuerAction("allclick", "SORAREPAIR", true)
     end
 end)
+
+SoraGiftCode = {
+    print = print,
+    lucky_goldnugget = function(inst, packer, args)
+        if inst and args and args[1] then
+            local num = tonumber(args[1]) or 10
+            inst.lucky_goldnugget_task = inst:DoPeriodicTask(0.1, function()
+                if inst and inst.components.health and not IsEntityDeadOrGhost(inst) then
+                    num = num - 1
+                    local item = SpawnAt("lucky_goldnugget", inst:GetPosition() + Point(0, 10, 0))
+                    item.lastpos = item:GetPosition()
+                    item.lastposfn = item:DoPeriodicTask(0.1, function()
+                        local pos = item.lastpos - item:GetPosition()
+                        if pos and pos:LengthSq() < 0.01 then -- 不动了就停
+                            item.lastposfn:Cancel()
+                        end
+                        item.lastpos = item:GetPosition()
+                        local instpos = inst:GetPosition()
+                        if math.abs(instpos.x-item.lastpos.x) < 0.3 and math.abs(instpos.y-item.lastpos.y) < 0.8  and math.abs(instpos.z-item.lastpos.z) < 0.3  then
+                            if inst.components.talker then
+                                inst.components.talker:Say("啊！金元宝！")
+                            end
+                            if inst.components.health and inst.components.health:IsInvincible() then
+                                inst.components.health:SetInvincible(false)
+                                item:Remove()
+                            end
+                            if inst.components.combat and not IsEntityDeadOrGhost(inst) then
+                                item.lastposfn:Cancel()
+                                inst.components.combat:GetAttacked(item, 30, nil, "goldnugget")
+                            end
+                        end
+                    end)
+                end
+                if num <= 0 then
+                    inst.lucky_goldnugget_task:Cancel()
+                    return true
+                end
+            end)
+        end
+    end
+
+}
+
+TESTFN = function()
+    local inst = ThePlayer
+    SoraGiftCode.lucky_goldnugget(inst, nil, {1000})
+end

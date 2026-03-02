@@ -65,7 +65,7 @@ local function Cure(inst)
     if inst:IsAsleep() then return end
     if inst:IsInLimbo() then return end
     for k,v in pairs(AllPlayers) do 
-        if v and v:IsValid() and v:HasTag("player") and not v.components.health:IsDead() and v:GetDistanceSqToInst(inst) < 225 then 
+        if v and v:IsValid() and v:HasTag("player") and not IsEntityDeadOrGhost(v) and v:GetDistanceSqToInst(inst) < 225 then 
             if not v.shouban_curecd then 
                 v.shouban_curecd= SoraCD(5)
             end

@@ -589,7 +589,7 @@ local ShowHook = userdata.MakeHook("AnimState", "Show", function(inst, symbol)
     else
         return false
     end
-end)
+end,90)
 local HideHook = userdata.MakeHook("AnimState", "Hide", function(inst, symbol)
     inst.SoraLayerShown[symbol] = false
     if inst.SoraLockLayerShown[symbol] then
@@ -597,7 +597,7 @@ local HideHook = userdata.MakeHook("AnimState", "Hide", function(inst, symbol)
     else
         return false
     end
-end)
+end,90)
 
 local ShowSymbolHook = userdata.MakeHook("AnimState", "ShowSymbol", function(inst, symbol)
     inst.SoraSymbolShown[symbol] = true
@@ -606,7 +606,7 @@ local ShowSymbolHook = userdata.MakeHook("AnimState", "ShowSymbol", function(ins
     else
         return false
     end
-end)
+end,90)
 
 local HideSymbolHook = userdata.MakeHook("AnimState", "HideSymbol", function(inst, symbol)
     inst.SoraSymbolShown[symbol] = false
@@ -615,7 +615,7 @@ local HideSymbolHook = userdata.MakeHook("AnimState", "HideSymbol", function(ins
     else
         return false
     end
-end)
+end,90)
 
 local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol", function(inst, symbol, build, newsymbol)
     if not inst.SoraLastSymbols[symbol] then
@@ -628,7 +628,7 @@ local OverrideSymbolHook = userdata.MakeHook("AnimState", "OverrideSymbol", func
     else
         return false
     end
-end)
+end,90)
 local ClearOverrideSymbolHook = userdata.MakeHook("AnimState", "ClearOverrideSymbol", function(inst, symbol)
     if inst.SoraLastSymbols[symbol] then
         inst.SoraLastSymbols[symbol] = nil
@@ -638,7 +638,7 @@ local ClearOverrideSymbolHook = userdata.MakeHook("AnimState", "ClearOverrideSym
     else
         return false
     end
-end)
+end,90)
 local function SoraLockSymbol(inst, symbol, key, build, newsymbol)
     if not inst.SoraLockSymbols then
         return false

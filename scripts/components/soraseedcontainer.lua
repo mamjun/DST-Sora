@@ -156,7 +156,7 @@ function c:GetSeeds(name)
 end
 function c:HandleGetSeeds(player, name)
     local db = self:GetDB()
-    if player and player.components.health and not player.components.health:IsDead() and type(name) == "string" then
+    if player and IsEntityDeadOrGhost(player) and type(name) == "string" then
         local num = db:Get("seeds", name, 0)
 
         if num > 0 then
@@ -179,7 +179,7 @@ local function TestSeeds(inst)
 end
 function c:HandleCollectAllSeeds(player)
     local db = self:GetDB()
-    if player and player.components.health and not player.components.health:IsDead() then
+    if player and player.components.health and not player:HasTag("playerghost") then
         local all = {}
         local ents = player.components.inventory:FindItems(TestSeeds)
         for k, v in pairs(ents or {}) do
