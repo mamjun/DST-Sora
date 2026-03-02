@@ -174,9 +174,9 @@ local function ConfigTip6()
         if ((tonumber(save) or 0 )< os.time())then
            (ThePlayer or TheWorld):DoTaskInTime(1,function()
                 if not HasHttpOK() and ThePlayer and ThePlayer:HasTag("sora") then
-            SoraPushPopupDialog("小穹的温馨提示","由于klei的更新，模组已经默认无法联网\n导致在线时长无法累计\n请按照提示进行操作\n如果已进行修复,仍然看到此提示\n请尝试重新运行修复", {"查看提示", "我已了解"},function() 
+                    SoraPushPopupDialog("小穹的温馨提示","由于klei的更新，模组已经默认无法联网\n导致在线时长无法累计\n请按照提示进行操作\n如果已进行修复,仍然看到此提示\n请尝试重新运行修复", {"查看提示", "我已了解"},{function() 
                 VisitURL("http://wiki.flapi.cn/n", false)
-            end)
+            end,nil})
                    Config:Set("ConfigTipConnect",os.time()+4*3600)
                 end
             end)
