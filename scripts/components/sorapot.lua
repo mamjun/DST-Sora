@@ -215,7 +215,6 @@ function com:UpdateSubSoraPot(k, data)
     if not self.cookslot.pot[k] and self.cookslot.spice[k] then
         return
     end
-    --print("刷新配方",k,data)
     -- 刷新缓存区
     if not data[4] then
         data[4] = {
@@ -258,7 +257,6 @@ function com:UpdateSubSoraPot(k, data)
             d.outitems[ik] = nil
         end
     end
-    print("检测物品是否有变化",needrepot)
     -- 有变化 刷新配方
     if needrepot then
         -- 刷新配方了 重计燃料和时间
@@ -718,7 +716,6 @@ function com:GetSoraPotRec(slots)
     local topr = {}
     ings.names.sora_pot_need = 0
     for k, v in pairs(sorafoods) do
-        -- print(v.name,v.test,fastdump(ings),fastdump(data))
         v.SetSoraExtData(data)
         if v.priority >= topp and v.test(self.inst.prefab, ings.names, ings.tags, data) then
             if v.priority > topp then
@@ -740,7 +737,7 @@ function com:GetSoraPotRec(slots)
         if rec.speuse then
             use = rec.speuse(data, data.items, alluse)
         end
-        -- print( rec, rec.alluse and alluse or use)
+
         return rec, rec.alluse and alluse or use
     end
     return nil
@@ -765,13 +762,11 @@ function com:GetPotRec(slots)
         return nil
     end
     local recname = cooking.CalculateRecipe("portablecookpot", data.prefablist)
-    -- print(recname,fastdump(data))
     if recname then
         if recname:match("wetgoop") then
             return nil
         end
         local rec = cooking.GetRecipe("portablecookpot", recname)
-        -- print(fastdump(rec))
         return rec
     end
     return nil
