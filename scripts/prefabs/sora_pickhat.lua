@@ -41,7 +41,7 @@ end
 local function turnoff(inst, owner)
     if inst.components.container ~= nil and not inst.notdrop then
         inst.components.container:Close(owner)
-        if (owner.components.health and IsEntityDeadOrGhost(owner) ) then
+        if (owner.components.health and not IsEntityDeadOrGhost(owner) ) then
             local items = inst.components.container:RemoveAllItems()
             for k, item in pairs(items) do
                 owner.components.inventory:GiveItem(item, nil, owner:GetPosition())

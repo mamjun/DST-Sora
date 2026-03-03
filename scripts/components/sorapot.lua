@@ -139,7 +139,13 @@ function com:GetDoer()
             owner = openers[1]
         end
     end
+    if owner then 
+        self.lastowner = owner
+    end
     if not owner then
+        if self.lastowner and self.lastowner:IsValid() and not IsEntityDeadOrGhost(self.lastowner) then
+            return self.lastowner
+        end
         return
     end
     return owner
@@ -209,6 +215,7 @@ function com:UpdateSubSoraPot(k, data)
     if not self.cookslot.pot[k] and self.cookslot.spice[k] then
         return
     end
+    --print("刷新配方",k,data)
     -- 刷新缓存区
     if not data[4] then
         data[4] = {
@@ -229,7 +236,7 @@ function com:UpdateSubSoraPot(k, data)
     local needrepot = self.nextrepot or  false
     self.nextrepot = false
     -- 检测物品是否有变化
-
+    
     for ik, slot in pairs(data[1]) do
         local item = self.con:GetItemInSlot(slot)
         if item and item.prefab ~= d.items[ik] then
@@ -251,7 +258,7 @@ function com:UpdateSubSoraPot(k, data)
             d.outitems[ik] = nil
         end
     end
-
+    print("检测物品是否有变化",needrepot)
     -- 有变化 刷新配方
     if needrepot then
         -- 刷新配方了 重计燃料和时间

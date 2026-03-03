@@ -156,7 +156,7 @@ function c:GetSeeds(name)
 end
 function c:HandleGetSeeds(player, name)
     local db = self:GetDB()
-    if player and IsEntityDeadOrGhost(player) and type(name) == "string" then
+    if player and not IsEntityDeadOrGhost(player) and type(name) == "string" then
         local num = db:Get("seeds", name, 0)
 
         if num > 0 then
