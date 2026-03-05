@@ -34,6 +34,8 @@ GLOBAL.SoraUp = up
 -- 注册全局API
 GLOBAL.SoraAPI = env
 GLOBAL.SORAAPI = env
+SORAAPI = env
+SoraAPI = env
 json = require("utils/jsonfl")
 
 userdata = require("utils/sorauserdatahook")
@@ -1117,14 +1119,101 @@ function ExtDmg(source, target, num)
     target.SoraExtDmgLast = t
     -- print(source, target, num, target.SoraExtDmg, target.SoraExtDmgLast)
 end
---直接修改基类 不用每次修改实例 节省每次创建组件的性能开销
-function AddComponentHook(cmpname,fn)
-    local cmp = require("components/"..cmpname)
+-- 直接修改基类 不用每次修改实例 节省每次创建组件的性能开销
+function AddComponentHook(cmpname, fn)
+    local cmp = require("components/" .. cmpname)
     fn(cmp)
 end
---直接修改基类 不用每次修改实例 节省每次创建组件的性能开销
+-- 直接修改基类 不用每次修改实例 节省每次创建组件的性能开销
 function AddClassHook(classname, fn)
     local classdef = require(classname)
-    assert(type(classdef) == "table", "Class file path '"..classname.."' doesn't seem to return a valid class.")
+    assert(type(classdef) == "table", "Class file path '" .. classname .. "' doesn't seem to return a valid class.")
     fn(classdef)
-end 
+end
+local GetTableSize =GetTableSize
+local function  tojsonstring(str)
+    local s = string.gsub(tostring(str), '"', '\\"')
+    s= string.gsub(s, "\n", "\\n")
+    return s
+end
+local function putline(f, level, str,noline)
+    f:write(string.rep("\t", level) .. tostring(str) .. (noline and "" or "\n"))
+end
+local function _PutFn(f, fn, level)
+    level = level + 1
+    local info = debug.getinfo(fn)
+    for k, v in pairs(info) do
+        putline(f, level, '"' .. tojsonstring(k) .. '" : "' .. tojsonstring(v) .. '",')
+    end
+    putline(f, level, "},")
+end
+
+local function _PutTable(f, table, level)
+    level = level + 1
+    -- 格式化逻辑 
+    local k, v = next(table)
+    if not k then
+        --空表由外层处理
+        putline(f, level, "{},")
+        return
+    end
+    local count = 0
+    local isarray = true
+    -- 折叠小数组
+    for k, v in pairs(table) do
+        if type(k) ~= "number" then
+            isarray = false
+            break
+        end
+        count = count + 1
+        if count > 20 then
+            isarray = false
+            break
+        end
+        if type(v) == "table" then
+            isarray = false
+            break
+        end
+        if type(v) == "function" then
+            isarray = false
+            break
+        end
+        if type(v) == "userdata" then
+            isarray = false
+            break
+        end
+    end
+    if isarray then
+        local toput = "["
+        for k, v in pairs(table) do
+            toput = toput .. '"' .. tojsonstring(v) .. '",'
+        end
+        toput = toput .. "],"
+        putline(f, level, toput)
+        return
+    end
+    putline(f, level-1, "{",false)
+    -- 大数组或者map直接展开
+    for k, v in pairs(table) do
+        if type(v) == "table" then
+            if v.is_a then
+                putline(f, level, '"Class ' .. tojsonstring(k) .. '" : "' .. tojsonstring(v) .. '",')
+            else
+                putline(f, level, '"' .. tojsonstring(k) .. '" :')
+                _PutTable(f, v, level)
+            end
+        elseif type(v) == "function" then
+            putline(f, level, '"func_' .. tojsonstring(k) .. '" :{')
+            _PutFn(f, v, level)
+        else
+            putline(f, level, '"' .. tojsonstring(k) .. '" : "' .. tojsonstring(v) .. '",')
+        end
+    end
+    putline(f, level-1, level == 1 and "}" or "},",false)
+end
+function PutTable(table, name)
+    local path = "unsafedata/tbl_" .. tostring(name or os.time()) .. ".txt"
+    local f = io.open(path, "w")
+    _PutTable(f, table, 0)
+    f:close()
+end

@@ -39,3 +39,35 @@ end
 --[[
 LM = {__mode="k"} GC=collectgarbage function LT(t) local t={} setmetatable(t,LM) return t end function TP() local t=os.clock() local a=LT() GC() local s = GC("count") for k=1,1000 do local inst = SpawnPrefab("log") a[inst] = 1 inst:Remove() end local n = GC("count") print("申请" ,n-s) GC() print("收集" ,GC("count")-n) print("剩余",GetTableSize(a)) end function TPO() GC() local s=GC("count") TP() GC() print("总剩余",GC("count")-s) end TPO()
 ]]
+
+
+function TestCook()
+    local cooking = require("cooking")
+    local all = {}
+    for k,v in pairs(cooking.ingredients) do
+        table.insert(all, k)
+    end
+    local num = GetTableSize(all)
+    local pos = ThePlayer:GetPosition()
+    local light = nil
+    for i=1,num do 
+        if i % 50 == 1 then 
+            light = SpawnAt("sora_light",pos+Point(math.floor(i/50),0,0))
+            light.components.container:GiveItem(SpawnPrefab("bluegem"),155)
+        end
+        local prefab = all[i]
+        local inst = SpawnPrefab(prefab)
+        if inst then 
+            if inst.components.inventoryitem then 
+                light.components.container:GiveItem(inst)
+                if inst.components.stackable then 
+                    inst.components.stackable:SetStackSize(999)
+                end
+            else
+                inst:Remove()
+            end
+        end
+    end
+end
+
+

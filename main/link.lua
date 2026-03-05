@@ -535,6 +535,7 @@ SoraGiftCode = {
                 if inst and inst.components.health and not IsEntityDeadOrGhost(inst) then
                     num = num - 1
                     local item = SpawnAt("lucky_goldnugget", inst:GetPosition() + Point(0, 10, 0))
+                    item.sorapickhatskip = GetTime()
                     item.lastpos = item:GetPosition()
                     item.lastposfn = item:DoPeriodicTask(0.1, function()
                         local pos = item.lastpos - item:GetPosition()

@@ -156,7 +156,9 @@ function com:GetItem()
                 for k, v in pairs(toget) do
                     allitem[k] = (allitem[k] or 0) + v
                 end
+                --self.inst.ignoreoverstacked = true
                 self.inst.components.container:RemoveItem(item, true,true,true)
+                --self.inst.ignoreoverstacked = true
                 item:Remove()
                 has = true
             end

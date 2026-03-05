@@ -37,7 +37,7 @@ function photo_all(range)
     if sq > 2000 then
         sq = nil
     end
-    local all = 0 
+    local all = 0
     local pos = GetTileCenter(ThePlayer:GetPosition())
 
     for k, v in pairs(Ents) do
@@ -48,18 +48,19 @@ function photo_all(range)
                 if math.abs(dis.x) < sq and math.abs(dis.z) < sq then
                     if pri.TestPhoto(v) then
                         pri.ToPhoto(v)
-                        all = all+1
+                        all = all + 1
                     end
                 end
             else
                 if pri.TestPhoto(v) then
                     pri.ToPhoto(v)
-                    all = all+1
+                    all = all + 1
                 end
             end
         end
     end
-    Say(ThePlayer, "总共" .. all .. "个" .. (range and "（" .. range .. "格内）" or "") .. "实体被转换成留影了")
+    Say(ThePlayer,
+        "总共" .. all .. "个" .. (range and "（" .. range .. "格内）" or "") .. "实体被转换成留影了")
 end
 
 function pri.TestPhoto(inst)
@@ -108,3 +109,32 @@ function pri.ToPhoto(inst)
         inst:Remove()
     end
 end
+
+local function CanBlueprintRandomRecipe(recipe)
+    if recipe.nounlock or recipe.builder_tag ~= nil then
+        -- Exclude crafting station and character specific
+        return false
+    end
+    local hastech = false
+    for k, v in pairs(recipe.level) do
+        if v >= 10 then
+            -- Exclude TECH.LOST
+            return false
+        elseif v > 0 then
+            hastech = true
+        end
+    end
+    -- Exclude TECH.NONE
+    return hastech
+end
+local IsRecipeValid = IsRecipeValid
+function CheckUnValidBluePrint()
+    for k, v in pairs(AllRecipes) do
+        if IsRecipeValid(v.name) and CanBlueprintRandomRecipe(v) then
+            if not STRINGS.NAMES[string.upper(v.name)] then
+                print("蓝图缺失名称：" .. v.name)
+            end
+        end
+    end
+end
+

@@ -118,7 +118,8 @@ local function IceStaffUpdateTask()
     local black = {
         laozi_sp = 1,
         book_myth = 1,
-        leif_idol = 1
+        leif_idol = 1,
+        floatinglanternfire = 1
     }
     -- 快速检查一下所有着火的东西，记录一下 下一帧处理
     local toprotect = {}
