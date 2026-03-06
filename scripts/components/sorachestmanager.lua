@@ -365,10 +365,27 @@ local function TryPutToContainer(chest, ents, container, fn)
         i[k.prefab] = 1
     end
     con.soragiving = true
+    
     for k, v in pairs(ents) do
         local over = false
-        while catch(k) and i[k.prefab] <= #container and not over and (not fn or fn and fn(chest, k)) do
+        --print("try put1",catch(k) ,not ( fn and not fn(chest, k)), fastdump(container) , fn)
+        if catch(k) and not ( fn and not fn(chest, k)) then 
             local item = con:GetItemInSlot(container[i[k.prefab]])
+            local findnil = nil
+            if not CanStack(item, k) then    --不能堆就重新选位置
+
+                for ii=1,#container do 
+                    local it = con:GetItemInSlot(container[ii])
+                    if CanStack(it,k) then 
+                        item = it 
+                        i[k.prefab]  = ii   --可以堆叠就堆到这儿
+                        break
+                    end
+                    if not it and not findnil then 
+                        findnil = ii
+                    end
+                end
+            end
             if CanStack(item, k) then
                 if item.components.inventoryitem ~= nil and item.components.inventoryitem.owner ~= nil then
                     item.components.inventoryitem.owner:PushEvent("gotnewitem", {
@@ -380,10 +397,10 @@ local function TryPutToContainer(chest, ents, container, fn)
                 if not ret then
                     puted[k] = 1
                     over = true
-                    i[k.prefab] = i[k.prefab] - 1
                 end
-            elseif not item then
-                k.components.inventoryitem:RemoveFromOwner(true)
+            elseif findnil then  --没有可以堆叠的 但是有空位置 
+                i[k.prefab] = findnil
+                k.components.inventoryitem:RemoveFromOwner(true,true)
                 if k.components.knownlocations then -- 有家就忘了 
                     k.components.knownlocations:ForgetLocation("home")
                 end
@@ -393,9 +410,7 @@ local function TryPutToContainer(chest, ents, container, fn)
                 con:GiveItem(k, container[i[k.prefab]], nil, true)
                 puted[k] = 1
                 over = true
-                i[k.prefab] = i[k.prefab] - 1
             end
-            i[k.prefab] = i[k.prefab] + 1
         end
     end
     for k, v in pairs(puted) do
@@ -1273,7 +1288,7 @@ function com:FindBestSlot(con, data, item)
             for _, slotnew in pairs(data.containers[k]) do
                 local it = con:GetItemInSlot(slotnew)
                 if it then
-                    if it.prefab == item.prefab and it.components.stackable and item.components.stackable then
+                    if CanStack(it, item) then
                         return slotnew
                     end
                 end
@@ -1318,6 +1333,7 @@ function com:RegByType(chest, type)
         if not chest.components.container.SoraOldGiveItem then
             chest.components.container.SoraOldGiveItem = chest.components.container.GiveItem
             chest.components.container.GiveItem = function(s, item, slot, src_pos, drop_on_fail)
+                print(s, item, slot, src_pos, drop_on_fail)
                 if not s.soragiving and slot and item then
                     self:TryFixSlotData(s, chest.sorachestdata, item, slot)
                 elseif not s.soragiving and not slot and item then

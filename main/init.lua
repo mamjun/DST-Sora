@@ -110,6 +110,8 @@ CONTROL_SECONDARY = GLOBAL.CONTROL_SECONDARY
 CONTROL_PRIMARY = GLOBAL.CONTROL_PRIMARY
 tonumber = GLOBAL.tonumber
 FindEntity = GLOBAL.FindEntity
+Point = GLOBAL.Point
+Vector3 = GLOBAL.Vector3
 
 AddPrefabPostInit("world",function()
     TheWorld = GLOBAL.TheWorld

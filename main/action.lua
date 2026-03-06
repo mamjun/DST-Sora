@@ -356,8 +356,7 @@ local function UnBind(inst, doer, target, actions, ...)
             table.insert(doer, ACTIONS.SORABIND)
             return
         end
-        if inst and doer and
-            not (doer.userid and inst:HasTag(doer.userid) or SoraAPI.IsSuperAdmin(doer.userid)) then
+        if inst and doer and not (doer.userid and inst:HasTag(doer.userid) or SoraAPI.IsSuperAdmin(doer.userid)) then
             table.insert(act, ACTIONS.SORABIND)
         end
         if inst and doer and doer:HasTag("sora") and inst:HasTag("soranotlink") and doer.userid and
@@ -518,7 +517,6 @@ end
 
 AddAction(SORACHESTPATCH)
 
-
 local SORANOTPICK = GLOBAL.Action({
     priority = 99
 })
@@ -536,6 +534,10 @@ SORANOTPICK.fn = function(act)
         if target.components.sorapatch and target.components.sorapatch:GetPatch("sora_notpick") then
             target.components.sorapatch:UnApplyPatch("sora_notpick")
             Say(doer, "解除黏地上")
+            return true
+        end
+        if not target.components.inventoryitem then 
+            Say(doer, "这个物品捡不起来，不能黏地上")
             return true
         end
         if target.components.inventoryitem and not target.components.inventoryitem.canbepickedup then
@@ -559,27 +561,26 @@ end
 
 AddAction(SORANOTPICK)
 
-
 local SORANOTPICK2 = GLOBAL.Action({
     priority = 99
 })
 SORANOTPICK2.id = "SORANOTPICK2"
 SORANOTPICK2.str = "解除黏地上"
-SORANOTPICK2.fn= SORANOTPICK.fn
-
+SORANOTPICK2.fn = SORANOTPICK.fn
 
 AddAction(SORANOTPICK2)
-
 
 AddComponentAction("USEITEM", "sorapatch", function(inst, doer, target, actions)
     if inst.prefab == "sora_tochest" and target.prefab == "treasurechest" and not target:HasTag("sora2chest") and
         not target:HasTag("fire") and not target:HasTag("burnt") then
         table.insert(actions, ACTIONS.SORACHESTPATCH)
     end
-    if inst.prefab == "sora_notpick" and target.replica.inventoryitem and target.replica.inventoryitem:CanBePickedUp() then
-        table.insert(actions, ACTIONS.SORANOTPICK)
-    else
-        table.insert(actions, ACTIONS.SORANOTPICK2)
+    if inst.prefab == "sora_notpick" and target.replica.inventoryitem then
+        if target.replica.inventoryitem:CanBePickedUp() then
+            table.insert(actions, ACTIONS.SORANOTPICK)
+        else
+            table.insert(actions, ACTIONS.SORANOTPICK2)
+        end
     end
 
 end)
@@ -589,10 +590,8 @@ AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORACHE
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK, "dolongaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK, "dolongaction"))
 
-
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK2, "dolongaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK2, "dolongaction"))
-
 
 local SORATELEITEM = GLOBAL.Action({
     priority = 999
@@ -834,8 +833,9 @@ local SORA_TQYWORK = GLOBAL.Action({
 })
 SORA_TQYWORK.id = "SORA_TQYWORK"
 SORA_TQYWORK.stroverridefn = function(act)
-    return act.target and (act.target:HasTag("CHOP_workable") and "砍" or act.target:HasTag("MINE_workable") and "敲" )or
-               "工作"
+    return
+        act.target and (act.target:HasTag("CHOP_workable") and "砍" or act.target:HasTag("MINE_workable") and "敲") or
+            "工作"
 end
 SORA_TQYWORK.fn = function(act)
     local target = act.target
@@ -844,7 +844,7 @@ SORA_TQYWORK.fn = function(act)
     if doer and target and inst then
         if (inst:HasTag("sora_tqy") or inst:HasTag("sora_tqy_box")) then
             if (target:HasTag("MINE_workable") or target:HasTag("CHOP_workable")) then
-                if inst:HasTag("sora_tqy") then 
+                if inst:HasTag("sora_tqy") then
                     doer.components.inventory:RemoveItem(inst)
                     inst.Transform:SetPosition(doer:GetPosition():Get())
                     inst.owner = inst.owner
