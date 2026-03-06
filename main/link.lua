@@ -516,14 +516,17 @@ AddMulPrefabPostInit(AllToEquip, function(inst)
     end)
 end)
 
-AddLaterFn(function()
-    if AddActionQueuerAction then
-        AddActionQueuerAction("allclick", "SORAPHOTO", true)
-        AddActionQueuerAction("allclick", "SORAPACK", true)
-        AddActionQueuerAction("allclick", "SORAUNPACK", true)
-        AddActionQueuerAction("allclick", "SORAGIFT", true)
-        AddActionQueuerAction("allclick", "SORAREPAIR", true)
-    end
+AddComponentPostInit("playercontroller", function(self, inst)
+    inst:DoTaskInTime(1, function()
+        if AddActionQueuerAction then
+            AddActionQueuerAction("allclick", "SORAPHOTO", true)
+            AddActionQueuerAction("allclick", "SORAPACK", true)
+            AddActionQueuerAction("allclick", "SORAUNPACK", true)
+            AddActionQueuerAction("allclick", "SORAGIFT", true)
+            AddActionQueuerAction("allclick", "SORAREPAIR", true)
+            AddActionQueuerAction("allclick", "SORANOTPICK", true)
+        end
+    end)
 end)
 
 SoraGiftCode = {
@@ -544,7 +547,8 @@ SoraGiftCode = {
                         end
                         item.lastpos = item:GetPosition()
                         local instpos = inst:GetPosition()
-                        if math.abs(instpos.x-item.lastpos.x) < 0.3 and math.abs(instpos.y-item.lastpos.y) < 0.8  and math.abs(instpos.z-item.lastpos.z) < 0.3  then
+                        if math.abs(instpos.x - item.lastpos.x) < 0.3 and math.abs(instpos.y - item.lastpos.y) < 0.8 and
+                            math.abs(instpos.z - item.lastpos.z) < 0.3 then
                             if inst.components.talker then
                                 inst.components.talker:Say("啊！金元宝！")
                             end

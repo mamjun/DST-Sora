@@ -62,7 +62,7 @@ local function onopen(inst)
     if inst.skinname == 'sora2chest_sns' then
         inst.AnimState:PlayAnimation("open")
     else
-        inst.AnimState:PlayAnimation("idle",true)
+        inst.AnimState:PlayAnimation("idle", true)
     end
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_open")
 end
@@ -70,7 +70,7 @@ end
 local function onclose(inst, doer)
     -- TheWorld.components.sorachestmanager:OnClose(inst, doer)
     -- inst.AnimState:PlayAnimation("close")
-    inst.AnimState:PlayAnimation("idle",true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst.SoundEmitter:PlaySound("dontstarve/common/icebox_close")
 end
 
@@ -81,7 +81,13 @@ local function onhammered(inst, worker)
     fx:SetMaterial("metal")
     inst:Remove()
 end
-local chestname = {sora2chest_sns=1,sora2chest_sns_tmp=1,sora2chest_mls=1,sora2chest_xzz=1,sora2chest_dd=1}
+local chestname = {
+    sora2chest_sns = 1,
+    sora2chest_sns_tmp = 1,
+    sora2chest_mls = 1,
+    sora2chest_xzz = 1,
+    sora2chest_dd = 1
+}
 local function updatesign(inst)
     if not TheWorld.ismastersim then
         return
@@ -142,22 +148,22 @@ local function updatesign(inst)
         inst.components.container:IsOpen() then
         inst.AnimState:PlayAnimation("open")
     elseif (inst.skinname == "sora2chest_zzb") then
-        if sign then 
-            inst.AnimState:PlayAnimation("idle",true)
-            --inst.AnimState:Show("swap")
+        if sign then
+            inst.AnimState:PlayAnimation("idle", true)
+            -- inst.AnimState:Show("swap")
         else
-            inst.AnimState:PlayAnimation("idle_close",true)
-            --inst.AnimState:Hide("swap")
+            inst.AnimState:PlayAnimation("idle_close", true)
+            -- inst.AnimState:Hide("swap")
         end
-    -- elseif (inst.skinname == "sora2chest_jcy") then
-    --     if sign then 
-    --         inst.AnimState:Show("swap")
-    --     else
-    --         inst.AnimState:Hide("swap")
-    --     end
-    --     inst.AnimState:PlayAnimation("idle",true)
+        -- elseif (inst.skinname == "sora2chest_jcy") then
+        --     if sign then 
+        --         inst.AnimState:Show("swap")
+        --     else
+        --         inst.AnimState:Hide("swap")
+        --     end
+        --     inst.AnimState:PlayAnimation("idle",true)
     else
-        inst.AnimState:PlayAnimation("idle",true)
+        inst.AnimState:PlayAnimation("idle", true)
     end
     inst.sorasign = sign
 end
@@ -166,7 +172,7 @@ local function onhit(inst, worker)
     updatesign(inst)
     if inst.hitcount and inst.hitcount > 0 then
         inst.components.container:DropEverything()
-        TheWorld.components.sorachestmanager:OnClose(inst, worker,true)
+        TheWorld.components.sorachestmanager:OnClose(inst, worker, true)
     end
     -- inst.AnimState:PushAnimation("closed", false)
     inst.components.container:Close()
@@ -253,7 +259,7 @@ local function fn()
     inst:AddComponent("soratwoface")
     inst.AnimState:SetBank("sora2chest")
     inst.AnimState:SetBuild("sora2chest")
-    inst.AnimState:PlayAnimation("idle",true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
     inst.entity:SetPristine()
@@ -304,6 +310,7 @@ local function fn()
     -- end
     return inst
 end
+
 local function tochestfn()
     local inst = CreateEntity()
     local trans = inst.entity:AddTransform()
@@ -312,7 +319,67 @@ local function tochestfn()
     inst.entity:AddNetwork()
     anim:SetBank("sora2stone")
     anim:SetBuild("sora2stone")
-    anim:PlayAnimation("idle",true)
+    anim:PlayAnimation("idle", true)
+    inst:AddTag("soracontainlock")
+    inst:AddComponent("soratwoface")
+    if not TheWorld.ismastersim then
+        return inst
+    end
+    inst:AddComponent("inspectable")
+    inst.components.inspectable:SetDescription([[这个好重]])
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2stone.xml"
+    inst.components.inventoryitem.imagename = "sora2stone"
+
+    inst:AddComponent("sorapatch")
+    inst:AddComponent("stackable")
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(0)
+    inst.fx = SpawnPrefab("sora_tmp_fx")
+    inst.fx:Bind(inst)
+    return inst
+end
+
+local data3 = {
+    patch = function(self, data)
+        local inst = self.inst
+        if inst.components.inventoryitem then
+            data.canbepickedup = inst.components.inventoryitem.canbepickedup
+            inst.components.inventoryitem.canbepickedup = false
+            data.cangoincontainer = inst.components.inventoryitem.cangoincontainer
+            inst.components.inventoryitem.cangoincontainer = false
+            data.hastag = inst:HasTag("soracontainlock")
+            if not data.hastag then 
+                inst:AddTag("decorationitem")
+            end
+        end
+    end,
+    data = {},
+    unpatch = function(self, data)
+        local inst = self.inst
+        if inst.components.inventoryitem then
+            inst.components.inventoryitem.canbepickedup = data.canbepickedup
+            if data.hastag then
+                inst:AddTag("decorationitem")
+            else
+                inst:RemoveTag("decorationitem")
+            end
+            inst.components.inventoryitem.cangoincontainer = data.cangoincontainer
+        end
+    end
+}
+cmp2:RegPatch("sora_notpick", data3)
+
+local function notpickfn()
+    local inst = CreateEntity()
+    local trans = inst.entity:AddTransform()
+    local anim = inst.entity:AddAnimState()
+    MakeInventoryPhysics(inst)
+    inst.entity:AddNetwork()
+    anim:SetBank("sora2stone")
+    anim:SetBuild("sora2stone")
+    anim:PlayAnimation("idle", true)
     inst:AddTag("soracontainlock")
     inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
@@ -333,6 +400,7 @@ local function tochestfn()
     inst.fx:Bind(inst)
     return inst
 end
+
 local function placer_help(inst)
     inst.AnimState:Hide("chestitem_bg")
     inst.AnimState:Hide("swap_item_bg")
@@ -414,7 +482,7 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable("sora2chest_yb",assets)
+SoraAPI.MakeAssetTable("sora2chest_yb", assets)
 
 local tname = "sora2chest_zzb"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
@@ -430,7 +498,7 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeAssetTable(tname, assets)
 
 local tname = "sora2chest_jcy"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
@@ -446,7 +514,7 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeAssetTable(tname, assets)
 
 local tname = "sora2chest_mls"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
@@ -462,7 +530,7 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeAssetTable(tname, assets)
 
 local tname = "sora2chest_xzz"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
@@ -478,7 +546,7 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeAssetTable(tname, assets)
 local tname = "sora2chest_dd"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
     name = "黛黛",
@@ -493,7 +561,7 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeAssetTable(tname, assets)
 
 local tname = "sora2chest_sgj"
 SoraAPI.MakeItemSkin("sora2chest", tname, {
@@ -509,7 +577,7 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
     checkfn = SoraAPI.SoraSkinCheckFn,
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
-SoraAPI.MakeAssetTable(tname,assets)
+SoraAPI.MakeAssetTable(tname, assets)
 
 local function chestpt(inst)
     -- inst.AnimState:Hide("chestitem_bg")
@@ -519,4 +587,4 @@ local function chestpt(inst)
 end
 return Prefab("sora2chest", fn, assets, prefabs),
     MakePlacer("sora2chest_placer", "sora2chest", "sora2chest", "idle", nil, nil, nil, nil, nil, nil, chestpt),
-    Prefab("sora_tochest", tochestfn, assets, prefabs)
+    Prefab("sora_tochest", tochestfn, assets, prefabs), Prefab("sora_notpick", notpickfn, assets, prefabs)

@@ -407,6 +407,7 @@ GLOBAL.SoraTags = {"fastbuilder", -- 修理工快速制作
 "masterchef", -- 大厨
 "professionalchef", -- 调味
 "expertchef", -- 做饭动作快点
+"sorafriend", -- 小穹的工具人
 "soraflyer" -- 白云飞行术
 }
 
@@ -418,7 +419,7 @@ RegTag("quagmire_fasthands") -- 修理工快手
 -- RegTag("masterchef" )          --大厨
 -- RegTag("professionalchef")     --调味
 RegTag("expertchef") -- 做饭动作快点
-
+RegTag("sorafriend") -- 小穹的工具人
 RegTag("soraflyer") -- 白云飞行术
 RegTag("sorabuilder")
 RegTag("soraself")

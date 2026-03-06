@@ -517,15 +517,82 @@ SORACHESTPATCH.fn = function(act)
 end
 
 AddAction(SORACHESTPATCH)
+
+
+local SORANOTPICK = GLOBAL.Action({
+    priority = 99
+})
+SORANOTPICK.id = "SORANOTPICK"
+SORANOTPICK.str = "黏地上"
+SORANOTPICK.fn = function(act)
+    local target = act.target
+    local invobject = act.invobject
+    local doer = act.doer
+    if not invobject then
+        return true
+    end
+
+    if target ~= nil and target:IsValid() then
+        if target.components.sorapatch and target.components.sorapatch:GetPatch("sora_notpick") then
+            target.components.sorapatch:UnApplyPatch("sora_notpick")
+            Say(doer, "解除黏地上")
+            return true
+        end
+        if target.components.inventoryitem and not target.components.inventoryitem.canbepickedup then
+            Say(doer, "这个物品捡不起来，不能黏地上")
+            return true
+        end
+        if not target.components.sorapatch then
+            target:AddComponent("sorapatch")
+        end
+        target.components.sorapatch:ApplyPatch("sora_notpick")
+        if invobject.components.stackable then
+            invobject.components.stackable:Get():Remove()
+        else
+            invobject:Remove()
+        end
+
+        Say(doer, "成功黏地上")
+        return true
+    end
+end
+
+AddAction(SORANOTPICK)
+
+
+local SORANOTPICK2 = GLOBAL.Action({
+    priority = 99
+})
+SORANOTPICK2.id = "SORANOTPICK2"
+SORANOTPICK2.str = "解除黏地上"
+SORANOTPICK2.fn= SORANOTPICK.fn
+
+
+AddAction(SORANOTPICK2)
+
+
 AddComponentAction("USEITEM", "sorapatch", function(inst, doer, target, actions)
     if inst.prefab == "sora_tochest" and target.prefab == "treasurechest" and not target:HasTag("sora2chest") and
         not target:HasTag("fire") and not target:HasTag("burnt") then
         table.insert(actions, ACTIONS.SORACHESTPATCH)
     end
-end)
+    if inst.prefab == "sora_notpick" and target.replica.inventoryitem and target.replica.inventoryitem:CanBePickedUp() then
+        table.insert(actions, ACTIONS.SORANOTPICK)
+    else
+        table.insert(actions, ACTIONS.SORANOTPICK2)
+    end
 
+end)
 AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
 AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORACHESTPATCH, "dolongaction"))
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK, "dolongaction"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK, "dolongaction"))
+
+
+AddStategraphActionHandler("wilson", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK2, "dolongaction"))
+AddStategraphActionHandler("wilson_client", GLOBAL.ActionHandler(ACTIONS.SORANOTPICK2, "dolongaction"))
+
 
 local SORATELEITEM = GLOBAL.Action({
     priority = 999
@@ -755,7 +822,7 @@ act.pre_action_cb = function(act)
     return true
 end
 AddComponentAction("INVENTORY", "soraopenui", function(inst, doer, actions, right)
-    if inst and doer and doer:HasTag("sora") and inst.components.soraopenui and
+    if inst and doer and (doer:HasTag("sora") or doer:HasTag("sorafriend")) and inst.components.soraopenui and
         inst.components.soraopenui:CanOpenUI(doer) then
         table.insert(actions, ACTIONS.SORAOPENUI)
     end

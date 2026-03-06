@@ -62,6 +62,6 @@ function com:Check(data)
     local get = owner.components.inventory:FindItem(function (i)
         return i:HasTag(self.tag) and inst ~= i
     end)
-    if get then owner:DoTaskInTime(0,dropitem,inst)  return end
+    if get then owner:DoTaskInTime(0,dropitem,self.dropold and get or inst)  return end
 end
 return com

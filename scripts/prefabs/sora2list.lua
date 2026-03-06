@@ -85,6 +85,7 @@ local function fn()
     inst.components.inventoryitem.canonlygoinpocket = true
     inst:AddComponent("soraonlyone")
     inst.components.soraonlyone.tag = "sora2list"
+    inst.components.soraonlyone.dropold = true
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("sora2list")
     inst.components.container.onopenfn = onopen

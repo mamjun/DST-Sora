@@ -869,6 +869,12 @@ Rec("sora_tochest", "原来你也有强迫症", "原来你也有强迫症", item
     cutstone = 10
 }})
 
+AddInvImg("sora_notpick", "inventoryimages/sora2stone", "sora2stone")
+Rec("sora_notpick", "把他黏地上", "把他黏地上", item, "sora",  {
+    boards = 10,
+    glommerfuel = 2
+}).numtogive = 10
+
 -- 魔法
 Rec("sora_birds", "鸽子还没到", "一定来,一定来\n不会咕,不会咕", skill, "sorabook", {
     [san] = 10 + 10 * mode
@@ -1037,6 +1043,10 @@ if IsModEnable("Legion") or IsModEnable("棱镜") then
 
     Rec("cutstone", nil, "石石石石", maker, "sora", {
         siving_rocks = 40
+    }).numtogive = 10
+
+    Rec("eel", nil, "什么捉影之镜,没听说过", maker, "sora", {
+        acc_l_shadowmirror = 1
     }).numtogive = 10
 
 end
