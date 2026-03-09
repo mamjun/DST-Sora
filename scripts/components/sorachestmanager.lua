@@ -373,7 +373,6 @@ local function TryPutToContainer(chest, ents, container, fn)
             local item = con:GetItemInSlot(container[i[k.prefab]])
             local findnil = nil
             if not CanStack(item, k) then    --不能堆就重新选位置
-
                 for ii=1,#container do 
                     local it = con:GetItemInSlot(container[ii])
                     if CanStack(it,k) then 
@@ -1333,7 +1332,7 @@ function com:RegByType(chest, type)
         if not chest.components.container.SoraOldGiveItem then
             chest.components.container.SoraOldGiveItem = chest.components.container.GiveItem
             chest.components.container.GiveItem = function(s, item, slot, src_pos, drop_on_fail)
-                print(s, item, slot, src_pos, drop_on_fail)
+                --print(s, item, slot, src_pos, drop_on_fail)
                 if not s.soragiving and slot and item then
                     self:TryFixSlotData(s, chest.sorachestdata, item, slot)
                 elseif not s.soragiving and not slot and item then

@@ -147,7 +147,7 @@ local function fn()
     inst:AddTag("nosteal")
     inst.AnimState:SetBank("sora2fire")
     inst.AnimState:SetBuild("sora2fire")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:PlayAnimation("idle",true)
     inst:AddComponent("soratwoface")
     inst.SoundEmitter:PlaySound("dontstarve/common/ice_box_LP", "idlesound")
 
@@ -310,6 +310,22 @@ local tname = "sora2fire_xhl"
         rarityorder = 80,
         raritycorlor = {0.957, 0.769, 0.188, 1},
         FrameSymbol = "heirloom",
+        checkfn = SoraAPI.SoraSkinCheckFn,
+        checkclientfn = SoraAPI.SoraSkinCheckClientFn
+    })
+
+    local tname = "sora2fire_rtt"
+    SoraAPI.MakeAssetTable(tname, assets)
+    SoraAPI.MakeItemSkin("sora2fire",tname, {
+        
+        name = "软桃兔",
+        atlas = "images/inventoryimages/" .. tname .. ".xml",
+        image = tname,
+        build = tname,
+        bank = tname,
+        init_fn = function(inst)
+        end,
+
         checkfn = SoraAPI.SoraSkinCheckFn,
         checkclientfn = SoraAPI.SoraSkinCheckClientFn
     })
