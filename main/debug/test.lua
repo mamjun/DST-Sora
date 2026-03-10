@@ -41,7 +41,7 @@ LM = {__mode="k"} GC=collectgarbage function LT(t) local t={} setmetatable(t,LM)
 ]]
 
 
-function TestCook()
+function TestCook(notrandom)
     local cooking = require("cooking")
     local all = {}
     for k,v in pairs(cooking.ingredients) do
@@ -61,7 +61,7 @@ function TestCook()
             if inst.components.inventoryitem then 
                 light.components.container:GiveItem(inst)
                 if inst.components.stackable then 
-                    inst.components.stackable:SetStackSize(math.random(10,50))
+                    inst.components.stackable:SetStackSize(notrandom and 999 or math.random(10,50))
                 else
                     for i=1,2 do 
                         light.components.container:GiveItem(SpawnPrefab(prefab))

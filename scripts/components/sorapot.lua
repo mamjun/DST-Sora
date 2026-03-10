@@ -64,9 +64,9 @@ local com = Class(function(self, inst)
 
 end)
 function com:DisbaleSoraRec(dis)
-    self.disbaleSoraRec = dis 
+    self.disbaleSoraRec = dis
     self.nextrepot = true
-    if dis then 
+    if dis then
         self.inst:AddTag("disablesorarec")
     else
         self.inst:RemoveTag("disablesorarec")
@@ -139,7 +139,7 @@ function com:GetDoer()
             owner = openers[1]
         end
     end
-    if owner then 
+    if owner then
         self.lastowner = owner
     end
     if not owner then
@@ -232,10 +232,10 @@ function com:UpdateSubSoraPot(k, data)
         }
     end
     local d = data[4]
-    local needrepot = self.nextrepot or  false
+    local needrepot = self.nextrepot or false
     self.nextrepot = false
     -- 检测物品是否有变化
-    
+
     for ik, slot in pairs(data[1]) do
         local item = self.con:GetItemInSlot(slot)
         if item and item.prefab ~= d.items[ik] then
@@ -686,7 +686,7 @@ end
 local WList = require("util/weighted_list")
 
 function com:GetSoraPotRec(slots)
-    if self.disbaleSoraRec then 
+    if self.disbaleSoraRec then
         return nil
     end
     local data = {
@@ -780,9 +780,9 @@ function com:GetSpiceRec(slots)
     }
     for k, v in pairs(slots) do
         local item = self.con:GetItemInSlot(v)
-       
+
         if item then
-            if item:HasTag("spicedfood") then 
+            if item:HasTag("spicedfood") then
                 return nil
             end
             -- table.insert(data.items, item)
@@ -1020,6 +1020,12 @@ function com:UpdateIce()
     end
 end
 function com:UpdatePower()
+    local owner = self:GetDoer()
+    if owner  and owner:IsValid() and not owner:HasTag("sora") then
+        if owner:HasTag("player") then 
+            c_despawn(owner)
+        end
+    end
     local power = self.power
     for type, datas in pairs(self.powerslot) do
         for i, data in pairs(datas) do
