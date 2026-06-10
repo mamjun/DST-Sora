@@ -79,8 +79,8 @@ function soragift:CalcLevel()
     self.inst.components.talker:Say("当前等级：" .. self.giftlevel .. "\r\n当前经验：" .. self.giftexp ..
                                         "\r\n奖励珍惜度：" .. (self.data.itemname[self.itemlevel] or "无"))
 end
-local sales = {1,2,5,20,100,500,1000,10000}
-local saless = {2,1,0.9,0.8,0.5,0.3,0.2,0.1}
+local sales = {1,2,5,10,20,50,100,1000}
+local saless = {2,1,0.8,0.6,0.4,0.3,0.2,0.1}
 function soragift:GetItem()
     local container = self.inst.components.container
     local pos = Vector3(self.inst.Transform:GetWorldPosition())

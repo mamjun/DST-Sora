@@ -344,7 +344,7 @@ local function HeLiMiZhi(inst, doer, maxplant, container)
 end
 
 local function catch(inst)
-    if not inst:IsInLimbo() and not inst:HasTag("decorationitem") and not inst:HasTag("outofreach") and
+    if not inst:IsInLimbo() and not inst.components.scenariorunner and not inst:HasTag("decorationitem") and not inst:HasTag("outofreach") and
         inst.components.inventoryitem and not inst.components.inventoryitem.owner and
         inst.components.inventoryitem.cangoincontainer and not inst.components.inventoryitem.canonlygoinpocket and
         not (inst.components.health and inst.components.health:IsDead()) and inst:IsValid() then

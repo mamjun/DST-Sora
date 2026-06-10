@@ -74,10 +74,7 @@ icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
 -- MOD标签
-server_filter_tags = {
-    "character", "sora", "Sora", "qiong", "xiaoqiong", "穹", "小穹",
-    "春日野穹", "Kasugano", "KasuganoSora"
-}
+server_filter_tags = { "Sora", "穹"}
 string = string or ""
 ]].."\n  configuration_options = {\n"
 

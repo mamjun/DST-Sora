@@ -81,7 +81,7 @@ c.sales = {
     mandrakesoup = 500, -- 曼德拉草汤
     spidereggsack = 500, -- 蜘蛛卵
     eyebrellahat = 10000, -- 眼球伞
-    beargervest = 10000, -- 熊皮大衣
+    beargervest = 1000, -- 熊皮大衣
     moonglass = 100, -- 月亮碎片
     moonglass_charged = 300, -- 充能月亮碎片
     orangestaff = 1500, -- 橙杖
@@ -90,7 +90,7 @@ c.sales = {
     opalstaff = 5000, -- 月杖 
     staff_tornado = 2500, -- 天气风向标
     alterguardianhat = 15000, -- 启迪
-    moonstorm_static_item = 15000 -- 约束静电
+    moonstorm_static_item = 3000 -- 约束静电
 }
 c.tagsales = {
     halloweencandy = 10,
@@ -105,7 +105,7 @@ c.namesales = {
     gem = 300,
     staff = 500,
     amulet = 300,
-    rock_avocado_fruit_sprout = 1000,
+    rock_avocado_fruit_sprout = 200,
     dug_ = 500
 }
 

@@ -30,7 +30,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] local assets = {}
 local name = "sora_yingyu"
-SoraAPI.MakeAssetTable("sora_yingyu", assets)
+SoraAPI.MakeAssetTable(name, assets)
 local function onequip(inst, owner)
 
     owner.AnimState:OverrideSymbol("swap_object", inst.skinname or name, name)
@@ -110,4 +110,4 @@ RegisterInventoryItemAtlas("images/inventoryimages/"..name..".xml", name..".tex"
 STRINGS.NAMES[name:upper()] ="樱雨"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE[name:upper()] = "樱花落下的速度是5厘米"
 
-return Prefab("sora_yingyu", fn, assets)
+return Prefab(name, fn, assets)

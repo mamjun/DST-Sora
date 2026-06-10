@@ -30,9 +30,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "13.75"
-name = "小穹 v13.75"
-description = [[当前版本：13.75\n
+version = "13.76"
+name = "小穹 v13.76"
+description = [[当前版本：13.76\n
 恨穹不是妹，恨妹不成穹！
 初始属性很差，但随着等级上升可以获得大量属性。
 交流群号： 777150028
@@ -97,10 +97,7 @@ icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
 -- MOD标签
-server_filter_tags = {
-    "character", "sora", "Sora", "qiong", "xiaoqiong", "穹", "小穹",
-    "春日野穹", "Kasugano", "KasuganoSora"
-}
+server_filter_tags = { "Sora", "穹"}
 string = string or ""
 
   configuration_options = {
@@ -216,6 +213,14 @@ string = string or ""
     options = { 
         { hover = "不禁用空白永不败北",description = "不禁用",data = false,}, 
         { hover = "禁用空白永不败北",description = "禁用",data = true,}, 
+    }, 
+    default = false},
+    {
+    name = "tentacles",
+    label = "禁用伪典-弑君者",
+    options = { 
+        { hover = "不禁用伪典-弑君者",description = "不禁用",data = false,}, 
+        { hover = "禁用伪典-弑君者",description = "禁用",data = true,}, 
     }, 
     default = false},
     {

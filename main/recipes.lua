@@ -475,15 +475,15 @@ Rec("sora3chest", "心语之愿", "装上你的美好心情", equip2, "soraother
     gift = 5
 }})
 Rec("sora2list", "祈巧", "用它来管理你的物品", equip2, "soraother", {{
-    orangemooneye=1,
+    orangemooneye = 1,
     moonglass = 5,
     petals = 10
 }, {
-    orangemooneye=1,
+    orangemooneye = 1,
     moonglass = 5,
     petals = 40
 }, {
-    orangemooneye=3,
+    orangemooneye = 3,
     moonglass = 400,
     petals = 400
 }})
@@ -870,7 +870,7 @@ Rec("sora_tochest", "原来你也有强迫症", "原来你也有强迫症", item
 }})
 
 AddInvImg("sora_notpick", "inventoryimages/sora2stone", "sora2stone")
-Rec("sora_notpick", "把他黏地上", "把他黏地上", item, "sora",  {
+Rec("sora_notpick", "把他黏地上", "把他黏地上", item, "sora", {
     boards = 10,
     glommerfuel = 2
 }).numtogive = 10
@@ -897,10 +897,11 @@ Rec("sora_lighting", "超电磁炮永世长存",
     "你指尖跃动的电光\n是我此生不灭的信仰\n唯我超电磁炮永世长存", skill, "sorabook", {
         [san] = 20 + 10 * mode
     })
-Rec("sora_tentacles", "伪典-弑君者", "向全体机凯种\n致以最崇高的敬意！", skill, "sorabook", {
-    [san] = 30 + 20 * mode
-})
-
+if not getsora("tentacles") then
+    Rec("sora_tentacles", "伪典-弑君者", "向全体机凯种\n致以最崇高的敬意！", skill, "sorabook", {
+        [san] = 30 + 20 * mode
+    })
+end
 -- 药水
 Rec("sora2qb", "谦卑", "活力四射！", itembuff, "soraother", {
     spidergland = 40
@@ -1085,7 +1086,7 @@ function UnlonkRecipes(name, ings, des)
     end
     local rec = Rec(name, nil, des, maker, "sora", ings or {})
     rec.level = TechTree.Create(TECH.LOST)
-    
+
     if not ings and AllRecipes[name] then
         rec.ingredients = AllRecipes[name].ingredients
         rec.character_ingredients = AllRecipes[name].character_ingredients

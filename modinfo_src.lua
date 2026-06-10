@@ -29,7 +29,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] author = "FL"
-version = "13.75" -- 版本
+version = "13.76" -- 版本
 name = "小穹 v" .. version
 forumthread = ""
 priority = -100000
@@ -96,10 +96,7 @@ icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
 -- MOD标签
-server_filter_tags = {
-    "character", "sora", "Sora", "qiong", "xiaoqiong", "穹", "小穹",
-    "春日野穹", "Kasugano", "KasuganoSora"
-}
+server_filter_tags = { "Sora", "穹"}
 string = string or ""
 local pre_name
 local pre_lable
@@ -343,7 +340,23 @@ configuration_options = {
             }
         },
         default = false
-    }, {
+    },  {
+        name = "tentacles",
+        label = "禁用伪典-弑君者",
+        options = {
+            {
+                description = "不禁用",
+                data = false,
+                hover = "不禁用伪典-弑君者"
+            },
+            {
+                description = "禁用",
+                data = true,
+                hover = "禁用伪典-弑君者"
+            }
+        },
+        default = false
+    },{
         name = "tochest",
         label = "禁止上强迫症(开启此选项会使已上强迫症失效)",
         options = {

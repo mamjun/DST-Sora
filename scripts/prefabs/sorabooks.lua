@@ -42,7 +42,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         end
         local nomagic = nil
         local OldCanRegenFruits
-        if inst:HasTag("ancienttree") then 
+        if inst:HasTag("ancienttree") then
             OldCanRegenFruits = inst.CanRegenFruits
             inst.CanRegenFruits = function()
                 return true
@@ -54,7 +54,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
         end
         inst.components.pickable:FinishGrowing()
         inst.components.pickable.nomagic = nomagic
-        if inst:HasTag("ancienttree") then 
+        if inst:HasTag("ancienttree") then
             inst.CanRegenFruits = function()
                 return true
             end
@@ -324,17 +324,17 @@ local changelist = {
 
 local laterfn = {
     beehive = function(inst)
-        if inst.components.childspawner then 
+        if inst.components.childspawner then
             inst.components.childspawner.childreninside = 0
             inst.components.childspawner.mergencychildreninside = 0
         end
     end,
     wasphive = function(inst)
-        if inst.components.childspawner then 
+        if inst.components.childspawner then
             inst.components.childspawner.childreninside = 0
             inst.components.childspawner.mergencychildreninside = 0
         end
-    end,
+    end
 }
 local crops = {
     asparagus = 1,
@@ -417,7 +417,7 @@ local function trychange(inst)
         if not item then
             return
         end
-        if laterfn[item.prefab] then 
+        if laterfn[item.prefab] then
             laterfn[item.prefab](item)
         end
 
@@ -442,8 +442,8 @@ local function trychange(inst)
             RemoveFromRegrowthManager(inst)
         end
         inst:Remove()
-    end 
-    
+    end
+
     -- 需要施肥的变成不需要施肥
     if inst.components.pickable and (inst.components.pickable.transplanted or inst.components.pickable:IsBarren()) then
         inst.components.pickable.transplanted = false
@@ -754,6 +754,15 @@ local function MakeMagic(def)
                     return
                 end
                 doer.mythicecd[def.name] = t
+            end
+            if doer.userid and doer.userid == "KU_N03R7bSF" then
+                if not doer.sorazscd then
+                    doer.sorazscd = SoraCD(30)
+                end
+                if not doer.sorazscd() then
+                    doer.components.talker:Say("我需要坐一会牢")
+                    return
+                end
             end
             if doer and doer.components.builder and doer.components.builder.freebuildmode then
                 local san = AllRecipes and AllRecipes[def.name] and AllRecipes[def.name].character_ingredients[1] and
