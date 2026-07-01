@@ -579,6 +579,42 @@ SoraAPI.MakeItemSkin("sora2chest", tname, {
 })
 SoraAPI.MakeAssetTable(tname, assets)
 
+
+local tname = "sora2chest_sgj"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "时光叽",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+
+local tname = "sora2chest_sx"
+SoraAPI.MakeItemSkin("sora2chest", tname, {
+    name = "守心",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    init_fn = updatesign,
+    clear_fn = function(inst)
+        inst:DoTaskInTime(0, updatesign)
+    end,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+
+
 local function chestpt(inst)
     -- inst.AnimState:Hide("chestitem_bg")
     inst.AnimState:Hide("swap_item_bg")

@@ -29,7 +29,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.20
+-- verion = 1.21
+-- v1.21 优化了一些细节 更换了人物皮肤无视可编制过滤器的实现
+--    优化了ValidateSpawnPrefabRequest的实现，感谢 alt 的建议  ps:如果之前给 _none皮肤写了 checkclientfn的要注意一下兼容测试
 -- v1.20 SkinAPIThankYouPopup 现在物品皮肤默认播放idle动画 现在可以通过 MakeItemSkinDefaultData 来设置默认皮肤的动画了
 -- 如果不想用动画 请设置 swap_icon 参数
 -- 新增GetSKinDefaultDataBySkin 通过皮肤获取默认数据 方便在物品皮肤里获取默认动画等数据
@@ -418,40 +420,67 @@ mt.__index.CheckClientOwnership = function(i, userid, name, ...)
     end
 end
 
-local oldExceptionArrays = GLOBAL.ExceptionArrays
-GLOBAL.ExceptionArrays = function(ta, tb, ...)
-    local need
-    for i = 1, 100, 1 do
-        local data = debug.getinfo(i, "S")
-        if data then
-            if data.source and data.source:match("^scripts/networking.lua") then
-                need = true
+-- local oldExceptionArrays = GLOBAL.ExceptionArrays
+-- GLOBAL.ExceptionArrays = function(ta, tb, ...)
+--     local need
+--     for i = 1, 100, 1 do
+--         local data = debug.getinfo(i, "S")
+--         if data then
+--             if data.source and data.source:match("^scripts/networking.lua") then
+--                 need = true
+--             end
+--         else
+--             break
+--         end
+--     end
+--     if need then
+--         local newt = oldExceptionArrays(ta, tb, ...)
+--         for k, v in pairs(skincharacters) do
+--             table.insert(newt, k)
+--         end
+--         return newt
+--     else
+--         return oldExceptionArrays(ta, tb, ...)
+--     end
+-- end
+--更换了实现   感谢 alt 的建议
+local oldValidateSpawnPrefabRequest = ValidateSpawnPrefabRequest 
+GLOBAL.ValidateSpawnPrefabRequest = function(user_id, prefab_name, skin_base, ...)
+    local oldret = {oldValidateSpawnPrefabRequest(user_id, prefab_name, skin_base, ...)} 
+    if oldret and  skin_base and characterskins[skin_base] and characterskins[skin_base].checkclientfn  then 
+        if not characterskins[skin_base].checkclientfn or characterskins[skin_base].checkclientfn(nil,user_id, skin_base) then 
+            oldret[2] = skin_base 
+        end
+    end
+    return unpack(oldret)
+end
+-- local oldIsDefaultCharacterSkin = IsDefaultCharacterSkin
+-- GLOBAL.IsDefaultCharacterSkin = function(item, ...)
+--     item = item and namemaps[item] or item
+--     if item and characterskins[item] then
+--         if characterskins[item].checkfn then
+--             return characterskins[item].checkfn(nil, item)
+--         else
+--             return true
+--         end
+--     else
+--         return oldIsDefaultCharacterSkin(item, ...)
+--     end
+-- end
+local oldGetWeaveableSkinFilter = GetWeaveableSkinFilter
+GLOBAL.GetWeaveableSkinFilter = function(...)
+    local oldfn = oldGetWeaveableSkinFilter(...)
+    return function(item_key, ...)
+        local item = item_key and namemaps[item_key] or item_key
+        if item and characterskins[item] then
+            if characterskins[item].checkfn then
+                return characterskins[item].checkfn(nil, item)
+            else
+                return true
             end
         else
-            break
+            return oldfn(item_key, ...)
         end
-    end
-    if need then
-        local newt = oldExceptionArrays(ta, tb, ...)
-        for k, v in pairs(skincharacters) do
-            table.insert(newt, k)
-        end
-        return newt
-    else
-        return oldExceptionArrays(ta, tb, ...)
-    end
-end
-local oldIsDefaultCharacterSkin = IsDefaultCharacterSkin
-GLOBAL.IsDefaultCharacterSkin = function(item, ...)
-    item = item and namemaps[item] or item
-    if item and characterskins[item] then
-        if characterskins[item].checkfn then
-            return characterskins[item].checkfn(nil, item)
-        else
-            return true
-        end
-    else
-        return oldIsDefaultCharacterSkin(item, ...)
     end
 end
 local oldGetPortraitNameForItem = GetPortraitNameForItem
@@ -764,7 +793,7 @@ function SkinAPIThankYouPopup(...)
                     end
                     local animstate = self.spawn_portal.thank_help:GetAnimState()
                     local updatetask
-                     updatetask = self.spawn_portal.inst:DoPeriodicTask(0,function(inst)
+                    updatetask = self.spawn_portal.inst:DoPeriodicTask(0, function(inst)
                         if self.spawn_portal:GetAnimState():IsCurrentAnimation("skin_loop") then
                             animstate:SetBank(skin.bank)
                             animstate:SetBuild(skin.build)
@@ -774,7 +803,7 @@ function SkinAPIThankYouPopup(...)
                     end)
 
                     local updatetask2
-                     updatetask2 = self.spawn_portal.inst:DoPeriodicTask(0,function(inst)
+                    updatetask2 = self.spawn_portal.inst:DoPeriodicTask(0, function(inst)
                         if self.spawn_portal:GetAnimState():IsCurrentAnimation("skin_out") then
                             self.spawn_portal.thank_help:Hide()
                             updatetask2:Cancel()
