@@ -32,7 +32,7 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
     inst.components.soragift.giftplayer = {}
     local self = inst.components.soragift
     for k,v in pairs(self.items) do
-        local vv = math.ceil(v*0.1)
+        local vv = math.ceil(v*math.random(2,5)/10)
         if vv == 1  and math.random() >0.2 then
             vv = 0
         end
@@ -65,6 +65,9 @@ function soragift:CanGift(doer)
 end
 function soragift:CalcLevel()
     self.giftlevel = 0
+    if self.giftexp < 0 then
+        self.giftexp = 0
+    end
     for k, v in ipairs(self.data.level) do
         if self.giftexp > v then
             self.giftlevel = k
@@ -79,8 +82,8 @@ function soragift:CalcLevel()
     self.inst.components.talker:Say("当前等级：" .. self.giftlevel .. "\r\n当前经验：" .. self.giftexp ..
                                         "\r\n奖励珍惜度：" .. (self.data.itemname[self.itemlevel] or "无"))
 end
-local sales = {1,2,5,10,20,50,100,1000}
-local saless = {2,1,0.8,0.6,0.4,0.3,0.2,0.1}
+local sales = {1,2,5,10,20,50,100,1000,2000,5000}
+local saless = {2,1,0.8,0.6,0.4,0.3,0.2,0.1,-0.2,-0.5}
 function soragift:GetItem()
     local container = self.inst.components.container
     local pos = Vector3(self.inst.Transform:GetWorldPosition())

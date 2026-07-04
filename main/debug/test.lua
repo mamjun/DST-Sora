@@ -1,7 +1,8 @@
 collectgarbage("collect")
+local a = LeakTable()
 function TestPrefab()
     local t = os.clock()
-    local a = LeakTable()
+    a = LeakTable()
     collectgarbage()
     local size = collectgarbage("count")
     local t2 = os.clock()
@@ -21,14 +22,16 @@ function TestPrefab()
     print("收集" ,collectgarbage("count")-newsize)
     print("剩余",GetTableSize(a))
     print("总耗时",os.clock()-t)
+    return a
 end
 
 function TestPrefabOut()
     collectgarbage()
     local size = collectgarbage("count")
-    TestPrefab()
+    local aa = TestPrefab()
     collectgarbage()
     print("总剩余",collectgarbage("count")-size)
+    return aa
 end
 
 

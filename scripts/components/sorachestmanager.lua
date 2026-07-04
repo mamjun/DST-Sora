@@ -1136,6 +1136,10 @@ function com:ResetCache(item)
         self.chestcache = {}
     end
 end
+function com:GetDebugCache()
+    print(GetTableSize(cacheents), GetTableSize(updateents), GetTableSize(updatechests))
+    return cacheents, updateents, updatechests
+end
 function com:GetCacheChest(item)
     local chestcache = self.chestcache
     local needprefab = toprefab(item)
