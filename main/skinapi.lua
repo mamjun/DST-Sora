@@ -29,7 +29,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] -- 请提前一键global 然后 modimport导入
--- verion = 1.21
+-- verion = 1.22
+-- v1.22 优化了打开礼物时的动画展示细节
 -- v1.21 优化了一些细节 更换了人物皮肤无视可编制过滤器的实现
 --    优化了ValidateSpawnPrefabRequest的实现，感谢 alt 的建议  ps:如果之前给 _none皮肤写了 checkclientfn的要注意一下兼容测试
 -- v1.20 SkinAPIThankYouPopup 现在物品皮肤默认播放idle动画 现在可以通过 MakeItemSkinDefaultData 来设置默认皮肤的动画了
@@ -776,6 +777,11 @@ function SkinAPIThankYouPopup(...)
             local item = self.current_item and self.items and self.items[self.current_item] and
                              self.items[self.current_item].item
             if item then
+                if self.spawn_portal.thank_help then
+                    self.spawn_portal.thank_help:Hide()
+                    local animstate = self.spawn_portal.thank_help:GetAnimState()
+                    animstate:PlayAnimation("stoploop")
+                end
                 local skin = GetSkin(item)
                 if skin and skin.swap_icon then
                     if type(skin.swap_icon) == "table" then
@@ -791,6 +797,7 @@ function SkinAPIThankYouPopup(...)
                         self.spawn_portal.thank_help = self.spawn_portal:AddChild(UIAnim())
                         self.spawn_portal.thank_help:SetPosition(0, -90)
                     end
+                    self.spawn_portal.thank_help:Show()
                     local animstate = self.spawn_portal.thank_help:GetAnimState()
                     local updatetask
                     updatetask = self.spawn_portal.inst:DoPeriodicTask(0, function(inst)
@@ -806,6 +813,7 @@ function SkinAPIThankYouPopup(...)
                     updatetask2 = self.spawn_portal.inst:DoPeriodicTask(0, function(inst)
                         if self.spawn_portal:GetAnimState():IsCurrentAnimation("skin_out") then
                             self.spawn_portal.thank_help:Hide()
+                            animstate:PlayAnimation("stoploop")
                             updatetask2:Cancel()
                         end
                     end)
