@@ -325,6 +325,8 @@ local function fn()
                 doer.components.bundler.preskinname = "sorapacker_dw"
             elseif inst.skinname == "sorabowknot_dw_tmp" then
                 doer.components.bundler.preskinname = "sorapacker_dw_tmp"
+            elseif inst.skinname == "sorabowknot_hd" then
+                doer.components.bundler.preskinname = math.random(1,2) == 1 and "sorapacker_hd" or "sorapacker_hd2"
             else
                 doer.components.bundler.preskinname = nil
             end
@@ -406,7 +408,7 @@ local function packfn()
 
     return inst
 end
-SoraAPI.MakeItemSkinDefaultData("sora2pack", {}, {"sora2pack", "sora2pack_1"})
+SoraAPI.MakeItemSkinDefaultData("sora2pack", {}, {"sora2pack_1", "sora2pack","anim"})
 SoraAPI.MakeItemSkin("sora2pack", "sora2pack_2", {
     name = "穹の打包纸",
     atlas = "images/inventoryimages/sora2pack_2.xml",
@@ -916,6 +918,57 @@ SoraAPI.MakeItemSkin("sorabowknot", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 SoraAPI.MakeAssetTable(tname, assets)
+
+
+local tname = "sorapacker_hd"
+SoraAPI.MakeItemSkin("sorapacker", tname, {
+    name = "凰蝶如梦",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+local tname = "sorapacker_hd2"
+SoraAPI.MakeItemSkin("sorapacker", tname, {
+    name = "凰蝶似幻",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+
+local tname = "sora3packer_hd"
+SoraAPI.MakeItemSkin("sora3packer", tname, {
+    name = "凰蝶如梦",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+local tname = "sora3packer_hd2"
+SoraAPI.MakeItemSkin("sora3packer", tname, {
+    name = "凰蝶似幻",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
 return Prefab("sorapack_container", pack3fn), Prefab("sorabowknot", fn, assets),
     Prefab("sorapacker", fullfn, packassets), Prefab("sora2pack", packfn, packassets),
     Prefab("sora3packer", full3fn, packassets), MakePlacer("sorapacker_placer", "sorapacker", "sorapacker", "place"),

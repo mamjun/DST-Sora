@@ -204,6 +204,8 @@ MakeSkin("xd","小蛋")
 MakeSkin("kfk","卡妈")
 MakeSkin("ly","流萤")
 
+MakeSkin("hd","凤凰如梦")
+MakeSkin("hd2","凤凰似幻")
 return Prefab(name, fn, assets),
     Prefab(name.."_item", item_fn, assets),
     MakePlacer(name.."_placer", name,name, "idle"),

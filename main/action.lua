@@ -85,19 +85,22 @@ SORAPACK.fn = function(act)
         local skin = invobject and invobject.prefab == "sora2pack" and invobject.link_skin or nil
         if invobject and invobject.prefab == "sorabowknot" then
             if invobject.skinname == "sorabowknot_ld" then
-                skin = "sorapacker_ld"
+                skin = "sora3packer_ld"
             end
             if invobject.skinname == "sorabowknot_sby" then
-                skin = "sorapacker_sby"
+                skin = "sora3packer_sby"
             end
             if invobject.skinname == "sorabowknot_dw" then
-                skin = "sorapacker_dw"
+                skin = "sora3packer_dw"
             end
             if invobject.skinname == "sorabowknot_wsqy" or invobject.skinname == "sorabowknot_wsqy_r" then
-                skin = "sorapacker_wsqy"
+                skin = "sora3packer_wsqy"
             end
             if invobject.skinname == "sorabowknot_dw_tmp" then
-                skin = "sorapacker_dw_tmp"
+                skin = "sora3packer_dw_tmp"
+            end
+            if invobject.skinname == "sorabowknot_hd" then
+                skin = math.random(1,2) == 1 and "sora3packer_hd" or "sora3packer_hd2"
             end
         end
         local pack = GLOBAL.SpawnPrefab("sorapacker", skin)

@@ -1,4 +1,12 @@
 collectgarbage("collect")
+local LeakMeta = {
+    __mode = "k"
+}
+local function LeakTable(tbl) -- 生成一个弱引用表
+    local t = tbl or {}
+    setmetatable(t, LeakMeta)
+    return t
+end
 local a = LeakTable()
 function TestPrefab()
     local t = os.clock()
