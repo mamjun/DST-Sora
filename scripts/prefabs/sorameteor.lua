@@ -89,7 +89,7 @@ local function fn()
                     -- ent.components.combat:GetAttacked(inst.attacker,att,inst)
                     if ent.components.combat then
 
-                        ent.components.combat:GetAttacked(inst.attacker, inst.att, inst.owner or inst)
+                        ent.components.combat:GetAttacked_Internal(inst.attacker, inst.att, inst.owner or inst)
                         -- ent.components.health:DoDelta(inst.att, nil, "NIL", nil, inst.attacker, true)
                     end
                 end

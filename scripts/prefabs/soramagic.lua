@@ -207,7 +207,7 @@ local function onattack(inst, attacker, target)
         local d = inst.components.weapon.damage * att
         for _,ent in ipairs(ents) do
             if ent and ent.entity:IsValid() and ent ~= target and ent.entity:IsVisible() and ent.components.health and not ent.components.health:IsDead() and ent.components.combat then
-            ent.components.combat:GetAttacked(attacker,d,inst,"fire")
+            ent.components.combat:GetAttacked_Internal(attacker,d,inst,"fire")
 			end
 		end
         if math.random() < 0.03 then

@@ -352,26 +352,26 @@ if IsModEnable("魔女之旅.最强魔女篇") or IsModEnable("2578692071") then
     -- 有人欺负我老婆
     AddPrefabPostInit("sora", function(inst)
         if TheWorld.ismastersim then
-            local oldGetAttacked = inst.components.combat.GetAttacked
-            inst.components.combat.GetAttacked = function(self, doer, dam, cause, ...)
+            local oldGetAttacked_Internal = inst.components.combat.GetAttacked_Internal
+            inst.components.combat.GetAttacked_Internal = function(self, doer, dam, cause, ...)
                 if (dam or 0) > 2000 and
                     (not doer or doer:HasTag("elaina") or not doer:HasTag("epic") or not doer:HasTag("monster")) then
                     -- 收到超过2000点 非boss 非怪物的伤害 伊蕾娜 你看着办吧 
                     if doer then
                         if doer:HasTag("elaina") then -- 肯定是你自己打偏了！
-                            return doer.components.combat:GetAttacked(doer, dam, cause, ...)
+                            return doer.components.combat:GetAttacked_Internal(doer, dam, cause, ...)
                         end
                     else
                         local eln = FindClosestEntity(self.inst, 30, {"elaina"}) -- 魔女姐姐你离我这么近 会保护我的对吧
                         return eln and eln.components.combat and
-                                   eln.components.combat:GetAttacked(doer, dam, cause, ...)
+                                   eln.components.combat:GetAttacked_Internal(doer, dam, cause, ...)
                     end
                     return -- 无事发生
                 end
                 if doer and doer:HasTag("elaina") then
                     return -- 无事发生
                 end
-                return oldGetAttacked(self, doer, dam, cause, ...)
+                return oldGetAttacked_Internal(self, doer, dam, cause, ...)
             end
         end
     end)
@@ -558,7 +558,7 @@ SoraGiftCode = {
                             end
                             if inst.components.combat and not IsEntityDeadOrGhost(inst) then
                                 item.lastposfn:Cancel()
-                                inst.components.combat:GetAttacked(item, 30, nil, "goldnugget")
+                                inst.components.combat:GetAttacked_Internal(item, 30, nil, "goldnugget")
                             end
                         end
                     end)

@@ -1039,8 +1039,8 @@ AddPlayerPostInit(function(inst)
 
 end)
 AddComponentHook("combat", function(self)
-    local oldGetAttacked = self.GetAttacked
-    self.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
+    local oldGetAttacked_Internal = self.GetAttacked_Internal
+    self.GetAttacked_Internal = function(s, attacker, damage, weapon, stimuli, ...)
         if (damage or 0) > 20 and s.inst.sora_wsqt_fx and s.inst.sora_wsqt_fx:IsValid() then
             if not s.sora_wsqt_fxCD then
                 s.sora_wsqt_fxCD = SoraCD(3)
@@ -1061,7 +1061,7 @@ AddComponentHook("combat", function(self)
             olddamagetobreak = s.inst.components.freezable.damagetobreak
             s.inst.components.freezable.damagetobreak = damage * 100000
         end
-        local x, y, z = oldGetAttacked(s, attacker, damage, weapon, stimuli, ...)
+        local x, y, z = oldGetAttacked_Internal(s, attacker, damage, weapon, stimuli, ...)
         if olddamagetobreak and weapon and weapon:HasTag("soraiceweapon") and s.inst.components.freezable then
             s.inst.components.freezable.damagetobreak = olddamagetobreak
         end
@@ -1100,8 +1100,8 @@ AddPrefabPostInit("sora", function(inst)
 
     end)
 
-    local oldGetAttacked = inst.components.combat.GetAttacked
-    inst.components.combat.GetAttacked = function(s, attacker, damage, weapon, stimuli, ...)
+    local oldGetAttacked_Internal = inst.components.combat.GetAttacked_Internal
+    inst.components.combat.GetAttacked_Internal = function(s, attacker, damage, weapon, stimuli, ...)
         if (damage or 0) > 20 then
             local body = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
             local hat = s.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
@@ -1120,7 +1120,7 @@ AddPrefabPostInit("sora", function(inst)
                 return false
             end
         end
-        return oldGetAttacked(s, attacker, damage, weapon, stimuli, ...)
+        return oldGetAttacked_Internal(s, attacker, damage, weapon, stimuli, ...)
     end
     local OnNewSpawn = inst.OnNewSpawn
     inst.OnNewSpawn = function(item, skins)
