@@ -30,9 +30,9 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 ]]
 
 author = "FL"
-version = "13.80"
-name = "小穹 v13.80"
-description = [[当前版本：13.80\n
+version = "13.81"
+name = "小穹 v13.81"
+description = [[当前版本：13.81\n
 恨穹不是妹，恨妹不成穹！
 初始属性很差，但随着等级上升可以获得大量属性。
 交流群号： 777150028
@@ -97,7 +97,7 @@ icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
 -- MOD标签
-server_filter_tags = { "Sora", "穹"}
+server_filter_tags = { "Sora", "穹","DST_SORA","DST-SORA"}
 string = string or ""
 
   configuration_options = {

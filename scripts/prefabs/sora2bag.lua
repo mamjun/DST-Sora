@@ -96,6 +96,9 @@ local function onequip(inst, owner)
 	if inst._task ~= nil then
         inst._task:Cancel()
     end
+	if not (owner and owner:HasTag("player")) then
+        return
+    end
 	inst._task = inst:DoPeriodicTask(1,onfind,nil,owner)
 	if inst.components.container ~= nil then
 		inst.components.container:Open(owner)
@@ -104,6 +107,9 @@ end
 
 local function onunequip(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body_backback")
+	if not (owner and owner:HasTag("player")) then
+        return
+    end
     --owner.AnimState:ClearOverrideSymbol("backpack")
     if inst.components.container ~= nil then
 		inst.components.container:Close(owner)

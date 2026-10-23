@@ -158,6 +158,9 @@ local function onequip(inst, owner)
     -- owner.AnimState:OverrideSymbol("swap_body", "sorabowknot", "swap_body")
     -- owner.AnimState:OverrideSymbol("swap_body", "sorabowknot", "swap_sorabowknot")
     -- inst.components.container:Open(owner)
+    if not (owner and owner:HasTag("sora")) then
+        return
+    end
     owner.components.combat.externaldamagemultipliers:SetModifier("sora2amulet", getsora("sorabowknotatt"))
     owner.components.combat.externaldamagetakenmultipliers:SetModifier("sora2amulet", 2 - getsora("sorabowknotarm"))
     turnoff(inst)
@@ -171,6 +174,9 @@ local function onunequip(inst, owner)
     -- owner.AnimState:ClearOverrideSymbol("swap_body")
     -- owner.AnimState:ClearOverrideSymbol("backpack")
     turnoff(inst)
+    if not (owner and owner:HasTag("sora")) then
+        return
+    end
     owner.components.combat.externaldamagemultipliers:SetModifier("sora2amulet")
     owner.components.combat.externaldamagetakenmultipliers:SetModifier("sora2amulet")
     -- inst:RemoveEventCallback("armorbroke",onbreak,owner)
@@ -326,7 +332,7 @@ local function fn()
             elseif inst.skinname == "sorabowknot_dw_tmp" then
                 doer.components.bundler.preskinname = "sorapacker_dw_tmp"
             elseif inst.skinname == "sorabowknot_hd" then
-                doer.components.bundler.preskinname = math.random(1,2) == 1 and "sorapacker_hd" or "sorapacker_hd2"
+                doer.components.bundler.preskinname = math.random(1, 2) == 1 and "sorapacker_hd" or "sorapacker_hd2"
             else
                 doer.components.bundler.preskinname = nil
             end
@@ -408,7 +414,7 @@ local function packfn()
 
     return inst
 end
-SoraAPI.MakeItemSkinDefaultData("sora2pack", {}, {"sora2pack_1", "sora2pack","anim"})
+SoraAPI.MakeItemSkinDefaultData("sora2pack", {}, {"sora2pack_1", "sora2pack", "anim"})
 SoraAPI.MakeItemSkin("sora2pack", "sora2pack_2", {
     name = "穹の打包纸",
     atlas = "images/inventoryimages/sora2pack_2.xml",
@@ -919,7 +925,6 @@ SoraAPI.MakeItemSkin("sorabowknot", tname, {
 })
 SoraAPI.MakeAssetTable(tname, assets)
 
-
 local tname = "sorapacker_hd"
 SoraAPI.MakeItemSkin("sorapacker", tname, {
     name = "凰蝶如梦",
@@ -943,7 +948,6 @@ SoraAPI.MakeItemSkin("sorapacker", tname, {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn
 })
 SoraAPI.MakeAssetTable(tname, assets)
-
 
 local tname = "sora3packer_hd"
 SoraAPI.MakeItemSkin("sora3packer", tname, {
