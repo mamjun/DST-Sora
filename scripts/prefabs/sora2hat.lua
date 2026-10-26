@@ -28,73 +28,60 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 3,严禁直接修改本mod内文件后二次发布。
 4,从本mod内提前的源码请保留版权信息,并且禁止加密、混淆。 
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
-]]
-local assets =
-{
-    Asset("ANIM", "anim/sora2hat.zip"),
-	Asset("ATLAS", "images/inventoryimages/sora2hat.xml"),
-	Asset("IMAGE", "images/inventoryimages/sora2hat.tex"),
-	Asset("ATLAS_BUILD", "images/inventoryimages/sora2hat.xml", 256),
-    
-    Asset("ANIM", "anim/sora2hatskin.zip"),
-    Asset("ATLAS", "images/inventoryimages/sora2hatskin.xml"),
-	Asset("IMAGE", "images/inventoryimages/sora2hatskin.tex"),
-	Asset("ATLAS_BUILD", "images/inventoryimages/sora2hatskin.xml", 256),
-}
+]] local assets = {Asset("ANIM", "anim/sora2hat.zip"), Asset("ATLAS", "images/inventoryimages/sora2hat.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sora2hat.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora2hat.xml", 256),
 
-local armorassets =
-{
-    Asset("ANIM", "anim/sora2armor.zip"),
-	Asset("ATLAS", "images/inventoryimages/sora2armor.xml"),
-	Asset("IMAGE", "images/inventoryimages/sora2armor.tex"),
-	Asset("ATLAS_BUILD", "images/inventoryimages/sora2armor.xml", 256),
-    
-    Asset("ANIM", "anim/sora2armorbuild.zip"),
-    Asset("ANIM", "anim/sora2armorskin.zip"),
-	Asset("ATLAS", "images/inventoryimages/sora2armorskin.xml"),
-	Asset("IMAGE", "images/inventoryimages/sora2armorskin.tex"),
-	Asset("ATLAS_BUILD", "images/inventoryimages/sora2armorskin.xml", 256),
-    
-}
+                   Asset("ANIM", "anim/sora2hatskin.zip"), Asset("ATLAS", "images/inventoryimages/sora2hatskin.xml"),
+                   Asset("IMAGE", "images/inventoryimages/sora2hatskin.tex"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sora2hatskin.xml", 256)}
+
+local armorassets = {Asset("ANIM", "anim/sora2armor.zip"), Asset("ATLAS", "images/inventoryimages/sora2armor.xml"),
+                     Asset("IMAGE", "images/inventoryimages/sora2armor.tex"),
+                     Asset("ATLAS_BUILD", "images/inventoryimages/sora2armor.xml", 256),
+
+                     Asset("ANIM", "anim/sora2armorbuild.zip"), Asset("ANIM", "anim/sora2armorskin.zip"),
+                     Asset("ATLAS", "images/inventoryimages/sora2armorskin.xml"),
+                     Asset("IMAGE", "images/inventoryimages/sora2armorskin.tex"),
+                     Asset("ATLAS_BUILD", "images/inventoryimages/sora2armorskin.xml", 256)}
 local l = SoraAPI.sorarepairer
 local function AcceptTest(inst, item)
-	if l[item.prefab] then
-	return inst.components.armor:GetPercent()<1
-	else
-	return false
-	end
+    if l[item.prefab] then
+        return inst.components.armor:GetPercent() < 1
+    else
+        return false
+    end
 end
-local function TraderCount(inst,giver,item)
-	local arm = 1-inst.components.armor:GetPercent()
-	if l[item.prefab]  then
-		return math.floor(arm/l[item.prefab])
-	else
-	return 1
-	end
-end
-
-
-local function OnGetItemFromPlayer(inst, giver, item, player) 
-	local num = 1
-	if item.components.stackable then
-	num = item.components.stackable.stacksize
-	end
-	inst.components.armor:SetPercent(inst.components.armor:GetPercent()+l[item.prefab]*num)
-
+local function TraderCount(inst, giver, item)
+    local arm = 1 - inst.components.armor:GetPercent()
+    if l[item.prefab] then
+        return math.floor(arm / l[item.prefab])
+    else
+        return 1
+    end
 end
 
-local function onequip(inst, owner) 
-    if owner:HasTag("sora")  then
+local function OnGetItemFromPlayer(inst, giver, item, player)
+    local num = 1
+    if item.components.stackable then
+        num = item.components.stackable.stacksize
+    end
+    inst.components.armor:SetPercent(inst.components.armor:GetPercent() + l[item.prefab] * num)
+
+end
+
+local function onequip(inst, owner)
+    if owner:HasTag("sora") and not (inst.skinname == "sora2hat_jyyh" or inst.skinname == "sora2hat_cyxg") then
         return
     end
     owner.AnimState:OverrideSymbol("swap_hat", inst.skinname or "sora2hat", "swap_hat")
     owner.AnimState:Show("HAT")
-    owner.AnimState:Hide("HAIR_HAT")
-    owner.AnimState:Show("HAIR_NOHAT")
-    owner.AnimState:Show("HAIR")
+    owner.AnimState:Show("HAIR_HAT")
+    owner.AnimState:Hide("HAIR_NOHAT")
+    owner.AnimState:Hide("HAIR")
 end
 
-local function onunequip(inst, owner) 
+local function onunequip(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_hat")
     owner.AnimState:Hide("HAT")
     owner.AnimState:Hide("HAIR_HAT")
@@ -102,37 +89,39 @@ local function onunequip(inst, owner)
     owner.AnimState:Show("HAIR")
 end
 
-local symbol = {"arm_lower","arm_upper","arm_upper_skin","foot","hand","leg","skirt","torso","torso_pelvis"}
-local function onequiparmor(inst, owner) 
-    if owner:HasTag("sora")  then
+local symbol = {"arm_lower", "arm_upper", "arm_upper_skin", "foot", "hand", "leg", "skirt", "torso", "torso_pelvis"}
+local function onequiparmor(inst, owner)
+    if owner:HasTag("sora") then
         return
     end
     if not inst.skinname or not owner.SoraLockSymbol then
         owner.AnimState:OverrideSymbol("swap_body", "sora2armor", "swap_body")
     else
-        for k,v in pairs(symbol) do
-            owner:SoraLockSymbol(v, "sora2armor", "sora2armorbuild",v)
+        for k, v in pairs(symbol) do
+            owner:SoraLockSymbol(v, "sora2armor", "sora2armorbuild", v)
         end
     end
 end
 
-local function onunequiparmor(inst, owner) 
+local function onunequiparmor(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
     if owner.SoraUnlockSymbol then
-        for k,v in pairs(symbol) do
-            owner:SoraUnlockSymbol(v,"sora2armor")
+        for k, v in pairs(symbol) do
+            owner:SoraUnlockSymbol(v, "sora2armor")
         end
     end
 end
-local function onhaunt (inst,doer)
-	if not doer then
-	return false
-	end
-	if  doer:HasTag("playerghost")  then
-		doer:PushEvent("respawnfromghost", { source = inst })
-		inst:Remove()
-		return true
-	end
+local function onhaunt(inst, doer)
+    if not doer then
+        return false
+    end
+    if doer:HasTag("playerghost") then
+        doer:PushEvent("respawnfromghost", {
+            source = inst
+        })
+        inst:Remove()
+        return true
+    end
 end
 local function fn()
     local inst = CreateEntity()
@@ -142,53 +131,53 @@ local function fn()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
-	inst:AddTag("aquatic")
+    inst:AddTag("aquatic")
     inst.AnimState:SetBank("sora2hat")
     inst.AnimState:SetBuild("sora2hat")
     inst.AnimState:PlayAnimation("anim")
     inst:AddTag("waterproofer")
-	inst:AddTag("soratrader")
+    inst:AddTag("soratrader")
     inst.entity:SetPristine()
-	inst.entity:AddMiniMapEntity()
-	inst.MiniMapEntity:SetIcon("sora2hat.tex")
+    inst.entity:AddMiniMapEntity()
+    inst.MiniMapEntity:SetIcon("sora2hat.tex")
     inst:AddComponent("soratwoface")
     if not TheWorld.ismastersim then
         return inst
     end
-   
+
     inst:AddComponent("inspectable")
-	inst.components.inspectable:SetDescription([[
+    inst.components.inspectable:SetDescription([[
 	银白骑士团の制式盔甲，
 	可以用绳子、木头、猪皮、石头、燧石
 	兔尾巴、蜘蛛丝、蜘蛛腺体、狗牙
 	大理石、噩梦燃料修复耐久
 	]])
     inst:AddComponent("inventoryitem")
-	inst.components.inventoryitem.atlasname="images/inventoryimages/sora2hat.xml"
-	inst.components.inventoryitem.imagename="sora2hat"
-	--护甲
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2hat.xml"
+    inst.components.inventoryitem.imagename = "sora2hat"
+    -- 护甲
     inst:AddComponent("planardefense")
-	inst.components.planardefense:SetBaseDefense(3)
+    inst.components.planardefense:SetBaseDefense(3)
     inst:AddComponent("armor")
-	--inst:AddTag("hide_percentage")
-    inst.components.armor:InitCondition(getsora("sora2hatarm2"),getsora("sora2hatarm1"))
-	--inst.components.armor.GetAbsorption = onAbsorption 
-	inst:AddComponent("waterproofer")
+    -- inst:AddTag("hide_percentage")
+    inst.components.armor:InitCondition(getsora("sora2hatarm2"), getsora("sora2hatarm1"))
+    -- inst.components.armor.GetAbsorption = onAbsorption 
+    inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(getsora("sora2hatwat"))
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)
-	--回脑残
-	inst.components.equippable.dapperness = getsora("sora2hatsan")/60
-	--移速
-	inst.components.equippable.walkspeedmult = getsora("sora2hatspe")
-	inst:AddComponent("trader")
-	inst.cantrader = TraderCount
-	inst.components.trader:SetAbleToAcceptTest(AcceptTest)
-	inst.components.trader.onaccept = OnGetItemFromPlayer
-	inst:AddComponent("hauntable")
-	inst.components.hauntable.onhaunt = onhaunt
+    -- 回脑残
+    inst.components.equippable.dapperness = getsora("sora2hatsan") / 60
+    -- 移速
+    inst.components.equippable.walkspeedmult = getsora("sora2hatspe")
+    inst:AddComponent("trader")
+    inst.cantrader = TraderCount
+    inst.components.trader:SetAbleToAcceptTest(AcceptTest)
+    inst.components.trader.onaccept = OnGetItemFromPlayer
+    inst:AddComponent("hauntable")
+    inst.components.hauntable.onhaunt = onhaunt
     return inst
 end
 local function armorfn()
@@ -199,73 +188,97 @@ local function armorfn()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
-	inst:AddTag("aquatic")
+    inst:AddTag("aquatic")
     inst.AnimState:SetBank("sora2armor")
     inst.AnimState:SetBuild("sora2armor")
     inst.AnimState:PlayAnimation("anim")
     inst:AddTag("waterproofer")
-	inst:AddTag("soratrader")
+    inst:AddTag("soratrader")
     inst.entity:SetPristine()
-	inst.entity:AddMiniMapEntity()
-	inst.MiniMapEntity:SetIcon("sora2armor.tex")
+    inst.entity:AddMiniMapEntity()
+    inst.MiniMapEntity:SetIcon("sora2armor.tex")
     if not TheWorld.ismastersim then
         return inst
     end
 
     inst:AddComponent("inspectable")
-	inst.components.inspectable:SetDescription([[
+    inst.components.inspectable:SetDescription([[
 	保护你的身体和脑子，
 	可以用绳子、木头、猪皮、石头、燧石
 	兔尾巴、蜘蛛丝、蜘蛛腺体、狗牙
 	大理石、噩梦燃料修复耐久
 	]])
     inst:AddComponent("inventoryitem")
-	inst.components.inventoryitem.atlasname="images/inventoryimages/sora2armor.xml"
-	inst.components.inventoryitem.imagename="sora2armor"
-	--护甲
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sora2armor.xml"
+    inst.components.inventoryitem.imagename = "sora2armor"
+    -- 护甲
     inst:AddComponent("planardefense")
-	inst.components.planardefense:SetBaseDefense(3)
+    inst.components.planardefense:SetBaseDefense(3)
     inst:AddComponent("armor")
-	--inst:AddTag("hide_percentage")
-    inst.components.armor:InitCondition(getsora("sora2armorarm2"),getsora("sora2armorarm1"))
-	--inst.components.armor.GetAbsorption = onAbsorption 
+    -- inst:AddTag("hide_percentage")
+    inst.components.armor:InitCondition(getsora("sora2armorarm2"), getsora("sora2armorarm1"))
+    -- inst.components.armor.GetAbsorption = onAbsorption 
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(getsora("sora2armorwat"))
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.BODY
     inst.components.equippable:SetOnEquip(onequiparmor)
     inst.components.equippable:SetOnUnequip(onunequiparmor)
-	--回脑残
-	inst.components.equippable.dapperness = getsora("sora2armorsan")/60
-	--移速
-	inst.components.equippable.walkspeedmult = getsora("sora2armorspe")
-	inst:AddComponent("trader")
-	inst.cantrader = TraderCount
-	inst.components.trader:SetAbleToAcceptTest(AcceptTest)
-	inst.components.trader.onaccept = OnGetItemFromPlayer
-	inst:AddComponent("hauntable")
-	inst.components.hauntable.onhaunt = onhaunt
+    -- 回脑残
+    inst.components.equippable.dapperness = getsora("sora2armorsan") / 60
+    -- 移速
+    inst.components.equippable.walkspeedmult = getsora("sora2armorspe")
+    inst:AddComponent("trader")
+    inst.cantrader = TraderCount
+    inst.components.trader:SetAbleToAcceptTest(AcceptTest)
+    inst.components.trader.onaccept = OnGetItemFromPlayer
+    inst:AddComponent("hauntable")
+    inst.components.hauntable.onhaunt = onhaunt
 
     return inst
 end
 SoraAPI.MakeItemSkinDefaultData("sora2hat", {}, {})
 SoraAPI.MakeItemSkinDefaultData("sora2armor", {}, {})
-SoraAPI.MakeItemSkin("sora2hat","sora2hatskin",{
-            name = "sdl,awsl",
-            atlas = "images/inventoryimages/sora2hatskin.xml",
-            image = "sora2hatskin",
-            build = "sora2hatskin",
-            bank =  "sora2hatskin",
-        })
-SoraAPI.MakeItemSkin("sora2armor","sora2armorskin",{
-            name = "sdl,awsl",
-            atlas = "images/inventoryimages/sora2armorskin.xml",
-            image = "sora2armorskin",
-            build = "sora2armorskin",
-            bank =  "sora2armorskin",
-        })
+SoraAPI.MakeItemSkin("sora2hat", "sora2hatskin", {
+    name = "sdl,awsl",
+    atlas = "images/inventoryimages/sora2hatskin.xml",
+    image = "sora2hatskin",
+    build = "sora2hatskin",
+    bank = "sora2hatskin"
+})
+SoraAPI.MakeItemSkin("sora2armor", "sora2armorskin", {
+    name = "sdl,awsl",
+    atlas = "images/inventoryimages/sora2armorskin.xml",
+    image = "sora2armorskin",
+    build = "sora2armorskin",
+    bank = "sora2armorskin"
+})
 
-RegisterInventoryItemAtlas("images/inventoryimages/sora2hat.xml","sora2hat.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/sora2armor.xml","sora2armor.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/sora2hat.xml", "sora2hat.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/sora2armor.xml", "sora2armor.tex")
 
-return Prefab("sora2hat", fn, assets),Prefab("sora2armor", armorfn, armorassets)
+local tname = "sora2hat_cyxg"
+SoraAPI.MakeItemSkin("sora2hat", tname, {
+    name = "翠叶星歌",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+local tname = "sora2hat_jyyh"
+SoraAPI.MakeItemSkin("sora2hat", tname, {
+    name = "金曜月华",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+return Prefab("sora2hat", fn, assets), Prefab("sora2armor", armorfn, armorassets)

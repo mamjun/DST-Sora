@@ -40,7 +40,7 @@ Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), A
                 Asset("ANIM", "anim/sora_mysora.zip"), Asset("ANIM", "anim/sora_mysora_r.zip"),
                 Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"),
                 Asset("ANIM", "anim/sora_wsqy.zip"), Asset("ANIM", "anim/sora_sdsz_r.zip"),
-                Asset("ANIM", "anim/sora_yhjd.zip"),  Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
+                Asset("ANIM", "anim/sora_yhjd.zip"), Asset("ANIM", "anim/sora_cyxg.zip"),Asset("ANIM", "anim/sora_jyyh.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
                 Asset("ANIM", "anim/ghost_sora_build.zip"), Asset("ANIM", "anim/ghost_sora_r_build.zip")}
 -- 追加新版本选人提示
 if TUNING.GAMEMODE_STARTING_ITEMS then
@@ -1097,5 +1097,16 @@ MakeSkin("sora_yhjd", {
     name = "樱华绝代",
     des = '芳华易逝？\n樱华绝代！\n    ---感谢每一个陪我走过低谷的人',
     quotes = '樱花飘落的速度\n是五厘米'
+})
+MakeSkin("sora_cyxg", {
+    name = "翠叶星歌",
+    des = '翠叶轻摇，星河低唱。\n把漫长的夜，穿成温柔的诗。\n\t\t----By AIGC',
+    quotes = '借一片叶的轻盈\n接住满天星光'
+})
+
+MakeSkin("sora_jyyh", {
+    name = "金曜月华",
+    des = '金叶凝辉，宝石映月。\n将未说出口的心愿，藏进月色里。\n\t\t----By AIGC',
+    quotes = '愿月光落在肩头\n也照亮你的归途'
 })
 return MakePlayerCharacter("sora", prefabs, assets, common_postinit, master_postinit, start_inv)
