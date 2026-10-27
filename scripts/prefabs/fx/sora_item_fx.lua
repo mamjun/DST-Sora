@@ -244,11 +244,12 @@ end
 
 local function shield_bind(inst, owner)
     inst.doer = owner
-    inst.entity:SetParent(owner.entity)
+    owner:AddChild(inst)
+    --inst.entity:SetParent(owner.entity)
     inst.Transform:SetPosition(0,-0.1,0)
-    inst:ListenForEvent("onremove", function(i)
-        i:DoTaskInTime(0, i.Remove)
-    end, owner)
+    -- inst:ListenForEvent("onremove", function(i)
+    --     inst:DoTaskInTime(0, inst.Remove)
+    -- end, owner)
     inst:ListenForEvent("blocked",function ()
         UpdateFx(inst)
     end,owner)

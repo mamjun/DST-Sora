@@ -310,4 +310,29 @@ SoraAPI.MakeItemSkin("soratele",tname , {
     checkclientfn = SoraAPI.SoraSkinCheckClientFn,
 })
 SoraAPI.MakeAssetTable(tname,assets)
+
+local tname = "soratele_cyxg"
+SoraAPI.MakeItemSkin("soratele", tname, {
+    name = "翠叶星歌",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+local tname = "soratele_jyyh"
+SoraAPI.MakeItemSkin("soratele", tname, {
+    name = "金曜月华",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
 return	Prefab( "soratele", fn, assets, prefabs)

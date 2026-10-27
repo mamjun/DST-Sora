@@ -161,7 +161,7 @@ local function onequip(inst, owner)
         end)
         return
     end
-    owner.AnimState:OverrideSymbol("swap_object", "sorahealing", "swap_weapon")
+    owner.AnimState:OverrideSymbol("swap_object", inst.skinname ~= nil and inst.skinname ~= "" and inst.skinname or "sorahealing", "swap_weapon")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
     if inst.magicfx ~= nil then
@@ -347,4 +347,31 @@ local function fn()
     inst.OnPreLoad = onpreload
     return inst
 end
+
+SoraAPI.MakeItemSkinDefaultData("sorahealing", {}, {})
+
+local tname = "sorahealing_cyxg"
+SoraAPI.MakeItemSkin("sorahealing", tname, {
+    name = "翠叶星歌",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+local tname = "sorahealing_jyyh"
+SoraAPI.MakeItemSkin("sorahealing", tname, {
+    name = "金曜月华",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
 return Prefab("sorahealing", fn, assets, prefabs)

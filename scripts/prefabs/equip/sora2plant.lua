@@ -1319,5 +1319,30 @@ SoraAPI.MakeItemSkin("sora2plant", tname, {
 })
 SoraAPI.MakeAssetTable(tname, assets)
 
+
+local tname = "sora2plant_cyxg"
+SoraAPI.MakeItemSkin("sora2plant", tname, {
+    name = "翠叶星歌",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+local tname = "sora2plant_jyyh"
+SoraAPI.MakeItemSkin("sora2plant", tname, {
+    name = "金曜月华",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
 return Prefab("sora2plant", fn, assets, prefabs), Prefab("sora2plant_fx", fxfn, assets, prefabs),
     Prefab("sora2plant_xm_fx", xmfxfn, assets, prefabs)

@@ -147,7 +147,7 @@ local function onequip(inst, owner)
         end)
 	return
 	end
-    owner.AnimState:OverrideSymbol("swap_object", "sorapick", "swap_weapon")
+    owner.AnimState:OverrideSymbol("swap_object", inst.skinname ~= nil and inst.skinname ~= "" and inst.skinname or "sorapick", "swap_weapon")
     owner.AnimState:Show("ARM_carry") 
     owner.AnimState:Hide("ARM_normal")
 	if inst.magicfx ~= nil then
@@ -433,4 +433,29 @@ local function fn()
     return inst
 end
 SoraAPI.MakeItemSkinDefaultData("sorapick", {}, {})
+
+local tname = "sorapick_cyxg"
+SoraAPI.MakeItemSkin("sorapick", tname, {
+    name = "翠叶星歌",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
+local tname = "sorapick_jyyh"
+SoraAPI.MakeItemSkin("sorapick", tname, {
+    name = "金曜月华",
+    atlas = "images/inventoryimages/" .. tname .. ".xml",
+    image = tname,
+    build = tname,
+    bank = tname,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+})
+SoraAPI.MakeAssetTable(tname, assets)
+
 return	Prefab( "sorapick", fn, assets, prefabs)

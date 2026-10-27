@@ -32,7 +32,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 local soraconfig = require "soraconfig/config"
 local fix = require "utils/soraplayerextend"
 require "debugtools"
-local assets = {Asset("SOUNDPACKAGE", "sound/sora.fev"),Asset("SOUND", "sound/sora_sfx.fsb"), Asset("SOUND", "sound/sora_bgm.fsb"), -- Asset( "ANIM", "anim/sora.zip" ),
+local assets = {Asset("SOUNDPACKAGE", "sound/sora.fev"), Asset("SOUND", "sound/sora_sfx.fsb"),
+                Asset("SOUND", "sound/sora_bgm.fsb"), -- Asset( "ANIM", "anim/sora.zip" ),
 Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), Asset("ANIM", "anim/sora_sllh.zip"),
                 Asset("ANIM", "anim/sora_zhizheng.zip"), Asset("ANIM", "anim/sora_hf.zip"),
                 Asset("ANIM", "anim/sora_amly.zip"), Asset("ANIM", "anim/sora_gete.zip"),
@@ -40,7 +41,8 @@ Asset("ANIM", "anim/sora_dress.zip"), Asset("ANIM", "anim/sora_uniforms.zip"), A
                 Asset("ANIM", "anim/sora_mysora.zip"), Asset("ANIM", "anim/sora_mysora_r.zip"),
                 Asset("ANIM", "anim/sora_shmm.zip"), Asset("ANIM", "anim/sora_sdsz.zip"),
                 Asset("ANIM", "anim/sora_wsqy.zip"), Asset("ANIM", "anim/sora_sdsz_r.zip"),
-                Asset("ANIM", "anim/sora_yhjd.zip"), Asset("ANIM", "anim/sora_cyxg.zip"),Asset("ANIM", "anim/sora_jyyh.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
+                Asset("ANIM", "anim/sora_yhjd.zip"), Asset("ANIM", "anim/sora_cyxg.zip"),
+                Asset("ANIM", "anim/sora_jyyh.zip"), Asset("ANIM", "anim/sora_foot_fx_sby.zip"),
                 Asset("ANIM", "anim/ghost_sora_build.zip"), Asset("ANIM", "anim/ghost_sora_r_build.zip")}
 -- 追加新版本选人提示
 if TUNING.GAMEMODE_STARTING_ITEMS then
@@ -111,6 +113,32 @@ for k, v in pairs(foods) do
         table.insert(sorafoods, v.name)
     end
 end
+-- 原有额外解锁配方；生成和读档时都补齐，后续可在此追加。
+local SORA_EXTRA_RECIPES = {
+    giftwrap = true,
+    mushroom_light = true,
+    mushroom_light2 = true,
+    winter_treestand = true,
+    red_mushroomhat = true,
+    blue_mushroomhat = true,
+    green_mushroomhat = true,
+}
+
+-- 扫描已注册配方，解锁上述固定配方及所有产物名以 shrine 结尾的神龛。
+local function UnlockSoraRecipes(inst)
+    local builder = inst.components.builder
+    if builder == nil then
+        return
+    end
+    for name, recipe in pairs(AllRecipes) do
+        local product = recipe.product or name
+        if (SORA_EXTRA_RECIPES[name] or product:sub(-6) == "shrine")
+            and not table.contains(builder.recipes, name) then
+            builder:AddRecipe(name)
+        end
+    end
+end
+
 local function OnSoraSpawn(inst, skins)
 
     local first = true
@@ -142,34 +170,12 @@ local function OnSoraSpawn(inst, skins)
             end
 
             local cane = 0
-            -- 手杖 没皮肤给1把 有皮肤给2把
-            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_victorian") then
-                table.insert(gifts, SpawnPrefab("cane", "cane_victorian", nil, inst.userid))
-                cane = cane + 1
-            end
-            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_ancient") then
-                table.insert(gifts, SpawnPrefab("cane", "cane_ancient", nil, inst.userid))
-                cane = cane + 1
-            end
-            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_candycane") then
-                table.insert(gifts, SpawnPrefab("cane", "cane_candycane", nil, inst.userid))
-                cane = cane + 1
-            end
-            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_sharp") then
-                table.insert(gifts, SpawnPrefab("cane", "cane_sharp", nil, inst.userid))
-                cane = cane + 1
-            end
-            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_harlequin") then
-                table.insert(gifts, SpawnPrefab("cane", "cane_harlequin", nil, inst.userid))
-                cane = cane + 1
-            end
-            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_rose") then
-                table.insert(gifts, SpawnPrefab("cane", "cane_rose", nil, inst.userid))
-                cane = cane + 1
-            end
-            if ValidateRecipeSkinRequest(inst.userid, "cane", "cane_chess") then
-                table.insert(gifts, SpawnPrefab("cane", "cane_chess", nil, inst.userid))
-                cane = cane + 1
+            -- 每个已拥有的手杖皮肤各给一把；皮肤手杖不足两把时，再给一把默认手杖。
+            for _, skin in ipairs(PREFAB_SKINS.cane or {}) do
+                if ValidateRecipeSkinRequest(inst.userid, "cane", skin) then
+                    table.insert(gifts, SpawnPrefab("cane", skin, nil, inst.userid))
+                    cane = cane + 1
+                end
             end
             if cane < 2 then
                 table.insert(gifts, SpawnPrefab("cane"))
@@ -192,21 +198,7 @@ local function OnSoraSpawn(inst, skins)
             inst.components.inventory.ignoresound = false
         end
     end
-    inst.components.builder:AddRecipe("giftwrap")
-    inst.components.builder:AddRecipe("mushroom_light")
-    inst.components.builder:AddRecipe("mushroom_light2")
-    inst.components.builder:AddRecipe("wargshrine")
-    inst.components.builder:AddRecipe("perdshrine")
-    inst.components.builder:AddRecipe("pigshrine")
-    inst.components.builder:AddRecipe("winter_treestand")
-    inst.components.builder:AddRecipe("red_mushroomhat")
-    inst.components.builder:AddRecipe("blue_mushroomhat")
-    inst.components.builder:AddRecipe("green_mushroomhat")
-    inst.components.builder:AddRecipe("yotc_carratshrine")
-    inst.components.builder:AddRecipe("yotb_beefaloshrine")
-    inst.components.builder:AddRecipe("yotr_rabbitshrine")
-    inst.components.builder:AddRecipe("yot_catcoonshrine")
-    inst.components.builder:AddRecipe("yotd_dragonshrine")
+    UnlockSoraRecipes(inst)
     -- local session = TheWorld.components.shard or "main"
 end
 
@@ -392,6 +384,7 @@ local function onload(inst, data)
         inst.components.health.base_health = 50
 
     end
+    UnlockSoraRecipes(inst)
 end
 
 local function soracaneat(inst, food)
@@ -416,13 +409,13 @@ local notpick = {
     plant_certificate = 1,
     medal_wormwood_flower = 1
 }
---消除大作物碰撞并锁定
-local function CheckCollides(inst, Collides,Collides2,Collides3,Collides4)
+-- 消除大作物碰撞并锁定
+local function CheckCollides(inst, Collides, Collides2, Collides3, Collides4)
     if not Collides then
         return false
     end
-    for k,v in pairs({Collides,Collides2,Collides3,Collides4}) do 
-        if v == COLLISION.CHARACTERS or v==COLLISION.GIANTS then
+    for k, v in pairs({Collides, Collides2, Collides3, Collides4}) do
+        if v == COLLISION.CHARACTERS or v == COLLISION.GIANTS then
             return true
         end
     end
@@ -441,7 +434,7 @@ local lockCollides = SoraAPI.userdata.MakeHook("Physics", 'CollidesWith', CheckC
 local lockCollidesGroup = SoraAPI.userdata.MakeHook("Physics", 'SetCollisionGroup', CheckCollidesGroup)
 
 local function ClearPhysics(item)
-    if item.Physics then 
+    if item.Physics then
         item.Physics:SetCollisionGroup(COLLISION.SMALLOBSTACLES)
         item.Physics:ClearCollidesWith(COLLISION.CHARACTERS)
         item.Physics:ClearCollidesWith(COLLISION.GIANTS)
@@ -954,8 +947,8 @@ local master_postinit = function(inst)
     inst.components.combat.hitrange = 4
     inst.OnLoad = onload
     inst.OnNewSpawn = OnSoraSpawn
-    local PushEvent = inst.PushEvent
-    inst.PushEvent = function(i, name, data, ...)
+    local PushEvent_Internal = inst.PushEvent_Internal
+    inst.PushEvent_Internal = function(i, name, data, ...)
         if name == "death" then
             if data and data.cause == "elaina_snapping_finger" then -- 谁爱死谁死
                 if SoraAPI.LastWB or data.afflicter then -- 你挖的宝是吧 
@@ -981,7 +974,7 @@ local master_postinit = function(inst)
                 return
             end
         end
-        return PushEvent(i, name, data, ...)
+        return PushEvent_Internal(i, name, data, ...)
     end
     if inst.components.spooked then
         inst:RemoveComponent("spooked")
@@ -1101,12 +1094,39 @@ MakeSkin("sora_yhjd", {
 MakeSkin("sora_cyxg", {
     name = "翠叶星歌",
     des = '翠叶轻摇，星河低唱。\n把漫长的夜，穿成温柔的诗。\n\t\t----By AIGC',
-    quotes = '借一片叶的轻盈\n接住满天星光'
+    quotes = '借一片叶的轻盈\n接住满天星光',
+    init_fn = function(inst)
+        if inst and TheWorld.ismastersim then
+            inst.sorafoot_fx = SpawnPrefab("sora_foot_star")
+            inst:AddChild(inst.sorafoot_fx)
+            --inst.sorafoot_fx.entity:SetParent(inst.entity)
+            inst.sorafoot_fx.owner = inst
+        end
+    end,
+    clear_fn = function(inst)
+        if inst and inst.sorafoot_fx and TheWorld.ismastersim then
+            inst.sorafoot_fx:Remove()
+            inst.soradancefxprefab = nil
+        end
+    end
 })
 
 MakeSkin("sora_jyyh", {
     name = "金曜月华",
     des = '金叶凝辉，宝石映月。\n将未说出口的心愿，藏进月色里。\n\t\t----By AIGC',
-    quotes = '愿月光落在肩头\n也照亮你的归途'
+    quotes = '愿月光落在肩头\n也照亮你的归途',
+    init_fn = function(inst)
+        if inst and TheWorld.ismastersim then
+            inst.sorafoot_fx = SpawnPrefab("sora_foot_star")
+            inst.sorafoot_fx.entity:SetParent(inst.entity)
+            inst.sorafoot_fx.owner = inst
+        end
+    end,
+    clear_fn = function(inst)
+        if inst and inst.sorafoot_fx and TheWorld.ismastersim then
+            inst.sorafoot_fx:Remove()
+            inst.soradancefxprefab = nil
+        end
+    end
 })
 return MakePlayerCharacter("sora", prefabs, assets, common_postinit, master_postinit, start_inv)

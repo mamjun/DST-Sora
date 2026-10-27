@@ -242,6 +242,9 @@ map['medal_spacetime_snacks_packet'] = 'medal_spacetime_lingshi'
 map['spore_small'] = 'spore_medium'
 map['spore_tall'] = 'spore_medium'
 
+map['security_pulse_cage_full'] = 'security_pulse_cage'
+map['spoiled_fish_small'] = 'spoiled_fish'
+
 for i = 1, 31 do
     map['trinket_' .. tostring(i)] = 'trinket'
 end

@@ -66,32 +66,77 @@ end
 
 modimport("main/init")
 -- prefab文件列表
-PrefabFiles = {"sora", "sorapocky", "sorarepairer", "sorabag", "soraclothes", "sorahat", "sora2hat", "sora2bag",
-               "sora2sword", "sora3sword", "sora2ice", "sora2fire", "sora2plant", "soramagic", "sorapick",
-               "sorahealing", "soratele", "sorabowknot", "sorabooks", "sorahealingstar", "soraprojectile", "sorameteor",
-               "sora2buffer", "sora2prop", "sora2amulet", "sora2base", "sora2chest", "sora2tree", "sorafoods",
-               "sora_item_fx", "sora_huapen", "sora_light", "sora_fl", "sora_flh", "sora_helper", "sora_wq",
-               "sora_nizao", "sora_lock", "sora_pickhat", "sora2pokeball", "sora_fx_feather"} -- ,""
+PrefabFiles = {}
 function AddPreFile(str)
     table.insert(PrefabFiles, str)
 end
 
-AddPreFile("sora2birdchest")
-AddPreFile("sora3chest")
-AddPreFile("sora_yingyu")
-AddPreFile("sora_dieyu")
-AddPreFile("sora_qiyu")
-AddPreFile("sora_shouban")
-AddPreFile("sora_smalllight")
-AddPreFile("sora_pot")
-AddPreFile("sora_tqy")
-AddPreFile("sora2vchest")
-AddPreFile("sora2build")
-AddPreFile("sora_lantern")
-AddPreFile("sora_ring")
-AddPreFile("sora_lyj")
-AddPreFile("sora_build")
-AddPreFile("sora_plant")
-AddPreFile("sora_gemsign")
-AddPreFile("sora2list")
+AddPreFile("sora")
 AddPreFile("sora_assets")
+AddPreFile("sora_helper")
+
+
+AddPreFile("build/sora2base")
+AddPreFile("build/sora2birdchest")
+AddPreFile("build/sora2build")
+AddPreFile("build/sora2chest")
+AddPreFile("build/sora2fire")
+AddPreFile("build/sora2ice")
+AddPreFile("build/sora2tree")
+AddPreFile("build/sora2vchest")
+AddPreFile("build/sora3chest")
+AddPreFile("build/sora_build")
+AddPreFile("build/sora_gemsign")
+AddPreFile("build/sora_huapen")
+AddPreFile("build/sora_light")
+AddPreFile("build/sora_plant")
+AddPreFile("build/sora_shouban")
+AddPreFile("build/sora_smalllight")
+
+
+AddPreFile("equip/sora2amulet")
+AddPreFile("equip/sora2bag")
+AddPreFile("equip/sora2hat")
+AddPreFile("equip/sora2list")
+AddPreFile("equip/sora2plant")
+AddPreFile("equip/sora2prop")
+AddPreFile("equip/sora3sword")
+AddPreFile("equip/sorabag")
+AddPreFile("equip/sorabowknot")
+AddPreFile("equip/soraclothes")
+AddPreFile("equip/sorahat")
+AddPreFile("equip/sorahealing")
+AddPreFile("equip/soramagic")
+AddPreFile("equip/sorapick")
+AddPreFile("equip/soratele")
+AddPreFile("equip/sora_dieyu")
+AddPreFile("equip/sora_lantern")
+AddPreFile("equip/sora_lyj")
+AddPreFile("equip/sora_pickhat")
+AddPreFile("equip/sora_qiyu")
+AddPreFile("equip/sora_tqy")
+AddPreFile("equip/sora_wq")
+AddPreFile("equip/sora_yingyu")
+
+
+AddPreFile("item/sora2buffer")
+AddPreFile("item/sora2pokeball")
+AddPreFile("item/sora2sword")
+AddPreFile("item/sorabooks")
+AddPreFile("item/sorafoods")
+AddPreFile("item/sorapocky")
+AddPreFile("item/sorarepairer")
+AddPreFile("item/sora_fl")
+AddPreFile("item/sora_flh")
+AddPreFile("item/sora_lock")
+AddPreFile("item/sora_nizao")
+AddPreFile("item/sora_pot")
+AddPreFile("item/sora_ring")
+
+
+AddPreFile("fx/sorahealingstar")
+AddPreFile("fx/sorameteor")
+AddPreFile("fx/soraprojectile")
+AddPreFile("fx/sora_fx_feather")
+AddPreFile("fx/sora_item_fx")
+AddPreFile("fx/sora_foot_star")

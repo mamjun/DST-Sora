@@ -3,3 +3,4 @@ temp/
 main/http_src.lua
 main/skin_src.lua
 main/src
+AGENTS.md
