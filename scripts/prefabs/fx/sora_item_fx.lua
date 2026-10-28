@@ -208,6 +208,8 @@ local function wsqt_fxfn(Sim)
     inst:ListenForEvent("onremove", wsqt_unfxbind)
     return inst
 end
+local ShieldVFX = require("sora_shield_vfx")
+
 local function UpdateFx(inst)
     if not inst.doer then
         return
@@ -217,11 +219,6 @@ local function UpdateFx(inst)
     local time = GetTime() - (doer.components.combat.lastdoattacktime or -100) 
     local time2 = GetTime() - (doer.components.combat.lastwasattackedtime > 0 and doer.components.combat.lastwasattackedtime  or -100 )
     --print(time,time2)
-    if (time > 60 ) and (time2 > 60 ) then 
-        inst:Hide()
-    else
-        inst:Show()
-    end
     local allshield = 0
     local body = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
     local hat = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
@@ -232,13 +229,11 @@ local function UpdateFx(inst)
         allshield = allshield + hat.sora_sheild
     end
     allshield = math.clamp(allshield, 0, 6)
-    for i=1,6 do
-        if i > allshield then 
-            inst.AnimState:Hide("f"..i)
-        else
-            inst.AnimState:Show("f"..i)
-        end
-
+    inst:SetShieldCount(allshield)
+    if (time > 60) and (time2 > 60) then
+        inst:Hide()
+    else
+        inst:Show()
     end
 end
 
@@ -260,21 +255,12 @@ local function shield_fxfn(Sim)
     -- print("footsbyfncc0")
     local inst = CreateEntity()
     inst.entity:AddTransform()
-    inst.entity:AddAnimState()
     inst.entity:AddNetwork()
-    -- inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
     inst.bind = shield_bind
-    --inst.AnimState:SetSortWorldOffset(0,0.1,0)
-    --inst.AnimState:SetLayer(LAYER_BACKGROUND)
-    --inst.AnimState:SetSortOrder(3)
     inst:AddTag("FX")
-    inst.AnimState:SetBank("sora_shield_fx")
-    inst.AnimState:SetBuild("sora_shield_fx")
-    inst.AnimState:PlayAnimation("idle", true)
-    inst.AnimState:SetScale(1.5,1.5,1.5)
-    inst.AnimState:SetMultColour(0.8,0.8,0.8,1)
     inst:AddTag("NOCLICK")
     inst:AddTag("NOBLOCK")
+    ShieldVFX.Init(inst)
     inst.entity:SetPristine()
     inst.persists = false
     if not TheWorld.soraismastersim then
@@ -286,5 +272,7 @@ end
 
 return Prefab("sora_item_fx", fn, Assets), Prefab("sora_tmp_fx", tmpfn, tmpAssets),
     Prefab("sora_foot_fx_sby", footsbyfn), Prefab("sora_foot_fx_sby_c", footsbycfn), Prefab("sora_wsqt_fx", wsqt_fxfn),
-    Prefab("sora_shield_fx", shield_fxfn)
+    Prefab("sora_shield_fx", shield_fxfn, ShieldVFX.assets, ShieldVFX.prefabs),
+    Prefab("sora_shield_dome_localfx", ShieldVFX.DomeFn, ShieldVFX.assets),
+    Prefab("sora_shield_orbit_localfx", ShieldVFX.OrbitFn, ShieldVFX.assets)
 
