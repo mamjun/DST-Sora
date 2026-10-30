@@ -273,6 +273,48 @@ for k, v in pairs({
     table.insert(fxprefabs, MakeFX(k))
 end
 local function pick(inst, item, hat)
+    local picktimeout = GetTime() + 30
+    local target_pos = item:GetPosition()
+    local target_owner = hat and hat.owner
+    local function ReturnCarriedItems()
+        local inventory = inst.components.inventory
+        if not inventory then
+            return
+        end
+        local can_use_hat = hat and hat:IsValid() and hat.components.container
+        local owner = target_owner
+        if not (owner and owner:IsValid()) then
+            owner = hat and hat:IsValid() and hat.components.inventoryitem
+                and hat.components.inventoryitem:GetGrandOwner()
+        end
+        local fallback_pos = owner and owner:IsValid() and owner:GetPosition()
+            or hat and hat:IsValid() and hat:GetPosition()
+            or target_pos
+        for slot = 1, inventory.maxslots do
+            local carried = inventory:RemoveItemBySlot(slot)
+            if carried then
+                if can_use_hat then
+                    -- 帽子容器满时由容器在帽子位置安全落地。
+                    hat.components.container:GiveItem(carried, nil, fallback_pos, true)
+                elseif owner and owner:IsValid() and owner.components.inventory then
+                    owner.components.inventory:GiveItem(carried, nil, fallback_pos)
+                else
+                    inventory:DropItem(carried, true, true, fallback_pos)
+                end
+            end
+        end
+    end
+    local function AbortPick()
+        inst.Physics:Stop()
+        ReturnCarriedItems()
+        if inst.unbind then
+            inst.unbind(hat)
+            inst.unbind = nil
+        end
+        item.sorapickhatskip = nil
+        inst:DoTaskInTime(0, inst.Remove)
+    end
+
     -- body
 
     inst:ListenForEvent("onremove", function()
@@ -281,12 +323,15 @@ local function pick(inst, item, hat)
             inst.unbind = nil
         end
     end)
-    local pos = item:GetPosition()
-    inst.Physics:Teleport(pos.x, 25, pos.z)
+    inst.Physics:Teleport(target_pos.x, 25, target_pos.z)
     local speed = math.random() * 10 - 20
     inst.Physics:SetMotorVel(0, speed, 0)
     inst:StartThread(function()
         while true do
+            if GetTime() >= picktimeout then
+                AbortPick()
+                return
+            end
             local p = inst:GetPosition()
             if p.y < 0.1  or inst:IsAsleep() then
                 inst.Physics:Stop()
@@ -317,6 +362,10 @@ local function pick(inst, item, hat)
             Sleep(0.01)
         end
         while true do
+            if GetTime() >= picktimeout then
+                AbortPick()
+                return
+            end
             local p = inst:GetPosition()
             inst.components.inventory:DropEverything()
             if p.y > 25   or inst:IsAsleep() then

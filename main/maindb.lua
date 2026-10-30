@@ -314,6 +314,83 @@ else
     end
     json = GLOBAL.json
 end
+
+-- MainDB 与依赖它的 ClientDB 共用同一套 JSON 键类型协议。
+SoraDBProtocol = {}
+function SoraDBProtocol.Pack(data)
+    if type(data) ~= "table" then
+        return data
+    end
+    local isarray = true
+    for k in pairs(data) do
+        if type(k) ~= "number" or k < 1 or k ~= math.floor(k) or k > 1000 then
+            isarray = false
+            break
+        end
+    end
+    local packed = {}
+    for k, v in pairs(data) do
+        if isarray then
+            packed[k] = SoraDBProtocol.Pack(v)
+        else
+            local ktype = type(k)
+            local prefix = ktype == "string" and "s"
+                or ktype == "number" and "n"
+                or ktype == "boolean" and "b"
+            if not prefix then
+                error("SoraDB: invalid key type " .. ktype)
+            end
+            packed[prefix .. ":" .. tostring(k)] = SoraDBProtocol.Pack(v)
+        end
+    end
+    return packed
+end
+
+function SoraDBProtocol.Unpack(data)
+    if type(data) ~= "table" then
+        return data
+    end
+    local isarray = true
+    for k in pairs(data) do
+        if type(k) ~= "number" then
+            isarray = false
+            break
+        end
+    end
+    local unpacked = {}
+    if isarray then
+        for k, v in pairs(data) do
+            unpacked[k] = SoraDBProtocol.Unpack(v)
+        end
+        return unpacked
+    end
+    for k, v in pairs(data) do
+        local sep = string.find(k, ":", 1, true)
+        if not sep then
+            error("SoraDB: invalid packed key " .. tostring(k))
+        end
+        local ktype = string.sub(k, 1, sep - 1)
+        local kstr = string.sub(k, sep + 1)
+        local key
+        if ktype == "s" then
+            key = kstr
+        elseif ktype == "n" then
+            key = tonumber(kstr)
+        elseif ktype == "b" then
+            if kstr == "true" then
+                key = true
+            elseif kstr == "false" then
+                key = false
+            end
+        end
+        if key == nil then
+            error("SoraDB: invalid packed key " .. tostring(k))
+        end
+        unpacked[key] = SoraDBProtocol.Unpack(v)
+    end
+    return unpacked
+end
+
 if not TheNet:GetIsServer() then
     env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...)
     end)
@@ -341,7 +418,9 @@ env.AddShardModRPCHandler(dbnamespace, "maindb", function(id, ns, cmd, data, ...
 end)
 
 local function encode(data)
-    local r, str = pcall(json.encode, data)
+    local r, str = pcall(function()
+        return json.encode(SoraDBProtocol.Pack(data))
+    end)
     if not r then
         print("MAINDB:ERROE ENCODE", str, tostring(data))
     end
@@ -352,8 +431,14 @@ local function decode(str)
     local r, data = pcall(json.decode, str)
     if not r then
         print("MAINDB:ERROE DECODE", data, tostring(str))
+        return data
     end
-    return data
+    local ok, unpacked = pcall(SoraDBProtocol.Unpack, data)
+    if not ok then
+        print("MAINDB:ERROE UNPACK", unpacked, tostring(str))
+        return unpacked
+    end
+    return unpacked
 end
 local rpc = SHARD_MOD_RPC[dbnamespace]["maindb"]
 
@@ -548,11 +633,11 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
             else
                 for k, v in pairs(self.data) do
                     if d[k] then
-                        self[k] = d[k]
+                        self.data[k] = d[k]
                         self:Notice("MainDBRootSync", {
                             namespace = self.namespace,
                             root = k,
-                            value = v
+                            value = d[k]
                         })
                     end
                 end
@@ -566,7 +651,7 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
                     value = nil
                 })
             else
-                for k, v in pairs() do
+                for k, v in pairs(self.data) do
                     self.data[k] = {}
                     self:Notice("MainDBRootSync", {
                         namespace = self.namespace,
@@ -703,32 +788,36 @@ function MainDB:AsynReply(id, aid, cmd, ret) -- 异步回复
     self:Send(id, "AsynReply", aid, cmd, encode(ret))
 end
 
-function MainDB:GetTableHash(t) -- 性能低就低吧
+function MainDB:GetTableHash(t)
     local kv = {}
-    for k, v in pairs(t) do
-        if type(v) == "table" then
-            table.insert(kv, k .. self:GetTableHash(v))
-        else
-            table.insert(kv, k .. tostring(v))
-        end
+    for k, v in pairs(t or {}) do
+        local keystr = type(k) .. ":" .. tostring(k)
+        local valuestr = type(v) == "table"
+            and "table:" .. tostring(self:GetTableHash(v))
+            or type(v) .. ":" .. tostring(v)
+        -- 类型和长度划定字段边界，排序不依赖 pairs 顺序或条目哈希碰撞。
+        kv[#kv + 1] = #keystr .. ":" .. keystr .. #valuestr .. ":" .. valuestr
     end
-    table.sort(kv, function(a, b)
-        return hash(a) < hash(b)
-    end)
+    table.sort(kv)
     return hash(table.concat(kv))
 end
 function MainDB:GetRootHash(root, needhash) -- 获取hash值 用于对比同步
     local keys = 0
     local hashs = 0
-    local str = ""
     if not root then
+        local roots = needhash and {} or nil
         for k, v in pairs(self.data) do
-            for ik, iv in pairs(v or {}) do
-                keys = keys + 1
+            if not self.noSyn[k] or self.noSyn[k] == 2 then
+                for ik, iv in pairs(v or {}) do
+                    keys = keys + 1
+                end
+                if needhash then
+                    roots[k] = v
+                end
             end
         end
         if needhash then
-            hashs = self:GetTableHash(self.data)
+            hashs = self:GetTableHash(roots)
         end
     elseif self.data[root] then
         for k, v in pairs(self.data[root] or {}) do
@@ -944,7 +1033,7 @@ local function MaindbUpdataFn()
 end
 
 AddSimPostInit(function(inst)
-    if not mid == sid then -- 主世界不需要去同步
+    if mid ~= sid then -- 主世界不需要去同步
         MaindbUpdataTask = TheWorld:DoPeriodicTask(1, MaindbUpdataFn)
     end
 

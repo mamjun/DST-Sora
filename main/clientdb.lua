@@ -78,7 +78,9 @@ env.AddModRPCHandler(dbnamespace, "ClientDB", serverandclientrpchandle)
 env.AddClientModRPCHandler(dbnamespace, "ClientDB", serverandclientrpchandle)
 MarkUserIDRPC(dbnamespace, "ClientDB")
 local function encode(data)
-    local r, str = pcall(json.encode, data)
+    local r, str = pcall(function()
+        return json.encode(SoraDBProtocol.Pack(data))
+    end)
     if not r then
         print("ClientDB:ERROE ENCODE", str, tostring(data))
     end
@@ -89,8 +91,14 @@ local function decode(str)
     local r, data = pcall(json.decode, str)
     if not r then
         print("Client:ERROE DECODE", data, tostring(str))
+        return data
     end
-    return data
+    local ok, unpacked = pcall(SoraDBProtocol.Unpack, data)
+    if not ok then
+        print("Client:ERROE UNPACK", unpacked, tostring(str))
+        return unpacked
+    end
+    return unpacked
 end
 local srpc = MOD_RPC[dbnamespace]["ClientDB"]
 local crpc = CLIENT_MOD_RPC[dbnamespace]["ClientDB"]
@@ -317,10 +325,10 @@ function ClientDB:Handle(id, cmd, data, data2, data3,...) -- 处理收到的数�
                 for k, v in pairs(self.data) do
                     if d[k] then
                         self.data[k] = d[k]
-                        self:Notice("ClientBRootSync", {
+                        self:Notice("ClientDBRootSync", {
                             namespace = self.namespace,
                             root = k,
-                            value = v
+                            value = d[k]
                         })
                     end
                 end
@@ -328,15 +336,15 @@ function ClientDB:Handle(id, cmd, data, data2, data3,...) -- 处理收到的数�
         elseif type(d) == "nil"  then
             if data then 
                 self.data[data] = {} 
-                self:Notice("ClientBRootSync", {
+                self:Notice("ClientDBRootSync", {
                     namespace = self.namespace,
                     root = data,
                     value = nil
                 })
             else 
-                for k,v in pairs() do 
+                for k,v in pairs(self.data) do
                     self.data[k] = {} 
-                    self:Notice("ClientBRootSync", {
+                    self:Notice("ClientDBRootSync", {
                         namespace = self.namespace,
                         root = k,
                         value = nil
@@ -458,37 +466,38 @@ function ClientDB:AsynReply(id, aid, cmd, ret) -- 异步回复
     self:Send(id, "AsynReply", aid, cmd, encode(ret))
 end
 
-function ClientDB:GetTableHash(t) -- 性能低就低吧
+function ClientDB:GetTableHash(t)
     local kv = {}
     for k, v in pairs(t or {}) do
-        if type(v) == "table" then
-            table.insert(kv, k .. self:GetTableHash(v))
-        else
-            table.insert(kv, k .. tostring(v))
-        end
+        local keystr = type(k) .. ":" .. tostring(k)
+        local valuestr = type(v) == "table"
+            and "table:" .. tostring(self:GetTableHash(v))
+            or type(v) .. ":" .. tostring(v)
+        -- 类型和长度划定字段边界，排序不依赖 pairs 顺序或条目哈希碰撞。
+        kv[#kv + 1] = #keystr .. ":" .. keystr .. #valuestr .. ":" .. valuestr
     end
-    table.sort(kv, function(a, b)
-        return hash(a) < hash(b)
-    end)
+    table.sort(kv)
     return hash(table.concat(kv))
 end
 function ClientDB:GetRootHash(root, needhash) -- 获取hash值 用于对比同步
     local keys = 0
     local hashs = 0
-    local str = ""
     if not root then
-        local roothash = ""
+        local roots = needhash and {} or nil
         for k, v in pairs(self.data) do
-            local t = self:GetRoot(k)
-            for ik, iv in pairs(t or {}) do
-                keys = keys + 1
+            if not self.noSyn[k] or self.noSyn[k] == 2 then
+                local t = self:GetRoot(k)
+                for ik, iv in pairs(t or {}) do
+                    keys = keys + 1
+                end
                 if needhash then
-                    roothash = roothash .. "|" .. tostring(self:GetTableHash(t))
+                    roots[k] = t
                 end
             end
         end
-        hashs = hash(roothash)
-
+        if needhash then
+            hashs = self:GetTableHash(roots)
+        end
     elseif self.data[root] then
         local t = self:GetRoot(root)
         for k, v in pairs(t or {}) do

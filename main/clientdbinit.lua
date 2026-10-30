@@ -2,7 +2,9 @@ if not CreateClientDB then
     return
 end
 local function encode(data)
-    local r, str = pcall(json.encode, data)
+    local r, str = pcall(function()
+        return json.encode(SoraDBProtocol.Pack(data))
+    end)
     if not r then
         print("ClientDB:ERROE ENCODE", str, tostring(data))
     end
@@ -13,8 +15,14 @@ local function decode(str)
     local r, data = pcall(json.decode, str)
     if not r then
         print("Client:ERROE DECODE", data, tostring(str))
+        return data
     end
-    return data
+    local ok, unpacked = pcall(SoraDBProtocol.Unpack, data)
+    if not ok then
+        print("Client:ERROE UNPACK", unpacked, tostring(str))
+        return unpacked
+    end
+    return unpacked
 end
 env.SoraClientDB = {}
 

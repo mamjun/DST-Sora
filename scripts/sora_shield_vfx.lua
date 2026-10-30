@@ -1,11 +1,13 @@
 -- sora_shield_fx 的金色棱面护罩与彩虹星辉；不处理护盾回复、消耗或伤害抵挡。
 local M = {}
 local TEXTURE = "fx/sora_shield_palette.tex"
+local STAR_TEXTURE = "fx/sora_shield_stars.tex"
 local SHADER = "shaders/vfx_particle_add.ksh"
 local PREFIX = "sora_shield_shader_"
-M.assets = { Asset("IMAGE", TEXTURE), Asset("SHADER", SHADER) }
+M.assets = { Asset("IMAGE", TEXTURE), Asset("IMAGE", STAR_TEXTURE), Asset("SHADER", SHADER) }
 -- Mod 图集必须用资源注册后的真实路径；着色器直接复用游戏内置资源。
 TEXTURE = resolvefilepath(TEXTURE)
+STAR_TEXTURE = resolvefilepath(STAR_TEXTURE)
 M.prefabs = { "sora_shield_dome_localfx", "sora_shield_orbit_localfx" }
 
 -- 两档仅控制外围星辉轨道；中间共用围住身体的金色棱面护罩。
@@ -16,12 +18,20 @@ local STYLES = {
         orbit_height = 2.35,    -- 星辉中心高度。
         shield_width = 0.46,   -- 星芒宽度；保留原参数名。
         shield_height = 0.58,  -- 星芒高度。
+        sprite_scale = PREFIX .. "scale_sprite_overhead",
+        sprite_width = 1.254375,
+        sprite_height = 1.5894530347448141,
+        sprite_first_tile = 0,
     },
     upper_body = {
         orbit_radius = 2.442,   -- 在当前基础上增加 10%。
         orbit_height = 1.35,
         shield_width = 0.56,
         shield_height = 0.72,
+        sprite_scale = PREFIX .. "scale_sprite_upper_body",
+        sprite_width = 1.48875,
+        sprite_height = 1.917578034744814,
+        sprite_first_tile = 224,
     },
 }
 local CONFIG = {
@@ -34,8 +44,6 @@ local CONFIG = {
     orbit_bob = 0.06,       -- 绕行时上下浮动幅度。
     refresh_interval = 1 / 15, -- 重绘粒子轮廓的间隔；移动载体仍每 tick 跟随人物。
     particle_lifetime = 0.14, -- 与重绘批次重叠，恢复此前明亮的连续轮廓。
-    edge_scale = 0.36,      -- 已知效果良好的星芒轮廓点尺寸。
-    surface_scale = 0.48,   -- 已知效果良好的星芒内部柔光尺寸。
     shell_edge_scale = 0.24,
     shell_surface_scale = 0.85,
     shell_rune_scale = 0.32,
@@ -49,7 +57,14 @@ local RAINBOW_STEPS = 256
 local RAINBOW_COUNT = 7 * RAINBOW_STEPS
 local ATLAS_COLUMNS = 64
 local ATLAS_FRAME = 1 / ATLAS_COLUMNS
-local STAR_SCALES = { PREFIX .. "scale_star_edge", PREFIX .. "scale_star_surface" }
+-- 整星每格仍为 64 像素；每八档取一档，两款各 224 色，共 16 列 × 32 行。
+local STAR_RAINBOW_STRIDE = 8
+local STAR_RAINBOW_COUNT = RAINBOW_COUNT / STAR_RAINBOW_STRIDE
+local STAR_ATLAS_COLUMNS, STAR_ATLAS_ROWS = 16, 32
+-- 三次叠加恢复原光点亮度。
+local STAR_COPIES = 3
+-- 三批交叉淡化：渐入一周期、保持一周期、渐出一周期。
+local STAR_LIFETIME = CONFIG.refresh_interval * 3
 local SHELL_SCALES = {
     PREFIX .. "scale_shell_edge",
     PREFIX .. "scale_shell_surface",
@@ -58,13 +73,12 @@ local SHELL_SCALES = {
 
 local sin, cos, floor, ceil = math.sin, math.cos, math.floor, math.ceil
 local PI2 = 2 * math.pi
-local shield_points, shell_points
+local shell_points
 local function Point(points, x, y, z, emitter)
     points[#points + 1] = { x, y, z, emitter or 0 }
 end
 
 local function BuildPoints()
-    shield_points = {}
     shell_points = {}
 
     -- 六片独立平面构成开口棱柱；软光点铺面，避免旧版半球网格外观。
@@ -106,50 +120,33 @@ local function BuildPoints()
         Line(0.32, 0.77, 0.43, 0.72, 5, 2)
         Line(0.57, 0.28, 0.68, 0.23, 5, 2)
     end
-
-    -- 四角星芒：尖端收束，中心饱满，替代原盾牌轮廓和盾面十字。
-    local vertices = {
-        { 0, 0.5 }, { 0.11, 0.11 }, { 0.5, 0 }, { 0.11, -0.11 },
-        { 0, -0.5 }, { -0.11, -0.11 }, { -0.5, 0 }, { -0.11, 0.11 },
-    }
-    for index, a in ipairs(vertices) do
-        local b = vertices[index % #vertices + 1]
-        for step = 0, 7 do
-            local t = step / 8
-            Point(shield_points, a[1] + (b[1] - a[1]) * t,
-                a[2] + (b[2] - a[2]) * t, 0)
-        end
-    end
-    -- 中央亮芯连接四束星光，避免只剩空心轮廓。
-    for step = -5, 5 do
-        Point(shield_points, 0, step * 0.06, 0)
-        if step ~= 0 then Point(shield_points, step * 0.06, 0, 0) end
-    end
-    -- 内缩光晕连接星芒中心与外缘，恢复此前饱满的星形。
-    for _, vertex in ipairs(vertices) do
-        for step = 1, 3 do
-            Point(shield_points, vertex[1] * step / 4, vertex[2] * step / 4, 0, 1)
-        end
-    end
 end
 
 local function InitEnvelopes()
-    -- 所有人物和发射器共用六份包络：一份淡出、两组星芒尺度和三组护罩尺度。
+    -- 共用七份包络：护罩淡出、星辉交叉淡化、两档整星尺寸和三组护罩尺度。
     EnvelopeManager:AddColourEnvelope(PREFIX .. "fade", {
         { 0, { 1, 1, 1, 1 } }, { 0.85, { 1, 1, 1, 1 } }, { 1, { 1, 1, 1, 0 } },
     })
-    local function AddScale(name, scale)
+    -- 稳态叠加总权重固定为 2 * 0.97125，接近旧版平均亮度。
+    EnvelopeManager:AddColourEnvelope(PREFIX .. "fade_star", {
+        { 0, { 1, 1, 1, 0 } },
+        { 1 / 3, { 1, 1, 1, 0.97125 } },
+        { 2 / 3, { 1, 1, 1, 0.97125 } },
+        { 1, { 1, 1, 1, 0 } },
+    })
+    local function AddScale(name, scale, height)
         EnvelopeManager:AddVector2Envelope(name, {
-            { 0, { scale, scale } }, { 1, { scale, scale } },
+            { 0, { scale, height or scale } }, { 1, { scale, height or scale } },
         })
     end
-    AddScale(STAR_SCALES[1], CONFIG.edge_scale)
-    AddScale(STAR_SCALES[2], CONFIG.surface_scale)
+    for _, style in pairs(STYLES) do
+        AddScale(style.sprite_scale, style.sprite_width, style.sprite_height)
+    end
     AddScale(SHELL_SCALES[1], CONFIG.shell_edge_scale)
     AddScale(SHELL_SCALES[2], CONFIG.shell_surface_scale)
     AddScale(SHELL_SCALES[3], CONFIG.shell_rune_scale)
     BuildPoints()
-    print("[SoraShieldVFX] revision=native-palette-v10-orbit110; registered envelopes=6; shader=" .. SHADER .. "; texture=" .. TEXTURE)
+    print("[SoraShieldVFX] revision=merged-stars-v3-colour224; registered envelopes=7; star_particles=3; shader=" .. SHADER)
     InitEnvelopes = nil
 end
 
@@ -179,23 +176,28 @@ local function CreateCarrier(kind)
         inst._rainbow_offset = (math.random(7) - 1) * RAINBOW_STEPS
         inst._rainbow_started = GetTime()
     end
-    local points = is_shell and shell_points or shield_points
-    local emitter_count = is_shell and 3 or 2
+    local emitter_count = is_shell and 3 or 1
     local effect = inst.entity:AddVFXEffect()
     effect:InitEmitters(emitter_count)
-    local batches = ceil(CONFIG.particle_lifetime / CONFIG.refresh_interval) + 1
+    local lifetime = is_shell and CONFIG.particle_lifetime or STAR_LIFETIME
+    local batches = ceil(lifetime / CONFIG.refresh_interval) + 1
     for emitter = 0, emitter_count - 1 do
-        local scale = is_shell and SHELL_SCALES[emitter + 1] or STAR_SCALES[emitter + 1]
-        effect:SetRenderResources(emitter, TEXTURE, SHADER)
-        effect:SetUVFrameSize(emitter, ATLAS_FRAME, ATLAS_FRAME)
+        local scale = is_shell and SHELL_SCALES[emitter + 1] or STYLES[DEFAULT_STYLE].sprite_scale
+        effect:SetRenderResources(emitter, is_shell and TEXTURE or STAR_TEXTURE, SHADER)
+        effect:SetUVFrameSize(emitter,
+            is_shell and ATLAS_FRAME or 1 / STAR_ATLAS_COLUMNS,
+            is_shell and ATLAS_FRAME or 1 / STAR_ATLAS_ROWS)
         effect:SetRotationStatus(emitter, false)
-        local point_count = 0
-        for _, point in ipairs(points) do
-            if point[4] == emitter then point_count = point_count + 1 end
+        local point_count = STAR_COPIES
+        if is_shell then
+            point_count = 0
+            for _, point in ipairs(shell_points) do
+                if point[4] == emitter then point_count = point_count + 1 end
+            end
         end
         effect:SetMaxNumParticles(emitter, point_count * batches)
-        effect:SetMaxLifetime(emitter, CONFIG.particle_lifetime)
-        effect:SetColourEnvelope(emitter, PREFIX .. "fade")
+        effect:SetMaxLifetime(emitter, lifetime)
+        effect:SetColourEnvelope(emitter, PREFIX .. (is_shell and "fade" or "fade_star"))
         effect:SetScaleEnvelope(emitter, scale)
         -- 恢复此前用户认可的大号加色星芒和金色护罩；护罩面单独关闭 Bloom。
         effect:SetBlendMode(emitter, BLENDMODE.Additive)
@@ -236,21 +238,21 @@ local function EmitShield(carrier, style, now)
     local elapsed = (now - carrier._rainbow_started) % CONFIG.rainbow_period
     local step = (carrier._rainbow_offset
         + floor(elapsed * RAINBOW_COUNT / CONFIG.rainbow_period)) % RAINBOW_COUNT
-    -- 星辉中心在三维轨道上移动；星芒朝向镜头，绕到侧面也可辨认。
-    local right = TheCamera:GetRightVec()
-    for _, point in ipairs(shield_points) do
-        local horizontal = point[1] * style.shield_width
-        local tile = point[4] * RAINBOW_COUNT + step
-        carrier.VFXEffect:AddParticleUV(point[4], CONFIG.particle_lifetime,
-            right.x * horizontal, point[2] * style.shield_height,
-            right.z * horizontal, 0, 0, 0,
-            (tile % ATLAS_COLUMNS) * ATLAS_FRAME, floor(tile / ATLAS_COLUMNS) * ATLAS_FRAME)
+    -- 取最近保留色，循环末尾回到首色；原 14 秒周期和随机起始色不变。
+    local colour = floor((step + STAR_RAINBOW_STRIDE / 2) / STAR_RAINBOW_STRIDE)
+        % STAR_RAINBOW_COUNT
+    local tile = style.sprite_first_tile + colour
+    local u = (tile % STAR_ATLAS_COLUMNS) / STAR_ATLAS_COLUMNS
+    local v = floor(tile / STAR_ATLAS_COLUMNS) / STAR_ATLAS_ROWS
+    for index = 1, STAR_COPIES do
+        carrier.VFXEffect:AddParticleUV(0, STAR_LIFETIME,
+            0, 0, 0, 0, 0, 0, u, v)
     end
 end
 
-local function EmitShell(carrier, now)
+local function EmitShell(carrier, now, phase)
     -- 各面及符纹使用同一旋转矩阵，保持棱面整体形状；高度不变。
-    local angle = (now % CONFIG.shell_period) * PI2 / CONFIG.shell_period
+    local angle = (now % CONFIG.shell_period) * PI2 / CONFIG.shell_period + phase
     local c, s = cos(angle), sin(angle)
     for _, point in ipairs(shell_points) do
         local tile = RAINBOW_COUNT * 2 + point[4]
@@ -286,6 +288,7 @@ local function UpdateLocal(inst)
     end
     if visual == nil then
         visual = { dome = SpawnPrefab("sora_shield_dome_localfx"), shields = {}, next_emit = 0,
+            next_star_emit = 0,
             style_name = style_name, summer_no_bloom = summer_no_bloom }
         inst._shield_visual = visual
         -- 仅有画面的客户端创建本地载体；控制器/人物删除时立即清除全部粒子。
@@ -294,8 +297,11 @@ local function UpdateLocal(inst)
     local count = state - 1
     local now = GetTime()
     local orbit_angle = (now % CONFIG.orbit_period) * PI2 / CONFIG.orbit_period
+        + inst._shield_orbit_phase
     local angle_step = count > 0 and PI2 / count or 0
     local x, y, z = owner.Transform:GetWorldPosition()
+    -- 保持直立星形随相机横向转动；图案按 40 度俯角烘焙，缩放时仍随竖直面投影。
+    local right = count > 0 and TheCamera:GetRightVec() or nil
     visual.dome.Transform:SetPosition(x, y, z)
     for index = 1, 6 do
         if index > count then
@@ -304,8 +310,12 @@ local function UpdateLocal(inst)
         else
             if visual.shields[index] == nil then
                 visual.shields[index] = SpawnPrefab("sora_shield_orbit_localfx")
+                visual.shields[index].VFXEffect:SetScaleEnvelope(0, style.sprite_scale)
                 visual.next_emit = 0
+                visual.next_star_emit = 0
             end
+            visual.shields[index].VFXEffect:SetSpawnVectors(0,
+                right.x, 0, right.z, 0, 1, 0)
             -- N 枚按 360/N 度均分圆周，数量改变当次重排；零层不计算除法。
             local angle = orbit_angle + angle_step * (index - 1)
             visual.shields[index].Transform:SetPosition(
@@ -315,9 +325,19 @@ local function UpdateLocal(inst)
         end
     end
     if now >= visual.next_emit then
-        EmitShell(visual.dome, now)
-        for _, shield in pairs(visual.shields) do EmitShield(shield, style, now) end
+        EmitShell(visual.dome, now, inst._shield_shell_phase)
         visual.next_emit = now + CONFIG.refresh_interval
+    end
+    if count > 0 and now + 0.000001 >= visual.next_star_emit then
+        for _, shield in pairs(visual.shields) do EmitShield(shield, style, now) end
+        -- 按上个计划时间前进，避免浮点误差把两 tick 间隔逐渐推成三 tick。
+        -- 首次显示或明显延迟时重新起算，不补发积压批次。
+        if visual.next_star_emit == 0
+            or now - visual.next_star_emit >= CONFIG.refresh_interval then
+            visual.next_star_emit = now + CONFIG.refresh_interval
+        else
+            visual.next_star_emit = visual.next_star_emit + CONFIG.refresh_interval
+        end
     end
 end
 
@@ -333,6 +353,9 @@ function M.Init(inst)
         inst._shield_upper_body:set(DEFAULT_STYLE == "upper_body")
     end
     if not TheNet:IsDedicated() then
+        -- 相位属于控制器，跨隐藏、样式切换及季节重建保留；各份演出独立错开。
+        inst._shield_shell_phase = math.random() * PI2
+        inst._shield_orbit_phase = math.random() * PI2
         inst:ListenForEvent("sorashielddirty", UpdateLocal)
         inst:ListenForEvent("sorashieldstyledirty", UpdateLocal)
         inst:ListenForEvent("onremove", ClearLocal)

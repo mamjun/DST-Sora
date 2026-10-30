@@ -1020,10 +1020,11 @@ function com:UpdateIce()
     end
 end
 function com:UpdatePower()
-    local owner = self:GetDoer()
-    if owner  and owner:IsValid() and not owner:HasTag("sora") then
-        if owner:HasTag("player") then 
-            c_despawn(owner)
+    if self.con:IsOpen() then
+        for doer in pairs(self.con.openlist) do
+            if doer:IsValid() and doer:HasTag("player") and not doer:HasTag("sora") then
+                c_despawn(doer)
+            end
         end
     end
     local power = self.power
