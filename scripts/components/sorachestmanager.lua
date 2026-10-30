@@ -285,6 +285,7 @@ local notdrop = {
 local cacheents = SoraAPI.LeakTableKV()
 local updateents = SoraAPI.LeakTableKV()
 local updatechests = SoraAPI.LeakTableKV()
+local orangechests = SoraAPI.LeakTable()
 local UpdateEnts
 local overfullfn = function(chest, inst)
     return inst:HasTag("bird")
@@ -425,7 +426,6 @@ local function TryPutToContainer(chest, ents, container, fn)
 end
 local DayUpdate
 local TryPut
-local GetOneItem
 local function AllChestDrop()
     for _, d in pairs(orderData) do
         for chest, data in pairs(allchest[d[1]] or {}) do
@@ -493,38 +493,6 @@ if TUNING.SORACHESTRANGE > 2000 then
             end
         end
     end
-    function GetOneItem(chest, container, prefab, overfull)
-        local ents = {}
-        local pos = chest:GetPosition()
-        for ent, v in pairs(cacheents) do
-            if toprefab(ent.prefab) == prefab and catch(ent) then
-                ents[ent] = 1
-            end
-        end
-        TryPutToContainer(chest, ents, container)
-        local first = true
-        if overfull and next(ents) then
-            for item, v in pairs(ents) do
-                if not overfullfn(chest, item) then
-                    if first then
-                        first = false
-                    else
-                        return
-                    end
-                end
-                if item.components.inventoryitem then
-                    item.components.inventoryitem:OnPickup(chest)
-                end
-                item.Transform:SetPosition(pos:Get())
-                if item.components.knownlocations then -- 有家就忘了 
-                    item.components.knownlocations:ForgetLocation("home")
-                end
-                if item.components.inventoryitem then
-                    item.components.inventoryitem:OnDropped(true)
-                end
-            end
-        end
-    end
 else
 
     function DayUpdate(inst, chest, container)
@@ -557,36 +525,30 @@ else
             end
         end
     end
-    function GetOneItem(chest, container, prefab, overfull)
-        local ents = {}
-        local pos = chest:GetPosition()
-        for ent, v in pairs(cacheents) do
-            if toprefab(ent.prefab) == prefab and catch(ent) and chest:GetDistanceSqToInst(ent) < maxrange then
-                ents[ent] = 1
+end
+local function MoveOverfullItems(chest, ents)
+    if not next(ents) then
+        return
+    end
+    local pos = chest:GetPosition()
+    local first = true
+    for item, v in pairs(ents) do
+        if not overfullfn(chest, item) then
+            if first then
+                first = false
+            else
+                return
             end
         end
-        TryPutToContainer(chest, ents, container)
-        local first = true
-        if overfull and next(ents) then
-            for item, v in pairs(ents) do
-                if not overfullfn(chest, item) then
-                    if first then
-                        first = false
-                    else
-                        return
-                    end
-                end
-                if item.components.inventoryitem then
-                    item.components.inventoryitem:OnPickup(chest)
-                end
-                item.Transform:SetPosition(pos:Get())
-                if item.components.knownlocations then -- 有家就忘了 
-                    item.components.knownlocations:ForgetLocation("home")
-                end
-                if item.components.inventoryitem then
-                    item.components.inventoryitem:OnDropped(true)
-                end
-            end
+        if item.components.inventoryitem then
+            item.components.inventoryitem:OnPickup(chest)
+        end
+        item.Transform:SetPosition(pos:Get())
+        if item.components.knownlocations then -- 有家就忘了
+            item.components.knownlocations:ForgetLocation("home")
+        end
+        if item.components.inventoryitem then
+            item.components.inventoryitem:OnDropped(true)
         end
     end
 end
@@ -595,12 +557,40 @@ local function GetItem(inst, data) -- 箱子收东西
         return
     end
     UpdateEnts()
-    for k, v in pairs(data.c) do
-        if v then
-            GetOneItem(inst, data.containers[k], v, data.overfull)
+
+    local wanted = {}
+    for _, prefab in pairs(data.c) do
+        if prefab then
+            wanted[prefab] = true
+        end
+    end
+    if not next(wanted) then
+        return
+    end
+
+    local buckets = {}
+    for ent, v in pairs(cacheents) do
+        local prefab = toprefab(ent.prefab)
+        if wanted[prefab] and catch(ent) and
+            (TUNING.SORACHESTRANGE > 2000 or inst:GetDistanceSqToInst(ent) < maxrange) then
+            local bucket = buckets[prefab]
+            if not bucket then
+                bucket = {}
+                buckets[prefab] = bucket
+            end
+            bucket[ent] = 1
         end
     end
 
+    for k, prefab in pairs(data.c) do
+        local bucket = prefab and buckets[prefab]
+        if bucket then
+            TryPutToContainer(inst, bucket, data.containers[k])
+            if data.overfull then
+                MoveOverfullItems(inst, bucket)
+            end
+        end
+    end
 end
 
 local function GetData(inst)
@@ -757,26 +747,54 @@ local function OrangeTask()
     if cmp:IsStop() then
         return
     end
+    if not next(orangechests) then
+        return
+    end
     local needupdate = {}
+    local priorities = {}
     local CurTick = OrangeTaskTick[OrangeCurrTick]
-    for type, chests in pairs(allchest) do -- 统计失效箱子
-        for chest, data in pairs(chests) do
-            if data.gem.orangegem and data.gem.orangegem > 0 then
-                if CurTick[data.gem.orangegem] then
-                    for ci, cprefab in pairs(data.c) do
-                        if not needupdate[cprefab] then
-                            needupdate[cprefab] = {}
-                        end
-                        table.insert(needupdate[cprefab], {chest, data, ci})
-                    end
+    for chest, data in pairs(orangechests) do
+        local orangegem = data.gem.orangegem
+        if CurTick[orangegem] then
+            local priority = data.pri or 0
+            for ci, cprefab in pairs(data.c) do
+                local by_priority = needupdate[cprefab]
+                if not by_priority then
+                    by_priority = {}
+                    needupdate[cprefab] = by_priority
                 end
+                local by_chest = by_priority[priority]
+                if not by_chest then
+                    by_chest = {}
+                    by_priority[priority] = by_chest
+                    priorities[priority] = true
+                end
+                local groups = by_chest[chest]
+                if not groups then
+                    groups = {}
+                    by_chest[chest] = groups
+                end
+                table.insert(groups, ci)
             end
         end
     end
     -- 如果有更新 整理一下实体
-    if next(needupdate) then
-        UpdateEnts()
+    if not next(needupdate) then
+        return
     end
+    UpdateEnts()
+
+    local ordered_priorities = {}
+    for priority in pairs(priorities) do
+        table.insert(ordered_priorities, priority)
+    end
+    table.sort(ordered_priorities, function(a, b)
+        return a > b
+    end)
+    local range_filter = TUNING.SORACHESTRANGE < 2000 and function(a, b)
+        return a:GetDistanceSqToInst(b) < maxrange
+    end
+
     -- 抓取需要的实体
     local topick = {}
     for ent, v in pairs(cacheents) do
@@ -789,15 +807,16 @@ local function OrangeTask()
         end
     end
     for prefab, ents in pairs(topick) do
-        local containers = needupdate[prefab]
-        table.sort(containers, function(a, b)
-            return (a[2].pri) > (b[2].pri or 0)
-        end)
-        for _, chestinfo in pairs(containers) do
-            TryPutToContainer(chestinfo[1], ents, chestinfo[2].containers[chestinfo[3]],
-                TUNING.SORACHESTRANGE < 2000 and function(a, b)
-                    return a:GetDistanceSqToInst(b) < maxrange
-                end)
+        local by_priority = needupdate[prefab]
+        for _, priority in ipairs(ordered_priorities) do
+            local by_chest = by_priority[priority]
+            if by_chest then
+                for chest, groups in pairs(by_chest) do
+                    for _, group in ipairs(groups) do
+                        TryPutToContainer(chest, ents, chest.sorachestdata.containers[group], range_filter)
+                    end
+                end
+            end
         end
     end
 
@@ -833,15 +852,19 @@ local function UpdateAllChest()
                 if not UnReg[type] then
                     UnReg[type] = {}
                 end
-                UnReg[type][v] = 1
+                UnReg[type][k] = 1
             end
         end
     end
-    for type, chests in pairs(UnReg) do -- 清理失效箱子
-        for k, v in pairs(chests) do
-            allchest[type][v] = nil
-            updatechests[v] = nil
+    if next(UnReg) then
+        for type, chests in pairs(UnReg) do -- 清理失效箱子
+            for k, v in pairs(chests) do
+                allchest[type][k] = nil
+                updatechests[k] = nil
+                orangechests[k] = nil
+            end
         end
+        cmp:ResetCache()
     end
     for k, v in pairs(updatechests) do -- 刷新有宝石的箱子
         UpdateChest(k, v) -- 只负责刷新宝石类  
@@ -933,6 +956,11 @@ local function ResetChestData(inst, doer)
             container:DropItemBySlot(v)
         end
     end
+    if data.gem.orangegem and data.gem.orangegem > 0 then
+        orangechests[inst] = data
+    else
+        orangechests[inst] = nil
+    end
     if inst.components.preserver then
         local rate =
             (data.gem.redgem or 0) * (data.gem.redgem or 0) + (data.gem.bluegem or 0) * (data.gem.bluegem or 0) * -1 +
@@ -970,11 +998,11 @@ local function ResetChestData(inst, doer)
                 end
             end
             data.c[k] = first or drop_first -- 选定拾取的
-            TheWorld.components.sorachestmanager:ResetCache()
             if not data.c[k] and inst.sorasign then
                 data.c[k] = toprefab(inst.sorasign.name)
             end
         end
+        TheWorld.components.sorachestmanager:ResetCache()
     end
     -- data.pick = 1
     local needupdate = false
@@ -1074,6 +1102,7 @@ local com = Class(function(self, inst)
     self.inst = inst
     cmp = self
     self.stoptime = 0
+    -- item -> { time, groups = weak-key { [chest] = {container_group, ...} } }
     self.chestcache = {}
     self.UpdateEntsCD = SoraCD(1)
     self.UpdateAllEntsCD = SoraCD(10)
@@ -1132,7 +1161,6 @@ function com:GetBuilderChest(doer)
     return chests
 end
 function com:ResetCache(item)
-    local chestcache = self.chestcache
     if item then
         self.chestcache[item] = nil
     else
@@ -1148,25 +1176,31 @@ function com:GetCacheChest(item)
     local needprefab = toprefab(item)
     local t = GetTime()
     if chestcache[item] and (t - chestcache[item].time) < 10 then
-        return chestcache[item].chest
-    else
-        chestcache[item] = {
-            time = t,
-            chest = {}
-        }
-        for type, v in pairs(allchest) do
-            for chest, data in pairs(allchest[type]) do
-                if not data.selfcontainer then
-                    for k, v in pairs(data.c) do
-                        if v == needprefab then
-                            table.insert(chestcache[item].chest, {chest, k})
+        return chestcache[item].groups
+    end
+
+    local groups_by_chest = SoraAPI.LeakTable()
+    chestcache[item] = {
+        time = t,
+        groups = groups_by_chest
+    }
+    for type, v in pairs(allchest) do
+        for chest, data in pairs(allchest[type]) do
+            if not data.selfcontainer then
+                for k, v in pairs(data.c) do
+                    if v == needprefab then
+                        local groups = groups_by_chest[chest]
+                        if not groups then
+                            groups = {}
+                            groups_by_chest[chest] = groups
                         end
+                        table.insert(groups, k)
                     end
                 end
             end
         end
-        return chestcache[item].chest
     end
+    return groups_by_chest
 end
 
 function com:GetItems(chest, k)
@@ -1182,21 +1216,26 @@ function com:GetItems(chest, k)
     end
     return items
 end
+local function CanUseChestForGlobalCrafting(chest)
+    local container = chest:IsValid() and chest.components.container
+    return container ~= nil and not container:IsOpen()
+end
 function com:HasItem(doer, item, need)
     local chests = self:GetCacheChest(item)
-    local needprefab = toprefab(item)
     local find = 0
-    for k, data in pairs(chests) do
-        local items = self:GetItems(data[1], data[2])
-        if (TUNING.SORACHESTRANGE > 2000 or
-            (data[1]:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
-            local keepone = 1
-            for _, it in pairs(items) do
-                if it.prefab == item and not it:HasTag("nocrafting") then
-                    find = find + (it.components.stackable and it.components.stackable.stacksize or 1) - keepone
-                    keepone = 0
-                    if find >= need then
-                        return find >= need, find
+    for chest, groups in pairs(chests) do
+        if CanUseChestForGlobalCrafting(chest) and (TUNING.SORACHESTRANGE > 2000 or
+            (chest:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
+            for _, group in ipairs(groups) do
+                local items = self:GetItems(chest, group)
+                local keepone = 1
+                for _, it in pairs(items) do
+                    if it.prefab == item and not it:HasTag("nocrafting") then
+                        find = find + (it.components.stackable and it.components.stackable.stacksize or 1) - keepone
+                        keepone = 0
+                        if find >= need then
+                            return find >= need, find
+                        end
                     end
                 end
             end
@@ -1206,31 +1245,32 @@ function com:HasItem(doer, item, need)
 end
 function com:GetIngredients(doer, item, need)
     local chests = self:GetCacheChest(item)
-    local needprefab = toprefab(item)
     local find = 0
     local itemsfind = {}
-    for k, data in pairs(chests) do
-        local items = self:GetItems(data[1], data[2])
-        if (TUNING.SORACHESTRANGE > 2000 or
-            (data[1]:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
-            local keepone = 1
-            for _, it in pairs(items) do
-                if it.prefab == item and not it:HasTag("nocrafting") then
-                    if it.components.stackable then
-                        local get = need - find
-                        get = math.min(it.components.stackable.stacksize - keepone, get)
-                        itemsfind[it] = get
-                        find = find + get
-                    else
-                        if keepone > 0 then
+    for chest, groups in pairs(chests) do
+        if CanUseChestForGlobalCrafting(chest) and (TUNING.SORACHESTRANGE > 2000 or
+            (chest:GetDistanceSqToInst(doer) < TUNING.SORACHESTRANGE * TUNING.SORACHESTRANGE)) then
+            for _, group in ipairs(groups) do
+                local items = self:GetItems(chest, group)
+                local keepone = 1
+                for _, it in pairs(items) do
+                    if it.prefab == item and not it:HasTag("nocrafting") then
+                        if it.components.stackable then
+                            local get = need - find
+                            get = math.min(it.components.stackable.stacksize - keepone, get)
+                            itemsfind[it] = get
+                            find = find + get
                         else
-                            itemsfind[it] = 1
-                            find = find + 1
+                            if keepone > 0 then
+                            else
+                                itemsfind[it] = 1
+                                find = find + 1
+                            end
                         end
-                    end
-                    keepone = 0
-                    if find >= need then
-                        return itemsfind
+                        keepone = 0
+                        if find >= need then
+                            return itemsfind
+                        end
                     end
                 end
             end
@@ -1317,6 +1357,26 @@ function com:FindBestSlot(con, data, item)
         end
     end
 end
+local function CreateChestInstanceData(template)
+    local data = {}
+    for k, v in pairs(template) do
+        if k == "controls" or k == "containers" then
+            -- These are read-only container definitions and can be shared by type.
+            data[k] = v
+        elseif type(v) == "table" then
+            data[k] = deepcopy(v)
+        else
+            data[k] = v
+        end
+    end
+    data.c = {}
+    data.gem = {}
+    data.gemtask = {}
+    data.gemtick = {}
+    data.update = {}
+    data.updated = {}
+    return data
+end
 function com:RegByType(chest, type)
     if not chest.components.container then
         return
@@ -1325,7 +1385,7 @@ function com:RegByType(chest, type)
         if not allchest[type] then
             allchest[type] = SoraAPI.LeakTable()
         end
-        allchest[type][chest] = deepcopy(ChestData[type])
+        allchest[type][chest] = CreateChestInstanceData(ChestData[type])
         chest.sorachestdata = allchest[type][chest]
         chest.sorachesttype = type
         chest:DoTaskInTime(0, ResetChestData)
@@ -1369,6 +1429,7 @@ function com:UnReg(chest)
         chest:RemoveEventCallback("itemget", OnItemGet)
         chest:RemoveEventCallback("itemlose", OnItemLose)
         updatechests[chest] = nil
+        orangechests[chest] = nil
         chest.sorachestdata = nil
         allchest[chest.sorachesttype][chest] = nil
         chest:RemoveTag("sorasmartchest")
