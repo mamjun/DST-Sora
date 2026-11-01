@@ -4,7 +4,7 @@ local boxname = "sora_tqy_box"
 SoraAPI.MakeAssetTable(name, assets)
 SoraAPI.MakeAssetTable(boxname, assets)
 local MAX_RETURN_DISTANCE_SQ = 40 * 40
-local CHAIN_MIN_TARGETS = 4
+local CHAIN_MIN_TARGETS = 2
 local MUST_TAGS = {"_combat", "_health"}
 local CANT_TAGS = {"player", "INLIMBO", "structure", "wall", "companion"}
 local AttackBlack = {
@@ -332,7 +332,7 @@ local function GetNextTarget(inst, target)
                 return true
             end
         end
-        if (inst.chainvalidcount or all) <= 3 then
+        if (inst.chainvalidcount or all) < CHAIN_MIN_TARGETS then
             break
         end
         inst.chainvisited = {}
