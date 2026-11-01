@@ -70,6 +70,8 @@ local SHELL_SCALES = {
     PREFIX .. "scale_shell_surface",
     PREFIX .. "scale_shell_rune",
 }
+local SHELL_TYPE_COUNT = #SHELL_SCALES
+local SHELL_FRONT_OFFSET = SHELL_TYPE_COUNT
 
 local sin, cos, floor, ceil = math.sin, math.cos, math.floor, math.ceil
 local PI2 = 2 * math.pi
@@ -146,7 +148,7 @@ local function InitEnvelopes()
     AddScale(SHELL_SCALES[2], CONFIG.shell_surface_scale)
     AddScale(SHELL_SCALES[3], CONFIG.shell_rune_scale)
     BuildPoints()
-    print("[SoraShieldVFX] revision=merged-stars-v3-colour224; registered envelopes=7; star_particles=3; shader=" .. SHADER)
+    print("[SoraShieldVFX] revision=merged-stars-v5-front-back-depth; registered envelopes=7; star_particles=3; shader=" .. SHADER)
     InitEnvelopes = nil
 end
 
@@ -176,13 +178,15 @@ local function CreateCarrier(kind)
         inst._rainbow_offset = (math.random(7) - 1) * RAINBOW_STEPS
         inst._rainbow_started = GetTime()
     end
-    local emitter_count = is_shell and 3 or 1
+    -- 护罩按“背面 3 类 + 正面 3 类”拆成两个绘制层；星辉仍为单层。
+    local emitter_count = is_shell and SHELL_TYPE_COUNT * 2 or 1
     local effect = inst.entity:AddVFXEffect()
     effect:InitEmitters(emitter_count)
     local lifetime = is_shell and CONFIG.particle_lifetime or STAR_LIFETIME
     local batches = ceil(lifetime / CONFIG.refresh_interval) + 1
     for emitter = 0, emitter_count - 1 do
-        local scale = is_shell and SHELL_SCALES[emitter + 1] or STYLES[DEFAULT_STYLE].sprite_scale
+        local emitter_type = is_shell and emitter % SHELL_TYPE_COUNT or 0
+        local scale = is_shell and SHELL_SCALES[emitter_type + 1] or STYLES[DEFAULT_STYLE].sprite_scale
         effect:SetRenderResources(emitter, is_shell and TEXTURE or STAR_TEXTURE, SHADER)
         effect:SetUVFrameSize(emitter,
             is_shell and ATLAS_FRAME or 1 / STAR_ATLAS_COLUMNS,
@@ -192,18 +196,25 @@ local function CreateCarrier(kind)
         if is_shell then
             point_count = 0
             for _, point in ipairs(shell_points) do
-                if point[4] == emitter then point_count = point_count + 1 end
+                if point[4] == emitter_type then point_count = point_count + 1 end
             end
         end
-        effect:SetMaxNumParticles(emitter, point_count * batches)
+        -- 相机平面将每种对称点阵均分为前后两半，避免把容量闲置翻倍。
+        effect:SetMaxNumParticles(emitter, ceil(point_count / 2) * batches)
         effect:SetMaxLifetime(emitter, lifetime)
         effect:SetColourEnvelope(emitter, PREFIX .. (is_shell and "fade" or "fade_star"))
         effect:SetScaleEnvelope(emitter, scale)
         -- 恢复此前用户认可的大号加色星芒和金色护罩；护罩面单独关闭 Bloom。
         effect:SetBlendMode(emitter, BLENDMODE.Additive)
-        effect:EnableBloomPass(emitter,
-            CONFIG.bloom and not summer_no_bloom and (not is_shell or emitter ~= 1))
-        effect:SetSortOrder(emitter, 0)
+        local bloom = CONFIG.bloom and not summer_no_bloom
+            and (not is_shell or emitter_type ~= 1)
+        effect:EnableBloomPass(emitter, bloom)
+        -- 相机朝向的前半组压住人物，后半组留在人物后面。
+        local sort_order = 0
+        if is_shell then
+            sort_order = emitter < SHELL_FRONT_OFFSET and -1 or 1
+        end
+        effect:SetSortOrder(emitter, sort_order)
         effect:SetSortOffset(emitter, 0)
         effect:SetFollowEmitter(emitter, true)
         effect:SetKillOnEntityDeath(emitter, true)
@@ -254,11 +265,15 @@ local function EmitShell(carrier, now, phase)
     -- 各面及符纹使用同一旋转矩阵，保持棱面整体形状；高度不变。
     local angle = (now % CONFIG.shell_period) * PI2 / CONFIG.shell_period + phase
     local c, s = cos(angle), sin(angle)
+    local down = TheCamera:GetDownVec()
     for _, point in ipairs(shell_points) do
+        local x = point[1] * c - point[3] * s
+        local z = point[1] * s + point[3] * c
+        local front_offset = x * down.x + z * down.z >= 0 and SHELL_FRONT_OFFSET or 0
+        local emitter = front_offset + point[4]
         local tile = RAINBOW_COUNT * 2 + point[4]
-        carrier.VFXEffect:AddParticleUV(point[4], CONFIG.particle_lifetime,
-            point[1] * c - point[3] * s, point[2],
-            point[1] * s + point[3] * c, 0, 0, 0,
+        carrier.VFXEffect:AddParticleUV(emitter, CONFIG.particle_lifetime,
+            x, point[2], z, 0, 0, 0,
             (tile % ATLAS_COLUMNS) * ATLAS_FRAME, floor(tile / ATLAS_COLUMNS) * ATLAS_FRAME)
     end
 end

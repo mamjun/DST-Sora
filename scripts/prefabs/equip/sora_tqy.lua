@@ -3,33 +3,19 @@ local name = "sora_tqy"
 local boxname = "sora_tqy_box"
 SoraAPI.MakeAssetTable(name, assets)
 SoraAPI.MakeAssetTable(boxname, assets)
-local function ForceReturnToOwner(inst, catcher)
-    if not (catcher and catcher.components.inventory) then
-        return
-    end
-    local data = inst:GetSaveRecord()
-    local instb = SpawnSaveRecord(data)
-    inst:Remove()
-    if catcher.components.inventory.isopen then
-        local equip = catcher.components.inventory:GetEquippedItem(inst.components.equippable.equipslot)
-        if not equip then
-            catcher.components.inventory:GiveItem(instb)
-            catcher.components.inventory:Equip(instb)
-        elseif equip and equip:HasTag("sora_tqy_box") and not equip.components.container:IsFull() then
-            equip.components.container:GiveItem(instb)
-        else
-            local box = catcher.components.inventory:FindItem(function(i)
-                return i:HasTag("sora_tqy_box") and not i.components.container:IsFull()
-            end)
-            if box then
-                box.components.container:GiveItem(instb)
-            else
-                catcher.components.inventory:GiveItem(instb)
-            end
-        end
-        catcher:PushEvent("catch")
-    end
-end
+local MAX_RETURN_DISTANCE_SQ = 40 * 40
+local CHAIN_MIN_TARGETS = 4
+local MUST_TAGS = {"_combat", "_health"}
+local CANT_TAGS = {"player", "INLIMBO", "structure", "wall", "companion"}
+local AttackBlack = {
+    ["crow"] = 1,
+    ["robin"] = 2,
+    ["lureplant"] = 2,
+    ["robin_winter"] = 2,
+    ["canary"] = 2,
+    ["butterfly"] = 1,
+    ["moonbutterfly"] = 1,
+}
 local function OnEquip(inst, owner)
     if inst.skinEquipFn then
         return
@@ -52,25 +38,108 @@ local function OnUnequip(inst, owner)
     owner.AnimState:Show("ARM_normal")
 end
 
+local function ClearChainTargets(inst)
+    inst.alltarget = nil
+    inst.chainvisited = nil
+    inst.chainvalidcount = nil
+    inst.index = 0
+    inst.targetCD = nil
+    inst.over = nil
+end
 local function OnDropped(inst)
+    inst.force_return = nil
+    ClearChainTargets(inst)
+    if inst.CheckGoToTask then
+        inst.CheckGoToTask:Cancel()
+        inst.CheckGoToTask = nil
+    end
     inst.AnimState:PlayAnimation("idle", true)
     -- inst.Physics:Stop()
     inst.components.inventoryitem.pushlandedevents = true
     inst:PushEvent("on_landed")
 end
+local function FinishForcedReturn(inst, owner)
+    if not inst.force_return then
+        return false
+    end
+    inst.force_return = nil
+    inst.canhitwork = false
+    if owner and owner:IsValid() then
+        inst.components.projectile.cancatch = true
+        inst.components.projectile:Catch(owner)
+    else
+        OnDropped(inst)
+    end
+    return true
+end
+local function FindChainTargetNearOwner(inst, excluded)
+    local owner = inst.delayowner
+    if not (owner and owner:IsValid()) then
+        return
+    end
+    local x, y, z = owner:GetPosition():Get()
+    local validtargets = {}
+    local chaintargets = {}
+    for k, v in pairs(TheSim:FindEntities(x, y, z, 15, MUST_TAGS, CANT_TAGS)) do
+        if not AttackBlack[v.prefab] and v:IsValid() and not v.components.health:IsDead() and v.components.combat and
+            v.components.combat:CanBeAttacked(owner) then
+            table.insert(validtargets, v)
+            if v ~= excluded then
+                table.insert(chaintargets, v)
+            end
+        end
+    end
+    if inst.canhitwork then
+        for k, v in pairs(TheSim:FindEntities(x, y, z, 15, nil, CANT_TAGS, {"CHOP_workable", "MINE_workable"})) do
+            if v:IsValid() and v.components.workable:CanBeWorked() then
+                table.insert(validtargets, v)
+                if v ~= excluded then
+                    table.insert(chaintargets, v)
+                end
+            end
+        end
+    end
+    if #validtargets >= CHAIN_MIN_TARGETS and #chaintargets > 0 then
+        return chaintargets[math.random(#chaintargets)]
+    end
+end
 local ApplyCheckFn
 local function TryGiveSelfToOwner(inst)
     if inst and inst.delayowner and inst.delayowner:IsValid() then
+        local projectile = inst.components.projectile
+        if projectile.target and projectile.target ~= inst.delayowner and
+            inst:GetDistanceSqToInst(inst.delayowner) > MAX_RETURN_DISTANCE_SQ then
+            local chaintarget = FindChainTargetNearOwner(inst, projectile.target)
+            if chaintarget then
+                inst.force_return = nil
+                inst.alltarget = {}
+                inst.index = 0
+                inst.over = true
+                inst.targetCD = nil
+                projectile:Stop()
+                projectile:Throw(inst.delayowner, chaintarget)
+                return true
+            end
+            inst.force_return = true
+            inst.canhitwork = false
+            projectile:Stop()
+            if inst.delayowner.SoundEmitter then
+                inst.delayowner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_return")
+            end
+            projectile:Throw(inst.delayowner, inst.delayowner)
+            return true
+        end
         local owner = inst.components.inventoryitem:GetGrandOwner()
         local powner = inst.entity:GetParent()
-        if not owner and powner then
+        if owner then
+            if owner == inst.delayowner then
+                ApplyCheckFn(inst, true)
+                return true
+            end
             inst.components.projectile.cancatch = true
             inst.components.projectile:Catch(inst.delayowner)
             return true
-        elseif owner == inst.delayowner then
-            ApplyCheckFn(inst, true)
-            return true
-        elseif owner ~= inst.delayowner then
+        elseif powner and not projectile.target then
             inst.components.projectile.cancatch = true
             inst.components.projectile:Catch(inst.delayowner)
             return true
@@ -83,7 +152,7 @@ function ApplyCheckFn(inst, Cancel)
         inst.CheckGoToTask = nil
     end
     if not Cancel then
-        inst.CheckGoToTask = inst:DoPeriodicTask(10, TryGiveSelfToOwner)
+        inst.CheckGoToTask = inst:DoPeriodicTask(0.5, TryGiveSelfToOwner)
     else
         inst.delayowner = nil
     end
@@ -108,6 +177,8 @@ local function onPickUP(inst, data)
     end
 end
 local function OnCaught(inst, catcher)
+    inst.force_return = nil
+    ClearChainTargets(inst)
     inst.canhitwork = false
     ApplyCheckFn(inst, true)
     inst.components.inventoryitem.canbepickedup = true
@@ -151,18 +222,39 @@ local function ReturnToOwner(inst, owner)
     end
 end
 
-local MUST_TAGS = {"_combat", "_health"}
-local CANT_TAGS = {"player", "INLIMBO", "structure", "wall", "companion"}
-local AttackBlack = {
-    ["crow"] = 1,
-    ["robin"] = 2,
-    ["lureplant"] = 2,
-    ["robin_winter"] = 2,
-    ["canary"] = 2,
-    ["butterfly"] = 1,
-    ["moonbutterfly"] = 1,
-}
-local function GetNextTarget(inst, target, try)
+local function RefreshChainTargets(inst, target)
+    inst.over = false
+    inst.index = 0
+    inst.alltarget = {}
+    local visited = inst.chainvisited or {}
+    local validcount = 0
+    local x, y, z = inst:GetPosition():Get()
+    local ents = TheSim:FindEntities(x, y, z, 15, MUST_TAGS, CANT_TAGS)
+    for k, v in pairs(ents) do
+        if v ~= target and not AttackBlack[v.prefab] and v:IsValid() and not v.components.health:IsDead() and
+            v.components.combat and v.components.combat:CanBeAttacked(inst.delayowner) then
+            validcount = validcount + 1
+            if not visited[v] then
+                table.insert(inst.alltarget, v)
+            end
+        end
+    end
+    if inst.canhitwork then
+        local workables = TheSim:FindEntities(x, y, z, 15, nil, CANT_TAGS, {"CHOP_workable", "MINE_workable"})
+        for k, v in pairs(workables) do
+            if v ~= target and v:IsValid() and v.components.workable:CanBeWorked() then
+                validcount = validcount + 1
+                if not visited[v] then
+                    table.insert(inst.alltarget, v)
+                end
+            end
+        end
+    end
+    inst.chainvalidcount = validcount
+    shuffleArray(inst.alltarget)
+end
+
+local function GetNextTarget(inst, target)
     if not (inst.delayowner and inst.delayowner:IsValid()) then
         -- 没有主人 掉落地上
         OnDropped(inst)
@@ -172,6 +264,10 @@ local function GetNextTarget(inst, target, try)
         OnDropped(inst)
         return
     end
+    inst.chainvisited = inst.chainvisited or {}
+    if target and target ~= inst.delayowner then
+        inst.chainvisited[target] = true
+    end
     if not inst.delayowner.soratqys then
         inst.delayowner.soratqys = {}
         inst.delayowner.soratqysCD = SoraCD(30)
@@ -180,7 +276,6 @@ local function GetNextTarget(inst, target, try)
         inst.delayowner.soratqys = {}
     end
     local allwork = 0
-    local toclean = {}
     for k, v in pairs(inst.delayowner.soratqys) do
         if k.delayowner == inst.delayowner and k.components.projectile and k.components.projectile.target then
             allwork = allwork + 1
@@ -197,71 +292,57 @@ local function GetNextTarget(inst, target, try)
         return
     end
     inst.delayowner.soratqys[inst] = 1
-    if inst:GetDistanceSqToInst(inst.delayowner) > 1600 then
-        -- 太远了 回去
+    if inst:GetDistanceSqToInst(inst.delayowner) > MAX_RETURN_DISTANCE_SQ then
+        local chaintarget = FindChainTargetNearOwner(inst, target)
+        if chaintarget then
+            inst.force_return = nil
+            inst.alltarget = {}
+            inst.index = 0
+            inst.over = true
+            inst.targetCD = nil
+            inst.components.projectile:Throw(inst.delayowner, chaintarget)
+            return true
+        end
+        -- 主人附近没有足够的连弹目标，回去
+        inst.force_return = true
         inst.canhitwork = false
         inst.components.projectile:Throw(inst.delayowner, inst.delayowner)
         return
     end
-    try = try or 1
-    if try > 10 then
-        OnDropped(inst)
-        return
-    end
-
-    if not inst.targetCD then
-        inst.targetCD = SoraCD(5)
-        inst.alltarget = {}
-        inst.index = 0
-        inst.over = false
-    end
-    if inst.targetCD() or inst.over then
-        inst.over = false
-        inst.index = 0
-        inst.alltarget = {}
-        local x, y, z = inst:GetPosition():Get()
-        local ents = TheSim:FindEntities(x, y, z, 15, MUST_TAGS, CANT_TAGS)
-        for k, v in pairs(ents) do
-            if v ~= target and not AttackBlack[v.prefab] and v:IsValid() and not v.components.health:IsDead() and
-                v.components.combat and v.components.combat:CanBeAttacked(inst.delayowner) then
-                table.insert(inst.alltarget, v)
-            end
+    for scan = 1, 2 do
+        if not inst.targetCD then
+            inst.targetCD = SoraCD(5)
+            inst.alltarget = {}
+            inst.index = 0
+            inst.over = false
         end
-        if inst.canhitwork then
-            local ents = TheSim:FindEntities(x, y, z, 15, nil, CANT_TAGS, {"CHOP_workable", "MINE_workable"})
-            for k, v in pairs(ents) do
-                if v ~= target and v:IsValid() and v.components.workable:CanBeWorked() then
-                    table.insert(inst.alltarget, v)
-                end
-            end
+        if inst.targetCD() or inst.over then
+            RefreshChainTargets(inst, target)
         end
-        shuffleArray(inst.alltarget)
-    end
-    local all = #inst.alltarget
-    while inst.index < all do
-        inst.index = inst.index + 1
-        local can = inst.alltarget[inst.index]
-        if can then
-            if can:IsValid() and
+        local all = #inst.alltarget
+        while inst.index < all do
+            inst.index = inst.index + 1
+            local can = inst.alltarget[inst.index]
+            if can and not inst.chainvisited[can] and can:IsValid() and
                 ((can.components.health and not can.components.health:IsDead() and can.components.combat and
                     can.components.combat:CanBeAttacked(inst.delayowner)) or
                     (inst.canhitwork and can.components.workable and can.components.workable:CanBeWorked())) then
-                -- 有不重复模板就丢出去
+                inst.chainvisited[can] = true
                 inst.components.projectile:Throw(inst.delayowner, can)
                 return true
             end
         end
-    end
-    if all > 3 then
-        -- 大于四个目标就继续弹射
+        if (inst.chainvalidcount or all) <= 3 then
+            break
+        end
+        inst.chainvisited = {}
         inst.over = true
-        return GetNextTarget(inst, target, try + 1)
     end
-    -- 否则弹回玩家 
     if inst.delayowner.SoundEmitter then
         inst.delayowner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_return")
     end
     inst.over = true
+    local all = #inst.alltarget
     if all == 0 and target == inst.delayowner then
         -- 没目标了 且弹回自己了 
         inst.components.projectile.cancatch = true
@@ -272,9 +353,11 @@ local function GetNextTarget(inst, target, try)
     return true
 end
 local function OnHit(inst, owner, target)
+    if FinishForcedReturn(inst, owner) then
+        return
+    end
     inst.components.inventoryitem.canbepickedup = true
     inst.components.projectile:SetSpeed(8 + math.random() * 10)
-    GetNextTarget(inst, target)
     if target and not target:HasTag("player") and inst.delayowner ~= target and target:IsValid() and
         target.components.combat then
         if not target:HasTag("smallcreature") then
@@ -293,9 +376,7 @@ local function OnHit(inst, owner, target)
                 inst.delayowner.components.combat:DoAttack(v, inst, inst, inst.components.projectile.stimuli)
             end
         end
-        return
-    end
-    if inst.canhitwork and target and target.components.workable and target.components.workable:CanBeWorked() then
+    elseif inst.canhitwork and target and target.components.workable and target.components.workable:CanBeWorked() then
         if target:HasTag("MINE_workable") then
             target.components.workable:WorkedBy(inst.delayowner, 3)
         end
@@ -303,9 +384,13 @@ local function OnHit(inst, owner, target)
             target.components.workable:WorkedBy(inst.delayowner, 3)
         end
     end
+    GetNextTarget(inst, target)
 end
 
 local function OnMiss(inst, owner, target)
+    if FinishForcedReturn(inst, owner) then
+        return
+    end
     inst.components.inventoryitem.canbepickedup = true
     if owner == target then
         OnDropped(inst)
@@ -333,9 +418,6 @@ local function fn()
     inst:AddTag("weapon")
     inst:AddTag("projectile")
     inst:AddTag("meteor_protection")
-    local swap_data = {
-        sym_build = "base"
-    }
 
     inst.entity:SetPristine()
 
@@ -353,6 +435,7 @@ local function fn()
     inst:AddComponent("projectile")
     inst.components.projectile:SetSpeed(15)
     inst.components.projectile:SetCanCatch(true)
+    inst.components.projectile:SetKeepOnDeflect(true)
     inst.components.projectile:SetOnThrownFn(OnThrown)
     inst.components.projectile:SetOnHitFn(OnHit)
     inst.components.projectile:SetOnMissFn(OnMiss)
@@ -401,23 +484,6 @@ local function BoxUpdateAnim(inst)
         end
     end
 end
-local function TryEquipTQY(item, owner)
-    if not item.components.equippable.onequipfn then
-        return
-    end
-    item.skinEquipFn = true
-    item.components.equippable.onequipfn(item, owner, false)
-    item.skinEquipFn = false
-end
-
-local function TryUnEquipTQY(item, owner)
-    if not item.components.equippable.onunequipfn then
-        return
-    end
-    item.skinEquipFn = true
-    item.components.equippable.onunequipfn(item, owner, false)
-    item.skinEquipFn = false
-end
 
 local function OnBoxEquip(inst, owner)
     inst.components.container:Open(owner)
@@ -440,13 +506,6 @@ local function OnBoxEquip(inst, owner)
     BoxUpdateAnim(inst, owner)
     inst:ListenForEvent("itemget", BoxUpdateAnim)
     inst:ListenForEvent("itemlose", BoxUpdateAnim)
-
-    -- for i=1,5 do 
-    --     local item = inst.components.container:GetItemInSlot(i)
-    --     if item and item:HasTag("sora_tqy") then 
-    --         TryEquipTQY(item,owner)
-    --     end
-    -- end
 end
 
 local function OnBoxUnequip(inst, owner)
@@ -457,32 +516,6 @@ local function OnBoxUnequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
     inst.owner = nil
-    -- for i=1,5 do 
-    --     local item = inst.components.container:GetItemInSlot(i)
-    --     if item and item:HasTag("sora_tqy") then 
-    --         TryUnEquipTQY(item,owner)
-    --     end
-    -- end
-end
-local function OnItemGet(inst, data)
-    local owner = inst.components.inventoryitem:GetGrandOwner()
-    if not (owner and owner:HasTag("player")) then
-        return
-    end
-    if not (data and data.item and data.item:HasTag("sora_tqy")) then
-        return
-    end
-    TryEquipTQY(data.item, owner)
-end
-local function OnItemLose(inst, data)
-    local owner = inst.components.inventoryitem:GetGrandOwner()
-    if not (owner and owner:HasTag("player")) then
-        return
-    end
-    if not (data and data.prev_item and data.prev_item:HasTag("sora_tqy")) then
-        return
-    end
-    TryUnEquipTQY(data.prev_item, owner)
 end
 
 local function boxfn()
@@ -498,7 +531,6 @@ local function boxfn()
     inst.AnimState:SetBank(boxname)
     inst.AnimState:SetBuild(boxname)
     inst.AnimState:PlayAnimation("idle_item", true)
-    -- inst.AnimState:SetRayTestOnBB(true)
     inst:AddTag("sora_tqy_box")
     inst:AddComponent("soratwoface")
     inst:AddTag("meteor_protection")
@@ -507,7 +539,6 @@ local function boxfn()
     if not TheWorld.ismastersim then
         return inst
     end
-    inst.CheckGoToTask = nil
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(0)
     inst:AddComponent("soraaction")
@@ -517,8 +548,6 @@ local function boxfn()
     inst.components.weapon.CanRangedAttack = function()
         return true
     end
-    -- inst:ListenForEvent("itemget", OnItemGet)
-    -- inst:ListenForEvent("itemlose", OnItemLose)
 
     inst.components.weapon.LaunchProjectile = function(s, attacker, target)
         if inst.components.container:IsEmpty() then

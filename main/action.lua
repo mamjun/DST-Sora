@@ -850,7 +850,6 @@ SORA_TQYWORK.fn = function(act)
                 if inst:HasTag("sora_tqy") then
                     doer.components.inventory:RemoveItem(inst)
                     inst.Transform:SetPosition(doer:GetPosition():Get())
-                    inst.owner = inst.owner
                     inst.components.projectile:Throw(doer, target, doer)
                     inst.canhitwork = true
                 else

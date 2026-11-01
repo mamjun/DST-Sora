@@ -182,6 +182,3 @@ end
 
 return Prefab("sora2bag", fn, assets)
 --,Prefab("soralight", soralightfn)
-
-
-		

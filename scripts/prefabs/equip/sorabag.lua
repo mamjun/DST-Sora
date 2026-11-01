@@ -30,9 +30,13 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] local assets = {Asset("ANIM", "anim/sorabag.zip"), Asset("ANIM", "anim/sorabag_sd.zip"),
                    Asset("ANIM", "anim/sorabag_sdl.zip"), Asset("ANIM", "anim/sora2bag.zip"),
+                   Asset("ANIM", "anim/sora_jrxy.zip"),
                     Asset("ATLAS", "images/inventoryimages/sorabag.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabag.xml", 256),
                    Asset("IMAGE", "images/inventoryimages/sorabag.tex"),
+                   Asset("ATLAS", "images/inventoryimages/sorabag_jrxy.xml"),
+                   Asset("ATLAS_BUILD", "images/inventoryimages/sorabag_jrxy.xml", 256),
+                   Asset("IMAGE", "images/inventoryimages/sorabag_jrxy.tex"),
                    Asset("ATLAS", "images/inventoryimages/sorabag_sd.xml"),
                    Asset("ATLAS_BUILD", "images/inventoryimages/sorabag_sd.xml", 256),
                    Asset("IMAGE", "images/inventoryimages/sorabag_sd.tex"),
@@ -151,42 +155,182 @@ local function onsave(inst, data)
     data.bxnum = inst.bxnum
 end
 
+local WINGMESH_SKIN = "sorabag_jrxy"
+local WING_FX_PREFABS = {
+    "sora_wingbag_draft_front_fx",
+    "sora_wingbag_draft_side_fx",
+    "sora_wingbag_draft_back_fx",
+    "sora_wingbag_draft_back_alt2_fx"
+}
+
+local function IsWingMeshSkin(inst)
+    if inst._sorabag_wingmesh_skin ~= nil then
+        return inst._sorabag_wingmesh_skin
+    end
+    return inst.skinname == WINGMESH_SKIN
+end
+
+local function GetWingMeshOwner(inst)
+    local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
+    if owner ~= nil
+        and owner:HasTag("player")
+        and inst.components.equippable ~= nil
+        and inst.components.equippable:IsEquipped()
+    then
+        return owner
+    end
+end
+
+local function DeactivateWingMesh(inst)
+    local owner = inst._sorabag_wingmesh_owner
+    if owner ~= nil and owner:IsValid() then
+        local colouradder = owner.components.colouradder
+        if colouradder ~= nil and inst._sorabag_wing_fx ~= nil then
+            for _, fx in ipairs(inst._sorabag_wing_fx) do
+                if fx:IsValid() then
+                    colouradder:DetachChild(fx)
+                    fx.Follower:StopFollowing()
+                end
+            end
+        end
+        owner.AnimState:ClearOverrideSymbol("swap_body_backback")
+        owner.AnimState:Show("swap_body_backback")
+    end
+
+    if inst._sorabag_wing_fx ~= nil then
+        for _, fx in ipairs(inst._sorabag_wing_fx) do
+            if fx:IsValid() then
+                fx:Remove()
+            end
+        end
+    end
+
+    inst._sorabag_wing_fx = nil
+    inst._sorabag_wingmesh_owner = nil
+end
+
+local function CreateWingFx(inst)
+    local fx_list = {}
+    for _, prefab_name in ipairs(WING_FX_PREFABS) do
+        local fx = SpawnPrefab(prefab_name)
+        if fx ~= nil then
+            table.insert(fx_list, fx)
+        end
+    end
+    return fx_list
+end
+
+local function ActivateWingMesh(inst, owner)
+    if owner == nil then
+        return
+    end
+
+    if inst._sorabag_wingmesh_owner == owner and inst._sorabag_wing_fx ~= nil then
+        owner.AnimState:ClearOverrideSymbol("swap_body_backback")
+        owner.AnimState:Hide("swap_body_backback")
+        return
+    end
+
+    if inst._sorabag_wingmesh_owner ~= nil then
+        DeactivateWingMesh(inst)
+    end
+
+    owner.AnimState:ClearOverrideSymbol("swap_body_backback")
+    owner.AnimState:Hide("swap_body_backback")
+    inst._sorabag_wingmesh_owner = owner
+
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    if inst._sorabag_wing_fx == nil then
+        inst._sorabag_wing_fx = CreateWingFx(inst)
+    end
+
+    for _, fx in ipairs(inst._sorabag_wing_fx) do
+        if fx:IsValid() then
+            fx.entity:SetParent(owner.entity)
+            fx.Follower:FollowSymbol(
+                owner.GUID,
+                "swap_body",
+                nil, nil, nil,
+                true,
+                nil,
+                fx.wing_source_frame,
+                fx.wing_source_frame_end
+            )
+            fx:Show()
+            if fx.components.highlightchild ~= nil then
+                fx.components.highlightchild:SetOwner(owner)
+            end
+            if owner.components.colouradder ~= nil then
+                owner.components.colouradder:AttachChild(fx)
+            end
+        end
+    end
+end
+
+local function OnWingMeshSkinInit(inst)
+    inst._sorabag_wingmesh_skin = true
+    local owner = GetWingMeshOwner(inst)
+    if owner ~= nil then
+        ActivateWingMesh(inst, owner)
+    end
+end
+
+local function OnWingMeshSkinClear(inst)
+    inst._sorabag_wingmesh_skin = false
+    DeactivateWingMesh(inst)
+end
+
 local function onfind(inst, owner)
     local pos = inst:GetPosition()
     local x, y, z = pos:Get()
     local ents = TheSim:FindEntities(x, y, z, 16, {"Sora2Bag"})
-    if #ents == 0 then
+    local linked_bag
+    for _, v in ipairs(ents) do
+        if v.components.equippable ~= nil
+            and v.components.equippable:IsEquipped()
+        then
+            linked_bag = v
+            break
+        end
+    end
+
+    if linked_bag == nil then
         inst.sora2bag = true
-        if inst.skinname then
+        if IsWingMeshSkin(inst) then
+            ActivateWingMesh(inst, owner)
+        elseif inst.skinname then
+            DeactivateWingMesh(inst)
             local skin = SoraAPI.GetSkin(inst.skinname)
             local build = skin and skin.build or inst.skinname
             owner.AnimState:OverrideSymbol("swap_body_backback", build, "swap_body")
         else
+            DeactivateWingMesh(inst)
             owner.AnimState:OverrideSymbol("swap_body_backback", "sorabag", "swap_body")
         end
         inst.components.equippable.dapperness = (san1 + san2 * inst.sanlevel) / 60
         return
     end
-    for i, v in ipairs(ents) do
-        if v.components.equippable:IsEquipped() and inst.sora2bag then
-            owner.AnimState:OverrideSymbol("swap_body_backback", "sora2bag", "swap_body2")
-            inst.components.equippable.dapperness = (san1 + san2 * inst.sanlevel + san3) / 60
-            if owner.SoraSound then
-                local t = TheWorld.state.cycles
-                if inst.thankplay[v.GUID] and inst.thankplay[v.GUID] == t then
-                else
-                    inst.thankplay[v.GUID] = t
-                    owner:SoraSound(owner.wlist({
-                        thanks1 = 1,
-                        thanks2 = 1,
-                        thanks3 = 1,
-                        thanks4 = 1
-                    }))
-                end
+
+    ActivateWingMesh(inst, owner)
+    inst.components.equippable.dapperness = (san1 + san2 * inst.sanlevel + san3) / 60
+    if inst.sora2bag then
+        if owner.SoraSound then
+            local t = TheWorld.state.cycles
+            if inst.thankplay[linked_bag.GUID] and inst.thankplay[linked_bag.GUID] == t then
+            else
+                inst.thankplay[linked_bag.GUID] = t
+                owner:SoraSound(owner.wlist({
+                    thanks1 = 1,
+                    thanks2 = 1,
+                    thanks3 = 1,
+                    thanks4 = 1
+                }))
             end
-            inst.sora2bag = false
-            return
         end
+        inst.sora2bag = false
     end
 end
 
@@ -207,12 +351,16 @@ local function onequip(inst, owner)
         end)
         return
     end
-    if inst.skinname then
+    if IsWingMeshSkin(inst) then
+        ActivateWingMesh(inst, owner)
+    elseif inst.skinname then
+        DeactivateWingMesh(inst)
             local skin = SoraAPI.GetSkin(inst.skinname)
             local build = skin and skin.build or inst.skinname
             owner.AnimState:OverrideSymbol("swap_body_backback", build, "swap_body")
         --owner.AnimState:OverrideSymbol("swap_body_backback", inst.skinname, "swap_body")
     else
+        DeactivateWingMesh(inst)
         owner.AnimState:OverrideSymbol("swap_body_backback", "sorabag", "swap_body")
     end
     -- turnon(inst)
@@ -229,7 +377,10 @@ end
 
 local function onunequip(inst, owner)
     --inst.components.inventoryitem.cangoincontainer = false
-    owner.AnimState:ClearOverrideSymbol("swap_body_backback")
+    DeactivateWingMesh(inst)
+    if owner ~= nil then
+        owner.AnimState:ClearOverrideSymbol("swap_body_backback")
+    end
     -- owner.AnimState:ClearOverrideSymbol("backpack")
     -- turnoff(inst)
     if inst._task ~= nil then
@@ -277,6 +428,7 @@ local function fn()
         end
         return inst
     end
+    inst:ListenForEvent("onremove", DeactivateWingMesh)
     inst.need = TUNING.SORAMODE / 2
     inst.maxlevel = 10
     inst.grnum = 0
@@ -384,6 +536,19 @@ end
 ]] --
 
 SoraAPI.MakeItemSkinDefaultData("sorabag", {}, {nil,nil,'anim',true})
+SoraAPI.MakeItemSkin("sorabag", WINGMESH_SKIN, {
+    name = "金蕊曦羽",
+    atlas = "images/inventoryimages/sorabag_jrxy.xml",
+    image = "sorabag_jrxy",
+    build = "sorabag_jrxy",
+    bank = "sorabag_jrxy",
+    anim = "idle",
+    animloop = true,
+    checkfn = SoraAPI.SoraSkinCheckFn,
+    checkclientfn = SoraAPI.SoraSkinCheckClientFn,
+    init_fn = OnWingMeshSkinInit,
+    clear_fn = OnWingMeshSkinClear
+})
 SoraAPI.MakeItemSkin("sorabag", "sorabag_sd", {
     name = "圣诞双子",
     atlas = "images/inventoryimages/sorabag_sd.xml",
