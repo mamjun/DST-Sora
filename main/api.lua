@@ -649,7 +649,11 @@ function AddLaterFn(fn)
         table.insert(laterfn, fn)
     end
 end
-
+AddLaterFn(function ()
+    --重新注册一次，防止某些mod错误覆盖
+    GLOBAL.SoraAPI = env
+    GLOBAL.SORAAPI = env
+end)
 local oldTranslateStringTable = TranslateStringTable -- modmain运行完之后就是 TranslateStringTable 在这儿下钩子 哈哈
 GLOBAL.TranslateStringTable = function(...)
     for k, v in pairs(laterfn) do

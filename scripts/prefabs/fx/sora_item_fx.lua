@@ -230,6 +230,10 @@ local function UpdateFx(inst)
     end
     allshield = math.clamp(allshield, 0, 6)
     inst:SetShieldCount(allshield)
+    if allshield == 0 then
+        inst:Hide()
+        return
+    end
     if (time > 60) and (time2 > 60) then
         inst:Hide()
     else

@@ -72,6 +72,7 @@ local SHELL_SCALES = {
 }
 local SHELL_TYPE_COUNT = #SHELL_SCALES
 local SHELL_FRONT_OFFSET = SHELL_TYPE_COUNT
+local FULL_FRONT_CAMERA_DISTANCE = 50
 
 local sin, cos, floor, ceil = math.sin, math.cos, math.floor, math.ceil
 local PI2 = 2 * math.pi
@@ -148,7 +149,7 @@ local function InitEnvelopes()
     AddScale(SHELL_SCALES[2], CONFIG.shell_surface_scale)
     AddScale(SHELL_SCALES[3], CONFIG.shell_rune_scale)
     BuildPoints()
-    print("[SoraShieldVFX] revision=merged-stars-v5-front-back-depth; registered envelopes=7; star_particles=3; shader=" .. SHADER)
+    print("[SoraShieldVFX] revision=merged-stars-v6-camera50; registered envelopes=7; star_particles=3; shader=" .. SHADER)
     InitEnvelopes = nil
 end
 
@@ -245,6 +246,17 @@ local function ClearLocal(inst)
     end
 end
 
+local function UpdateShellSortMode(carrier, full_front)
+    if carrier._shield_full_front == full_front then return end
+    carrier._shield_full_front = full_front
+    for emitter = 0, SHELL_TYPE_COUNT * 2 - 1 do
+        local sort_order = emitter < SHELL_FRONT_OFFSET and -1 or 1
+        -- 大视野下无法可靠地按单点深度遮挡；整层前置可保持完整轮廓。
+        if full_front then sort_order = 1 end
+        carrier.VFXEffect:SetSortOrder(emitter, sort_order)
+    end
+end
+
 local function EmitShield(carrier, style, now)
     local elapsed = (now - carrier._rainbow_started) % CONFIG.rainbow_period
     local step = (carrier._rainbow_offset
@@ -309,6 +321,8 @@ local function UpdateLocal(inst)
         -- 仅有画面的客户端创建本地载体；控制器/人物删除时立即清除全部粒子。
         EmitterManager:AddEmitter(visual.dome, nil, function() UpdateLocal(inst) end)
     end
+    UpdateShellSortMode(visual.dome,
+        TheCamera:GetDistance() > FULL_FRONT_CAMERA_DISTANCE)
     local count = state - 1
     local now = GetTime()
     local orbit_angle = (now % CONFIG.orbit_period) * PI2 / CONFIG.orbit_period
