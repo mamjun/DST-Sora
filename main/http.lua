@@ -3,981 +3,914 @@
 Copyright 2025 [FL]。
 该文件仅限我自己使用 谢绝授权
 ]]-- 请勿破解本文件
-local __T__H_iSBu__g__=modname;local _tH_i__Sb__u__G_=tostring(GetModConfigData("\67\108\105\101\110\116"..
-"\80\114\111\120\121"
-)
-)
-=="\49"
-local T__hi_SBU_g__=__T__H_iSBu__g__.."\95\114\112\99"
-local t_HIsb_U__G="\112\114\111\120\121"
-local _T_h_i__S_B__uG_=(428
-+
-499
--
-237
-*
-150
-+
-308
-==-34308)
-local _T_Hi_s_b__U__G_=TheNet:GetUserID()
-local _T__h__I_s__b__U__g=__T__H_iSBu__g__.."\95\112\114\111\120"..
-"\121"
-local _t_H_iS_B_uG__="\104\116\116\112"..
-"\58\47\47\49\50"..
-"\55\46\48\46"..
-"\48\46\49\58\53\48"..
-"\50\48\53"..
-("\121\120\111\114\112\47"):reverse()
+local t_Hi__sBU__G=modname;local _tH__i_SBuG_=tostring(GetModConfigData(("\101\105\108\67"):reverse()
 ..
-"\46\112\104\112"
-local _tH__i__s__Bug=(387
-*
-27
-+
-436
+"\110\116\80"..
+string.char(114, 111, 120, 121)
+
+)
+)
+== ("\49"):reverse()
+
+local t__H_IsbUg=t_Hi__sBU__G.."\95\114\112\99"
+local t__Hi_S__buG_="\112\114\111"..
+"\120\121"
+local t_h__ISb__ug_=(180
 -
-278
-==10610)
-local _T__H__isB__U_G__=(205
+148
 *
-345
-*
-46
-~=3253350)
-local __t__h__i__Sb_uG=TheNet:GetIsServer()
-local t__H__i__sb__U_g=TheShard:GetShardId()
-if not ClearTableBy then local function __t_H__is_BU__G(__tHI__sB__uG,_T__hI__sbUg__)local _t__H_I_s_b_U__G__={}
-for __T__Hi__s_b_UG_,t_Hi__s_B_u__G_ in pairs(__tHI__sB__uG)
-do if _T__hI__sbUg__(__T__Hi__s_b_UG_,t_Hi__s_B_u__G_)
-then _t__H_I_s_b_U__G__[__T__Hi__s_b_UG_]=1 end end;for __T_H__ISb__UG_,__t__H__I__s__B__Ug_ in pairs(_t__H_I_s_b_U__G__)
-do __tHI__sB__uG[__T_H__ISb__UG_]=nil
-end;return __tHI__sB__uG end end;function IsHttpDirectOK()return _T__H__isB__U_G__ or(251
+119
+==-17423)
+local _T__h_Is__BU_G=TheNet:GetUserID()
+local __TH_Is__BuG__=t_Hi__sBU__G.."\95\112\114\111"..
+string.char(120, 121)
+
+local t_H__iS__B_u_g__=string.char(104, 116, 116, 112)
+..
+"\58\47\47\49\50\55"..
+"\46\48\46"..
+string.char(48, 46, 49, 58)
+..
+"\53\48\50\48\53"..
+"\47\112\114\111\120"..
+"\121\46\112"..
+"\104\112"
+local __T__H_i__sb__u__G__=(49
+-
+191
 +
-445
+412
++
+166
+~=436)
+local t_h_IS_B_U_g_=(58
+-
+409
 +
 244
--
-497
-~=443)
-end;function IsHttpOK()return _T__H__isB__U_G__ or _tH__i__s__Bug or(158
 *
-383
-+
-456
-+
-90
--
-112
-==60952)
-end;function GetClientProxy()return _tH_i__Sb__u__G_ end;local function _T_HI_sb__Ug__(_tHI_S_B_U_g)for T__Hi_S_BU__G_,__T_H_i_S__bU__G in pairs(_tHI_S_B_U_g)
-do if __T_H_i_S__bU__G and(__T_H_i_S__bU__G["\72\97\115"..
-"\65\100\109"..
-"\105\110"]or __T_H_i_S__bU__G[string.char(72, 97, 115)
-..
-"\80\108\97\121"..
-"\101\114"])
-then return(97
--
-45
+6
 *
-424
--
-452
-==-19435)
-end end;return(290
--
-225
--
-304
-~=-239)
-end;function HasHttpOK()if IsHttpOK()
-then return(105
-+
-33
--
-29
-~=118)
-end;if not __t__h__i__Sb_uG then return TheWorld and TheWorld["\110\101\116"]:HasTag(_T__h__I_s__b__U__g)
-and(416
+495
+~=724329)
+local __th__IS_B_u_g_=TheNet:GetIsServer()
+local __THi_Sbu__g_=TheShard:GetShardId()
+if not ClearTableBy then local function _T_h__Isbu__G_(_T__H_i_S__B__U_g,__T__his__b_UG__)local __t__H__i__s_bu__G__={}
+for th__Is_B_Ug__,_tH__i_s__B_U_g__ in pairs(_T__H_i_S__B__U_g)
+do if __T__his__b_UG__(th__Is_B_Ug__,_tH__i_s__B_U_g__)
+then __t__H__i__s_bu__G__[th__Is_B_Ug__]=1 end end;for T__H_is_B__U__g,T__h__I_S_b__U_G__ in pairs(__t__H__i__s_bu__G__)
+do _T__H_i_S__B__U_g[T__H_is_B__U__g]=nil
+end;return _T__H_i_S__B__U_g end end;function IsHttpDirectOK()return t_h_IS_B_U_g_ or(194
 *
-163
--
 161
+*
+258
+*
+24
+~=193400928)
+end;function IsHttpOK()return t_h_IS_B_U_g_ or __T__H_i__sb__u__G__ or(122
 -
-327
-==67320)
-or(224
+357
 *
-240
+23
+==-8080)
+end;function GetClientProxy()return _tH__i_SBuG_ end;local function __TH__I__s__B_U__G_(__t__Hi__sbu_G)for _t__His_B__UG_,T__his__B_U__g_ in pairs(__t__Hi__sbu_G)
+do if T__his__B_U__g_ and(T__his__B_U__g_["\72\97\115\65"..
+"\100\109\105\110"]or T__his__B_U__g_["\72\97\115"..
+"\80\108\97\121\101\114"])
+then return(42
 -
-139
-~=53621)
-end;if __t__h__i__Sb_uG and QueryManager then if _T_HI_sb__Ug__(QueryManager[string.char(97, 108, 108, 112)
-..
-"\97\116\104"][1])
-or next(QueryManager[string.char(97, 108, 108, 112, 97)
-..
-"\116\104"][2])
-or next(QueryManager["\97\108\108\112"..
-"\97\116\104"][3])
-then return(25
+392
 +
-2
+138
+==-212)
+end end;return(186
+-
+64
++
+342
+-
+107
+~=357)
+end;function HasHttpOK()if IsHttpOK()
+then return(224
 *
-445
-~=920)
-end end;return(53
+123
+-
+70
+~=27490)
+end;if not __th__IS_B_u_g_ then return TheWorld and TheWorld[string.char(110, 101, 116)
+]:HasTag(__TH_Is__BuG__)
+and(194
 *
-292
+280
+-
+366
+-
+365
+-
+167
+~=53426)
+or(332
 +
-279
+338
 +
-369
+326
 *
 346
-==143436)
-end;function ServerHasHttpOK()if __t__h__i__Sb_uG then return HasHttpOK()
-end;return TheWorld and TheWorld["\110\101\116"]:HasTag(_T__h__I_s__b__U__g)
-and(88
+==113469)
+end;if __th__IS_B_u_g_ and QueryManager then if __TH__I__s__B_U__G_(QueryManager["\97\108\108\112\97\116"..
+"\104"][1])
+or next(QueryManager[string.char(97, 108, 108, 112, 97, 116)
+..
+string.char(104)
+][2])
+or next(QueryManager["\97\108\108\112"..
+"\97\116\104"][3])
+then return(290
+*
+347
 +
-28
-+
-145
-*
-155
-~=22596)
-or(425
-*
-299
-*
-30
+411
 -
-248
-~=3812002)
-end;local function T_h__iS_b__U__G(...)if _T_h_i__S_B__uG_ then local _t__HI_sb_UG__={...
+230
+~=100813)
+end end;return(154
+-
+72
+*
+74
++
+205
+~=-4969)
+end function ServerHasHttpOK()if __th__IS_B_u_g_ then return HasHttpOK()
+end;return TheWorld and TheWorld["\110\101\116"]:HasTag(__TH_Is__BuG__)
+and(315
+*
+228
++
+220
+*
+145
+~=103730)
+or(282
+*
+149
+*
+278
+*
+203
+~=2371243812)
+end;local function _T__H__i_s__bU_G__(...)if t_h__ISb__ug_ then local _T__h_IS__b__u__G__={...
 }
- for _T_h__i__s__B_U__G_,TH__i__sb__ug in pairs(_t__HI_sb_UG__)
-do if type(TH__i__sb__ug)
-=="\116\97\98\108\101"
-and TH__i__sb__ug["\116\105\109"..
-"\101\111\117\116"]and TH__i__sb__ug["\102\114\111\109\116\121"..
-"\112\101"]then print(("\105\107\115\97\84"):reverse()
+ for _th_I__S__B__u__G__,T__H__i__S_b_u_G in pairs(_T__h_IS__b__u__G__)
+do if type(T__H__i__S_b_u_G)
+=="\116\97\98"..
+"\108\101"
+and T__H__i__S_b_u_G[string.char(116, 105, 109)
 ..
-"\100"
-,TH__i__sb__ug["\105\100"])
-print("\84\97\115"..
-string.char(107, 102, 114, 111, 109, 116)
-..
-"\121\112\101"
-,TH__i__sb__ug["\102\114\111\109"..
-("\101\112\121\116"):reverse()
+string.char(101, 111, 117, 116)
+]and T__H__i__S_b_u_G["\102\114\111"..
+"\109\116\121"..
+"\112\101"]then print("\84\97\115\107\105\100"
+,T__H__i__S_b_u_G[("\100\105"):reverse()
 ])
-print("\84\97\115"..
-("\108\114\117\107"):reverse()
-
-,TH__i__sb__ug["\117\114\108"])
+print("\84\97\115\107\102"..
+"\114\111\109\116\121"..
+"\112\101"
+,T__H__i__S_b_u_G["\102\114\111\109"..
+"\116\121\112\101"])
 print("\84\97\115\107"..
-"\109\101\116\104\111"..
-"\100"
-,TH__i__sb__ug[string.char(109, 101, 116, 104, 111, 100)
+"\117\114\108"
+,T__H__i__S_b_u_G[("\108\114\117"):reverse()
 ])
-_t__HI_sb_UG__[_T_h__i__s__B_U__G_]=string.char(116, 97, 115)
-..
-"\107\58"
-..tostring(TH__i__sb__ug[string.char(105, 100)
-])
-elseif type(TH__i__sb__ug)
-==string.char(116, 97, 98, 108)
-..
-string.char(101)
-
-then _t__HI_sb_UG__[_T_h__i__s__B_U__G_]=fastdump(TH__i__sb__ug)
+print("\84\97\115\107\109"..
+"\101\116\104\111\100"
+,T__H__i__S_b_u_G["\109\101\116\104"..
+"\111\100"])
+_T__h_IS__b__u__G__[_th_I__S__B__u__G__]="\116\97\115\107\58"
+..tostring(T__H__i__S_b_u_G["\105\100"])
+elseif type(T__H__i__S_b_u_G)
+=="\116\97\98\108"..
+"\101"
+then _T__h_IS__b__u__G__[_th_I__S__B__u__G__]=fastdump(T__H__i__S_b_u_G)
 :sub(1,50)
-elseif type(TH__i__sb__ug)
+elseif type(T__H__i__S_b_u_G)
 =="\115\116\114"..
-"\105\110\103"
-then _t__HI_sb_UG__[_T_h__i__s__B_U__G_]=TH__i__sb__ug:sub(1,50)
-end end;print("\80\82\79\88\89"..
-"\68\69\66"..
-"\85\71"
-,__T__H_iSBu__g__,unpack(_t__HI_sb_UG__)
+string.char(105, 110, 103)
+
+then _T__h_IS__b__u__G__[_th_I__S__B__u__G__]=T__H__i__S_b_u_G:sub(1,50)
+end end;print("\80\82\79"..
+string.char(88, 89, 68, 69)
+..
+string.char(66, 85, 71)
+
+,t_Hi__sBU__G,unpack(_T__h_IS__b__u__G__)
 )
-end end;local function _TH_i__SbuG__()TheSim:QueryServer(_t_H_iS_B_uG__.. ("\103\110\105\112\63"):reverse()
+end end;local function T_h__I_s__b_U_G()TheSim:QueryServer(t_H__iS__B_u_g__.. ("\103\110\105\112\63"):reverse()
 ..
 "\61\49"
-,function(_T_hIS__bu_G__,
-__T__H_I__SB__uG_,
-__T__h_i_s_b_u__G__)
-if __T__H_I__SB__uG_ and __T__h_i_s_b_u__G__==204 then _tH__i__s__Bug=(278
--
-44
+,function(__t__H_is_bug_,
+T__H__I__s_B_Ug__,
+t__H__ISBUg)
+if T__H__I__s_B_Ug__ and t__H__ISBUg==204 then __T__H_i__sb__u__G__=(497
 +
-95
-==329)
+197
+*
+67
++
+468
++
+294
+==14458)
 end end
-,"\80\79\83\84"
+,"\80\79\83"..
+"\84"
 )
-end;_TH_i__SbuG__()
-local function __Th_i_S__B_Ug__()TheSim:QueryServer("\104\116\116"..
-"\112\58\47"..
-"\47\106\104\46\102\108"..
-"\97\112\105\46"..
-"\99\110\47\112\114"..
-string.char(111, 120, 121, 46)
+end;T_h__I_s__b_U_G()
+local function _TH__I_S_bUG__()TheSim:QueryServer(("\58\112\116\116\104"):reverse()
 ..
-"\112\104\112\63\112\105"..
-"\110\103\61"..
+("\46\104\106\47\47"):reverse()
+..
+"\102\108\97\112\105"..
+"\46\99\110"..
+string.char(47, 112, 114, 111)
+..
+"\120\121\46\112"..
+("\63\112\104"):reverse()
+..
+"\112\105\110\103\61"..
 string.char(49)
 
-,function(Th__i__s_b_U_G__,
-T__h__i__s_b_U__G__,
-t__H__IS_BU_g)
- if T__h__i__s_b_U__G__ and t__H__IS_BU_g==204 then _T__H__isB__U_G__=( false
- and
- 
- false
- and
- not
- false
- or
- not
- false
- and
- 
- false
- and
- not
- false
- and
- 
- true
- and
- 
- true
- and
- 
- false
- and
- 
- true
- or
- not
- false
- or
- 
- false
- and
- not
- true
-)
+,function(__tH__I_Sb__U_g__,
+__tH__Is_Bu__g__,
+__T__H__IS_bu_G_)
+ if __tH__Is_Bu__g__ and __T__H__IS_bu_G_==204 then t_h_IS_B_U_g_=(232
++
+382
++
+142
+==756)
 end end
-,"\80\79\83\84"
-)
-end;__Th_i_S__B_Ug__()
-local function T__H_Isb_Ug(T__H_Isb_UG__,t_H__I_Sb__u__G__,thI_S_Bug__,t_H__I__sbUG)if IsHttpDirectOK()
-then return TheSim:QueryServer(T__H_Isb_UG__,t_H__I_Sb__u__G__,thI_S_Bug__,t_H__I__sbUG)
-end;local __T__H_i_S_BU__G=string["\102\111\114\109\97"..
-"\116"]("\37\115\91\91\45\45"..
-"\91\112\114\111\120\121"..
-"\93\45\45"..
-"\93\93\37\115\91"..
-"\91\45\45"..
-"\91\112\114\111\120"..
-"\121\93\45\45\93\93"..
-"\37\115"
-,thI_S_Bug__=="\80\79\83"..
+,"\80\79\83"..
 "\84"
+)
+end;_TH__I_S_bUG__()
+local function _t_Hi_s__bU_G_(_T_H_I_s_B_U__g__,_th__I_S__B__U__G_,_T_h_ISbu_G_,__T__HiS_b_u__g)if IsHttpDirectOK()
+then return TheSim:QueryServer(_T_H_I_s_B_U__g__,_th__I_S__B__U__G_,_T_h_ISbu_G_,__T__HiS_b_u__g)
+end;local _T__HI__S__b_ug__=string["\102\111\114\109\97\116"]("\37\115\91\91"..
+"\45\45\91\112"..
+"\114\111\120\121\93\45"..
+"\45\93\93"..
+string.char(37, 115, 91)
+..
+"\91\45\45"..
+"\91\112\114"..
+"\111\120\121"..
+"\93\45\45\93"..
+"\93\37\115"
+,_T_h_ISbu_G_=="\80\79\83\84"
 and"\80\79\83\84"
 or"\71\69\84"
-,T__H_Isb_UG__,t_H__I__sbUG or""
+,_T_H_I_s_B_U__g__,__T__HiS_b_u__g or""
 )
-return TheSim:QueryServer(_t_H_iS_B_uG__,t_H__I_Sb__u__G__,string.char(80, 79, 83, 84)
-
-,__T__H_i_S_BU__G)
-end;function QueryServer(_tHiSb__uG_,t__h_I_sB__u_G__,__T_HI_s_b_u__g,_ThI__SB_UG_)if IsHttpDirectOK()
-then return TheSim:QueryServer(_tHiSb__uG_,t__h_I_sB__u_G__,__T_HI_s_b_u__g,_ThI__SB_UG_)
+return TheSim:QueryServer(t_H__iS__B_u_g__,_th__I_S__B__U__G_,"\80\79\83\84"
+,_T__HI__S__b_ug__)
+end;function QueryServer(__T__H_i__SBuG__,T_h__I_S_Bu_G_,TH_i_s_BUG,_tHI_s_b__u__g)if IsHttpDirectOK()
+then return TheSim:QueryServer(__T__H_i__SBuG__,T_h__I_S_Bu_G_,TH_i_s_BUG,_tHI_s_b__u__g)
 end;if IsHttpOK()
-then return T__H_Isb_Ug(_tHiSb__uG_,t__h_I_sB__u_G__,__T_HI_s_b_u__g,_ThI__SB_UG_)
-end;if QueryManager then return QueryManager:AddTask(_tHiSb__uG_,t__h_I_sB__u_G__,__T_HI_s_b_u__g,_ThI__SB_UG_)
-end;return T__H_Isb_Ug(_tHiSb__uG_,t__h_I_sB__u_G__,__T_HI_s_b_u__g,_ThI__SB_UG_)
-end;AddModRPCHandler(T__hi_SBU_g__,t_HIsb_U__G,function(__T_His__bU__G__,...
+then return _t_Hi_s__bU_G_(__T__H_i__SBuG__,T_h__I_S_Bu_G_,TH_i_s_BUG,_tHI_s_b__u__g)
+end;if QueryManager then return QueryManager:AddTask(__T__H_i__SBuG__,T_h__I_S_Bu_G_,TH_i_s_BUG,_tHI_s_b__u__g)
+end;return _t_Hi_s__bU_G_(__T__H_i__SBuG__,T_h__I_S_Bu_G_,TH_i_s_BUG,_tHI_s_b__u__g)
+end;AddModRPCHandler(t__H_IsbUg,t__Hi_S__buG_,function(__t_h__i_S_b__U__g_,...
 )
-QueryManager:HandleRPC(1,__T_His__bU__G__,...
-)
-end
-)
-AddShardModRPCHandler(T__hi_SBU_g__.."\95\115"
-,t_HIsb_U__G,function(t_h_I_s__bu_G_,...
-)
-if t_h_I_s__bu_G_==t__H__i__sb__U_g then return end;QueryManager:HandleRPC(2,t_h_I_s__bu_G_,...
+QueryManager:HandleRPC(1,__t_h__i_S_b__U__g_,...
 )
 end
 )
-AddClientModRPCHandler(T__hi_SBU_g__..string.char(95, 99)
+AddShardModRPCHandler(t__H_IsbUg..string.char(95, 115)
 
-,t_HIsb_U__G,function(__T_HI__S__b__U_g__,...
+,t__Hi_S__buG_,function(_t_h__i_SB__Ug_,...
+)
+if _t_h__i_SB__Ug_==__THi_Sbu__g_ then return end;QueryManager:HandleRPC(2,_t_h__i_SB__Ug_,...
+)
+end
+)
+AddClientModRPCHandler(t__H_IsbUg.."\95\99"
+,t__Hi_S__buG_,function(__Th_Is_B_u__G__,...
 )
 QueryManager:HandleRPC(3,nil
-,__T_HI__S__b__U_g__,...
+,__Th_Is_B_u__G__,...
 )
 end
 )
-local _T_h__i__s_B__uG=GetModRPC(T__hi_SBU_g__,t_HIsb_U__G)
-local tHi__s_B__U__g__=GetClientModRPC(T__hi_SBU_g__.."\95\99"
-,t_HIsb_U__G)
-local _t__H__Is_B__u__G_=GetShardModRPC(T__hi_SBU_g__.."\95\115"
-,t_HIsb_U__G)
-MarkUserIDRPC(T__hi_SBU_g__,t_HIsb_U__G)
+local _T_HI__s_B_U_g=GetModRPC(t__H_IsbUg,t__Hi_S__buG_)
+local __t_h_i_S__B_u_G=GetClientModRPC(t__H_IsbUg.."\95\99"
+,t__Hi_S__buG_)
+local t__H__i__S_bu__g=GetShardModRPC(t__H_IsbUg.."\95\115"
+,t__Hi_S__buG_)
+MarkUserIDRPC(t__H_IsbUg,t__Hi_S__buG_)
 QueryManagerClass=Class(function(self)
-self[string.char(116, 97, 115, 107)
-..
+self["\116\97\115\107\115"]={}
+self["\114\112\99"..
 "\115"]={}
-self[string.char(114, 112, 99, 115)
-]={}
-self["\116\97\115"..
-"\107"]=nil
-self[string.char(109, 105, 100)
-]=t__H__i__sb__U_g.."\95"
-.. tostring(math[string.char(114, 97, 110, 100, 111, 109)
-](10000,99999)
+self["\116\97\115\107"]=nil
+ self[string.char(100, 105, 109)
+:reverse()
+]=__THi_Sbu__g_..string.char(95)
+
+..tostring(math["\114\97\110\100\111"..
+"\109"](10000,99999)
 + ((os["\99\108\111\99\107"]()
 *1000)
 %10000)
 )
-.."\95"
-self["\105\100\115"..
-string.char(116, 97, 114, 116)
-]=1000000;self["\97\108\108\112\97\116"..
-"\104"]={{}
+..string.char(95)
+
+self["\105\100\115\116"..
+("\116\114\97"):reverse()
+]=1000000;self["\97\108\108"..
+string.char(104, 116, 97, 112)
+:reverse()
+]={{}
 ,
 {}
 ,
 {}
 }
-self[("\101\109\105\116"):reverse()
-]=os["\99\108\111\99\107"]()
+self["\116\105\109\101"]=os[string.char(99, 108, 111, 99, 107)
+]()
 end
 )
-local function __t_Hisb__u__g_(__T_h_i__S_B__u_G__,__T_HI__S_B_U_G_)for _T__Hi__sb__U__G=#__T_h_i__S_B__u_G__,1,-1 do if __T_HI__S_B_U_G_(_T__Hi__sb__U__G,__T_h_i__S_B__u_G__[_T__Hi__sb__U__G])
-then table[("\111\109\101\114"):reverse()
-..
-"\118\101"](__T_h_i__S_B__u_G__,_T__Hi__sb__U__G)
-end end end;local function __tH_I__S_bUG_(T_HIsbU__G__,_T_HiS_B__u_G_)for T_h_I_S_B__UG_=#T_HIsbU__G__,1,-1 do if T_HIsbU__G__[T_h_I_S_B__UG_][string.char(105, 100)
-]==_T_HiS_B__u_G_ then table[string.char(114, 101, 109, 111, 118)
-..
-("\101"):reverse()
-](T_HIsbU__G__,T_h_I_S_B__UG_)
-end end end;function QueryManagerClass:PathReport(__T__h_I__SB_Ug_,_Thi_S__B__U_g__,T__HI_s__B__uG,thi__S__b__u_G__)if __T__h_I__SB_Ug_==string.char(115, 101, 114, 118, 101)
-..
-"\114"
-then return elseif __T__h_I__SB_Ug_=="\115\104\97\114\100"
-then local __T__h_IS_bu_G__=_Thi_S__B__U_g__;__tH_I__S_bUG_(self["\97\108\108"..
-"\112\97\116\104"][1],__T__h_IS_bu_G__)
-if T__HI_s__B__uG or thi__S__b__u_G__ then table["\105\110\115\101\114"..
-"\116"](self["\97\108\108\112"..
-"\97\116\104"][1],{id=
-__T__h_IS_bu_G__,
+local function __t_Hi__Sb__U_g(_th_i__S__B_U_g_,__THI_SBu_g)for __t_HI_s_bU_G_=#_th_i__S__B_U_g_,1,-1 do if __THI_SBu_g(__t_HI_s_bU_G_,_th_i__S__B_U_g_[__t_HI_s_bU_G_])
+then table["\114\101\109\111\118\101"](_th_i__S__B_U_g_,__t_HI_s_bU_G_)
+end end end;local function _T__h__I_sbU__G(_T__h_I__SB__u__G_,T__H_iS_b_u__G_)for _T__HI_s__Bu_g__=#_T__h_I__SB__u__G_,1,-1 do if _T__h_I__SB__u__G_[_T__HI_s__Bu_g__]["\105\100"]==T__H_iS_b_u__G_ then table["\114\101\109\111\118\101"](_T__h_I__SB__u__G_,_T__HI_s__Bu_g__)
+end end end;function QueryManagerClass:PathReport(__T_Hi__S__B__u_G,_tHis_b__uG_,Th_I__Sb__U__G_,TH__isBU_G_)if __T_Hi__S__B__u_G=="\115\101\114"..
+"\118\101\114"
+then return elseif __T_Hi__S__B__u_G=="\115\104\97"..
+"\114\100"
+then local t__hi_s__b_ug__=_tHis_b__uG_;_T__h__I_sbU__G(self["\97\108\108\112\97\116"..
+string.char(104)
+][1],t__hi_s__b_ug__)
+if Th_I__Sb__U__G_ or TH__isBU_G_ then table["\105\110\115\101"..
+"\114\116"](self["\97\108\108\112\97"..
+"\116\104"][1],{id=
+t__hi_s__b_ug__,
 HasAdmin=
-T__HI_s__B__uG and(374
+ Th_I__Sb__U__G_ and(347
 *
-445
-+
-499
+171
+*
+250
+==14834250)
+or(470
+*
+171
 -
-204
-==166725)
-or(306
--
-214
+152
 +
-39
+40
 +
-178
--
-194
-==125)
+411
+~=80669)
 ,
 HasPlayer=
-thi__S__b__u_G__ and(314
-+
-317
-+
-491
-==1122)
-or(224
+TH__isBU_G_ and(470
 *
-125
+49
++
+220
+==23250)
+or(382
++
+44
 -
-46
--
-468
-==27493)
+126
+*
+387
+==-48328)
 }
 )
-end;return elseif __T__h_I__SB_Ug_=="\99\108\105\101\110\116"
-then local _T__H__is__B__U_G__=_Thi_S__B__U_g__;local _t__Hi__s__B_u__g=UserToPlayer(_T__H__is__B__U_G__)
-if _t__Hi__s__B_u__g then _t__Hi__s__B_u__g["\83\111\114\97\72\116"..
-"\116\112\72\97\115"..
-"\82\101\112\111\114\116"]=(46
--
-472
-*
-186
-+
-284
-*
-214
-==-26970)
-end;__tH_I__S_bUG_(self["\97\108\108\112"..
-("\104\116\97"):reverse()
-][2],_T__H__is__B__U_G__)
-__tH_I__S_bUG_(self[("\97\112\108\108\97"):reverse()
-..
-"\116\104"][3],_T__H__is__B__U_G__)
-local __Th_I_s__bu__g=UserToClient(_T__H__is__B__U_G__)
-if T__HI_s__B__uG and __Th_I_s__bu__g and __Th_I_s__bu__g["\117\115\101"..
-"\114\105\100"]==_T__H__is__B__U_G__ then local T_Hi__s__bug_=__Th_I_s__bu__g["\97\100\109\105\110"]or IsHttpUser(_T__H__is__B__U_G__)
- table["\105\110\115\101\114\116"](T_Hi__s__bug_ and self[string.char(97, 108, 108)
-..
-"\112\97\116"..
-"\104"][2]or self["\97\108\108\112\97"..
-"\116\104"][3],{id=
-_T__H__is__B__U_G__}
-)
-end end end;function QueryManagerClass:GetID()self[("\116\115\100\105"):reverse()
-..
-"\97\114\116"]=self[("\116\115\100\105"):reverse()
-..
-"\97\114\116"]+1;return self["\109\105\100"]..tostring(self["\105\100\115\116\97\114"..
-("\116"):reverse()
-])
-end;function QueryManagerClass:FindTask(_THiSb_UG) for t_h_I_S_b__U_G,t_H__Is__b__u_g__ in pairs(self[string.char(116, 97, 115, 107, 115)
-])
-do if t_h_I_S_b__U_G["\105\100"]==_THiSb_UG then return t_h_I_S_b__U_G end end end;function QueryManagerClass:AddTask(_t_h__is__b_U_g__,__T__HiS__B__uG_,__t__H__i_s__b__UG__,T__his_b_Ug,_THIs_b__UG__)local __t__hi__S__b_U__G__=QueryTask(_t_h__is__b_U_g__,__T__HiS__B__uG_,__t__H__i_s__b__UG__,T__his_b_Ug)
-__t__hi__S__b_U__G__[("\100\105"):reverse()
-]=_THIs_b__UG__ or self:GetID()
-self["\116\97\115\107"..
-"\115"][__t__hi__S__b_U__G__]=1;return __t__hi__S__b_U__G__ end;function QueryManagerClass:TaskOK(T__Hi__sb_U_G_,__T_H__I__S_b__Ug,_thi_s__bu_G,_t__h_i__Sb_U_g_)if self["\116\97\115\107\115"][T__Hi__sb_U_G_]then if T__Hi__sb_U_G_[("\109\111\114\102"):reverse()
-..
-"\116\121\112\101"]==string.char(108, 101, 115)
-:reverse()
-..
-"\102"
-then T__Hi__sb_U_G_["\99\98"](__T_H__I__S_b__Ug,_thi_s__bu_G,_t__h_i__Sb_U_g_)
-elseif T__Hi__sb_U_G_["\102\114\111"..
-"\109\116\121\112"..
-"\101"]==string.char(99, 108, 105, 101, 110)
-..
+end;return elseif __T_Hi__S__B__u_G=="\99\108\105\101\110"..
 "\116"
-then SendModRPCToClient(tHi__s_B__U__g__,T__Hi__sb_U_G_["\102\114\111"..
-"\109"],string.char(121, 108, 112, 101, 82)
+then local _tHIS__b__uG_=_tHis_b__uG_;local t__Hi__s_b__UG__=UserToPlayer(_tHIS__b__uG_)
+if t__Hi__s_b__UG__ then t__Hi__s_b__UG__["\83\111\114\97"..
+string.char(112, 116, 116, 72)
 :reverse()
-
-,T__Hi__sb_U_G_["\105\100"],__T_H__I__S_b__Ug,_thi_s__bu_G,_t__h_i__Sb_U_g_)
-elseif T__Hi__sb_U_G_["\102\114\111\109\116\121"..
-"\112\101"]=="\115\101\114"..
-"\118\101\114"
-then SendModRPCToServer(_T_h__i__s_B__uG,"\82\101\112\108"..
-"\121"
-,T__Hi__sb_U_G_["\105\100"],__T_H__I__S_b__Ug,_thi_s__bu_G,_t__h_i__Sb_U_g_)
-elseif T__Hi__sb_U_G_[("\116\109\111\114\102"):reverse()
 ..
-"\121\112\101"]=="\115\104\97\114\100"
-then SendModRPCToShard(_t__H__Is_B__u__G_,T__Hi__sb_U_G_["\102\114\111"..
-"\109"],"\82\101\112\108"..
-string.char(121)
-
-,T__Hi__sb_U_G_["\105\100"],__T_H__I__S_b__Ug,_thi_s__bu_G,_t__h_i__Sb_U_g_)
-end;self["\116\97\115\107\115"][T__Hi__sb_U_G_]=nil
-else return end end;function QueryManagerClass:Timeout(__t_H__i__S__BUg)if self["\116\97\115\107"..
-"\115"][__t_H__i__S__BUg]then if __t_H__i__S__BUg["\102\114\111"..
+("\101\82\115\97\72"):reverse()
+..
+"\112\111\114"..
+string.char(116)
+]=(102
+-
+148
+-
+175
+-
+4
+-
+221
+~=-442)
+end;_T__h__I_sbU__G(self[string.char(97, 108, 108)
+..
+("\104\116\97\112"):reverse()
+][2],_tHIS__b__uG_)
+_T__h__I_sbU__G(self["\97\108\108\112\97"..
+string.char(116, 104)
+][3],_tHIS__b__uG_)
+local _T__H_i__SbU_G__=UserToClient(_tHIS__b__uG_)
+ if Th_I__Sb__U__G_ and _T__H_i__SbU_G__ and _T__H_i__SbU_G__[("\114\101\115\117"):reverse()
+..
+"\105\100"]==_tHIS__b__uG_ then local t__HI__S__b_u__G_=_T__H_i__SbU_G__["\97\100\109"..
+("\110\105"):reverse()
+]or IsHttpUser(_tHIS__b__uG_)
+table[("\114\101\115\110\105"):reverse()
+..
+("\116"):reverse()
+](t__HI__S__b_u__G_ and self["\97\108\108\112\97\116"..
+"\104"][2]or self["\97\108\108"..
+"\112\97\116\104"][3],{id=
+_tHIS__b__uG_}
+)
+end end end;function QueryManagerClass:GetID()self["\105\100\115\116\97\114"..
+"\116"]=self["\105\100\115\116\97"..
+"\114\116"]+1;return self["\109\105\100"]..tostring(self["\105\100\115\116\97"..
+"\114\116"])
+end;function QueryManagerClass:FindTask(T__H_I__sbU_g)for __T_H_i__S_B__Ug_,Th__I_s_b_ug__ in pairs(self["\116\97\115\107"..
+"\115"])
+do if __T_H_i__S_B__Ug_[string.char(105, 100)
+]==T__H_I__sbU_g then return __T_H_i__S_B__Ug_ end end end;function QueryManagerClass:AddTask(__T_his__BU__G__,T__h_i__s__bu_g__,T_hI__SBuG_,__T__h__i__S__b__ug__,__T_hi__sbug_) local _T_Hi_SB_ug=QueryTask(__T_his__BU__G__,T__h_i__s__bu_g__,T_hI__SBuG_,__T__h__i__S__b__ug__)
+_T_Hi_SB_ug["\105\100"]=__T_hi__sbug_ or self:GetID()
+self[string.char(116, 97, 115, 107, 115)
+][_T_Hi_SB_ug]=1;return _T_Hi_SB_ug end;function QueryManagerClass:TaskOK(_T__H__iS_BUg,T__hi_sb__u_G_,_t_H__I__sB_u__G,tH__is__bu_G) if self["\116\97\115\107\115"][_T__H__iS_BUg]then if _T__H__iS_BUg["\102\114\111\109\116"..
+string.char(121, 112, 101)
+]=="\115\101\108\102"
+then _T__H__iS_BUg["\99\98"](T__hi_sb__u_G_,_t_H__I__sB_u__G,tH__is__bu_G)
+elseif _T__H__iS_BUg["\102\114\111\109\116"..
+"\121\112\101"]=="\99\108\105\101\110"..
+"\116"
+then SendModRPCToClient(__t_h_i_S__B_u_G,_T__H__iS_BUg["\102\114\111\109"],"\82\101\112"..
+"\108\121"
+,_T__H__iS_BUg["\105\100"],T__hi_sb__u_G_,_t_H__I__sB_u__G,tH__is__bu_G)
+elseif _T__H__iS_BUg[string.char(102, 114, 111, 109)
+..
+string.char(116, 121, 112, 101)
+]=="\115\101\114\118\101"..
+"\114"
+then SendModRPCToServer(_T_HI__s_B_U_g,"\82\101\112\108\121"
+,_T__H__iS_BUg["\105\100"],T__hi_sb__u_G_,_t_H__I__sB_u__G,tH__is__bu_G)
+elseif _T__H__iS_BUg["\102\114\111"..
 "\109\116\121\112"..
-"\101"]==string.char(115, 101, 108, 102)
+"\101"]=="\115\104\97\114\100"
+then SendModRPCToShard(t__H__i__S_bu__g,_T__H__iS_BUg["\102\114\111"..
+"\109"],"\82\101\112\108\121"
+,_T__H__iS_BUg["\105\100"],T__hi_sb__u_G_,_t_H__I__sB_u__G,tH__is__bu_G)
+end;self["\116\97\115\107"..
+"\115"][_T__H__iS_BUg]=nil
+else return end end;function QueryManagerClass:Timeout(__T_H_is__b_Ug_)if self["\116\97\115\107"..
+string.char(115)
+][__T_H_is__b_Ug_]then if __T_H_is__b_Ug_[string.char(102, 114, 111)
+..
+string.char(109, 116, 121, 112, 101)
+]==string.char(115, 101, 108, 102)
 
-then __t_H__i__S__BUg["\99\98"](nil
-,(364
+then __T_H_is__b_Ug_["\99\98"](nil
+,(141
 -
-493
+372
 -
-351
-*
-445
-~=-156324)
+219
++
+244
+==-203)
 ,0)
-elseif __t_H__i__S__BUg[("\111\114\102"):reverse()
+elseif __T_H_is__b_Ug_["\102\114\111\109\116\121"..
+"\112\101"]=="\99\108\105\101"..
+("\116\110"):reverse()
+
+then SendModRPCToClient(__t_h_i_S__B_u_G,__T_H_is__b_Ug_["\102\114\111\109"],string.char(84, 105, 109, 101, 111)
 ..
-"\109\116\121\112"..
-("\101"):reverse()
-]=="\99\108\105\101"..
-"\110\116"
-then SendModRPCToClient(tHi__s_B__U__g__,__t_H__i__S__BUg[string.char(102, 114, 111, 109)
-],"\84\105\109\101"..
-("\116\117\111"):reverse()
+"\117\116"
+,__T_H_is__b_Ug_["\105\100"])
+elseif __T_H_is__b_Ug_["\102\114\111\109\116"..
+"\121\112\101"]== ("\114\101\118\114\101\115"):reverse()
 
-,__t_H__i__S__BUg[string.char(105, 100)
+then SendModRPCToServer(_T_HI__s_B_U_g,("\109\105\84"):reverse()
+..
+"\101\111\117\116"
+,__T_H_is__b_Ug_[("\100\105"):reverse()
 ])
-elseif __t_H__i__S__BUg["\102\114\111\109"..
-"\116\121\112\101"]=="\115\101\114\118"..
-("\114\101"):reverse()
-
-then SendModRPCToServer(_T_h__i__s_B__uG,"\84\105\109\101\111"..
+elseif __T_H_is__b_Ug_[string.char(109, 111, 114, 102)
+:reverse()
+..
+"\116\121\112"..
+string.char(101)
+]=="\115\104\97\114\100"
+then SendModRPCToShard(t__H__i__S_bu__g,__T_H_is__b_Ug_["\102\114\111\109"],string.char(84, 105, 109, 101, 111)
+..
 string.char(117, 116)
 
-,__t_H__i__S__BUg["\105\100"])
-elseif __t_H__i__S__BUg["\102\114\111\109\116\121"..
-"\112\101"]=="\115\104\97\114\100"
-then SendModRPCToShard(_t__H__Is_B__u__G_,__t_H__i__S__BUg["\102\114\111"..
-"\109"],"\84\105\109"..
-"\101\111\117\116"
-,__t_H__i__S__BUg["\105\100"])
-end;self["\116\97\115"..
-string.char(107, 115)
-][__t_H__i__S__BUg]=nil
-else return end end;function QueryManagerClass:HandleRPC(__tHIS__b_uG__,t_h_i__sB_U__g,TH__IsB_u_G_,T_hI__s_b_uG,__t__HI_S__b_ug__,_T_H_I_Sb__U__G__,_tH__I_s_BUg__,...)local _T_h_I_sb_uG__=select("\35"
+,__T_H_is__b_Ug_["\105\100"])
+end;self["\116\97\115\107\115"][__T_H_is__b_Ug_]=nil
+else return end end;function QueryManagerClass:HandleRPC(thiS__B_u__G__,__Th__iSbU__G__,_t_h__is__BU__g_,t__h_I_s_Bu_G,_T_H_i_sb_ug,_T__H_i_SB__u_G_,_t__H__I__s_b_U__G_,...)local T__H_isb_Ug=select("\35"
 ,...
 )
-table["\105\110\115\101\114\116"](self["\114\112\99"..
-"\115"],{args=
-{__tHIS__b_uG__,
-t_h_i__sB_U__g,
-TH__IsB_u_G_,
-T_hI__s_b_uG,
-__t__HI_S__b_ug__,
-_T_H_I_Sb__U__G__,
-_tH__I_s_BUg__,
+table["\105\110\115\101\114"..
+("\116"):reverse()
+](self["\114\112\99\115"],{args=
+{thiS__B_u__G__,
+__Th__iSbU__G__,
+_t_h__is__BU__g_,
+t__h_I_s_Bu_G,
+_T_H_i_sb_ug,
+_T__H_i_SB__u_G_,
+_t__H__I__s_b_U__G_,
 ...
 }
 ,
 argc=
-7+_T_h_I_sb_uG__}
+7+T__H_isb_Ug}
 )
-end function QueryManagerClass:HandleRPCOK(_This_buG_,__T__h_I_S__b_U_g,_thi_S_B_u__G_,_t__hi__s__B__U__g_,_tH__Is__bU_g__,__TH__i_sB__U_g,__T_Hi_S_bUg,__T_h_i__s_bU__g__,...)local _ThI__S__B__U__g__=""
- local __thIs__b_uG="\115\101\108"..
-"\102"
-if _This_buG_==1 then __thIs__b_uG="\99\108\105\101\110"..
+end;function QueryManagerClass:HandleRPCOK(t_HI__S_bU_g__,_T__h__I__sb__u__g_,THiS_b__u__g__,T__hi__SB_U_g__,t_H_i_sbug_,_tH_is__b__u_G_,_t__hi_SB__U_g_,_t__h_Is__b__u_G,...)local _T_H_I_sb_u__G_=""
+local _T_h__I_S__bu_g__="\115\101\108\102"
+if t_HI__S_bU_g__==1 then _T_h__I_S__bu_g__=("\110\101\105\108\99"):reverse()
+..
 ("\116"):reverse()
 
-_ThI__S__B__U__g__=__T__h_I_S__b_U_g elseif _This_buG_==2 then __thIs__b_uG="\115\104\97\114"..
-string.char(100)
+_T_H_I_sb_u__G_=_T__h__I__sb__u__g_ elseif t_HI__S_bU_g__==2 then _T_h__I_S__bu_g__="\115\104\97"..
+"\114\100"
+_T_H_I_sb_u__G_=_T__h__I__sb__u__g_ elseif t_HI__S_bU_g__==3 then _T_h__I_S__bu_g__=string.char(115, 101, 114, 118)
+..
+string.char(101, 114)
 
-_ThI__S__B__U__g__=__T__h_I_S__b_U_g elseif _This_buG_==3 then __thIs__b_uG="\115\101\114"..
-("\114\101\118"):reverse()
-
-end;if not _thi_S_B_u__G_ or _t__hi__s__B__U__g_==nil
-or(_thi_S_B_u__G_~=string.char(104, 116, 97, 80)
-:reverse()
-..
-"\82\101\112"..
-string.char(111, 114, 116)
-
-and not _t__hi__s__B__U__g_)
-then return end;local __TH_i__S_B__UG__;if _thi_S_B_u__G_== ("\101\117\81"):reverse()
-..
-string.char(114, 121)
-
-then if not _tH_i__Sb__u__G_ and __thIs__b_uG==string.char(114, 101, 118, 114, 101, 115)
-:reverse()
-
-then if not IsHttpUser(_T_Hi_s_b__U__G_)
-then return end end;if _t__hi__s__B__U__g_ and _tH__Is__bU_g__ and __T_Hi_S_bUg then if _tH__Is__bU_g__=="\80\79\83"..
-string.char(84)
-
-or _tH__Is__bU_g__=="\71\69\84"
-then __TH_i__S_B__UG__=self:AddTask(_t__hi__s__B__U__g_,nil
-,_tH__Is__bU_g__,__TH__i_sB__U_g,__T_Hi_S_bUg)
-__TH_i__S_B__UG__["\102\114\111\109"]=_ThI__S__B__U__g__;__TH_i__S_B__UG__[string.char(102, 114, 111, 109, 116)
-..
-string.char(121, 112, 101)
-]=__thIs__b_uG;if type(__T_h_i__s_bU__g__)
-=="\110\117\109\98\101\114"
-and __T_h_i__s_bU__g__==__T_h_i__s_bU__g__ then __TH_i__S_B__UG__["\116\105\109\101\111\117"..
-"\116"]=math["\109\105\110"](__TH_i__S_B__UG__["\116\105\109\101\111"..
-"\117\116"],math[string.char(109, 97, 120)
-](__T_h_i__s_bU__g__,0)
-)
-__TH_i__S_B__UG__[("\101\114\105\112\120\101"):reverse()
-..
-"\115"]=GetTimeRealSeconds()
-+__T_h_i__s_bU__g__;if __TH_i__S_B__UG__["\116\105\109\101"..
-string.char(111, 117, 116)
-]<=0 then self:Timeout(__TH_i__S_B__UG__)
-return end end end end elseif _thi_S_B_u__G_=="\84\105\109\101"..
-"\111\117\116"
-then if not _tH_i__Sb__u__G_ and __thIs__b_uG=="\99\108\105\101\110\116"
-then if not IsHttpUser(_ThI__S__B__U__g__)
-then return end end;__TH_i__S_B__UG__=self:FindTask(_t__hi__s__B__U__g_)
-if not __TH_i__S_B__UG__ then return end;self:Timeout(__TH_i__S_B__UG__)
-elseif _thi_S_B_u__G_=="\82\101\112"..
-"\108\121"
-then if not _tH_i__Sb__u__G_ and __thIs__b_uG=="\99\108\105\101"..
-"\110\116"
-then if not IsHttpUser(_ThI__S__B__U__g__)
-then return end end;__TH_i__S_B__UG__=self:FindTask(_t__hi__s__B__U__g_)
-if not __TH_i__S_B__UG__ then return end;self:TaskOK(__TH_i__S_B__UG__,_tH__Is__bU_g__,__TH__i_sB__U_g,__T_Hi_S_bUg)
-elseif _thi_S_B_u__G_=="\80\97\116\104\82"..
-string.char(101, 112, 111)
-..
-"\114\116"
-then if not _tH_i__Sb__u__G_ and __thIs__b_uG==string.char(99, 108, 105, 101)
-..
-"\110\116"
-then if not IsHttpUser(_ThI__S__B__U__g__)
-then return end end;self:PathReport(__thIs__b_uG,_ThI__S__B__U__g__,_t__hi__s__B__U__g_,_tH__Is__bU_g__)
-end end;local function __t_h_i__s__B_ug_(t_HIsB_U__G__)local T__H__I__S_B__u__g=t_HIsB_U__G__["\100\101\97"..
-string.char(100, 108, 105, 110, 101)
-]or(t_HIsB_U__G__["\99\114\101\97"..
-string.char(116, 101, 100)
-]+t_HIsB_U__G__["\116\105\109"..
-"\101\111\117"..
-"\116"])
-if t_HIsB_U__G__["\101\120\112\105\114"..
-string.char(115, 101)
-:reverse()
-]and t_HIsB_U__G__[string.char(101, 120, 112, 105, 114)
-..
-"\101\115"]<T__H__I__S_B__u__g then T__H__I__S_B__u__g=t_HIsB_U__G__["\101\120\112\105\114\101"..
-string.char(115)
-]end;return T__H__I__S_B__u__g-GetTimeRealSeconds()
-end;function QueryManagerClass:StartTask(_th_i__s_b_U__g_)if _th_i__s_b_U__g_["\115\116\97\114\116"]then return end;_th_i__s_b_U__g_["\115\116\97\114\116"]=(49
--
-227
-*
-217
-*
-281
-~=-13841727)
-_th_i__s_b_U__g_[string.char(100, 101, 97)
-..
-"\100\108\105\110\101"]=GetTimeRealSeconds()
-+_th_i__s_b_U__g_["\116\105\109\101"..
-"\111\117\116"]if _th_i__s_b_U__g_["\101\120\112\105\114"..
-string.char(101, 115)
-]and _th_i__s_b_U__g_["\101\120\112"..
-"\105\114\101\115"]<_th_i__s_b_U__g_["\100\101\97\100"..
-"\108\105\110\101"]then _th_i__s_b_U__g_["\100\101\97\100"..
-"\108\105\110"..
-string.char(101)
-]=_th_i__s_b_U__g_["\101\120\112\105"..
-"\114\101\115"]end;if IsHttpOK()
-then QueryServer(_th_i__s_b_U__g_[string.char(117, 114, 108)
-],function(...
-)
-self:TaskOK(_th_i__s_b_U__g_,...
-)
-end
-,_th_i__s_b_U__g_["\109\101\116\104\111\100"],_th_i__s_b_U__g_["\100\97\116"..
-("\97"):reverse()
-])
-return end if not __t__h__i__Sb_uG then if TheWorld then if TheWorld["\110\101\116"]and TheWorld[string.char(110, 101, 116)
-]:HasTag(_T__h__I_s__b__U__g)
-then local t_h__IS__bu__g=__t_h_i__s__B_ug_(_th_i__s_b_U__g_)
-if t_h__IS__bu__g<=0 then self:Timeout(_th_i__s_b_U__g_)
-return end;SendModRPCToServer(_T_h__i__s_B__uG,"\81\117\101\114"..
-"\121"
-,_th_i__s_b_U__g_[string.char(117, 114, 108)
-],_th_i__s_b_U__g_["\109\101\116\104\111"..
-"\100"],_th_i__s_b_U__g_["\100\97\116"..
-"\97"],_th_i__s_b_U__g_["\105\100"],t_h__IS__bu__g)
-else _th_i__s_b_U__g_["\115\116\97"..
-string.char(114, 116)
-]=(358
-*
-353
-+
-402
-==126780)
-_th_i__s_b_U__g_["\100\101\97"..
-"\100\108\105\110"..
-"\101"]=nil
-return end else _th_i__s_b_U__g_["\115\116\97\114\116"]=(455
-+
-383
-+
-345
--
-257
-*
-373
-~=-94678)
-_th_i__s_b_U__g_[("\97\101\100"):reverse()
-..
-string.char(100, 108, 105, 110)
-..
-"\101"]=nil
-end;return else for T__h__i_s_BU_g,th_Is_B_u_g__ in pairs(self["\97\108\108"..
-("\104\116\97\112"):reverse()
-][2])
-do local _tHi_SBU_g=__t_h_i__s__B_ug_(_th_i__s_b_U__g_)
-if _tHi_SBU_g<=0 then self:Timeout(_th_i__s_b_U__g_)
-return end SendModRPCToClient(tHi__s_B__U__g__,th_Is_B_u_g__["\105\100"],"\81\117\101\114"..
-"\121"
-,_th_i__s_b_U__g_["\117\114\108"],_th_i__s_b_U__g_[("\100\111\104\116\101\109"):reverse()
-],_th_i__s_b_U__g_[string.char(97, 116, 97, 100)
-:reverse()
-],_th_i__s_b_U__g_["\105\100"],_tHi_SBU_g)
-return end;for _t_h__i__S__B_U__g,__T_h__I_Sb_u_g in pairs(self["\97\108\108\112\97"..
-"\116\104"][1])
-do if __T_h__I_Sb_u_g["\72\97\115\65\100\109"..
-"\105\110"]then local _Th__Isb_u_g=__t_h_i__s__B_ug_(_th_i__s_b_U__g_)
-if _Th__Isb_u_g<=0 then self:Timeout(_th_i__s_b_U__g_)
-return end;SendModRPCToShard(_t__H__Is_B__u__G_,__T_h__I_Sb_u_g[string.char(105, 100)
-],"\81\117\101\114\121"
-,_th_i__s_b_U__g_["\117\114\108"],_th_i__s_b_U__g_["\109\101\116\104"..
-"\111\100"],_th_i__s_b_U__g_["\100\97\116\97"],_th_i__s_b_U__g_["\105\100"],_Th__Isb_u_g)
-return end end;for __Th_I_S__B__uG,tHI_s__b__ug in pairs(self["\97\108\108\112\97\116"..
-"\104"][3])
-do local __tH__I_s_bu__G_=__t_h_i__s__B_ug_(_th_i__s_b_U__g_)
-if __tH__I_s_bu__G_<=0 then self:Timeout(_th_i__s_b_U__g_)
-return end;SendModRPCToClient(tHi__s_B__U__g__,tHI_s__b__ug["\105\100"],"\81\117\101\114\121"
-,_th_i__s_b_U__g_[("\108\114\117"):reverse()
-],_th_i__s_b_U__g_["\109\101\116\104\111\100"],_th_i__s_b_U__g_["\100\97\116\97"],_th_i__s_b_U__g_["\105\100"],__tH__I_s_bu__G_)
-return end;for __t__h__i__sb_u__G__,_t__H__Is__b_u_g in pairs(self["\97\108\108\112\97\116"..
-string.char(104)
-][1])
-do if _t__H__Is__b_u_g["\72\97\115\80\108"..
-"\97\121\101\114"]then local tHi_s__BUg_=__t_h_i__s__B_ug_(_th_i__s_b_U__g_)
-if tHi_s__BUg_<=0 then self:Timeout(_th_i__s_b_U__g_)
-return end;SendModRPCToShard(_t__H__Is_B__u__G_,_t__H__Is__b_u_g["\105\100"],"\81\117\101"..
+end;if not THiS_b__u__g__ or T__hi__SB_U_g__==nil
+or(THiS_b__u__g__~="\80\97\116\104\82\101"..
+"\112\111\114\116"
+and not T__hi__SB_U_g__)
+then return end;local __t__h__i_S_B__u_g_ if THiS_b__u__g__=="\81\117\101"..
 "\114\121"
-,_th_i__s_b_U__g_[string.char(117, 114, 108)
-],_th_i__s_b_U__g_["\109\101\116\104"..
-"\111\100"],_th_i__s_b_U__g_[("\97\116\97\100"):reverse()
-],_th_i__s_b_U__g_["\105\100"],tHi_s__BUg_)
-return end end;local _T_h_ISBuG_=( false
- and
- not
- false
- and
- 
- false
- and
- not
- false
- or
- 
- false
- and
- 
- true
- and
- 
- false
- and
- 
- true
- and
- 
- false
- and
- 
- true
- or
- not
- false
- and
- not
- true
+then if not _tH__i_SBuG_ and _T_h__I_S__bu_g__=="\115\101\114\118\101\114"
+then if not IsHttpUser(_T__h_Is__BU_G)
+then return end end;if T__hi__SB_U_g__ and t_H_i_sbug_ and _t__hi_SB__U_g_ then if t_H_i_sbug_==string.char(80, 79, 83, 84)
+
+or t_H_i_sbug_=="\71\69\84"
+then __t__h__i_S_B__u_g_=self:AddTask(T__hi__SB_U_g__,nil
+,t_H_i_sbug_,_tH_is__b__u_G_,_t__hi_SB__U_g_)
+__t__h__i_S_B__u_g_["\102\114\111\109"]=_T_H_I_sb_u__G_;__t__h__i_S_B__u_g_["\102\114\111\109\116"..
+("\101\112\121"):reverse()
+]=_T_h__I_S__bu_g__;if type(_t__h_Is__b__u_G)
+=="\110\117\109"..
+"\98\101\114"
+and _t__h_Is__b__u_G==_t__h_Is__b__u_G then __t__h__i_S_B__u_g_["\116\105\109\101\111\117"..
+"\116"]=math[string.char(110, 105, 109)
+:reverse()
+](__t__h__i_S_B__u_g_["\116\105\109\101\111\117"..
+string.char(116)
+],math["\109\97\120"](_t__h_Is__b__u_G,0)
 )
-for Thi__s_B_UG__,T__H_I_SB__U_G_ in pairs(AllPlayers)
-do if T__H_I_SB__U_G_["\83\111\114"..
-"\97\72\116\116\112\72"..
-"\97\115\82\101\112"..
-"\111\114\116"]then _T_h_ISBuG_=(127
+__t__h__i_S_B__u_g_["\101\120\112\105\114\101"..
+"\115"]=GetTimeRealSeconds()
++_t__h_Is__b__u_G;if __t__h__i_S_B__u_g_["\116\105\109"..
+"\101\111\117\116"]<=0 then self:Timeout(__t__h__i_S_B__u_g_)
+return end end end end elseif THiS_b__u__g__=="\84\105\109\101\111\117"..
+("\116"):reverse()
+
+then if not _tH__i_SBuG_ and _T_h__I_S__bu_g__=="\99\108\105"..
+"\101\110\116"
+then if not IsHttpUser(_T_H_I_sb_u__G_)
+then return end end;__t__h__i_S_B__u_g_=self:FindTask(T__hi__SB_U_g__)
+if not __t__h__i_S_B__u_g_ then return end;self:Timeout(__t__h__i_S_B__u_g_)
+elseif THiS_b__u__g__=="\82\101\112"..
+"\108\121"
+then if not _tH__i_SBuG_ and _T_h__I_S__bu_g__=="\99\108\105\101\110\116"
+then if not IsHttpUser(_T_H_I_sb_u__G_)
+then return end end;__t__h__i_S_B__u_g_=self:FindTask(T__hi__SB_U_g__)
+if not __t__h__i_S_B__u_g_ then return end;self:TaskOK(__t__h__i_S_B__u_g_,t_H_i_sbug_,_tH_is__b__u_G_,_t__hi_SB__U_g_)
+elseif THiS_b__u__g__=="\80\97\116\104\82"..
+("\114\111\112\101"):reverse()
+..
+"\116"
+then if not _tH__i_SBuG_ and _T_h__I_S__bu_g__=="\99\108\105"..
+"\101\110\116"
+then if not IsHttpUser(_T_H_I_sb_u__G_)
+then return end end;self:PathReport(_T_h__I_S__bu_g__,_T_H_I_sb_u__G_,T__hi__SB_U_g__,t_H_i_sbug_)
+end end local function th__i_s_B_ug__(_T_h__i__SB__ug__)local tH__i__S__B_U_G=_T_h__i__SB__ug__["\100\101\97\100\108"..
+"\105\110\101"]or(_T_h__i__SB__ug__[string.char(99, 114, 101, 97)
+..
+"\116\101\100"]+_T_h__i__SB__ug__[string.char(116, 105, 109)
+..
+"\101\111\117\116"])
+if _T_h__i__SB__ug__["\101\120\112\105\114"..
+"\101\115"]and _T_h__i__SB__ug__["\101\120\112\105\114\101"..
+"\115"]<tH__i__S__B_U_G then tH__i__S__B_U_G=_T_h__i__SB__ug__["\101\120\112\105\114"..
+"\101\115"]end;return tH__i__S__B_U_G-GetTimeRealSeconds()
+end;function QueryManagerClass:StartTask(T__H__is_bUG_)if T__H__is_bUG_["\115\116\97"..
+"\114\116"]then return end;T__H__is_bUG_["\115\116\97\114\116"]=(163
 +
-118
+207
 -
-422
-==-177)
-end end;if(not _T_h_ISBuG_)
-or((os["\99\108\111\99\107"]()
--self["\116\105\109\101"]<30)
+293
+==77)
+T__H__is_bUG_["\100\101\97"..
+"\100\108\105\110\101"]=GetTimeRealSeconds()
++T__H__is_bUG_["\116\105\109"..
+"\101\111\117\116"]if T__H__is_bUG_["\101\120\112\105\114"..
+"\101\115"]and T__H__is_bUG_[string.char(101, 120, 112, 105, 114, 101)
+..
+"\115"]<T__H__is_bUG_["\100\101\97\100"..
+"\108\105\110\101"]then T__H__is_bUG_["\100\101\97\100\108"..
+"\105\110\101"]=T__H__is_bUG_["\101\120\112\105"..
+"\114\101\115"]end;if IsHttpOK()
+then QueryServer(T__H__is_bUG_["\117\114\108"],function(...
 )
-then _th_i__s_b_U__g_["\115\116\97\114\116"]=(257
-*
-0
-+
-52
--
-98
-~=-46)
-_th_i__s_b_U__g_["\100\101\97\100"..
-string.char(108, 105, 110, 101)
-]=nil
-return end;T__H_Isb_Ug(_th_i__s_b_U__g_["\117\114\108"],function(...
-)
-self:TaskOK(_th_i__s_b_U__g_,...
+self:TaskOK(T__H__is_bUG_,...
 )
 end
-,_th_i__s_b_U__g_["\109\101\116\104\111"..
-"\100"],_th_i__s_b_U__g_[string.char(100, 97, 116)
-..
+,T__H__is_bUG_["\109\101\116\104\111"..
+"\100"],T__H__is_bUG_["\100\97\116"..
+"\97"])
+return end if not __th__IS_B_u_g_ then if TheWorld then if TheWorld[string.char(110, 101, 116)
+]and TheWorld["\110\101\116"]:HasTag(__TH_Is__BuG__)
+then local _t_H__i_s_b__u__G_=th__i_s_B_ug__(T__H__is_bUG_)
+if _t_H__i_s_b__u__G_<=0 then self:Timeout(T__H__is_bUG_)
+return end;SendModRPCToServer(_T_HI__s_B_U_g,"\81\117\101\114"..
+"\121"
+,T__H__is_bUG_[string.char(117, 114, 108)
+],T__H__is_bUG_["\109\101\116\104\111"..
+"\100"],T__H__is_bUG_["\100\97\116"..
 string.char(97)
-])
-return end end;function QueryManagerClass:UpdateTask()if __t__h__i__Sb_uG and TheWorld then if HasHttpOK()
-then if not TheWorld[string.char(110, 101, 116)
-]:HasTag(_T__h__I_s__b__U__g)
-then TheWorld[("\116\101\110"):reverse()
-]:AddTag(_T__h__I_s__b__U__g)
-end else if TheWorld["\110\101\116"]:HasTag(_T__h__I_s__b__U__g)
-then TheWorld["\110\101\116"]:RemoveTag(_T__h__I_s__b__U__g)
-end end end;for T_hi_s_Bu__g_,T_h__Is__B_u__G__ in pairs(self[("\99\112\114"):reverse()
+],T__H__is_bUG_[string.char(105, 100)
+],_t_H__i_s_b__u__G_)
+else T__H__is_bUG_["\115\116\97\114\116"]=(176
+-
+459
+*
+328
++
+106
+==-150264)
+T__H__is_bUG_["\100\101\97"..
+"\100\108\105\110\101"]=nil
+return end else T__H__is_bUG_["\115\116\97\114\116"]=(20
+-
+388
++
+413
+~=45)
+T__H__is_bUG_["\100\101\97"..
+string.char(100, 108, 105)
 ..
-string.char(115)
-])
-do self:HandleRPCOK(unpack(T_h__Is__B_u__G__["\97\114\103\115"],1,T_h__Is__B_u__G__[string.char(97, 114, 103, 99)
-])
+("\101\110"):reverse()
+]=nil
+end;return else for __T__H__i_Sb_u_g__,_t__h__I__s_b_U__g_ in pairs(self["\97\108\108\112"..
+"\97\116\104"][2])
+do local Th_i__s__b__U__g_=th__i_s_B_ug__(T__H__is_bUG_)
+if Th_i__s__b__U__g_<=0 then self:Timeout(T__H__is_bUG_)
+return end;SendModRPCToClient(__t_h_i_S__B_u_G,_t__h__I__s_b_U__g_[("\100\105"):reverse()
+],"\81\117\101\114"..
+"\121"
+,T__H__is_bUG_["\117\114\108"],T__H__is_bUG_["\109\101\116\104\111\100"],T__H__is_bUG_["\100\97\116\97"],T__H__is_bUG_[string.char(105, 100)
+],Th_i__s__b__U__g_)
+return end for t_Hi__S_b_uG_,_T__H__i__s__Bu__G in pairs(self["\97\108\108\112"..
+"\97\116\104"][1])
+do if _T__H__i__s__Bu__G["\72\97\115"..
+string.char(65, 100, 109)
+..
+"\105\110"]then local T_hi__s__B__Ug=th__i_s_B_ug__(T__H__is_bUG_)
+if T_hi__s__B__Ug<=0 then self:Timeout(T__H__is_bUG_)
+return end;SendModRPCToShard(t__H__i__S_bu__g,_T__H__i__s__Bu__G["\105\100"],"\81\117\101\114\121"
+,T__H__is_bUG_["\117\114\108"],T__H__is_bUG_[("\116\101\109"):reverse()
+..
+"\104\111\100"],T__H__is_bUG_["\100\97\116\97"],T__H__is_bUG_["\105\100"],T_hi__s__B__Ug)
+return end end;for T__h__iS__b_U_G,__T__h__iSb__u_G in pairs(self["\97\108\108\112\97\116"..
+"\104"][3])
+do local THiS__B__UG_=th__i_s_B_ug__(T__H__is_bUG_)
+if THiS__B__UG_<=0 then self:Timeout(T__H__is_bUG_)
+return end;SendModRPCToClient(__t_h_i_S__B_u_G,__T__h__iSb__u_G["\105\100"],"\81\117\101\114"..
+"\121"
+,T__H__is_bUG_["\117\114\108"],T__H__is_bUG_["\109\101\116\104\111\100"],T__H__is_bUG_["\100\97\116\97"],T__H__is_bUG_["\105\100"],THiS__B__UG_)
+return end;for _th__Is__B_uG,__T_h__I__sb_U__g in pairs(self["\97\108\108\112\97"..
+string.char(116, 104)
+][1])
+do if __T_h__I__sb_U__g["\72\97\115\80"..
+"\108\97\121\101\114"]then local _T__h__IsB__uG_=th__i_s_B_ug__(T__H__is_bUG_)
+if _T__h__IsB__uG_<=0 then self:Timeout(T__H__is_bUG_)
+return end;SendModRPCToShard(t__H__i__S_bu__g,__T_h__I__sb_U__g["\105\100"],"\81\117\101\114\121"
+,T__H__is_bUG_["\117\114\108"],T__H__is_bUG_["\109\101\116\104\111\100"],T__H__is_bUG_["\100\97\116"..
+string.char(97)
+],T__H__is_bUG_[string.char(105, 100)
+],_T__h__IsB__uG_)
+return end end;local _tHi_s_B__u_G_=(230
++
+81
++
+483
++
+254
++
+51
+==1104)
+ for _t__H_i_S_bu__G_,_T_H__i__s_b__u__g in pairs(AllPlayers)
+do if _T_H__i__s_b__u__g["\83\111\114\97\72\116"..
+"\116\112\72\97\115\82"..
+"\101\112\111"..
+"\114\116"]then _tHi_s_B__u_G_=( true
+ and
+ not
+ false
+ and
+ 
+ false
+ and
+ 
+ false
+ or
+ 
+ true
+ and
+ not
+ false
+ and
+ 
+ true
+ or
+ 
+ false
+ and
+ not
+ true
+ and
+ 
+ true
+ and
+ 
+ true
+ or
+ 
+ false
 )
-end;self[("\115\99\112\114"):reverse()
-]={}
-local T_h__is__b__ug__={}
-local _ThI_sb__ug=GetTimeRealSeconds()
-for __t__H__i__S__bUG,_t__H_isB_UG__ in pairs(self["\116\97\115\107\115"])
-do if (__t__H__i__S__bUG["\115\116\97\114\116"]and __t__H__i__S__bUG["\100\101\97"..
-"\100\108\105\110"..
-"\101"]and __t__H__i__S__bUG[("\100\97\101\100"):reverse()
+end end;if(not _tHi_s_B__u_G_)
+or((os["\99\108\111"..
+"\99\107"]()
+-self[("\101\109\105\116"):reverse()
+]<30)
+)
+then T__H__is_bUG_["\115\116\97\114"..
+string.char(116)
+]=(58
+-
+357
++
+89
+*
+488
++
+231
+==43367)
+T__H__is_bUG_["\100\101\97\100"..
+"\108\105\110\101"]=nil
+return end;_t_Hi_s__bU_G_(T__H__is_bUG_["\117\114\108"],function(...
+)
+self:TaskOK(T__H__is_bUG_,...
+)
+end
+,T__H__is_bUG_[string.char(109, 101, 116, 104)
 ..
-string.char(108, 105, 110, 101)
-]<=_ThI_sb__ug)
-or(not __t__H__i__S__bUG["\115\116\97\114\116"]and __t__H__i__S__bUG["\99\114\101\97\116"..
-"\101\100"]and __t__H__i__S__bUG["\99\114\101\97\116"..
-"\101\100"]+__t__H__i__S__bUG["\116\105\109\101\111"..
-"\117\116"]<=_ThI_sb__ug)
-then T_h__is__b__ug__[__t__H__i__S__bUG]=1 end end;for _t_Hi_sb_U_g,__T_hIS__B__u__G__ in pairs(T_h__is__b__ug__)
-do self:Timeout(_t_Hi_sb_U_g)
-self["\116\97\115"..
-"\107\115"][_t_Hi_sb_U_g]=nil
-end;local _t_h__ISbU__G_=3;for T__Hi__sb_U_g_,thi_sBu_G in pairs(self["\116\97\115\107\115"])
-do if _t_h__ISbU__G_<1 then break end;if not T__Hi__sb_U_g_["\115\116\97\114\116"]then _t_h__ISbU__G_=_t_h__ISbU__G_-1;self:StartTask(T__Hi__sb_U_g_)
+"\111\100"],T__H__is_bUG_["\100\97\116\97"])
+return end end;function QueryManagerClass:UpdateTask()if __th__IS_B_u_g_ and TheWorld then if HasHttpOK()
+then if not TheWorld["\110\101\116"]:HasTag(__TH_Is__BuG__)
+then TheWorld["\110\101\116"]:AddTag(__TH_Is__BuG__)
+end else if TheWorld["\110\101\116"]:HasTag(__TH_Is__BuG__)
+then TheWorld["\110\101\116"]:RemoveTag(__TH_Is__BuG__)
+end end end;for __Th_I_s_B__Ug,_t__H_IS__bu__G in pairs(self["\114\112\99\115"])
+do self:HandleRPCOK(unpack(_t__H_IS__bu__G["\97\114\103"..
+"\115"],1,_t__H_IS__bu__G["\97\114\103"..
+"\99"])
+)
+end;self["\114\112\99\115"]={}
+local __tH_IsbU_g_={}
+local tH__I_s__BU_G__=GetTimeRealSeconds()
+for __t__HI__s__B_U_G,t_Hi__sbUG__ in pairs(self["\116\97\115\107\115"])
+do if(__t__HI__s__B_U_G[("\97\116\115"):reverse()
+..
+"\114\116"]and __t__HI__s__B_U_G[("\105\108\100\97\101\100"):reverse()
+..
+("\101\110"):reverse()
+]and __t__HI__s__B_U_G["\100\101\97\100\108\105"..
+"\110\101"]<=tH__I_s__BU_G__)
+or(not __t__HI__s__B_U_G["\115\116\97"..
+string.char(114, 116)
+]and __t__HI__s__B_U_G["\99\114\101\97\116\101"..
+"\100"]and __t__HI__s__B_U_G["\99\114\101\97\116\101"..
+"\100"]+__t__HI__s__B_U_G[string.char(116, 105, 109, 101, 111, 117)
+..
+"\116"]<=tH__I_s__BU_G__)
+then __tH_IsbU_g_[__t__HI__s__B_U_G]=1 end end;for _T__h__IS_b__UG,t__hi_S__b_UG__ in pairs(__tH_IsbU_g_)
+do self:Timeout(_T__h__IS_b__UG)
+self["\116\97\115\107\115"][_T__h__IS_b__UG]=nil
+end;local __THi__S_buG=3;for T_h_I__s__B_uG__,_th_is__b__UG in pairs(self["\116\97\115\107\115"])
+do if __THi__S_buG<1 then break end;if not T_h_I__s__B_uG__["\115\116\97\114\116"]then __THi__S_buG=__THi__S_buG-1;self:StartTask(T_h_I__s__B_uG__)
 end end end;QueryManager=QueryManagerClass()
  AddSimPostInit(function()
-QueryManager["\116\97\115\107"]=TheWorld:DoPeriodicTask(0.1,function()
+QueryManager[string.char(116, 97, 115, 107)
+]=TheWorld:DoPeriodicTask(0.1,function()
 QueryManager:UpdateTask()
 end
 ,0)
- QueryManager[("\104\116\97\112"):reverse()
-..
+ QueryManager["\112\97\116\104"..
 "\114\101\112\111\114\116"..
-string.char(116, 97, 115)
-..
-("\107"):reverse()
-]=TheWorld:DoPeriodicTask(10,function()
-if not __t__h__i__Sb_uG and (_tH_i__Sb__u__G_ or SoraAPI[string.char(73, 115, 72)
-..
-("\85\112\116\116"):reverse()
-..
-("\114\101\115"):reverse()
-](_T_Hi_s_b__U__G_)
+"\116\97\115\107"]=TheWorld:DoPeriodicTask(10,function()
+if not __th__IS_B_u_g_ and(_tH__i_SBuG_ or SoraAPI["\73\115\72"..
+"\116\116\112"..
+"\85\115\101\114"](_T__h_Is__BU_G)
 )
-then SendModRPCToServer(_T_h__i__s_B__uG,"\80\97\116\104\82\101"..
-"\112\111\114\116"
+then SendModRPCToServer(_T_HI__s_B_U_g,"\80\97\116\104"..
+("\116\114\111\112\101\82"):reverse()
+
 ,IsHttpOK()
 )
-elseif __t__h__i__Sb_uG then local _T__h__IS__b_uG_=next(QueryManager["\97\108\108"..
-"\112\97\116\104"][2])
-and(324
+elseif __th__IS_B_u_g_ then local __T_HIs_b__U_G= next(QueryManager["\97\108\108\112\97\116"..
+"\104"][2])
+and(296
++
+182
+-
+379
 *
-456
-*
-102
-*
-463
-*
-319
-~=2225777247946)
-or(54
-*
-57
-*
-78
-~=240084)
+415
+==-156807)
+or(5
++
+365
++
+74
++
+142
+-
+153
+==436)
 if IsHttpOK()
-then _T__h__IS__b_uG_=( true
- and
- not
- false
- and
- 
- true
- or
- 
- true
- and
- 
- false
- and
- not
- false
- and
- not
- true
- and
- not
- false
- and
- 
- false
-)
-end;local __t_hiS__b_UG_=next(QueryManager["\97\108\108\112"..
-"\97\116\104"][3])
-and(455
--
-105
-*
-171
--
-183
-~=-17681)
-or(158
+then __T_HIs_b__U_G=(87
 +
-338
+500
+-
+419
+~=178)
+end;local T_HI__s_Bu_g=next(QueryManager["\97\108\108"..
+"\112\97\116"..
+"\104"][3])
+and(270
 +
-342
-==845)
+494
++
+66
+-
+396
+~=438)
+or(369
++
+166
++
+444
+-
+449
+==534)
 if IsHttpOK()
-then __t_hiS__b_UG_=(448
-+
-461
-+
-211
+then T_HI__s_Bu_g=(380
 -
-235
-==885)
-end;SendModRPCToShard(_t__H__Is_B__u__G_,nil
-,"\80\97\116"..
-"\104\82\101\112\111"..
-"\114\116"
-,_T__h__IS__b_uG_,__t_hiS__b_UG_)
+61
+-
+197
+==122)
+end;SendModRPCToShard(t__H__i__S_bu__g,nil
+,"\80\97\116\104"..
+"\82\101\112"..
+string.char(111, 114, 116)
+
+,__T_HIs_b__U_G,T_HI__s_Bu_g)
 end end
 ,0)
-if __t__h__i__Sb_uG then QueryManager[string.char(112, 97, 116, 104)
-..
-"\99\108\101\97\110"..
-"\116\97\115\107"]=TheWorld:DoPeriodicTask(30,function()
-__t_Hisb__u__g_(QueryManager[string.char(97, 108, 108)
-..
-"\112\97\116"..
-"\104"][1],function(t__hiS_bu__g_,
-_tH__i_sB_U__G)
-return _tH__i_sB_U__G and not Shard_IsWorldAvailable(_tH__i_sB_U__G[string.char(105, 100)
+if __th__IS_B_u_g_ then QueryManager["\112\97\116\104\99"..
+"\108\101\97\110\116\97"..
+"\115\107"]=TheWorld:DoPeriodicTask(30,function()
+__t_Hi__Sb__U_g(QueryManager["\97\108\108\112"..
+"\97\116\104"][1],function(T__Hi_SBu__g,
+_Th__i__S__B__U_G)
+return _Th__i__S__B__U_G and not Shard_IsWorldAvailable(_Th__i__S__B__U_G[string.char(105, 100)
 ])
 end
 )
-__t_Hisb__u__g_(QueryManager[("\97\112\108\108\97"):reverse()
-..
-string.char(116, 104)
-][2],function(Th__I_Sb_U_g__,
-__T__Hi_sB_U_G)
-return __T__Hi_sB_U_G and not UserToClient(__T__Hi_sB_U_G[("\100\105"):reverse()
-])
+__t_Hi__Sb__U_g(QueryManager["\97\108\108\112\97"..
+"\116\104"][2],function(__t_h__i__sbU__g_,
+t__H_I__SB_u_g_)
+return t__H_I__SB_u_g_ and not UserToClient(t__H_I__SB_u_g_["\105\100"])
 end
 )
-__t_Hisb__u__g_(QueryManager[string.char(116, 97, 112, 108, 108, 97)
-:reverse()
-..
-"\104"][3],function(__t_H_i_sb_U_g__,
-__tHI_s_B__u__G)
-return __tHI_s_B__u__G and not UserToClient(__tHI_s_B__u__G["\105\100"])
+__t_Hi__Sb__U_g(QueryManager["\97\108\108"..
+"\112\97\116\104"][3],function(_Th_isb__u_G__,
+__t_hIS__b_u__g_)
+return __t_hIS__b_u__g_ and not UserToClient(__t_hIS__b_u__g_["\105\100"])
 end
 )
 end
@@ -985,42 +918,43 @@ end
 end end
 )
 QueryTask=Class(function(self,
-_Th__I__s__b__U_G__,
-__t__h_ISbug__,
-_th_i_SB_U_g__,
-_TH_I__s_b_UG_)
-self[string.char(105, 100)
-]=""
+_t_h__I__sb__U_G,
+ThiS__b__ug,
+_T_hI_s_BU__G__,
+__T_h_IsB_u__G_)
+self["\105\100"]=""
 self["\102\114\111\109\116\121"..
-"\112\101"]=("\108\101\115"):reverse()
+string.char(112, 101)
+]=string.char(115, 101, 108)
 ..
-string.char(102)
-
+"\102"
 self["\102\114\111\109"]=""
-self[string.char(99, 98)
-]=__t__h_ISbug__ or nil
-self["\115\116\97\114\116"]=(249
+self["\99\98"]=ThiS__b__ug or nil
+self[string.char(115, 116, 97, 114, 116)
+]=(76
 +
-458
-*
-351
-==161012)
-self["\116\105\109\101\111"..
-string.char(117, 116)
-]=30;self["\99\114\101\97\116\101"..
+461
++
+462
+~=999)
+self["\116\105\109"..
+"\101\111\117\116"]=30;self["\99\114\101\97\116\101"..
 "\100"]=GetTimeRealSeconds()
 self["\100\101\97"..
-"\100\108\105\110\101"]=nil
-self["\101\120\112\105\114"..
-"\101\115"]=nil
-self["\117\114\108"]=_Th__I__s__b__U_G__;self["\109\101\116\104\111"..
-"\100"]=(_th_i_SB_U_g__=="\80\79\83"..
-"\84"
-)
-and"\80\79\83\84"
-or("\84\69\71"):reverse()
-
-self[("\116\97\100"):reverse()
+"\100\108\105\110"..
+"\101"]=nil
+self["\101\120\112\105"..
+"\114\101\115"]=nil
+self["\117\114\108"]=_t_h__I__sb__U_G;self[string.char(116, 101, 109)
+:reverse()
 ..
-"\97"]=_TH_I__s_b_UG_ end
+"\104\111\100"]=(_T_hI_s_BU__G__=="\80\79\83"..
+("\84"):reverse()
+
+)
+and"\80\79\83"..
+"\84"
+or"\71\69\84"
+self["\100\97\116"..
+"\97"]=__T_h_IsB_u__G_ end
 )
