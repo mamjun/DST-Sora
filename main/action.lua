@@ -681,10 +681,11 @@ end, function(act)
         target.components.soraportable:ChangToItem(act.doer)
     end
     return true
-end, 1, "dolongaction")
+end, 9999, "dolongaction")
 
 AddComponentAction("SCENE", "soraportable", function(inst, doer, actions, right)
-    if right and inst and not inst.replica.inventoryitem:CanBePickedUp() then
+    if right and inst and doer and doer:HasTag("sora") and
+        not inst.replica.inventoryitem:CanBePickedUp() then
         table.insert(actions, ACTIONS.SORAITEMCHANGE)
     end
 end)

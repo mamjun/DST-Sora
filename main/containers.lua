@@ -673,7 +673,11 @@ params.sora_pot = {
 
         bgatlas = "images/quagmire_recipebook.xml",
         bgimage = "quagmire_recipe_menu_bg.tex",
-        pos = Vector3(10, 500, 0)
+        pos = Vector3(10, 500, 0),
+        buttoninfo = {
+            text = "收起锅",
+            position = Vector3(320, -220, 0)
+        }
 
     },
     acceptsstacks = true,
@@ -792,6 +796,41 @@ function params.sora_pot.widget:SoraOnOpenFn(inst)
     img:MoveToBack()
     self:SoraAutoClose(img)
     self.bgimage:MoveToBack()
+end
+
+local function SoraPotPickup(player, inst)
+    if not (player and player:IsValid() and inst and inst:IsValid()) then
+        return
+    end
+
+    local container = inst.components.container
+    local portable = inst.components.soraportable
+    if container == nil or portable == nil or not container:IsOpenedBy(player) then
+        return
+    end
+
+    container:Close(player)
+    if not portable:IsOwner(player) or player.components.locomotor == nil or
+        (player.components.rider ~= nil and player.components.rider:IsRiding()) or
+        (player.sg ~= nil and player.sg:HasStateTag("busy")) then
+        return
+    end
+
+    player.components.locomotor:PushAction(GLOBAL.BufferedAction(player, inst, GLOBAL.ACTIONS.SORAITEMCHANGE), true)
+end
+AddModRPCHandler("sora", "sora_pot_pickup", SoraPotPickup)
+
+function params.sora_pot.widget.buttoninfo.fn(inst, doer)
+    if inst.components.container ~= nil then
+        SoraPotPickup(doer, inst)
+    elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
+        inst.replica.container:Close()
+        SendModRPCToServer(MOD_RPC["sora"]["sora_pot_pickup"], inst)
+    end
+end
+
+function params.sora_pot.widget.buttoninfo.validfn(inst)
+    return inst.replica.container ~= nil and not inst.replica.container:IsBusy()
 end
 
 function params.sora_pot.itemtestfn(container, item, slot)
