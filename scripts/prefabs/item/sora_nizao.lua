@@ -121,30 +121,59 @@ table.insert(All, MakePlacer("sora_butterfly_placer", "butterfly", "butterfly_ba
 table.insert(All, MakePlacer("sora_moonbutterfly_placer", "butterfly", "butterfly_moon", "idle_flight_loop"))
 
 local lightasset = {}
-local function uninit(inst)
-    if inst and inst.cat and inst.cat:IsValid() then
-        --inst.cat.stoppackprotect = true
-        local data, refs = inst.cat:GetPersistData()
-        inst.components.sorasavecmp:SetSave("cat", {
+-- 由召唤道具统一保存和收回；异常移除时跳过消失动画。
+local function uninit(item, removing)
+    local cat = item and item.cat
+    if not (cat and cat:IsValid()) then
+        if item then
+            item.cat = nil
+        end
+        return
+    end
+    if cat._sora_returning or cat._sora_returned then
+        return
+    end
+    if not item:IsValid() or cat._sora_item ~= item then
+        return
+    end
+
+    cat._sora_returning = true
+    local ok, err = pcall(function()
+        local data = cat:GetPersistData()
+        item.components.sorasavecmp:SetSave("cat", {
             init = 0,
             data = data
         })
-        inst.cat:AddTag("FX")
-        inst.cat:AddTag("NOCLICK")
-        if inst.cat.components.container:IsOpen() then
-            inst.cat.components.container:Close()
+        cat._sora_returned = true
+        item.cat = nil
+        cat._sora_item = nil
+        local player = cat._sora_player
+        if player and player.sora_lightflier_cat == cat then
+            player.sora_lightflier_cat = nil
         end
-        inst.cat.components.container.ignoreoverstacked = true
-        inst.cat.components.container:DestroyContents()
-        inst.cat.components.container.ignoreoverstacked = false
-        -- local items = inst.cat.components.container:RemoveAllItems()
-        -- for k, v in pairs(items) do
-        --     v:Remove()
-        -- end
-        ErodeAway(inst.cat, 2)
-        inst.components.rechargeable:Discharge(0)
+        cat._sora_player = nil
+        item.components.rechargeable:Discharge(0)
+
+        local container = cat.components.container
+        container.canbeopened = false
+        container:Close()
+        local ignoreoverstacked = container.ignoreoverstacked
+        container.ignoreoverstacked = true
+        local cleared, clearerr = pcall(container.DestroyContents, container)
+        container.ignoreoverstacked = ignoreoverstacked
+        if not cleared then
+            error(clearerr, 0)
+        end
+    end)
+    cat._sora_returning = nil
+    if not ok then
+        error(err, 0)
     end
-    inst.cat = nil
+    if removing ~= true then
+        cat:AddTag("FX")
+        cat:AddTag("NOCLICK")
+        ErodeAway(cat, 2)
+    end
 end
 local function OnDropped(inst)
     uninit(inst)
@@ -180,6 +209,8 @@ local function onuse(inst, doer)
         cat.components.sorafollewer:Init(doer)
         doer.sora_lightflier_cat = cat
         inst.cat = cat
+        cat._sora_item = inst
+        cat._sora_player = doer
         if doer and doer.components.talker then
             doer.components.talker:Say("拟造-萤火！")
         end
@@ -263,6 +294,7 @@ function makelightflier_cat()
         MakeGhostPhysics(inst, 1, .1)
         inst:AddTag("NOBLOCK")
         inst:AddTag("companion")
+        inst:AddTag("followsthroughvirtualrooms") -- 虚拟房间切换时保留并随玩家传送
         inst:AddTag("nosteal")
         inst:AddTag("flying")
         inst:AddTag("rotatableobject")
@@ -317,6 +349,18 @@ function makelightflier_cat()
             inst.magicfx.Follower:FollowSymbol(inst.GUID, "body_full", 0, -60, 0)
         end
         inst.persists = false
+        local oldRemove = inst.Remove
+        inst.Remove = function(cat, ...)
+            if cat._sora_removing or cat._sora_returning then
+                return
+            end
+            local item = cat._sora_item
+            if item and item:IsValid() and item.cat == cat then
+                uninit(item, true)
+            end
+            cat._sora_removing = true
+            return oldRemove(cat, ...)
+        end
         return inst
     end
     return Prefab("sora_lightflier_cat", lightflier_catfn, lightasset)

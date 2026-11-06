@@ -46,7 +46,15 @@ local function ClearChainTargets(inst)
     inst.targetCD = nil
     inst.over = nil
 end
+local function RemoveFlightRecord(inst)
+    local owner = inst.delayowner
+    if owner and owner.soratqys then
+        owner.soratqys[inst] = nil
+    end
+end
 local function OnDropped(inst)
+    RemoveFlightRecord(inst)
+    inst.components.inventoryitem.canbepickedup = true
     inst.force_return = nil
     ClearChainTargets(inst)
     if inst.CheckGoToTask then
@@ -154,6 +162,7 @@ function ApplyCheckFn(inst, Cancel)
     if not Cancel then
         inst.CheckGoToTask = inst:DoPeriodicTask(0.5, TryGiveSelfToOwner)
     else
+        RemoveFlightRecord(inst)
         inst.delayowner = nil
     end
 end
@@ -276,9 +285,12 @@ local function GetNextTarget(inst, target)
         inst.delayowner.soratqys = {}
     end
     local allwork = 0
-    for k, v in pairs(inst.delayowner.soratqys) do
-        if k.delayowner == inst.delayowner and k.components.projectile and k.components.projectile.target then
+    for k in pairs(inst.delayowner.soratqys) do
+        if k:IsValid() and k.delayowner == inst.delayowner and
+            k.components.projectile and k.components.projectile.target then
             allwork = allwork + 1
+        else
+            inst.delayowner.soratqys[k] = nil
         end
     end
     if allwork > 4 then
@@ -368,12 +380,14 @@ local function OnHit(inst, owner, target)
                 impactfx:FacePoint(inst.Transform:GetWorldPosition())
             end
         end
-        local x, y, z = inst:GetPosition():Get()
+        local splashpos = inst:GetPosition()
+        local x, y, z = splashpos:Get()
         local ents = TheSim:FindEntities(x, y, z, 4, MUST_TAGS, CANT_TAGS)
         for k, v in pairs(ents) do
             if v ~= target and v:IsValid() and not v.components.health:IsDead() and v.components.combat and
                 v.components.combat:CanBeAttacked(inst.delayowner) then
-                inst.delayowner.components.combat:DoAttack(v, inst, inst, inst.components.projectile.stimuli)
+                inst.delayowner.components.combat:DoAttack(v, inst, inst, inst.components.projectile.stimuli, nil, 4,
+                    splashpos)
             end
         end
     elseif inst.canhitwork and target and target.components.workable and target.components.workable:CanBeWorked() then
@@ -414,6 +428,7 @@ local function fn()
     inst.AnimState:PlayAnimation("idle", true)
     -- inst.AnimState:SetRayTestOnBB(true)
     inst:AddTag("sora_tqy")
+    inst:AddTag("followsthroughvirtualrooms") -- 虚拟房间切换时保留并随玩家传送
     inst:AddTag("thrown")
     inst:AddTag("weapon")
     inst:AddTag("projectile")
@@ -425,6 +440,7 @@ local function fn()
         return inst
     end
     inst:ListenForEvent("onpickup", onPickUP)
+    inst:ListenForEvent("onremove", RemoveFlightRecord)
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(10)
     inst.components.weapon:SetRange(14, 16)
