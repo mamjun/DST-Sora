@@ -183,7 +183,7 @@ end
 
 local function soramagicfn(staff, target, pos)
 	local caster = staff.components.inventoryitem.owner
-	if not caster or not caster:HasTag("Sora") then
+	if not caster or not caster:HasTag("sora") then
 	return false
 	end
 	if not staff.components.rechargeable:IsCharged() then 

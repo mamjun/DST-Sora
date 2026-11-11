@@ -197,7 +197,7 @@ local function onuse(inst)
 end
 local function soramagicfn(staff, target, pos)
     local caster = staff.components.inventoryitem.owner
-    if not caster or not caster:HasTag("Sora") then
+    if not caster or not caster:HasTag("sora") then
         return false
     end
     if not staff.components.rechargeable:IsCharged() then
@@ -224,7 +224,7 @@ local function onhaunt(inst, doer)
         return false
     end
 
-    if not doer:HasTag("Sora") then
+    if not doer:HasTag("sora") then
         if doer.components.talker then
             doer.components.talker:Say("这是Sora的法杖")
         end

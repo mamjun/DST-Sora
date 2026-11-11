@@ -59,7 +59,7 @@ SORAPACK.fn = function(act)
         return true
     end
     if invobject.prefab == "sorabowknot" then
-        if not doer:HasTag("Sora") then
+        if not doer:HasTag("sora") then
             doer.components.talker:Say("这是sora的蝴蝶结")
             return true
         end

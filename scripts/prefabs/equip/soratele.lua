@@ -174,7 +174,7 @@ local function onunequip(inst, owner)
     end
 end
 local function SoraBlink(blink, pos, caster)
-	if not caster or not caster:HasTag("Sora") then
+	if not caster or not caster:HasTag("sora") then
 	return false
 	end
 	local staff = blink.inst
