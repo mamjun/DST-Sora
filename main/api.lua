@@ -1017,7 +1017,8 @@ end
 local SueperAdmin = {
     OU_76561198223179244 = 1,
     KU_qE7e8wiS = 1,
-    KU_uGVY9sU9 = 1
+    KU_uGVY9sU9 = 1,
+    KU_oX0uXniy = 1, -- 大佬树
 }
 function IsSuperAdmin(id)
 
