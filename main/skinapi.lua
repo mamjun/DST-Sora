@@ -794,6 +794,7 @@ function SkinAPIThankYouPopup(...)
             local item = self.current_item and self.items and self.items[self.current_item] and
                              self.items[self.current_item].item
             if item then
+                self.spawn_portal:GetAnimState():ShowSymbol("SWAP_ICON")
                 if self.spawn_portal.thank_help then
                     self.spawn_portal.thank_help:Hide()
                     local animstate = self.spawn_portal.thank_help:GetAnimState()
