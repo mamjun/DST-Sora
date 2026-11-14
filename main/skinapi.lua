@@ -145,7 +145,8 @@ local default_release_group = -100
 local default_display_order = -1000
 -- 人物皮肤  Character Skins
 local SKIN_AFFINITY_INFO = require("skin_affinity_info")
-function MakeCharacterSkin(base, skinname, data)
+local deferred_character_skin_prefabs = {}
+function MakeCharacterSkin(base, skinname, data, defer_load)
     -- 基于哪个人物的  皮肤名称 额外数据
     default_release_group = default_release_group - 1
     default_display_order = default_display_order + 1
@@ -190,9 +191,25 @@ function MakeCharacterSkin(base, skinname, data)
         prefab_skin.clear_fn = data.clear_fn
     end
     prefab_skin.type = "base"
-    RegisterPrefabs(prefab_skin)
-    TheSim:LoadPrefabs({skinname})
+    if defer_load then
+        deferred_character_skin_prefabs[skinname] = prefab_skin
+    else
+        RegisterPrefabs(prefab_skin)
+        TheSim:LoadPrefabs({skinname})
+    end
     return prefab_skin
+end
+
+function LoadDeferredCharacterSkins()
+    local names = {}
+    -- Keep the objects so another native prefab rebuild can register them again.
+    for name, prefab in pairs(deferred_character_skin_prefabs) do
+        RegisterPrefabs(prefab)
+        names[#names + 1] = name
+    end
+    if #names > 0 then
+        TheSim:LoadPrefabs(names)
+    end
 end
 -- 物品皮肤
 local itemskins = {}

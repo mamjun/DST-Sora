@@ -135,7 +135,7 @@ local function fn()
 
     inst.AnimState:SetBank("sora2bag")
     inst.AnimState:SetBuild("sora2bag")
-    inst.AnimState:PlayAnimation("anim")
+    inst.AnimState:PlayAnimation("idle")
 	inst:AddTag("Sora2Bag")
 	inst:AddTag("backpack")
 	inst:AddTag("fridge")

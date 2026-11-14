@@ -407,7 +407,7 @@ local function fn()
 
     inst.AnimState:SetBank("sorabag")
     inst.AnimState:SetBuild("sorabag")
-    inst.AnimState:PlayAnimation("anim",true)
+    inst.AnimState:PlayAnimation("idle",true)
     inst:AddComponent("soratwoface")
     -- inst.foleysound = "dontstarve/movement/foley/krampuspack"
     inst:AddTag("backpack")
@@ -535,7 +535,7 @@ end
 end
 ]] --
 
-SoraAPI.MakeItemSkinDefaultData("sorabag", {}, {nil,nil,'anim',true})
+SoraAPI.MakeItemSkinDefaultData("sorabag", {}, {nil,nil,'idle',true})
 SoraAPI.MakeItemSkin("sorabag", WINGMESH_SKIN, {
     name = "金蕊曦羽",
     atlas = "images/inventoryimages/sorabag_jrxy.xml",

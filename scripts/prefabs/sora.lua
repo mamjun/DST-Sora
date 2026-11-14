@@ -1129,4 +1129,5 @@ MakeSkin("sora_jyyh", {
         end
     end
 })
+SoraAPI.LoadDeferredCharacterSkins()
 return MakePlayerCharacter("sora", prefabs, assets, common_postinit, master_postinit, start_inv)

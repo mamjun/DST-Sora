@@ -386,7 +386,7 @@ local function packfn()
 
     inst.AnimState:SetBank("sora2pack_1")
     inst.AnimState:SetBuild("sora2pack")
-    inst.AnimState:PlayAnimation("anim", true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
     inst:AddTag("aquatic")
     inst:AddTag("sorapacker")
@@ -414,7 +414,7 @@ local function packfn()
 
     return inst
 end
-SoraAPI.MakeItemSkinDefaultData("sora2pack", {}, {"sora2pack_1", "sora2pack", "anim"})
+SoraAPI.MakeItemSkinDefaultData("sora2pack", {}, {"sora2pack_1", "sora2pack", "idle"})
 SoraAPI.MakeItemSkin("sora2pack", "sora2pack_2", {
     name = "穹の打包纸",
     atlas = "images/inventoryimages/sora2pack_2.xml",
@@ -448,7 +448,7 @@ local function fullfn()
 
     inst.AnimState:SetBank("sora3pack_1")
     inst.AnimState:SetBuild("sora3pack")
-    inst.AnimState:PlayAnimation("anim", true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
     inst:AddTag("sorapacker")
 
@@ -486,7 +486,7 @@ local function fullfn()
 end
 
 SoraAPI.MakeItemSkinDefaultData("sorapacker", {"images/inventoryimages/sora3pack.xml", "sora3pack"},
-    {"sora3pack_1", "sora3pack", "anim", true})
+    {"sora3pack_1", "sora3pack", "idle", true})
 SoraAPI.MakeItemSkin("sorapacker", "sorapacker_2", {
     name = "打包的礼物",
     atlas = "images/inventoryimages/sora3pack_2.xml",
@@ -612,7 +612,7 @@ local function OnWrapped(inst, num, doer)
     if doer and doer.components.bundler and doer.components.bundler.preskinname then
         inst.preskinname = doer.components.bundler.preskinname
     end
-    inst.AnimState:PlayAnimation("anim", true)
+    inst.AnimState:PlayAnimation("idle", true)
     if inst.preskinname then
         TheSim:ReskinEntity(inst.GUID, inst.skinname, inst.preskinname, nil)
     elseif math.random() > 0.5 then
@@ -674,7 +674,7 @@ local function full3fn()
 
     inst.AnimState:SetBank("sora3pack_1")
     inst.AnimState:SetBuild("sora3pack")
-    inst.AnimState:PlayAnimation("anim", true)
+    inst.AnimState:PlayAnimation("idle", true)
     inst:AddComponent("soratwoface")
     inst:AddTag("bundle")
 
@@ -719,7 +719,7 @@ local function full3fn()
 end
 
 SoraAPI.MakeItemSkinDefaultData("sora3packer", {"images/inventoryimages/sora3pack.xml", "sora3pack"},
-    {"sora3pack_1", "sora3pack", "anim", true})
+    {"sora3pack_1", "sora3pack", "idle", true})
 
 SoraAPI.MakeItemSkin("sora3packer", "sora3packer_2", {
     name = "穹の打包纸",
