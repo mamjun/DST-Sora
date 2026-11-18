@@ -34,6 +34,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 if not TheNet:GetIsServer() then
     return
 end
+local FindOnlinePlayer = require("utils/soraonlineplayer")
+
 local function TrimLevel(t, level)
     level = (level or 0) + 1
     if t.prefab and t.data then
@@ -224,10 +226,10 @@ MailDB:ListenForEvent("ChestData", NextFrame(function(id, data)
     if not (data and data.player and data.data and data.guid) then
         return
     end
-    local doer = UserToPlayer(data.player)
+    local doer = FindOnlinePlayer(data.player)
     local inst = Ents[data.guid]
 
-    if not doer and inst then
+    if not doer or not inst then
         return
     end
     local owner = inst.components.inventoryitem and inst.components.inventoryitem:GetGrandOwner()

@@ -53,13 +53,18 @@ AddPrefabPostInit("world", function(inst)
     SoraDB.MailDB.inst = inst
     SoraDB.GLOBALDB.inst = inst
     SoraDB.SeedDB.inst = inst
-    inst:WatchWorldState("cycles", function ()
-        local t = TheWorld.state.cycles
-        for k,v in pairs(AllPlayers) do
-            if v.userid then
-                GLOBALDB:Set("useronline",v.userid,t)
+    inst:WatchWorldState("cycles", function()
+        local cycle = inst.state.cycles
+        assert(GLOBALDB:BeginBatch("useronline"))
+        local ok, err = pcall(function()
+            for _, player in pairs(AllPlayers) do
+                if player.userid then
+                    GLOBALDB:Set("useronline", player.userid, cycle)
+                end
             end
-        end
+        end)
+        GLOBALDB:EndBatch("useronline")
+        if not ok then error(err, 0) end
     end)
 end)
 MailDB:InitRoot("Players")      --存放玩家 以及玩家拥有哪些邮件

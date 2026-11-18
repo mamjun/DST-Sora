@@ -210,6 +210,10 @@ AddPrefabPostInit("babybeefalo", function(inst)
     end
 end)
 
+if rawget(GLOBAL, "FL_SERVER_PATCH_POSTINIT_CACHE") then
+    return
+end
+
 -- 别一次次算了 
 local oldGetServerModsNames = ModManager.GetServerModsNames
 local servermodsnamescache = nil

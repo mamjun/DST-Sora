@@ -316,7 +316,7 @@ else
 end
 
 -- MainDB 与依赖它的 ClientDB 共用同一套 JSON 键类型协议。
-SoraDBProtocol = {}
+SoraDBProtocol = { version = 2 } -- SetBatch support
 function SoraDBProtocol.Pack(data)
     if type(data) ~= "table" then
         return data
@@ -442,7 +442,9 @@ local function decode(str)
 end
 local rpc = SHARD_MOD_RPC[dbnamespace]["maindb"]
 
+local Batch = require("utils/soradbbatch")
 local MainDB = Class(function(self)
+    self.batches = {}
     self.Inited = false
     self.inst = nil
     -- 数据
@@ -475,6 +477,8 @@ end
 function MainDB:SetMiD(str)
     mid = str
 end
+MainDB.ProtocolVersion = SoraDBProtocol.version
+
 function MainDB:Init(namespace, syntime, roottime) -- 初始化
     if self.Inited then
         return
@@ -486,6 +490,7 @@ function MainDB:Init(namespace, syntime, roottime) -- 初始化
     self.Syn.roottime = roottime or 1 -- 默认每1秒只同步一个 根 注意 根数量 * 根更新时间 要小于同步时间
 end
 function MainDB:UnInit(e) -- 卸载
+    self.batches = {}
     self.Inited = false
     dbhandles[self.namespace] = nil
     self.namespace = nil
@@ -660,6 +665,17 @@ function MainDB:Handle(id, cmd, data, data2, data3, ...) -- 处理收到的数�
                     })
                 end
             end
+        end
+        return
+    elseif cmd == "SetBatch" then
+        if tostring(id) == tostring(sid) or not self.data[data] then return end
+        local entries = decode(data3)
+        if Batch.Apply(self.data[data], entries) then
+            for _, entry in ipairs(entries) do
+                self:Notice("MainDBSet", {namespace = self.namespace, root = data,
+                    key = entry.key, value = entry.value, batched = true})
+            end
+            self:Notice("MainDBBatch", {namespace = self.namespace, root = data, entries = entries})
         end
         return
     elseif cmd == "Set" then -- 通知对方有数据修改
@@ -850,6 +866,7 @@ function MainDB:InitRoot(root, noSyn) -- 创建根 参数是是否自动同步
 end
 
 function MainDB:UnInitRoot(root) -- 销毁根 不再进行相关操作  一般不需要
+    self.batches[root] = nil
     self.data[root] = nil
 end
 
@@ -860,15 +877,29 @@ end
 function MainDB:GetRoot(root) -- 获取整个根的数据 可以用于遍历 但是请勿修改！！！
     return self.data[root]
 end
+MainDB.BeginBatch = Batch.Begin
+MainDB.EndBatch = Batch.Finish
+
+function MainDB:FlushBatch(root, entries)
+    if not self.noSyn[root] or self.noSyn[root] <= 1 then
+        Batch.Send(self, root, entries, encode)
+    end
+    self:Notice("MainDBBatch", {namespace = self.namespace, root = root, entries = entries})
+end
+
 function MainDB:Set(root, key, value) -- 设置数据 并通知其他世界更新 
     if self.data[root] then
         self.data[root][key] = value
+        local batch = self.batches[root]
+        if batch then Batch.Record(batch, key, value) end
         self:Notice("MainDBSet", {
             namespace = self.namespace,
             root = root,
             key = key,
-            value = value
+            value = value,
+            batched = batch and true
         })
+        if batch then return true end
         if self.noSyn[root] and self.noSyn[root] > 1 then -- 不进行手动同步
             return true
         end

@@ -31,6 +31,8 @@ WeGame平台: 穹の空 模组ID：workshop-2199027653598519351
 如确实需要加密以保护其他文件,请额外放置一份 后缀为.lua.src 或者.txt的源代码。
 ]] --[[专属交互
 ]] --
+local FindOnlinePlayer = require("utils/soraonlineplayer")
+
 local com = Class(function(self, inst)
     self.inst = inst
     self.userid = nil
@@ -49,7 +51,7 @@ function com:Tele(doer)
         return false,"这个精灵球还未绑定"
     end
     
-    local player = UserToPlayer(self.userid)
+    local player = FindOnlinePlayer(self.userid)
     if not player then 
         return false,"这个精灵球里的宝可梦不在家"
     end

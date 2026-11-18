@@ -1,6 +1,8 @@
 if not CreateClientDB then
     return
 end
+local FindOnlinePlayer = require("utils/soraonlineplayer")
+
 local function encode(data)
     local r, str = pcall(function()
         return json.encode(SoraDBProtocol.Pack(data))
@@ -80,12 +82,18 @@ temp.clientfn = function(ns, db, userid)
     SoraClientDB.InfoDB = InfoDB
 end
 
+local function UpdateSeedOwners(world)
+    for _, checkOwner in pairs(world.soraSeedOwnerChecks) do
+        checkOwner()
+    end
+end
+
 local temp = CreateClientDBTemple("seed", 300, 1)
 temp:InitRoot("seeds")
 
 temp.serverfn = function(ns, db, userid)
     db:ListenForEvent("GetSeeds", function(id, data, event)
-        local player = UserToPlayer(id)
+        local player = FindOnlinePlayer(id)
         if player and data and data.name then
             local staff = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
             if staff and staff.components.soraseedcontainer then
@@ -94,7 +102,7 @@ temp.serverfn = function(ns, db, userid)
         end
     end)
     db:ListenForEvent("CollectAllSeeds", function(id, data, event)
-        local player = UserToPlayer(id)
+        local player = FindOnlinePlayer(id)
         if player then
             local staff = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
             if staff and staff.components.soraseedcontainer then
@@ -183,7 +191,7 @@ temp.serverfn = function(ns, db, userid)
         return maindb:GetRoot(root)
     end
 
-    db.UpdateOwnerKeyTask = db.inst:DoPeriodicTask(3, function()
+    local function CheckOwner()
         local newkey = GetOwnerKey()
         if oldOwnerKey == newkey then
             return
@@ -192,12 +200,25 @@ temp.serverfn = function(ns, db, userid)
         local str = encode(newt)
         db:Send(nil, "SyncReply", selfroot, hash(str), str)
         oldOwnerKey = newkey
-    end)
+    end
     local changefn = function(i, data)
         -- print("changefn", data.root, data.key)
+        if data.namespace ~= maindb.namespace or data.batched then return end
         if data.root == root then
             local o = GetOwnerKey()
-            if data.key then
+            if data.entries then
+                local visible = {}
+                for _, entry in ipairs(data.entries) do
+                    if o ~= "" and entry.key == o then
+                        local str = encode(entry.value)
+                        db:Send(nil, "SyncReply", selfroot, hash(str), str)
+                        return
+                    elseif o == "" and not entry.key:match("^[ST]_") then
+                        table.insert(visible, entry)
+                    end
+                end
+                db:FlushBatch(selfroot, visible)
+            elseif data.key then
                 if data.key:match("^S_") or data.key:match("^T_") then
                     if o == data.key then
                         local str = encode(data.value)
@@ -231,11 +252,42 @@ temp.serverfn = function(ns, db, userid)
     if db.inst and maindb.inst then -- 如果双方都有实体 就监听event
         db.inst:ListenForEvent("MainDBRootSync", changefn, maindb.inst)
         db.inst:ListenForEvent("MainDBSet", changefn, maindb.inst)
+        db.inst:ListenForEvent("MainDBBatch", changefn, maindb.inst)
     end
     local bind = db:BindRootFn(selfroot, getfn, setfn, getrootfn)
+    bind.batchDB, bind.batchRoot = maindb, root
+    local world = db.inst
+    local initialSyncTask
+    if mode == 1 then
+        initialSyncTask = world:DoTaskInTime(3, function()
+            initialSyncTask = nil
+            CheckOwner()
+        end)
+    elseif mode == 2 or mode == 3 then
+        if not world.soraSeedOwnerChecks then
+            world.soraSeedOwnerChecks = {}
+            world.soraSeedOwnerTask = world:DoPeriodicTask(3, UpdateSeedOwners)
+        end
+        world.soraSeedOwnerChecks[userid] = CheckOwner
+    end
+
     bind.Remove = function()
+        if initialSyncTask then
+            initialSyncTask:Cancel()
+            initialSyncTask = nil
+        end
+        local checks = world.soraSeedOwnerChecks
+        if checks and checks[userid] == CheckOwner then
+            checks[userid] = nil
+            if not next(checks) then
+                world.soraSeedOwnerTask:Cancel()
+                world.soraSeedOwnerTask = nil
+                world.soraSeedOwnerChecks = nil
+            end
+        end
         db.inst:RemoveEventCallback("MainDBRootSync", changefn, maindb.inst)
         db.inst:RemoveEventCallback("MainDBSet", changefn, maindb.inst)
+        db.inst:RemoveEventCallback("MainDBBatch", changefn, maindb.inst)
     end
 
     -- db:BindMainDB("seeds", SeedDB, "seeds")
@@ -252,7 +304,7 @@ temp:InitRoot("data")
 temp.serverfn = function(ns, db, userid)
 
     db:ListenForEvent("SelectBook", function(id, data, event, ent)
-        local player = UserToPlayer(id)
+        local player = FindOnlinePlayer(id)
         if player and data and data.id and type(ent) == "table" and ent:IsValid() and ent.components.spellbook then
             ent.components.spellbook:SelectSpell(data.id)
         end
@@ -263,7 +315,7 @@ temp.serverfn = function(ns, db, userid)
             return
         end
         local cmd = data.cmd
-        local doer = UserToPlayer(id)
+        local doer = FindOnlinePlayer(id)
         -- print(doer.userid,cmd,data.pass or "0")
         if not (doer and ent and ent.components.soracontainlock) then
             return
@@ -295,7 +347,7 @@ temp.serverfn = function(ns, db, userid)
             return
         end
         local cmd = data.cmd
-        local doer = UserToPlayer(id)
+        local doer = FindOnlinePlayer(id)
         -- print(doer.userid,cmd,data.pass or "0")
         if not (doer) then
             return
@@ -351,7 +403,7 @@ temp.serverfn = function(ns, db, userid)
             return
         end
         local cmd = data.cmd
-        local doer = UserToPlayer(id)
+        local doer = FindOnlinePlayer(id)
         -- print(doer.userid,cmd,data.pass or "0")
         if not (doer) then
             return
@@ -383,7 +435,7 @@ temp.serverfn = function(ns, db, userid)
             return
         end
         local cmd = data.cmd
-        local doer = UserToPlayer(id)
+        local doer = FindOnlinePlayer(id)
         if not (doer) then
             return
         end

@@ -657,11 +657,17 @@ local function Onfull3Load(inst, data)
     if data.superdata then
         inst.superdata = data.superdata
     end
-    -- inst.components.inspectable:SetDescription(inst.components.sorapacker.item.name)
+    if type(data.description) == "string" then
+        inst.components.inspectable:SetDescription(data.description)
+    end
 end
 local function Onfull3Save(inst, data)
     data.sorapacklevel = inst.sorapacklevel
     data.superdata = inst.superdata
+    local description = inst.components.inspectable.description
+    if type(description) == "string" then
+        data.description = description
+    end
 end
 local function full3fn()
     local inst = CreateEntity()

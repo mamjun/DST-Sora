@@ -118,13 +118,22 @@ function c:GetDB()
     end
 end
 
-function c:AddSeed(name, num)
-    local db = self:GetDB()
+local function AddSeedAmount(db, name, num)
     local old = db:Get("seeds", name, 0)
     old = math.max(old + num, 0)
     db:Set("seeds", name, old)
     return old
 end
+function c:AddSeed(name, num)
+    return AddSeedAmount(self:GetDB(), name, num)
+end
+
+local function StoreSeeds(db, counts)
+    for name, num in pairs(counts) do
+        AddSeedAmount(db, name, num)
+    end
+end
+
 function c:GetAllName()
     return allseeds
 end
@@ -177,10 +186,9 @@ local function TestSeeds(inst)
     return inst and inst.prefab and allseeds[inst.prefab]
     -- body
 end
-function c:HandleCollectAllSeeds(player)
-    local db = self:GetDB()
+function c:HandleCollectAllSeeds(player, harvested)
+    local all = harvested or {}
     if player and player.components.health and not player:HasTag("playerghost") then
-        local all = {}
         local ents = player.components.inventory:FindItems(TestSeeds)
         for k, v in pairs(ents or {}) do
             if v and v:IsValid() then
@@ -213,9 +221,13 @@ function c:HandleCollectAllSeeds(player)
             end
         end
 
-        for k, v in pairs(all) do
-            self:AddSeed(k, v)
-        end
+    end
+    if next(all) then
+        local db = self:GetDB()
+        assert(db:BeginBatch("seeds"))
+        local ok, err = pcall(StoreSeeds, db, all)
+        db:EndBatch("seeds")
+        if not ok then error(err) end
     end
 end
 

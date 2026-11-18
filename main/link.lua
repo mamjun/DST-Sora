@@ -541,6 +541,10 @@ SoraGiftCode = {
                     item.sorapickhatskip = GetTime()
                     item.lastpos = item:GetPosition()
                     item.lastposfn = item:DoPeriodicTask(0.1, function()
+                        if not inst:IsValid() then
+                            item:Remove()
+                            return
+                        end
                         local pos = item.lastpos - item:GetPosition()
                         if pos and pos:LengthSq() < 0.01 then -- 不动了就停
                             item.lastposfn:Cancel()

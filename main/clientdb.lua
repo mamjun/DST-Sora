@@ -103,7 +103,9 @@ end
 local srpc = MOD_RPC[dbnamespace]["ClientDB"]
 local crpc = CLIENT_MOD_RPC[dbnamespace]["ClientDB"]
 
+local Batch = require("utils/soradbbatch")
 local ClientDB = Class(function(self)
+    self.batches = {}
     self.namespace = nil
     self.rawnamespace = nil
     self.Inited = false
@@ -136,6 +138,8 @@ local ClientDB = Class(function(self)
     }
 end)
 -- 基础模块
+
+ClientDB.ProtocolVersion = SoraDBProtocol.version
 
 function ClientDB:Init(namespace, userid, syntime, roottime, isserver) -- 初始化
     if self.Inited then
@@ -178,6 +182,7 @@ function ClientDB:UnInit(e) -- 卸载 基本不调用
         end
         self.player = nil
     end
+    self.batches = {}
     self.rawnamespace = nil
     self.namespace = nil
     self.Inited = false
@@ -350,6 +355,16 @@ function ClientDB:Handle(id, cmd, data, data2, data3,...) -- 处理收到的数�
                         value = nil
                     })
                 end
+            end
+        end
+        return
+    elseif cmd == "SetBatch" then
+        if self.IsServer or not self.data[data] then return end
+        local entries = decode(data3)
+        if Batch.Apply(self.data[data], entries) then
+            for _, entry in ipairs(entries) do
+                self:Notice("ClientDBSet", {namespace = self.namespace, root = data,
+                    key = entry.key, value = entry.value})
             end
         end
         return
@@ -566,8 +581,11 @@ function ClientDB:BindMainDB(selfroot, maindb, root)
     end
     local changefn = function(i, data)
         --print("changefn", data.root, data.key)
+        if data.namespace ~= maindb.namespace or data.batched then return end
         if data.root == root then
-            if data.key then
+            if data.entries then
+                self:FlushBatch(selfroot, data.entries)
+            elseif data.key ~= nil then
                 self:Send(nil, "Set", selfroot, data.key, encode(data.value))
             else
                 local str = encode(data.value)
@@ -578,15 +596,19 @@ function ClientDB:BindMainDB(selfroot, maindb, root)
     if self.inst and maindb.inst then -- 如果双方都有实体 就监听event
         self.inst:ListenForEvent("MainDBRootSync", changefn, maindb.inst)
         self.inst:ListenForEvent("MainDBSet", changefn, maindb.inst)
+        self.inst:ListenForEvent("MainDBBatch", changefn, maindb.inst)
     end
     local bind = self:BindRootFn(selfroot, getfn, setfn, getrootfn)
+    bind.batchDB, bind.batchRoot = maindb, root
     bind.Remove = function()
         self.inst:RemoveEventCallback("MainDBRootSync", changefn, maindb.inst)
         self.inst:RemoveEventCallback("MainDBSet", changefn, maindb.inst)
+        self.inst:RemoveEventCallback("MainDBBatch", changefn, maindb.inst)
     end
 end
 
 function ClientDB:UnInitRoot(root) -- 销毁根 不再进行相关操作  一般不需要
+    self.batches[root] = nil
     self.data[root] = nil
 end
 
@@ -603,6 +625,30 @@ function ClientDB:GetRoot(root) -- 获取整个根的数据 可以用于遍历 �
     end
     return self.data[root]
 end
+function ClientDB:BeginBatch(root)
+    if not self.IsServer then return false, "Not Server" end
+    local bind = self.rootbind[root]
+    if bind and bind.Set then
+        if not bind.batchDB then return false, "Binding has no batch writer" end
+        return bind.batchDB:BeginBatch(bind.batchRoot)
+    end
+    return Batch.Begin(self, root)
+end
+
+function ClientDB:EndBatch(root)
+    if not self.IsServer then return false, "Not Server" end
+    local bind = self.rootbind[root]
+    if bind and bind.Set then
+        if not bind.batchDB then return false, "Binding has no batch writer" end
+        return bind.batchDB:EndBatch(bind.batchRoot)
+    end
+    return Batch.Finish(self, root)
+end
+
+function ClientDB:FlushBatch(root, entries)
+    Batch.Send(self, root, entries, encode)
+end
+
 function ClientDB:Set(root, key, value) -- 设置数据 并通知其他世界更新 
     if not self.IsServer then
         return false, "Not Server"
@@ -613,6 +659,10 @@ function ClientDB:Set(root, key, value) -- 设置数据 并通知其他世界更
     if self.data[root] then
         self.data[root][key] = value
         if self.noSyn[root] and self.noSyn[root] > 1 then -- 不进行手动同步
+            return true
+        end
+        if self.batches[root] then
+            Batch.Record(self.batches[root], key, value)
             return true
         end
         self:Send(nil, "Set", root, key, encode(value)) -- 通知所有人修改

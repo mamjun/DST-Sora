@@ -476,7 +476,6 @@ local function OnPickFn(inst, doer, pos)
     local IsDoerNear = isNear(doer, pos, range) 
     local DoerTileCenter = GetTileCenter(inst, doer:GetPosition())
     local rr = DoBig(TryPickFn, inst, doer, pos,IsDoerNear and DoerTileCenter or nil)
-    inst.components.soraseedcontainer:HandleCollectAllSeeds(doer)
     if not sora2plantseed then 
         local allseeds = inst.components.soraseedcontainer:GetAllName()
         sora2plantseed = {}
@@ -494,14 +493,12 @@ local function OnPickFn(inst, doer, pos)
         end
     end
 
+    inst.components.soraseedcontainer:HandleCollectAllSeeds(doer, seeditems)
     local pro = makepacker(inst, doer, items)
     if pro then
         pro.components.named:SetName("打包的作物")
         pro.components.inspectable:SetDescription("这是打包的作物")
         doer.components.inventory:GiveItem(pro, nil, inst:GetPosition())
-    end
-    for k, v in pairs(seeditems) do
-        inst.components.soraseedcontainer:AddSeed(k, v)
     end
 end
 local allseeds = nil
